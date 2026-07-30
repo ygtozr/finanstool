@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finans Grafiği</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, #263b62 0, var(--bg) 45%); }
+    main { width:min(920px,100%); background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
+    h1 { margin:0; font-size:clamp(1.5rem,4vw,2.15rem); }
+    .intro { margin:6px 0 25px; color:var(--muted); }
+    form { display:flex; gap:10px; margin-bottom:22px; }
+    input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:uppercase; }
+    input:focus { outline:3px solid #52d5b166; border-color:var(--accent); }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    button { border:0; border-radius:10px; padding:12px 20px; background:var(--accent); color:#062019; font:600 16px inherit; cursor:pointer; }
+    button:disabled { opacity:.65; cursor:wait; }
+    .meta { display:flex; flex-wrap:wrap; gap:10px 22px; min-height:28px; margin:0 0 14px; color:var(--muted); }
+    .price { color:var(--text); font-weight:700; }
+    .error { color:var(--danger); }
+    .chart-wrap { position:relative; height:clamp(290px,55vw,460px); }
+    .hint { margin:18px 0 0; color:var(--muted); font-size:.9rem; }
+    .periods { display:flex; flex-wrap:wrap; gap:8px; margin-top:26px; padding-top:22px; border-top:1px solid var(--line); }
+    .periods button { padding:9px 13px; color:var(--text); background:#26344d; font-size:.9rem; }
+    .periods button.active { background:var(--accent); color:#062019; }
+    .date-picker { display:none; width:100%; margin-top:10px; }
+    .date-picker.visible { display:block; }
+    .date-picker input { width:100%; }
+    code { color:#bcecdf; }
+    @media (max-width:500px) { form { flex-direction:column; } button { width:100%; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Hisse Fiyat Grafiği</h1>
+    <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
+    <form id="symbolForm">
+      <label class="sr-only" for="symbol">Finans kodu</label>
+      <input id="symbol" name="symbol" value="AAPL" maxlength="20" autocomplete="off" placeholder="Örn. AAPL veya THYAO.IS" required>
+      <button id="submitButton" type="submit">Grafiği getir</button>
+    </form>
+    <div id="meta" class="meta" aria-live="polite"></div>
+    <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img"></canvas></div>
+    <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
+    <section class="periods" aria-label="Grafik süresi">
+      <button type="button" data-range="5d">1 hafta</button>
+      <button type="button" data-range="1mo">1 ay</button>
+      <button type="button" data-range="3mo">3 ay</button>
+      <button type="button" data-range="6mo" class="active">6 ay</button>
+      <button type="button" data-range="1y">1 yıl</button>
+      <button type="button" data-range="5y">5 yıl</button>
+      <button id="customPeriod" type="button">Şu tarihten itibaren</button>
+      <div id="datePicker" class="date-picker">
+        <label for="startDate">Başlangıç tarihi</label>
+        <input id="startDate" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="GG.AA.YYYY  (ör. 15.01.2024)" aria-describedby="dateHelp dateError">
+        <div id="dateHelp" class="hint">Tarihi gün, ay ve yıl sırasıyla yazın.</div>
+        <div id="dateError" class="error" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    let chart;
+    const form = document.getElementById('symbolForm');
+    const symbolInput = document.getElementById('symbol');
+    const button = document.getElementById('submitButton');
+    const meta = document.getElementById('meta');
+    const periodButtons = [...document.querySelectorAll('[data-range]')];
+    const customPeriod = document.getElementById('customPeriod');
+    const datePicker = document.getElementById('datePicker');
+    const startDate = document.getElementById('startDate');
+    const dateError = document.getElementById('dateError');
+    let selectedRange = '6mo';
+    let selectedStart = '';
+
+    function money(value, currency) {
+      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: currency || 'USD', maximumFractionDigits: 2 }).format(value);
+    }
+
+    function renderChart(labels, prices, name, currency) {
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById('priceChart'), {
+        type: 'line',
+        data: { labels, datasets: [{ label: `${name} kapanış fiyatı (${currency || ''})`, data: prices, borderColor: '#52d5b1', backgroundColor: 'rgba(82,213,177,.14)', fill: true, pointRadius: 0, pointHoverRadius: 5, tension: .18, borderWidth: 2 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => money(c.parsed.y, currency) } } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#aebbd0', maxTicksLimit: 7 } },
+            y: { grid: { color: '#2b3a55' }, ticks: { color: '#aebbd0', callback: v => money(v, currency) } }
+          }
+        }
+      });
+    }
+
+    function setActivePeriod(button) {
+      periodButtons.forEach(item => item.classList.toggle('active', item === button));
+      customPeriod.classList.remove('active');
+    }
+
+    function changeLabel() {
+      if (selectedStart) return 'Seçilen tarihten bu yana değişim: ';
+      const labels = { '5d': '1 haftalık değişim: ', '1mo': '1 aylık değişim: ', '3mo': '3 aylık değişim: ', '6mo': '6 aylık değişim: ', '1y': '1 yıllık değişim: ', '5y': '5 yıllık değişim: ' };
+      return labels[selectedRange] || 'Dönem değişimi: ';
+    }
+
+    function tidyDate(value) {
+      const digits = value.replace(/\D/g, '').slice(0, 8);
+      if (digits.length < 3) return digits;
+      if (digits.length < 5) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+      return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
+    }
+
+    function applyStartDate() {
+      const match = startDate.value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+      if (!match) {
+        dateError.textContent = 'Tarihi GG.AA.YYYY biçiminde girin.';
+        return;
+      }
+      const iso = `${match[3]}-${match[2]}-${match[1]}`;
+      const date = new Date(`${iso}T00:00:00`);
+      if (date.getFullYear() !== Number(match[3]) || date.getMonth() + 1 !== Number(match[2]) || date.getDate() !== Number(match[1]) || date > new Date()) {
+        dateError.textContent = 'Geçerli ve geçmişte bir tarih girin.';
+        return;
+      }
+      dateError.textContent = '';
+      selectedStart = iso;
+      periodButtons.forEach(item => item.classList.remove('active'));
+      customPeriod.classList.add('active');
+      customPeriod.textContent = `${startDate.value} tarihinden itibaren`;
+      datePicker.classList.remove('visible');
+      loadPrice(symbolInput.value.trim().toUpperCase());
+    }
+
+    async function loadPrice(symbol) {
+      button.disabled = true;
+      button.textContent = 'Yükleniyor…';
+      meta.textContent = '';
+      try {
+        const query = selectedStart
+          ? `period1=${Math.floor(new Date(`${selectedStart}T00:00:00Z`).getTime() / 1000)}&period2=${Math.floor(Date.now() / 1000)}&interval=1d`
+          : `range=${encodeURIComponent(selectedRange)}&interval=1d`;
+        const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?${query}`;
+        const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          const message = await response.text();
+          throw new Error(message || 'Veri sağlayıcısına ulaşılamadı.');
+        }
+        const payload = await response.json();
+        const result = payload.chart?.result?.[0];
+        const closes = result?.indicators?.quote?.[0]?.close;
+        if (!result || !closes) throw new Error('Bu finans kodu için fiyat verisi bulunamadı.');
+        const points = result.timestamp.map((time, i) => ({ time, close: closes[i] })).filter(p => Number.isFinite(p.close));
+        if (!points.length) throw new Error('Bu finans kodu için kullanılabilir fiyat verisi bulunamadı.');
+        const labels = points.map(p => new Intl.DateTimeFormat('tr-TR', { day:'2-digit', month:'short', year:'numeric' }).format(new Date(p.time * 1000)));
+        const prices = points.map(p => p.close);
+        const info = result.meta || {};
+        const name = info.longName || info.shortName || symbol;
+        const currency = info.currency || 'USD';
+        const last = prices.at(-1);
+        const change = ((last / prices[0]) - 1) * 100;
+        meta.replaceChildren();
+        const namePart = document.createElement('span');
+        const nameStrong = document.createElement('strong');
+        nameStrong.textContent = name;
+        namePart.append(nameStrong);
+        const pricePart = document.createElement('span');
+        pricePart.className = 'price';
+        pricePart.textContent = `Son kapanış: ${money(last, currency)}`;
+        const changePart = document.createElement('span');
+        const changeStrong = document.createElement('strong');
+        changeStrong.className = change < 0 ? 'error' : '';
+        changeStrong.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+        changePart.append(changeLabel(), changeStrong);
+        meta.append(namePart, pricePart, changePart);
+        renderChart(labels, prices, name, currency);
+      } catch (error) {
+        meta.innerHTML = `<span class="error">${error.message} Kodu kontrol edip tekrar deneyin.</span>`;
+        if (chart) { chart.destroy(); chart = null; }
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Grafiği getir';
+      }
+    }
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      loadPrice(symbolInput.value.trim().toUpperCase());
+    });
+    periodButtons.forEach(periodButton => periodButton.addEventListener('click', () => {
+      selectedRange = periodButton.dataset.range;
+      selectedStart = '';
+      datePicker.classList.remove('visible');
+      customPeriod.textContent = 'Şu tarihten itibaren';
+      dateError.textContent = '';
+      setActivePeriod(periodButton);
+      loadPrice(symbolInput.value.trim().toUpperCase());
+    }));
+    customPeriod.addEventListener('click', () => {
+      datePicker.classList.add('visible');
+      startDate.focus();
+    });
+    startDate.addEventListener('input', () => { startDate.value = tidyDate(startDate.value); });
+    startDate.addEventListener('change', applyStartDate);
+    startDate.addEventListener('keydown', event => { if (event.key === 'Enter') applyStartDate(); });
+    loadPrice('AAPL');
+  </script>
+</body>
+</html>
