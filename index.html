@@ -168,12 +168,23 @@
           ? `period1=${Math.floor(new Date(`${selectedStart}T00:00:00Z`).getTime() / 1000)}&period2=${Math.floor(Date.now() / 1000)}&interval=1d`
           : `range=${encodeURIComponent(selectedRange)}&interval=1d`;
         const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?${query}`;
-        const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          const message = await response.text();
-          throw new Error(message || 'Veri sağlayıcısına ulaşılamadı.');
+        const sources = [
+          yahooUrl,
+          `https://corsproxy.io/?url=${encodeURIComponent(yahooUrl)}`,
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`
+        ];
+        let response;
+        let lastError;
+        for (const source of sources) {
+          try {
+            const attempt = await fetch(source);
+            if (attempt.ok) { response = attempt; break; }
+            lastError = new Error(`Veri sağlayıcısı ${attempt.status} hatası verdi.`);
+          } catch (error) {
+            lastError = error;
+          }
         }
+        if (!response) throw new Error(lastError?.message || 'Veri sağlayıcısına ulaşılamadı.');
         const payload = await response.json();
         const result = payload.chart?.result?.[0];
         const closes = result?.indicators?.quote?.[0]?.close;
