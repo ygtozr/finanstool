@@ -24,6 +24,8 @@
     .search-field { display:flex; flex:1; min-width:0; gap:8px; }
     .favorite-toggle { flex:0 0 46px; width:46px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.55rem; }
     .favorite-toggle.is-favorite { background:#5b4817; border-color:#d7aa38; }
+    .search-field { position:relative; }
+    .search-suggestions {display:none;position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:54px;margin:0;padding:5px;list-style:none;border:1px solid var(--line);border-radius:10px;background:#101827;box-shadow:0 12px 25px #0008}.search-suggestions.visible{display:grid;gap:3px}.suggestion{width:100%;padding:8px 10px;text-align:left;color:var(--text);background:transparent;border-radius:7px;font-size:.88rem}.suggestion:hover{background:#26344d}
     input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:uppercase; }
     input:focus { outline:3px solid #52d5b166; border-color:var(--accent); }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
@@ -52,7 +54,7 @@
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
-      <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button></div>
+      <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
     <div id="meta" class="meta" aria-live="polite"></div>
@@ -89,6 +91,7 @@
     const favoritesList = document.getElementById('favoritesList');
     const favoritesEmpty = document.getElementById('favoritesEmpty');
     const favoritesKey = 'finans-grafigi-favorites-v1';
+    const suggestions = document.getElementById('suggestions'); let searchTimer;
     let currentName = '';
     let favorites = (() => { try { const saved = JSON.parse(localStorage.getItem(favoritesKey)); return Array.isArray(saved) ? saved.filter(item => item && item.symbol).map(item => ({symbol:item.symbol.toUpperCase(), name:item.name || item.symbol.toUpperCase()})) : []; } catch { return []; } })();
     const saveFavorites = () => localStorage.setItem(favoritesKey, JSON.stringify(favorites));
@@ -214,7 +217,8 @@
       event.preventDefault();
       loadPrice(symbolInput.value.trim().toUpperCase());
     });
-    symbolInput.addEventListener('input', updateFavoriteButton);
+    function showSuggestions(items){suggestions.replaceChildren();items.slice(0,5).forEach(item=>{const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='suggestion';b.textContent=item.symbol+' · '+item.name;b.addEventListener('click',()=>{symbolInput.value=item.symbol;suggestions.classList.remove('visible');updateFavoriteButton();loadPrice(item.symbol)});li.append(b);suggestions.append(li)});suggestions.classList.toggle('visible',items.length>0)}
+    symbolInput.addEventListener('input',()=>{updateFavoriteButton();clearTimeout(searchTimer);const q=symbolInput.value.trim();if(q.length<2)return showSuggestions([]);searchTimer=setTimeout(async()=>{try{const r=await fetch('/api/search?q='+encodeURIComponent(q));const d=await r.json();showSuggestions(d.quotes||[])}catch{showSuggestions([])}},250)});
     favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol)) favorites=favorites.filter(item=>item.symbol!==symbol); else favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); });
     periodButtons.forEach(periodButton => periodButton.addEventListener('click', () => {
       selectedRange = periodButton.dataset.range;
