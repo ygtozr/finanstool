@@ -9,10 +9,21 @@
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
     * { box-sizing:border-box; }
     body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, #263b62 0, var(--bg) 45%); }
-    main { width:min(920px,100%); background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
+    main { width:min(1120px,100%); background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
+    .app-layout { display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:24px; align-items:start; }
+    .favorites-panel { border-left:1px solid var(--line); padding-left:24px; }
+    .favorites-panel h2 { margin:0 0 10px; font-size:1.15rem; }
+    .favorites-note { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
+    .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+    .favorite-row { display:flex; gap:8px; align-items:center; }
+    .favorite-symbol { flex:1; min-width:0; padding:9px 10px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:8px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .favorite-remove { width:36px; height:36px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.25rem; }
     h1 { margin:0; font-size:clamp(1.5rem,4vw,2.15rem); }
     .intro { margin:6px 0 25px; color:var(--muted); }
     form { display:flex; gap:10px; margin-bottom:22px; }
+    .search-field { display:flex; flex:1; min-width:0; gap:8px; }
+    .favorite-toggle { flex:0 0 46px; width:46px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.55rem; }
+    .favorite-toggle.is-favorite { background:#5b4817; border-color:#d7aa38; }
     input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:uppercase; }
     input:focus { outline:3px solid #52d5b166; border-color:var(--accent); }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
@@ -30,16 +41,18 @@
     .date-picker.visible { display:block; }
     .date-picker input { width:100%; }
     code { color:#bcecdf; }
-    @media (max-width:500px) { form { flex-direction:column; } button { width:100%; } }
+    @media (max-width:760px) { .app-layout { grid-template-columns:1fr; } .favorites-panel { border-left:0; border-top:1px solid var(--line); padding:20px 0 0; } }
+    @media (max-width:500px) { form { flex-wrap:wrap; } .search-field { flex-basis:100%; } #submitButton { width:100%; } }
   </style>
 </head>
 <body>
   <main>
+    <div class="app-layout"><section class="chart-panel">
     <h1>Hisse Fiyat Grafiği</h1>
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
-    <form id="symbolForm">
-      <label class="sr-only" for="symbol">Finans kodu</label>
-      <input id="symbol" name="symbol" value="AAPL" maxlength="20" autocomplete="off" placeholder="Örn. AAPL veya THYAO.IS" required>
+    <form id="symbolForm" role="search">
+      <label class="sr-only" for="symbol">Hisse ara</label>
+      <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
     <div id="meta" class="meta" aria-live="polite"></div>
@@ -59,7 +72,7 @@
         <div id="dateHelp" class="hint">Tarihi gün, ay ve yıl sırasıyla yazın.</div>
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
-    </section>
+    </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><h2>Favoriler</h2><p class="favorites-note">Yıldıza tıklayarak hisse ekleyin. Favoriler bu cihazda saklanır.</p><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
   </main>
   <script>
     let chart;
@@ -72,6 +85,17 @@
     const datePicker = document.getElementById('datePicker');
     const startDate = document.getElementById('startDate');
     const dateError = document.getElementById('dateError');
+    const favoriteButton = document.getElementById('favoriteButton');
+    const favoritesList = document.getElementById('favoritesList');
+    const favoritesEmpty = document.getElementById('favoritesEmpty');
+    const favoritesKey = 'finans-grafigi-favorites-v1';
+    let currentName = '';
+    let favorites = (() => { try { const saved = JSON.parse(localStorage.getItem(favoritesKey)); return Array.isArray(saved) ? saved.filter(item => item && item.symbol).map(item => ({symbol:item.symbol.toUpperCase(), name:item.name || item.symbol.toUpperCase()})) : []; } catch { return []; } })();
+    const saveFavorites = () => localStorage.setItem(favoritesKey, JSON.stringify(favorites));
+    const currentSymbol = () => symbolInput.value.trim().toUpperCase();
+    const isFavorite = symbol => favorites.some(item => item.symbol === symbol);
+    function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
+    function renderFavorites() { favoritesList.replaceChildren(); favoritesEmpty.hidden = favorites.length > 0; favorites.forEach(item => { const row=document.createElement('li'); row.className='favorite-row'; const open=document.createElement('button'); open.type='button'; open.className='favorite-symbol'; open.textContent=item.name !== item.symbol ? item.symbol+' · '+item.name : item.symbol; open.addEventListener('click',()=>{symbolInput.value=item.symbol; updateFavoriteButton(); loadPrice(item.symbol);}); const remove=document.createElement('button'); remove.type='button'; remove.className='favorite-remove'; remove.textContent='★'; remove.title=item.symbol+' favorilerden çıkar'; remove.addEventListener('click',()=>{favorites=favorites.filter(f=>f.symbol!==item.symbol);saveFavorites();renderFavorites();updateFavoriteButton();}); row.append(open,remove); favoritesList.append(row); }); }
     let selectedRange = '6mo';
     let selectedStart = '';
 
@@ -160,6 +184,10 @@
         const prices = points.map(p => p.close);
         const info = result.meta || {};
         const name = info.longName || info.shortName || symbol;
+        currentName = name;
+        const favorite = favorites.find(item => item.symbol === symbol);
+        if (favorite && favorite.name !== name) { favorite.name=name; saveFavorites(); renderFavorites(); }
+        updateFavoriteButton();
         const currency = info.currency || 'USD';
         const last = prices.at(-1);
         const change = ((last / prices[0]) - 1) * 100;
@@ -191,6 +219,8 @@
       event.preventDefault();
       loadPrice(symbolInput.value.trim().toUpperCase());
     });
+    symbolInput.addEventListener('input', updateFavoriteButton);
+    favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol)) favorites=favorites.filter(item=>item.symbol!==symbol); else favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); });
     periodButtons.forEach(periodButton => periodButton.addEventListener('click', () => {
       selectedRange = periodButton.dataset.range;
       selectedStart = '';
@@ -207,6 +237,8 @@
     startDate.addEventListener('input', () => { startDate.value = tidyDate(startDate.value); });
     startDate.addEventListener('change', applyStartDate);
     startDate.addEventListener('keydown', event => { if (event.key === 'Enter') applyStartDate(); });
+    renderFavorites();
+    updateFavoriteButton();
     loadPrice('AAPL');
   </script>
 </body>
