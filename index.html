@@ -198,7 +198,7 @@
         const query = selectedStart
           ? `period1=${Math.floor(new Date(`${selectedStart}T00:00:00Z`).getTime() / 1000)}&period2=${Math.floor(Date.now() / 1000)}&interval=1d`
           : `range=${encodeURIComponent(selectedRange)}&interval=1d`;
-        const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query));
+        const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache: 'no-store' });
         if (!response.ok) throw new Error('Veri sağlayıcısına ulaşılamadı.');
         const payload = await response.json();
         const result = payload.chart?.result?.[0];
@@ -253,7 +253,7 @@
       if (!symbol || !lastPrices.length) return;
       try {
         const query = selectedStart ? 'period1=' + Math.floor(new Date(selectedStart + 'T00:00:00Z').getTime()/1000) + '&period2=' + Math.floor(Date.now()/1000) + '&interval=1d' : 'range=' + selectedRange + '&interval=1d';
-        const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query));
+        const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache: 'no-store' });
         const payload = await response.json();
         if (!response.ok) throw new Error(payload.error || 'Veri alınamadı');
         const result = payload.chart && payload.chart.result && payload.chart.result[0];
