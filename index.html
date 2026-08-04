@@ -58,7 +58,7 @@
       <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
-    <div class="toolbar"><button id="compareButton" type="button">📈 Karşılaştır</button><label><input id="rsiToggle" type="checkbox"> RSI göster</label></div><div id="meta" class="meta" aria-live="polite"></div>
+    <div class="toolbar"><button id="compareButton" type="button">📈 Karşılaştır</button><label><input id="ma20" type="checkbox"> MA20</label><label><input id="ma50" type="checkbox"> MA50</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img"></canvas></div>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     <section class="periods" aria-label="Grafik süresi">
@@ -111,7 +111,7 @@
       if (chart) chart.destroy();
       chart = new Chart(document.getElementById('priceChart'), {
         type: 'line',
-        data: { labels, datasets: [{ label: `${name} kapanış fiyatı (${currency || ''})`, data: prices, borderColor: '#52d5b1', backgroundColor: 'rgba(82,213,177,.14)', fill: true, pointRadius: 0, pointHoverRadius: 5, tension: .18, borderWidth: 2 }] },
+        data: { labels, datasets: [{ label: `${name} kapanış fiyatı (${currency || ''})`, data: prices, borderColor: '#52d5b1', backgroundColor: 'rgba(82,213,177,.14)', fill: true, pointRadius: 0, pointHoverRadius: 5, tension: .18, borderWidth: 2 }, ...(document.getElementById('ma20').checked?[{label:'MA20',data:sma(prices,20),borderColor:'#fbbf24',pointRadius:0,borderWidth:1.5}]:[]), ...(document.getElementById('ma50').checked?[{label:'MA50',data:sma(prices,50),borderColor:'#a78bfa',pointRadius:0,borderWidth:1.5}]:[]), ...(compareData?[{label:compareData.symbol,data:compareData.values,borderColor:'#fb7185',pointRadius:0,borderWidth:2,fill:false}]:[])] },
         options: {
           responsive: true, maintainAspectRatio: false,
           interaction: { intersect: false, mode: 'index' },
@@ -214,7 +214,7 @@
       }
     }
 
-    function drawRsi(){const on=document.getElementById('rsiToggle').checked;document.getElementById('rsiWrap').classList.toggle('visible',on);if(!on)return;if(rsiChart)rsiChart.destroy();rsiChart=new Chart(document.getElementById('rsiChart'),{type:'line',data:{labels:lastLabels,datasets:[{data:rsi(lastPrices),borderColor:'#52d5b1',pointRadius:0}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}})}document.getElementById('rsiToggle').addEventListener('change',drawRsi);document.getElementById('compareButton').onclick=()=>{const s=prompt('Karşılaştırılacak hisse kodu');if(s){compareSymbol=s.trim().toUpperCase();loadPrice(compareSymbol)}};
+    function drawRsi(){const on=document.getElementById('rsiToggle').checked;document.getElementById('rsiWrap').classList.toggle('visible',on);if(!on)return;if(rsiChart)rsiChart.destroy();rsiChart=new Chart(document.getElementById('rsiChart'),{type:'line',data:{labels:lastLabels,datasets:[{data:rsi(lastPrices),borderColor:'#52d5b1',pointRadius:0}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}})}document.querySelectorAll('#ma20,#ma50,#rsiToggle').forEach(x=>x.addEventListener('change',()=>{renderChart(lastLabels,lastPrices,symbolInput.value,'');drawRsi()}));document.getElementById('compareButton').onclick=async()=>{const s=prompt('Karşılaştırılacak hisse kodu');if(!s)return;compareSymbol=s.trim().toUpperCase();try{const q=selectedStart?'period1='+Math.floor(new Date(selectedStart+'T00:00:00Z').getTime()/1000)+'&period2='+Math.floor(Date.now()/1000)+'&interval=1d':'range='+selectedRange+'&interval=1d';const r=await fetch('/api/price?symbol='+encodeURIComponent(compareSymbol)+'&query='+encodeURIComponent(q));const d=await r.json();const raw=d.chart.result[0].indicators.quote[0].close;const vals=raw.filter(x=>Number.isFinite(x));compareData={symbol:compareSymbol,values:vals.map(x=>x/vals[0]*lastPrices[0])};renderChart(lastLabels,lastPrices,symbolInput.value,'')}catch(e){alert('Karşılaştırma verisi alınamadı')}};
     form.addEventListener('submit', event => {
       event.preventDefault();
       loadPrice(symbolInput.value.trim().toUpperCase());
