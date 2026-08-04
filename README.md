@@ -1,4 +1,4 @@
-# Finans Tool v2.3
+# Finans Tool v2.4
 
 Finans kodu girerek günlük kapanış fiyatlarını grafik üzerinde gösteren web uygulaması.
 
@@ -13,6 +13,6 @@ Uygulama Vercel üzerinde çalışır ve fiyat verilerini sunucu tarafındaki ve
 
 ## Sürüm düzeni
 
-Mevcut çalışma sürümü: **v2.3**
+Mevcut çalışma sürümü: **v2.4**
 
-Dört aşamalı geliştirme planının ilk aşaması tamamlandı: kalıcı portföy ekranı, güncel değer ve kâr/zarar hesapları ile temettü listesi eklendi. İkinci aşamada fiyat alarmları ve piyasa/ürün türü filtreli gelişmiş arama eklendi. Sonraki aşamalar sürümü sırasıyla **v2.4** ve **v2.5** olarak ilerletir. Dört aşama da tamamlandığında kalıcı sürüm numarası kullanıcı onayıyla belirlenir.
+Dört aşamalı geliştirme planının ilk aşaması tamamlandı: kalıcı portföy ekranı, güncel değer ve kâr/zarar hesapları ile temettü listesi eklendi. İkinci aşamada fiyat alarmları ve piyasa/ürün türü filtreli gelişmiş arama eklendi. Üçüncü aşamada CSV/PNG dışa aktarma, kalıcı açık/koyu tema ve mobil görünüm iyileştirmeleri eklendi. Son aşama sürümü **v2.5** olarak ilerletir. Dört aşama da tamamlandığında kalıcı sürüm numarası kullanıcı onayıyla belirlenir.
