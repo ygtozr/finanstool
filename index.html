@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finans Grafiği v2.4</title>
+  <title>Finans Grafiği v2.5</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -157,6 +157,24 @@
     html[data-theme="light"] .app-tabs button.active { color:#fff; background:var(--accent); }
     html[data-theme="light"] .analysis-table { background:#f8fafc; }
     @media (max-width:500px) { .app-tabs button { flex:1; } .analysis-table th, .analysis-table td { padding:9px 8px; font-size:.86rem; } }
+
+    .market-summary { margin:0 0 22px; padding:16px; border:1px solid var(--line); border-radius:14px; background:#111a2b; }
+    .market-summary-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:12px; }
+    .market-summary-head h2 { margin:0; font-size:1.05rem; }
+    .market-summary-head .favorites-note { margin:2px 0 0; }
+    .market-summary-head button { padding:7px 11px; color:var(--text); background:#26344d; font-size:.8rem; }
+    .market-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+    .market-card { min-width:0; padding:11px; text-align:left; color:var(--text); background:#0d1523; border:1px solid var(--line); }
+    .market-card:hover { border-color:var(--accent); transform:translateY(-1px); }
+    .market-card span, .market-card strong, .market-card small { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+    .market-card span { color:var(--muted); font-size:.75rem; }
+    .market-card strong { margin-top:3px; font-size:.95rem; }
+    .market-card small { margin-top:2px; }
+    .market-card.loading { min-height:78px; cursor:wait; opacity:.65; }
+    html[data-theme="light"] .market-summary { background:#f1f5f9; }
+    html[data-theme="light"] .market-card { color:var(--text); background:#fff; }
+    @media (max-width:760px) { .market-cards { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:420px) { .market-summary { padding:12px; } .market-cards { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
@@ -165,8 +183,12 @@
     <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Ana ekran</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button></nav>
     <section id="mainView" class="app-view active">
     <div class="app-layout"><section class="chart-panel">
-    <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.4</span></h1>
+    <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.5</span></h1>
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
+    <section class="market-summary" aria-labelledby="marketSummaryTitle">
+      <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="marketRefresh" type="button">Yenile</button></div>
+      <div id="marketCards" class="market-cards" aria-live="polite"></div>
+    </section>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
       <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="compareButton" class="compare-toggle" type="button" aria-label="Grafiğe karşılaştırma olarak ekle" aria-pressed="false" title="Grafiğe ekle">📈</button><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
@@ -250,6 +272,17 @@
     const symbolInput = document.getElementById('symbol');
     const button = document.getElementById('submitButton');
     const meta = document.getElementById('meta');
+    const marketCards = document.getElementById('marketCards');
+    const marketUpdated = document.getElementById('marketUpdated');
+    const marketRefresh = document.getElementById('marketRefresh');
+    const marketItems = [
+      {symbol:'^XU100',label:'BIST 100'},
+      {symbol:'^GSPC',label:'S&P 500'},
+      {symbol:'^IXIC',label:'Nasdaq'},
+      {symbol:'TRY=X',label:'USD / TRY'},
+      {symbol:'GC=F',label:'Altın'},
+      {symbol:'BTC-USD',label:'Bitcoin'}
+    ];
     const themeToggle = document.getElementById('themeToggle');
     const exportCsv = document.getElementById('exportCsv');
     const exportPng = document.getElementById('exportPng');
@@ -326,6 +359,52 @@
 
 
 
+
+
+    function createMarketCard(item,data) {
+      const card=document.createElement('button');
+      card.type='button';
+      card.className='market-card';
+      const label=document.createElement('span');label.textContent=item.label+' · '+item.symbol;
+      const value=document.createElement('strong');
+      const change=document.createElement('small');
+      if(data?.ok){
+        value.textContent=money(data.price,data.currency);
+        change.textContent=(data.change>=0?'+':'')+data.change.toFixed(2)+'%';
+        change.className=data.change>=0?'positive':'negative';
+        card.title=item.label+' grafiğini aç';
+        card.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+      }else{
+        value.textContent='Veri alınamadı';
+        change.textContent='Tekrar yenileyin';
+        change.className='negative';
+        card.disabled=true;
+      }
+      card.append(label,value,change);
+      return card;
+    }
+
+    async function loadMarketSummary() {
+      marketRefresh.disabled=true;
+      marketCards.replaceChildren();
+      marketItems.forEach(()=>{const loading=document.createElement('div');loading.className='market-card loading';marketCards.append(loading)});
+      const query='range=5d&interval=1d';
+      const results=await Promise.all(marketItems.map(async item=>{
+        try{
+          const response=await fetch('/api/price?symbol='+encodeURIComponent(item.symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'});
+          const payload=await response.json();
+          if(!response.ok)throw new Error('Veri alınamadı');
+          const result=payload.chart?.result?.[0],prices=result?.indicators?.quote?.[0]?.close?.filter(Number.isFinite)||[];
+          if(prices.length<2)throw new Error('Yetersiz veri');
+          const price=prices.at(-1),previous=prices.at(-2);
+          return{ok:true,price,currency:result.meta?.currency||'USD',change:(price/previous-1)*100};
+        }catch{return{ok:false}}
+      }));
+      marketCards.replaceChildren();
+      marketItems.forEach((item,index)=>marketCards.append(createMarketCard(item,results[index])));
+      marketUpdated.textContent='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit'}).format(new Date());
+      marketRefresh.disabled=false;
+    }
 
     function applyTheme(theme) {
       const next = theme === 'light' ? 'light' : 'dark';
@@ -989,6 +1068,7 @@
 
 
 
+    marketRefresh.addEventListener('click',loadMarketSummary);
     themeToggle.addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light'));
     exportCsv.addEventListener('click',exportChartCsv);
     exportPng.addEventListener('click',exportChartPng);
@@ -1065,8 +1145,10 @@
     updateFavoriteButton();
     updateCompareButton();
     loadPrice('AAPL');
+    loadMarketSummary();
     renderAlarms();
     setInterval(checkAlarms, 60000);
+    setInterval(loadMarketSummary, 300000);
   </script>
 </body>
 </html>
