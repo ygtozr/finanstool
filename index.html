@@ -24,10 +24,13 @@
     .intro { margin:6px 0 25px; color:var(--muted); }
     form { display:flex; gap:10px; margin-bottom:22px; }
     .search-field { display:flex; flex:1; min-width:0; gap:8px; }
-    .favorite-toggle { flex:0 0 46px; width:46px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.55rem; }
+    .favorite-toggle, .compare-toggle { flex:0 0 46px; width:46px; padding:0; font-size:1.4rem; }
+    .favorite-toggle { color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.55rem; }
     .favorite-toggle.is-favorite { background:#5b4817; border-color:#d7aa38; }
+    .compare-toggle { color:#f9a8d4; background:#3a1830; border:1px solid #7f315f; }
+    .compare-toggle.compare-active { color:#fff; background:#be185d; border-color:#f9a8d4; }
     .search-field { position:relative; }
-    .search-suggestions {display:none;position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:54px;margin:0;padding:5px;list-style:none;border:1px solid var(--line);border-radius:10px;background:#101827;box-shadow:0 12px 25px #0008}.search-suggestions.visible{display:grid;gap:3px}.suggestion{width:100%;padding:8px 10px;text-align:left;color:var(--text);background:transparent;border-radius:7px;font-size:.88rem}.suggestion:hover{background:#26344d}
+    .search-suggestions {display:none;position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:108px;margin:0;padding:5px;list-style:none;border:1px solid var(--line);border-radius:10px;background:#101827;box-shadow:0 12px 25px #0008}.search-suggestions.visible{display:grid;gap:3px}.suggestion{width:100%;padding:8px 10px;text-align:left;color:var(--text);background:transparent;border-radius:7px;font-size:.88rem}.suggestion:hover{background:#26344d}
     input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:uppercase; }
     input:focus { outline:3px solid #52d5b166; border-color:var(--accent); }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
@@ -144,7 +147,7 @@
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
-      <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
+      <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="compareButton" class="compare-toggle" type="button" aria-label="Grafiğe karşılaştırma olarak ekle" aria-pressed="false" title="Grafiğe ekle">📈</button><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
     <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button><button id="exportCsv" type="button">CSV indir</button><button id="exportPng" type="button">PNG indir</button></div><div id="meta" class="meta" aria-live="polite"></div>
@@ -210,7 +213,8 @@
     let chart;
     let rsiChart;
     let movingAverageData = null;
-    let compareData = null;
+    let movingAverageNativeData = null;
+    let compareData = [];
     let lastPrices = [];
     let lastLabels = [];
     let currentCurrency = 'TRY';
@@ -219,6 +223,8 @@
     let primaryLabels = [];
     let primaryCurrency = 'TRY';
     let primaryChartName = '';
+    let primarySymbol = '';
+    const comparisonColors = ['#fb7185','#60a5fa','#f97316','#a78bfa','#84cc16','#22d3ee','#f472b6'];
     const form = document.getElementById('symbolForm');
     const symbolInput = document.getElementById('symbol');
     const button = document.getElementById('submitButton');
@@ -233,6 +239,7 @@
     const startDate = document.getElementById('startDate');
     const dateError = document.getElementById('dateError');
     const favoriteButton = document.getElementById('favoriteButton');
+    const compareButton = document.getElementById('compareButton');
     const favoritesList = document.getElementById('favoritesList');
     const favoritesEmpty = document.getElementById('favoritesEmpty');
     const favoritesKey = 'finans-grafigi-favorites';
@@ -287,7 +294,12 @@
     const currentSymbol = () => symbolInput.value.trim().toUpperCase();
     const isFavorite = symbol => favorites.some(item => item.symbol === symbol);
     function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
-    function renderFavorites() { favoritesList.replaceChildren(); favoritesEmpty.hidden = favorites.length > 0; favorites.forEach(item => { const row=document.createElement('li'); row.className='favorite-row'; const open=document.createElement('button'); open.type='button'; open.className='favorite-symbol'; open.textContent=item.name !== item.symbol ? item.symbol+' · '+item.name : item.symbol; open.addEventListener('click',()=>{symbolInput.value=item.symbol; updateFavoriteButton(); loadPrice(item.symbol);}); const compare=document.createElement('button'); compare.type='button'; compare.className='favorite-remove'; compare.classList.toggle('compare-active',compareData&&compareData.rawSymbol===item.symbol); compare.textContent='📈'; compare.title=item.symbol+' ile karşılaştır'; compare.addEventListener('click',()=>{if(compareData&&compareData.rawSymbol===item.symbol){compareData=null;renderChart(primaryLabels,primaryPrices,primaryChartName,primaryCurrency,false);renderFavorites()}else compareStock(item.symbol)}); const remove=document.createElement('button'); remove.type='button'; remove.className='favorite-remove'; remove.textContent='★'; remove.title=item.symbol+' favorilerden çıkar'; remove.addEventListener('click',()=>{favorites=favorites.filter(f=>f.symbol!==item.symbol);saveFavorites();renderFavorites();updateFavoriteButton();}); row.append(open,compare,remove); favoritesList.append(row); }); }
+    const isCompared = symbol => compareData.some(item => item.rawSymbol === symbol);
+    function updateCompareButton() { const symbol=currentSymbol(),on=isCompared(symbol),isPrimary=symbol&&symbol===primarySymbol; compareButton.classList.toggle('compare-active',on); compareButton.setAttribute('aria-pressed',String(on)); compareButton.disabled=!symbol||isPrimary||!primaryPrices.length; compareButton.title=isPrimary?'Bu ana grafik':(on?'Karşılaştırmadan çıkar':'Grafiğe karşılaştırma olarak ekle'); }
+    function renderFavorites() {
+      favoritesList.replaceChildren(); favoritesEmpty.hidden=favorites.length>0;
+      favorites.forEach(item=>{const row=document.createElement('li');row.className='favorite-row';const open=document.createElement('button');open.type='button';open.className='favorite-symbol';open.textContent=item.name!==item.symbol?item.symbol+' · '+item.name:item.symbol;open.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});const compare=document.createElement('button');compare.type='button';compare.className='favorite-remove';compare.classList.toggle('compare-active',isCompared(item.symbol));compare.textContent='📈';compare.title=isCompared(item.symbol)?item.symbol+' karşılaştırmadan çıkar':item.symbol+' ile karşılaştır';compare.addEventListener('click',()=>compareStock(item.symbol));const remove=document.createElement('button');remove.type='button';remove.className='favorite-remove';remove.textContent='★';remove.title=item.symbol+' favorilerden çıkar';remove.addEventListener('click',()=>{favorites=favorites.filter(f=>f.symbol!==item.symbol);saveFavorites();renderFavorites();updateFavoriteButton()});row.append(open,compare,remove);favoritesList.append(row)});
+    }
     let selectedRange = '6mo';
     let selectedStart = '';
 
@@ -326,7 +338,7 @@
         {name:'Tarih',values:lastLabels},
         {name:currentChartName+' ('+currentCurrency+')',values:lastPrices}
       ];
-      if(compareData)columns.push({name:compareData.symbol,values:compareData.values});
+      compareData.forEach(item=>columns.push({name:item.rawSymbol+' ('+currentCurrency+')',values:item.values}));
       if(includeMa){
         columns.push({name:'MA50',values:movingAverageData?.ma50||sma(lastPrices,50)});
         columns.push({name:'MA100',values:movingAverageData?.ma100||sma(lastPrices,100)});
@@ -464,7 +476,7 @@
         const meta=document.createElement('small');
         meta.textContent=[item.exchange,item.type].filter(Boolean).join(' · ');
         button.append(title,meta);
-        button.addEventListener('click',()=>{symbolInput.value=item.symbol;advancedSearchDialog.close();updateFavoriteButton();loadPrice(item.symbol)});
+        button.addEventListener('click',()=>{symbolInput.value=item.symbol;advancedSearchDialog.close();updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
         advancedResults.append(button);
       });
     }
@@ -684,11 +696,8 @@
         const averages = sma(values,period);
         return new Map(points.map((point,index)=>[formatter.format(new Date(point.time*1000)),averages[index]]));
       });
-      movingAverageData = {
-        ma50:labels.map(label=>maps[0].get(label) ?? null),
-        ma100:labels.map(label=>maps[1].get(label) ?? null),
-        ma200:labels.map(label=>maps[2].get(label) ?? null)
-      };
+      movingAverageData = { ma50:labels.map(label=>maps[0].get(label) ?? null), ma100:labels.map(label=>maps[1].get(label) ?? null), ma200:labels.map(label=>maps[2].get(label) ?? null) };
+      movingAverageNativeData = { ma50:[...movingAverageData.ma50], ma100:[...movingAverageData.ma100], ma200:[...movingAverageData.ma200] };
     }
 
     function renderRsiChart(labels, prices) {
@@ -744,7 +753,7 @@
         datasets.push({ label:'MA100', data:movingAverageData?.ma100 || sma(lastPrices,100), borderColor:'#facc15', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
         datasets.push({ label:'MA200', data:movingAverageData?.ma200 || sma(lastPrices,200), borderColor:'#ef4444', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
       }
-      if (compareData) datasets.push({ label:compareData.symbol, data:compareData.values, borderColor:'#fb7185', pointRadius:0, borderWidth:2, fill:false, spanGaps:true, yAxisID:'price' });
+      compareData.forEach(item=>datasets.push({label:item.rawSymbol+' ('+currentCurrency+')',data:item.values,borderColor:item.color,pointRadius:0,borderWidth:2,fill:false,spanGaps:true,yAxisID:'price'}));
       if (chart) chart.destroy();
       chart = new Chart(document.getElementById('priceChart'), {
         type:'line',
@@ -829,6 +838,7 @@
         const currency = info.currency || 'USD';
         currentCurrency = currency;
         currentChartName = name;
+        primarySymbol = symbol;
         const last = prices.at(-1);
         const change = ((last / prices[0]) - 1) * 100;
         meta.replaceChildren();
@@ -845,13 +855,15 @@
         changeStrong.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
         changePart.append(changeLabel(), changeStrong);
         meta.append(namePart, pricePart, changePart);
-        compareData = null;
+        compareData = [];
         movingAverageData = null;
+        movingAverageNativeData = null;
         if (document.getElementById('maToggle').checked) {
           try { await prepareMovingAverages(symbol, labels); } catch {}
         }
         renderChart(labels, prices, name, currency, true);
         renderFavorites();
+        updateCompareButton();
       } catch (error) {
         meta.innerHTML = `<span class="error">${error.message} Kodu kontrol edip tekrar deneyin.</span>`;
         if (chart) { chart.destroy(); chart = null; }
@@ -914,44 +926,44 @@
       return values.map((value, index) => Number.isFinite(value) && Number.isFinite(rates[index]) ? value * rates[index] : null);
     }
 
-    async function compareStock(inputSymbol) {
-      const symbol = String(inputSymbol || '').trim().toUpperCase();
-      if (!symbol || !primaryPrices.length) return;
-      try {
-        const query = selectedStart ? 'period1=' + Math.floor(new Date(selectedStart + 'T00:00:00Z').getTime()/1000) + '&period2=' + Math.floor(Date.now()/1000) + '&interval=1d' : 'range=' + selectedRange + '&interval=1d';
-        const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache: 'no-store' });
-        const payload = await response.json();
-        if (!response.ok) throw new Error(payload.error || 'Veri alınamadı');
-        const result = payload.chart?.result?.[0];
-        if (!result) throw new Error('Fiyat verisi bulunamadı');
+    function comparisonQuery(){return selectedStart?'period1='+Math.floor(new Date(selectedStart+'T00:00:00Z').getTime()/1000)+'&period2='+Math.floor(Date.now()/1000)+'&interval=1d':'range='+selectedRange+'&interval=1d'}
 
-        const comparisonCurrency = String(result.meta?.currency || 'USD').toUpperCase();
-        let mainValues = [...primaryPrices];
-        let comparisonValues = alignResultToLabels(result, primaryLabels);
-        let axisCurrency = primaryCurrency;
-
-        if (String(primaryCurrency).toUpperCase() !== comparisonCurrency) {
-          [mainValues, comparisonValues] = await Promise.all([
-            convertSeriesToUsd(primaryCurrency, primaryPrices, primaryLabels, query),
-            convertSeriesToUsd(comparisonCurrency, comparisonValues, primaryLabels, query)
-          ]);
-          axisCurrency = 'USD';
-        }
-
-        compareData = { symbol: symbol + ' (' + axisCurrency + ')', rawSymbol: symbol, values: comparisonValues };
-        renderChart(primaryLabels, mainValues, primaryChartName, axisCurrency, false);
-        renderFavorites();
-      } catch (error) {
-        alert('Karşılaştırma verisi alınamadı: ' + error.message);
+    async function refreshComparisons(){
+      if(!primaryPrices.length)return;
+      const query=comparisonQuery();
+      const mixed=compareData.some(item=>String(item.currency).toUpperCase()!==String(primaryCurrency).toUpperCase());
+      let mainValues=[...primaryPrices],axisCurrency=primaryCurrency;
+      if(mixed){axisCurrency='USD';mainValues=await convertSeriesToUsd(primaryCurrency,primaryPrices,primaryLabels,query)}
+      await Promise.all(compareData.map(async item=>{item.values=mixed?await convertSeriesToUsd(item.currency,item.rawValues,primaryLabels,query):[...item.rawValues]}));
+      if(movingAverageNativeData){
+        if(mixed){const [ma50,ma100,ma200]=await Promise.all([convertSeriesToUsd(primaryCurrency,movingAverageNativeData.ma50,primaryLabels,query),convertSeriesToUsd(primaryCurrency,movingAverageNativeData.ma100,primaryLabels,query),convertSeriesToUsd(primaryCurrency,movingAverageNativeData.ma200,primaryLabels,query)]);movingAverageData={ma50,ma100,ma200}}
+        else movingAverageData={ma50:[...movingAverageNativeData.ma50],ma100:[...movingAverageNativeData.ma100],ma200:[...movingAverageNativeData.ma200]};
       }
+      renderChart(primaryLabels,mainValues,primaryChartName,axisCurrency,false);renderFavorites();updateCompareButton();
+    }
+
+    async function compareStock(inputSymbol){
+      const symbol=String(inputSymbol||'').trim().toUpperCase();
+      if(!symbol||!primaryPrices.length)return;
+      if(symbol===primarySymbol)return updateCompareButton();
+      try{
+        if(isCompared(symbol)){compareData=compareData.filter(item=>item.rawSymbol!==symbol);await refreshComparisons();return}
+        const query=comparisonQuery(),response=await fetch('/api/price?symbol='+encodeURIComponent(symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'}),payload=await response.json();
+        if(!response.ok)throw new Error(payload.error||'Veri alınamadı');
+        const result=payload.chart?.result?.[0];if(!result)throw new Error('Fiyat verisi bulunamadı');
+        const used=new Set(compareData.map(item=>item.color)),color=comparisonColors.find(item=>!used.has(item))||comparisonColors[compareData.length%comparisonColors.length];
+        compareData.push({rawSymbol:symbol,currency:String(result.meta?.currency||'USD').toUpperCase(),rawValues:alignResultToLabels(result,primaryLabels),values:[],color});
+        await refreshComparisons();
+      }catch(error){alert('Karşılaştırma verisi alınamadı: '+error.message)}
     }
 
     form.addEventListener('submit', event => {
       event.preventDefault();
       loadPrice(symbolInput.value.trim().toUpperCase());
     });
-    function showSuggestions(items){suggestions.replaceChildren();items.slice(0,5).forEach(item=>{const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='suggestion';b.textContent=item.symbol+' · '+item.name;b.addEventListener('click',()=>{symbolInput.value=item.symbol;suggestions.classList.remove('visible');updateFavoriteButton();loadPrice(item.symbol)});li.append(b);suggestions.append(li)});suggestions.classList.toggle('visible',items.length>0)}
-    symbolInput.addEventListener('input',()=>{updateFavoriteButton();clearTimeout(searchTimer);const q=symbolInput.value.trim();if(q.length<2)return showSuggestions([]);searchTimer=setTimeout(async()=>{try{const r=await fetch('/api/search?q='+encodeURIComponent(q));const d=await r.json();showSuggestions(d.quotes||[])}catch{showSuggestions([])}},250)});
+    function showSuggestions(items){suggestions.replaceChildren();items.slice(0,5).forEach(item=>{const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='suggestion';b.textContent=item.symbol+' · '+item.name;b.addEventListener('click',()=>{symbolInput.value=item.symbol;suggestions.classList.remove('visible');updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});li.append(b);suggestions.append(li)});suggestions.classList.toggle('visible',items.length>0)}
+    symbolInput.addEventListener('input',()=>{updateFavoriteButton();updateCompareButton();clearTimeout(searchTimer);const q=symbolInput.value.trim();if(q.length<2)return showSuggestions([]);searchTimer=setTimeout(async()=>{try{const r=await fetch('/api/search?q='+encodeURIComponent(q));const d=await r.json();showSuggestions(d.quotes||[])}catch{showSuggestions([])}},250)});
+    compareButton.addEventListener('click',()=>compareStock(currentSymbol()));
     favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol)) favorites=favorites.filter(item=>item.symbol!==symbol); else favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); });
     periodButtons.forEach(periodButton => periodButton.addEventListener('click', () => {
       selectedRange = periodButton.dataset.range;
@@ -1047,6 +1059,7 @@
     applyTheme(localStorage.getItem(themeKey) || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
     renderFavorites();
     updateFavoriteButton();
+    updateCompareButton();
     loadPrice('AAPL');
     renderAlarms();
     setInterval(checkAlarms, 60000);
