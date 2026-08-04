@@ -117,8 +117,9 @@
       <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
-    <div class="toolbar"><label><input id="ma20" type="checkbox"> MA20</label><label><input id="ma50" type="checkbox"> MA50</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button></div><div id="meta" class="meta" aria-live="polite"></div>
+    <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img"></canvas></div>
+    <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img"></canvas></div>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     <section class="periods" aria-label="Grafik süresi">
       <button type="button" data-range="5d">1 hafta</button>
@@ -177,6 +178,7 @@
   </dialog>
   <script>
     let chart;
+    let rsiChart;
     let compareData = null;
     let lastPrices = [];
     let lastLabels = [];
@@ -531,6 +533,41 @@
       });
     }
 
+    function renderRsiChart(labels, prices) {
+      const wrap = document.getElementById('rsiWrap');
+      const enabled = document.getElementById('rsiToggle').checked;
+      wrap.classList.toggle('visible', enabled);
+      if (!enabled) {
+        if (rsiChart) { rsiChart.destroy(); rsiChart = null; }
+        return;
+      }
+      const rsiValues = calculateRsi(prices);
+      const threshold70 = labels.map(() => 70);
+      const threshold30 = labels.map(() => 30);
+      if (rsiChart) rsiChart.destroy();
+      rsiChart = new Chart(document.getElementById('rsiChart'), {
+        type:'line',
+        data:{
+          labels,
+          datasets:[
+            { label:'RSI (14)', data:rsiValues, borderColor:'#52d5b1', backgroundColor:'rgba(82,213,177,.08)', fill:true, pointRadius:0, pointHoverRadius:4, borderWidth:2, tension:.18 },
+            { label:'Aşırı alım (70)', data:threshold70, borderColor:'#ef4444', borderDash:[5,5], pointRadius:0, borderWidth:1, fill:false },
+            { label:'Aşırı satım (30)', data:threshold30, borderColor:'#fbbf24', borderDash:[5,5], pointRadius:0, borderWidth:1, fill:false }
+          ]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          interaction:{intersect:false,mode:'index'},
+          plugins:{legend:{display:true},tooltip:{callbacks:{label:context=>context.dataset.label+': '+Number(context.parsed.y).toFixed(2)}}},
+          scales:{
+            x:{grid:{display:false},ticks:{color:'#aebbd0',maxTicksLimit:7}},
+            y:{min:0,max:100,grid:{color:'#2b3a55'},ticks:{color:'#aebbd0',stepSize:20}}
+          }
+        }
+      });
+    }
+
     function renderChart(labels, prices, name, currency, rememberPrimary = true) {
       if (!labels.length || !prices.length) return;
       if (rememberPrimary) {
@@ -544,15 +581,31 @@
       currentChartName = name || currentChartName;
       currentCurrency = currency || currentCurrency;
       const datasets = [{ label: currentChartName + ' kapanış fiyatı (' + currentCurrency + ')', data: lastPrices, borderColor: '#52d5b1', backgroundColor: 'rgba(82,213,177,.14)', fill: true, pointRadius: 0, pointHoverRadius: 5, tension: .18, borderWidth: 2, yAxisID: 'price' }];
-      if (document.getElementById('ma20').checked) datasets.push({ label: 'MA20', data: sma(lastPrices,20), borderColor:'#fbbf24', pointRadius:0, borderWidth:1.5, fill:false, yAxisID:'price' });
-      if (document.getElementById('ma50').checked) datasets.push({ label: 'MA50', data: sma(lastPrices,50), borderColor:'#a78bfa', pointRadius:0, borderWidth:1.5, fill:false, yAxisID:'price' });
-      if (document.getElementById('rsiToggle').checked) datasets.push({ label:'RSI (14)', data:calculateRsi(lastPrices), borderColor:'#52d5b1', borderDash:[6,4], pointRadius:0, borderWidth:1.5, fill:false, yAxisID:'rsi' });
+      if (document.getElementById('maToggle').checked) {
+        datasets.push({ label:'MA50', data:sma(lastPrices,50), borderColor:'#22c55e', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
+        datasets.push({ label:'MA100', data:sma(lastPrices,100), borderColor:'#facc15', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
+        datasets.push({ label:'MA200', data:sma(lastPrices,200), borderColor:'#ef4444', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
+      }
       if (compareData) datasets.push({ label:compareData.symbol, data:compareData.values, borderColor:'#fb7185', pointRadius:0, borderWidth:2, fill:false, spanGaps:true, yAxisID:'price' });
       if (chart) chart.destroy();
-      chart = new Chart(document.getElementById('priceChart'), { type:'line', data:{labels:lastLabels,datasets}, options:{ responsive:true, maintainAspectRatio:false, interaction:{intersect:false,mode:'index'}, plugins:{legend:{display:true},tooltip:{callbacks:{label: context => context.dataset.yAxisID === 'rsi' ? context.dataset.label + ': ' + context.parsed.y.toFixed(2) : context.dataset.label + ': ' + money(context.parsed.y,currentCurrency)}}}, scales:{x:{grid:{display:false},ticks:{color:'#aebbd0',maxTicksLimit:7}},price:{position:'left',grid:{color:'#2b3a55'},ticks:{color:'#aebbd0',callback:value=>money(value,currentCurrency)}},rsi:{display:document.getElementById('rsiToggle').checked,position:'right',min:0,max:100,grid:{drawOnChartArea:false},ticks:{color:'#52d5b1'}}}} });
+      chart = new Chart(document.getElementById('priceChart'), {
+        type:'line',
+        data:{labels:lastLabels,datasets},
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          interaction:{intersect:false,mode:'index'},
+          plugins:{legend:{display:true},tooltip:{callbacks:{label:context=>context.dataset.label+': '+money(context.parsed.y,currentCurrency)}}},
+          scales:{
+            x:{grid:{display:false},ticks:{color:'#aebbd0',maxTicksLimit:7}},
+            price:{position:'left',grid:{color:'#2b3a55'},ticks:{color:'#aebbd0',callback:value=>money(value,currentCurrency)}}
+          }
+        }
+      });
+      renderRsiChart(lastLabels,lastPrices);
     }
 
-        function setActivePeriod(button) {
+    function setActivePeriod(button) {
       periodButtons.forEach(item => item.classList.toggle('active', item === button));
       customPeriod.classList.remove('active');
     }
@@ -640,6 +693,8 @@
       } catch (error) {
         meta.innerHTML = `<span class="error">${error.message} Kodu kontrol edip tekrar deneyin.</span>`;
         if (chart) { chart.destroy(); chart = null; }
+        if (rsiChart) { rsiChart.destroy(); rsiChart = null; }
+        document.getElementById('rsiWrap').classList.remove('visible');
       } finally {
         button.disabled = false;
         button.textContent = 'Grafiği getir';
@@ -649,7 +704,7 @@
     function redrawIndicators() {
       renderChart(lastLabels, lastPrices, currentChartName, currentCurrency, false);
     }
-    document.querySelectorAll('#ma20,#ma50,#rsiToggle').forEach(control => control.addEventListener('change', redrawIndicators));
+    document.querySelectorAll('#maToggle,#rsiToggle').forEach(control => control.addEventListener('change', redrawIndicators));
 
     function alignResultToLabels(result, labels) {
       const raw = result?.indicators?.quote?.[0]?.close;
