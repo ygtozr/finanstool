@@ -31,6 +31,7 @@
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     button { border:0; border-radius:10px; padding:12px 20px; background:var(--accent); color:#062019; font:600 16px inherit; cursor:pointer; }
     button:disabled { opacity:.65; cursor:wait; }
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.toolbar button{padding:8px 11px;background:#26344d;color:var(--text);font-size:.85rem}.rsi-wrap{height:150px;display:none;margin-top:14px}.rsi-wrap.visible{display:block}
     .meta { display:flex; flex-wrap:wrap; gap:10px 22px; min-height:28px; margin:0 0 14px; color:var(--muted); }
     .price { color:var(--text); font-weight:700; }
     .error { color:var(--danger); }
@@ -57,7 +58,7 @@
       <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
-    <div id="meta" class="meta" aria-live="polite"></div>
+    <div class="toolbar"><button id="compareButton" type="button">📈 Karşılaştır</button><label><input id="rsiToggle" type="checkbox"> RSI göster</label></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img"></canvas></div>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     <section class="periods" aria-label="Grafik süresi">
@@ -213,6 +214,7 @@
       }
     }
 
+    function drawRsi(){const on=document.getElementById('rsiToggle').checked;document.getElementById('rsiWrap').classList.toggle('visible',on);if(!on)return;if(rsiChart)rsiChart.destroy();rsiChart=new Chart(document.getElementById('rsiChart'),{type:'line',data:{labels:lastLabels,datasets:[{data:rsi(lastPrices),borderColor:'#52d5b1',pointRadius:0}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}})}document.getElementById('rsiToggle').addEventListener('change',drawRsi);document.getElementById('compareButton').onclick=()=>{const s=prompt('Karşılaştırılacak hisse kodu');if(s){compareSymbol=s.trim().toUpperCase();loadPrice(compareSymbol)}};
     form.addEventListener('submit', event => {
       event.preventDefault();
       loadPrice(symbolInput.value.trim().toUpperCase());
