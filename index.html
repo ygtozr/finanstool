@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finans Grafiği v2.1</title>
+  <title>Finans Grafiği v2.2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -46,14 +46,60 @@
     .date-picker.visible { display:block; }
     .date-picker input { width:100%; }
     code { color:#bcecdf; }
+
+    .portfolio-open { position:fixed; left:0; top:50%; z-index:20; transform:translateY(-50%); padding:14px 9px; border-radius:0 12px 12px 0; writing-mode:vertical-rl; background:var(--accent); box-shadow:0 8px 24px #0008; }
+    .portfolio-backdrop { position:fixed; inset:0; z-index:29; background:#020617aa; opacity:0; pointer-events:none; transition:opacity .2s; }
+    .portfolio-backdrop.visible { opacity:1; pointer-events:auto; }
+    .portfolio-drawer { position:fixed; inset:0 auto 0 0; z-index:30; width:min(560px,92vw); padding:24px; overflow:auto; color:var(--text); background:#121c2e; border-right:1px solid var(--line); box-shadow:20px 0 60px #0009; transform:translateX(-105%); transition:transform .25s ease; }
+    .portfolio-drawer.open { transform:translateX(0); }
+    .portfolio-head { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:18px; }
+    .portfolio-head h2, .dividend-section h3 { margin:0; }
+    .portfolio-close { width:40px; height:40px; padding:0; color:var(--text); background:#26344d; font-size:1.35rem; }
+    .portfolio-search { display:flex; gap:8px; position:relative; margin-bottom:18px; }
+    .portfolio-search input { width:100%; }
+    .portfolio-add { flex:0 0 48px; padding:0; font-size:1.5rem; }
+    .portfolio-suggestions { left:0; right:56px; top:calc(100% + 4px); }
+    .portfolio-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
+    .summary-card { padding:12px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
+    .summary-card small { display:block; color:var(--muted); }
+    .summary-card strong { display:block; margin-top:3px; }
+    .portfolio-list { display:grid; gap:10px; }
+    .portfolio-empty { padding:18px; text-align:center; color:var(--muted); border:1px dashed #40516e; border-radius:12px; }
+    .portfolio-row { padding:14px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
+    .portfolio-row-head { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+    .portfolio-row-title { flex:1; min-width:0; }
+    .portfolio-row-title strong, .portfolio-row-title small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .portfolio-row-title small { color:var(--muted); }
+    .portfolio-delete { width:34px; height:34px; padding:0; color:var(--danger); background:#3b1720; }
+    .portfolio-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .portfolio-stat { padding:8px; border-radius:8px; background:#162238; }
+    .portfolio-stat span, .portfolio-stat strong { display:block; }
+    .portfolio-stat span { color:var(--muted); font-size:.75rem; }
+    .portfolio-stat strong { margin-top:2px; font-size:.9rem; }
+    .positive { color:#52d5b1; }
+    .negative { color:var(--danger); }
+    .dividend-section { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+    .dividend-note { margin:4px 0 12px; color:var(--muted); font-size:.82rem; }
+    .dividend-list { list-style:none; display:grid; gap:7px; padding:0; margin:0; }
+    .dividend-row { display:grid; grid-template-columns:90px 1fr auto; gap:8px; align-items:center; padding:9px 10px; border-radius:9px; background:#0d1523; font-size:.85rem; }
+    .dividend-row span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .portfolio-dialog { width:min(420px,calc(100vw - 30px)); color:var(--text); background:#192337; border:1px solid var(--line); border-radius:16px; padding:22px; box-shadow:0 24px 70px #000b; }
+    .portfolio-dialog::backdrop { background:#020617bb; }
+    .portfolio-dialog h3 { margin:0 0 4px; }
+    .portfolio-dialog-symbol { margin:0 0 16px; color:var(--muted); }
+    .portfolio-form { display:grid; gap:13px; margin:0; }
+    .portfolio-form label { display:grid; gap:5px; color:var(--muted); font-size:.88rem; }
+    .portfolio-form input { width:100%; text-transform:none; }
+    .dialog-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:4px; }
+    .dialog-cancel { color:var(--text); background:#26344d; }
     @media (max-width:760px) { .app-layout { grid-template-columns:1fr; } .favorites-panel { border-left:0; border-top:1px solid var(--line); padding:20px 0 0; } }
-    @media (max-width:500px) { form { flex-wrap:wrap; } .search-field { flex-basis:100%; } #submitButton { width:100%; } }
+    @media (max-width:500px) { form { flex-wrap:wrap; } .search-field { flex-basis:100%; } #submitButton { width:100%; } .portfolio-drawer { width:100%; padding:18px; } .portfolio-stats { grid-template-columns:1fr; } .portfolio-open { top:auto; bottom:18px; transform:none; writing-mode:horizontal-tb; border-radius:0 12px 12px 0; } }
   </style>
 </head>
 <body>
   <main>
     <div class="app-layout"><section class="chart-panel">
-    <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.1</span></h1>
+    <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.2</span></h1>
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -79,6 +125,24 @@
       </div>
     </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><h2>Favoriler</h2><p class="favorites-note">Yıldıza tıklayarak hisse ekleyin. Favoriler bu cihazda saklanır.</p><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
   </main>
+
+  <button id="portfolioOpen" class="portfolio-open" type="button" aria-controls="portfolioDrawer" aria-expanded="false">Portföy</button>
+  <div id="portfolioBackdrop" class="portfolio-backdrop"></div>
+  <aside id="portfolioDrawer" class="portfolio-drawer" aria-label="Portföy ekranı" aria-hidden="true">
+    <div class="portfolio-head"><div><h2>Portföyüm</h2><p class="favorites-note">Pozisyonlarınız bu cihazda saklanır.</p></div><button id="portfolioClose" class="portfolio-close" type="button" aria-label="Portföyü kapat">×</button></div>
+    <div class="portfolio-search"><input id="portfolioSymbol" type="search" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" aria-label="Portföy hisse önerileri"></ul></div>
+    <div id="portfolioSummary" class="portfolio-summary"></div>
+    <div id="portfolioList" class="portfolio-list"></div>
+    <section class="dividend-section"><h3>Temettü takvimi</h3><p class="dividend-note">Portföy hisselerinin son açıklanan temettüleri, en fazla 5 satır.</p><ul id="dividendList" class="dividend-list"></ul></section>
+  </aside>
+  <dialog id="portfolioDialog" class="portfolio-dialog">
+    <h3>Portföye ekle</h3><p id="portfolioDialogSymbol" class="portfolio-dialog-symbol"></p>
+    <form id="portfolioForm" class="portfolio-form" method="dialog">
+      <label>Adet<input id="portfolioQuantity" type="number" min="0.000001" step="any" required></label>
+      <label>Birim maliyet<input id="portfolioCost" type="number" min="0" step="any" required></label>
+      <div class="dialog-actions"><button id="portfolioCancel" class="dialog-cancel" type="button">Vazgeç</button><button type="submit">Kaydet</button></div>
+    </form>
+  </dialog>
   <script>
     let chart;
     let compareData = null;
@@ -105,6 +169,27 @@
     const favoritesKey = 'finans-grafigi-favorites';
     const legacyFavoritesKey = Object.keys(localStorage).find(key => key.startsWith(favoritesKey + '-'));
     const suggestions = document.getElementById('suggestions'); let searchTimer;
+    const portfolioOpen = document.getElementById('portfolioOpen');
+    const portfolioClose = document.getElementById('portfolioClose');
+    const portfolioBackdrop = document.getElementById('portfolioBackdrop');
+    const portfolioDrawer = document.getElementById('portfolioDrawer');
+    const portfolioSymbol = document.getElementById('portfolioSymbol');
+    const portfolioAdd = document.getElementById('portfolioAdd');
+    const portfolioSuggestions = document.getElementById('portfolioSuggestions');
+    const portfolioSummary = document.getElementById('portfolioSummary');
+    const portfolioList = document.getElementById('portfolioList');
+    const dividendList = document.getElementById('dividendList');
+    const portfolioDialog = document.getElementById('portfolioDialog');
+    const portfolioDialogSymbol = document.getElementById('portfolioDialogSymbol');
+    const portfolioForm = document.getElementById('portfolioForm');
+    const portfolioQuantity = document.getElementById('portfolioQuantity');
+    const portfolioCost = document.getElementById('portfolioCost');
+    const portfolioCancel = document.getElementById('portfolioCancel');
+    const portfolioKey = 'finans-grafigi-portfolio';
+    let portfolio = (() => { try { const saved = JSON.parse(localStorage.getItem(portfolioKey)); return Array.isArray(saved) ? saved.filter(item => item && item.symbol && Number(item.quantity) > 0).map(item => ({ symbol:String(item.symbol).toUpperCase(), name:item.name || item.symbol, quantity:Number(item.quantity), unitCost:Number(item.unitCost) || 0 })) : []; } catch { return []; } })();
+    let portfolioSearchTimer;
+    let portfolioSelection = null;
+    let portfolioRenderId = 0;
     let currentName = '';
     let favorites = (() => { try { const saved = JSON.parse(localStorage.getItem(favoritesKey) || (legacyFavoritesKey && localStorage.getItem(legacyFavoritesKey))); return Array.isArray(saved) ? saved.filter(item => item && item.symbol).map(item => ({symbol:item.symbol.toUpperCase(), name:item.name || item.symbol.toUpperCase()})) : []; } catch { return []; } })();
     if (legacyFavoritesKey && !localStorage.getItem(favoritesKey)) {
@@ -118,6 +203,178 @@
     function renderFavorites() { favoritesList.replaceChildren(); favoritesEmpty.hidden = favorites.length > 0; favorites.forEach(item => { const row=document.createElement('li'); row.className='favorite-row'; const open=document.createElement('button'); open.type='button'; open.className='favorite-symbol'; open.textContent=item.name !== item.symbol ? item.symbol+' · '+item.name : item.symbol; open.addEventListener('click',()=>{symbolInput.value=item.symbol; updateFavoriteButton(); loadPrice(item.symbol);}); const compare=document.createElement('button'); compare.type='button'; compare.className='favorite-remove'; compare.classList.toggle('compare-active',compareData&&compareData.rawSymbol===item.symbol); compare.textContent='📈'; compare.title=item.symbol+' ile karşılaştır'; compare.addEventListener('click',()=>{if(compareData&&compareData.rawSymbol===item.symbol){compareData=null;renderChart(primaryLabels,primaryPrices,primaryChartName,primaryCurrency,false);renderFavorites()}else compareStock(item.symbol)}); const remove=document.createElement('button'); remove.type='button'; remove.className='favorite-remove'; remove.textContent='★'; remove.title=item.symbol+' favorilerden çıkar'; remove.addEventListener('click',()=>{favorites=favorites.filter(f=>f.symbol!==item.symbol);saveFavorites();renderFavorites();updateFavoriteButton();}); row.append(open,compare,remove); favoritesList.append(row); }); }
     let selectedRange = '6mo';
     let selectedStart = '';
+
+
+    const savePortfolio = () => localStorage.setItem(portfolioKey, JSON.stringify(portfolio));
+
+    function setPortfolioOpen(open) {
+      portfolioDrawer.classList.toggle('open', open);
+      portfolioBackdrop.classList.toggle('visible', open);
+      portfolioDrawer.setAttribute('aria-hidden', String(!open));
+      portfolioOpen.setAttribute('aria-expanded', String(open));
+      if (open) renderPortfolio();
+    }
+
+    function showPortfolioSuggestions(items) {
+      portfolioSuggestions.replaceChildren();
+      items.slice(0,5).forEach(item => {
+        const li = document.createElement('li');
+        const option = document.createElement('button');
+        option.type = 'button';
+        option.className = 'suggestion';
+        option.textContent = item.symbol + ' · ' + item.name;
+        option.addEventListener('click', () => {
+          portfolioSelection = { symbol:item.symbol, name:item.name };
+          portfolioSymbol.value = item.symbol;
+          portfolioSuggestions.classList.remove('visible');
+          openPortfolioDialog();
+        });
+        li.append(option);
+        portfolioSuggestions.append(li);
+      });
+      portfolioSuggestions.classList.toggle('visible', items.length > 0);
+    }
+
+    function openPortfolioDialog() {
+      const symbol = String(portfolioSelection?.symbol || portfolioSymbol.value).trim().toUpperCase();
+      if (!symbol) return portfolioSymbol.focus();
+      portfolioSelection = { symbol, name:portfolioSelection?.name || symbol };
+      portfolioDialogSymbol.textContent = portfolioSelection.symbol + (portfolioSelection.name !== portfolioSelection.symbol ? ' · ' + portfolioSelection.name : '');
+      portfolioQuantity.value = '';
+      portfolioCost.value = '';
+      portfolioDialog.showModal();
+      portfolioQuantity.focus();
+    }
+
+    async function fetchPortfolioItem(position) {
+      const query = 'range=1y&interval=1d&events=div';
+      const response = await fetch('/api/price?symbol=' + encodeURIComponent(position.symbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache:'no-store' });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || 'Fiyat alınamadı');
+      const result = payload.chart?.result?.[0];
+      const closes = result?.indicators?.quote?.[0]?.close?.filter(Number.isFinite) || [];
+      if (!closes.length) throw new Error('Fiyat bulunamadı');
+      const currency = result.meta?.currency || 'USD';
+      const name = result.meta?.longName || result.meta?.shortName || position.name || position.symbol;
+      const dividends = Object.values(result.events?.dividends || {}).map(event => ({ symbol:position.symbol, name, date:Number(event.date) * 1000, amount:Number(event.amount), currency })).filter(item => Number.isFinite(item.date) && Number.isFinite(item.amount));
+      return { ...position, name, currency, price:closes.at(-1), dividends };
+    }
+
+    function addPortfolioStat(parent, label, value, className='') {
+      const box = document.createElement('div');
+      box.className = 'portfolio-stat';
+      const caption = document.createElement('span');
+      caption.textContent = label;
+      const strong = document.createElement('strong');
+      strong.textContent = value;
+      if (className) strong.className = className;
+      box.append(caption,strong);
+      parent.append(box);
+    }
+
+    async function renderPortfolio() {
+      const renderId = ++portfolioRenderId;
+      portfolioList.replaceChildren();
+      portfolioSummary.replaceChildren();
+      dividendList.replaceChildren();
+      if (!portfolio.length) {
+        const empty = document.createElement('div');
+        empty.className = 'portfolio-empty';
+        empty.textContent = 'Portföyünüz boş. Hisse arayıp + düğmesine basın.';
+        portfolioList.append(empty);
+        const dividendEmpty = document.createElement('li');
+        dividendEmpty.className = 'favorites-note';
+        dividendEmpty.textContent = 'Temettü verisi için portföye hisse ekleyin.';
+        dividendList.append(dividendEmpty);
+        return;
+      }
+      const loading = document.createElement('div');
+      loading.className = 'portfolio-empty';
+      loading.textContent = 'Portföy fiyatları güncelleniyor…';
+      portfolioList.append(loading);
+      const results = await Promise.all(portfolio.map(async position => {
+        try { return { ok:true, value:await fetchPortfolioItem(position) }; }
+        catch (error) { return { ok:false, position, error }; }
+      }));
+      if (renderId !== portfolioRenderId) return;
+      portfolioList.replaceChildren();
+      let totalPositions = 0;
+      let profitablePositions = 0;
+      const allDividends = [];
+      results.forEach(result => {
+        const position = result.ok ? result.value : result.position;
+        const row = document.createElement('article');
+        row.className = 'portfolio-row';
+        const head = document.createElement('div');
+        head.className = 'portfolio-row-head';
+        const title = document.createElement('div');
+        title.className = 'portfolio-row-title';
+        const symbol = document.createElement('strong');
+        symbol.textContent = position.symbol;
+        const name = document.createElement('small');
+        name.textContent = result.ok ? position.name : result.error.message;
+        title.append(symbol,name);
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'portfolio-delete';
+        remove.title = position.symbol + ' pozisyonunu sil';
+        remove.textContent = '×';
+        remove.addEventListener('click', () => { portfolio = portfolio.filter(item => item.symbol !== position.symbol); savePortfolio(); renderPortfolio(); });
+        head.append(title,remove);
+        const stats = document.createElement('div');
+        stats.className = 'portfolio-stats';
+        const cost = position.quantity * position.unitCost;
+        addPortfolioStat(stats,'Adet',new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(position.quantity));
+        addPortfolioStat(stats,'Toplam maliyet',money(cost,result.ok ? position.currency : 'TRY'));
+        if (result.ok) {
+          totalPositions++;
+          const value = position.quantity * position.price;
+          const profit = value - cost;
+          const percent = cost > 0 ? profit / cost * 100 : 0;
+          if (profit >= 0) profitablePositions++;
+          const tone = profit >= 0 ? 'positive' : 'negative';
+          addPortfolioStat(stats,'Güncel değer',money(value,position.currency));
+          addPortfolioStat(stats,'Kâr / zarar',money(profit,position.currency) + ' · ' + (percent >= 0 ? '+' : '') + percent.toFixed(2) + '%',tone);
+          allDividends.push(...position.dividends);
+          const saved = portfolio.find(item => item.symbol === position.symbol);
+          if (saved) saved.name = position.name;
+        } else {
+          addPortfolioStat(stats,'Güncel değer','Veri yok','negative');
+          addPortfolioStat(stats,'Kâr / zarar','Hesaplanamadı','negative');
+        }
+        row.append(head,stats);
+        portfolioList.append(row);
+      });
+      savePortfolio();
+      const countCard = document.createElement('div');
+      countCard.className = 'summary-card';
+      countCard.innerHTML = '<small>Pozisyon</small><strong>' + portfolio.length + '</strong>';
+      const profitCard = document.createElement('div');
+      profitCard.className = 'summary-card';
+      profitCard.innerHTML = '<small>Kârda olan</small><strong>' + profitablePositions + ' / ' + totalPositions + '</strong>';
+      portfolioSummary.append(countCard,profitCard);
+      const dividends = allDividends.sort((a,b) => b.date - a.date).slice(0,5);
+      if (!dividends.length) {
+        const empty = document.createElement('li');
+        empty.className = 'favorites-note';
+        empty.textContent = 'Temettü kaydı bulunamadı.';
+        dividendList.append(empty);
+      } else {
+        dividends.forEach(item => {
+          const row = document.createElement('li');
+          row.className = 'dividend-row';
+          const date = document.createElement('time');
+          date.dateTime = new Date(item.date).toISOString().slice(0,10);
+          date.textContent = new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));
+          const symbol = document.createElement('span');
+          symbol.textContent = item.symbol;
+          const amount = document.createElement('strong');
+          amount.textContent = money(item.amount,item.currency);
+          row.append(date,symbol,amount);
+          dividendList.append(row);
+        });
+      }
+    }
 
     function money(value, currency) {
       return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: currency || 'USD', maximumFractionDigits: 2 }).format(value);
@@ -361,6 +618,47 @@
     startDate.addEventListener('input', () => { startDate.value = tidyDate(startDate.value); });
     startDate.addEventListener('change', applyStartDate);
     startDate.addEventListener('keydown', event => { if (event.key === 'Enter') applyStartDate(); });
+
+    portfolioOpen.addEventListener('click', () => setPortfolioOpen(true));
+    portfolioClose.addEventListener('click', () => setPortfolioOpen(false));
+    portfolioBackdrop.addEventListener('click', () => setPortfolioOpen(false));
+    portfolioAdd.addEventListener('click', openPortfolioDialog);
+    portfolioCancel.addEventListener('click', () => portfolioDialog.close());
+    portfolioSymbol.addEventListener('input', () => {
+      portfolioSelection = null;
+      clearTimeout(portfolioSearchTimer);
+      const query = portfolioSymbol.value.trim();
+      if (query.length < 2) return showPortfolioSuggestions([]);
+      portfolioSearchTimer = setTimeout(async () => {
+        try {
+          const response = await fetch('/api/search?q=' + encodeURIComponent(query));
+          const payload = await response.json();
+          showPortfolioSuggestions(payload.quotes || []);
+        } catch { showPortfolioSuggestions([]); }
+      },250);
+    });
+    portfolioSymbol.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); openPortfolioDialog(); } });
+    portfolioForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const quantity = Number(portfolioQuantity.value);
+      const unitCost = Number(portfolioCost.value);
+      if (!portfolioSelection || !Number.isFinite(quantity) || quantity <= 0 || !Number.isFinite(unitCost) || unitCost < 0) return;
+      const existing = portfolio.find(item => item.symbol === portfolioSelection.symbol);
+      if (existing) {
+        const totalQuantity = existing.quantity + quantity;
+        existing.unitCost = totalQuantity > 0 ? (existing.quantity * existing.unitCost + quantity * unitCost) / totalQuantity : unitCost;
+        existing.quantity = totalQuantity;
+        existing.name = portfolioSelection.name || existing.name;
+      } else {
+        portfolio.push({ symbol:portfolioSelection.symbol, name:portfolioSelection.name, quantity, unitCost });
+      }
+      savePortfolio();
+      portfolioDialog.close();
+      portfolioSymbol.value = '';
+      portfolioSelection = null;
+      showPortfolioSuggestions([]);
+      renderPortfolio();
+    });
     renderFavorites();
     updateFavoriteButton();
     loadPrice('AAPL');
