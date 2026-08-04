@@ -137,11 +137,33 @@
       .periods button { flex-basis:calc(50% - 8px); }
       .theme-toggle { top:10px; right:10px; }
     }
+
+    .app-tabs { display:flex; gap:8px; margin:0 0 24px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+    .app-tabs button { flex:0 1 180px; color:var(--text); background:#26344d; }
+    .app-tabs button.active { color:#062019; background:var(--accent); }
+    .app-view { display:none; }
+    .app-view.active { display:block; }
+    .portfolio-page { min-height:620px; }
+    .portfolio-page .portfolio-head { margin-bottom:16px; }
+    .portfolio-page .portfolio-search { max-width:720px; }
+    .portfolio-analysis { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+    .portfolio-analysis h3 { margin:0; }
+    .analysis-table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
+    .analysis-table th, .analysis-table td { padding:11px 13px; border-bottom:1px solid var(--line); text-align:left; }
+    .analysis-table tr:last-child th, .analysis-table tr:last-child td { border-bottom:0; }
+    .analysis-table th { color:var(--muted); font-weight:500; }
+    .analysis-table td { text-align:right; font-weight:700; }
+    html[data-theme="light"] .app-tabs button { color:var(--text); background:#e2e8f0; }
+    html[data-theme="light"] .app-tabs button.active { color:#fff; background:var(--accent); }
+    html[data-theme="light"] .analysis-table { background:#f8fafc; }
+    @media (max-width:500px) { .app-tabs button { flex:1; } .analysis-table th, .analysis-table td { padding:9px 8px; font-size:.86rem; } }
   </style>
 </head>
 <body>
   <button id="themeToggle" class="theme-toggle" type="button" aria-label="Açık temaya geç" title="Tema değiştir">☀️</button>
   <main>
+    <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Ana ekran</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button></nav>
+    <section id="mainView" class="app-view active">
     <div class="app-layout"><section class="chart-panel">
     <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.4</span></h1>
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
@@ -169,17 +191,16 @@
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
     </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><h2>Favoriler</h2><p class="favorites-note">Yıldıza tıklayarak hisse ekleyin. Favoriler bu cihazda saklanır.</p><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
+    </section>
+    <section id="portfolioView" class="app-view portfolio-page" aria-label="Portföy ekranı">
+      <div class="portfolio-head"><div><h2>Portföyüm</h2><p class="favorites-note">Pozisyonlarınız bu cihazda saklanır.</p></div></div>
+      <div class="portfolio-search"><input id="portfolioSymbol" type="search" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" aria-label="Portföy hisse önerileri"></ul></div>
+      <div id="portfolioList" class="portfolio-list"></div>
+      <section class="portfolio-analysis"><h3>Portföy özet analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
+      <section class="dividend-section"><h3>Temettü takvimi</h3><p class="dividend-note">Portföy hisselerinin son açıklanan temettüleri, en fazla 5 satır.</p><ul id="dividendList" class="dividend-list"></ul></section>
+    </section>
   </main>
 
-  <button id="portfolioOpen" class="portfolio-open" type="button" aria-controls="portfolioDrawer" aria-expanded="false">Portföy</button>
-  <div id="portfolioBackdrop" class="portfolio-backdrop"></div>
-  <aside id="portfolioDrawer" class="portfolio-drawer" aria-label="Portföy ekranı" aria-hidden="true">
-    <div class="portfolio-head"><div><h2>Portföyüm</h2><p class="favorites-note">Pozisyonlarınız bu cihazda saklanır.</p></div><button id="portfolioClose" class="portfolio-close" type="button" aria-label="Portföyü kapat">×</button></div>
-    <div class="portfolio-search"><input id="portfolioSymbol" type="search" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" aria-label="Portföy hisse önerileri"></ul></div>
-    <div id="portfolioSummary" class="portfolio-summary"></div>
-    <div id="portfolioList" class="portfolio-list"></div>
-    <section class="dividend-section"><h3>Temettü takvimi</h3><p class="dividend-note">Portföy hisselerinin son açıklanan temettüleri, en fazla 5 satır.</p><ul id="dividendList" class="dividend-list"></ul></section>
-  </aside>
   <dialog id="portfolioDialog" class="portfolio-dialog">
     <h3>Portföye ekle</h3><p id="portfolioDialogSymbol" class="portfolio-dialog-symbol"></p>
     <form id="portfolioForm" class="portfolio-form" method="dialog">
@@ -245,10 +266,10 @@
     const favoritesKey = 'finans-grafigi-favorites';
     const legacyFavoritesKey = Object.keys(localStorage).find(key => key.startsWith(favoritesKey + '-'));
     const suggestions = document.getElementById('suggestions'); let searchTimer;
-    const portfolioOpen = document.getElementById('portfolioOpen');
-    const portfolioClose = document.getElementById('portfolioClose');
-    const portfolioBackdrop = document.getElementById('portfolioBackdrop');
-    const portfolioDrawer = document.getElementById('portfolioDrawer');
+    const mainTab = document.getElementById('mainTab');
+    const portfolioTab = document.getElementById('portfolioTab');
+    const mainView = document.getElementById('mainView');
+    const portfolioView = document.getElementById('portfolioView');
     const portfolioSymbol = document.getElementById('portfolioSymbol');
     const portfolioAdd = document.getElementById('portfolioAdd');
     const portfolioSuggestions = document.getElementById('portfolioSuggestions');
@@ -483,12 +504,15 @@
 
     const savePortfolio = () => localStorage.setItem(portfolioKey, JSON.stringify(portfolio));
 
-    function setPortfolioOpen(open) {
-      portfolioDrawer.classList.toggle('open', open);
-      portfolioBackdrop.classList.toggle('visible', open);
-      portfolioDrawer.setAttribute('aria-hidden', String(!open));
-      portfolioOpen.setAttribute('aria-expanded', String(open));
-      if (open) renderPortfolio();
+    function setActiveView(view) {
+      const showPortfolio = view === 'portfolio';
+      mainView.classList.toggle('active',!showPortfolio);
+      portfolioView.classList.toggle('active',showPortfolio);
+      mainTab.classList.toggle('active',!showPortfolio);
+      portfolioTab.classList.toggle('active',showPortfolio);
+      mainTab.setAttribute('aria-selected',String(!showPortfolio));
+      portfolioTab.setAttribute('aria-selected',String(showPortfolio));
+      if(showPortfolio) renderPortfolio();
     }
 
     function showPortfolioSuggestions(items) {
@@ -528,12 +552,19 @@
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || 'Fiyat alınamadı');
       const result = payload.chart?.result?.[0];
-      const closes = result?.indicators?.quote?.[0]?.close?.filter(Number.isFinite) || [];
-      if (!closes.length) throw new Error('Fiyat bulunamadı');
+      const rawCloses = result?.indicators?.quote?.[0]?.close;
+      const timestamps = result?.timestamp;
+      if (!rawCloses || !timestamps) throw new Error('Fiyat bulunamadı');
+      const points = timestamps.map((time,index)=>({time,close:rawCloses[index]})).filter(point=>Number.isFinite(point.close));
+      if (!points.length) throw new Error('Fiyat bulunamadı');
+      const monday = new Date();
+      monday.setHours(0,0,0,0);
+      monday.setDate(monday.getDate()-((monday.getDay()+6)%7));
+      const weekBase = [...points].reverse().find(point=>point.time*1000<monday.getTime()) || points[0];
       const currency = result.meta?.currency || 'USD';
       const name = result.meta?.longName || result.meta?.shortName || position.name || position.symbol;
       const dividends = Object.values(result.events?.dividends || {}).map(event => ({ symbol:position.symbol, name, date:Number(event.date) * 1000, amount:Number(event.amount), currency })).filter(item => Number.isFinite(item.date) && Number.isFinite(item.amount));
-      return { ...position, name, currency, price:closes.at(-1), dividends };
+      return { ...position, name, currency, price:points.at(-1).close, weekStartPrice:weekBase.close, dividends };
     }
 
     function addPortfolioStat(parent, label, value, className='') {
@@ -548,108 +579,82 @@
       parent.append(box);
     }
 
+    function addAnalysisRow(table,label,value,tone='') {
+      const row=document.createElement('tr');
+      const heading=document.createElement('th');
+      heading.scope='row';
+      heading.textContent=label;
+      const cell=document.createElement('td');
+      cell.textContent=value;
+      if(tone)cell.className=tone;
+      row.append(heading,cell);
+      table.append(row);
+    }
+
     async function renderPortfolio() {
-      const renderId = ++portfolioRenderId;
+      const renderId=++portfolioRenderId;
       portfolioList.replaceChildren();
       portfolioSummary.replaceChildren();
       dividendList.replaceChildren();
-      if (!portfolio.length) {
-        const empty = document.createElement('div');
-        empty.className = 'portfolio-empty';
-        empty.textContent = 'Portföyünüz boş. Hisse arayıp + düğmesine basın.';
-        portfolioList.append(empty);
-        const dividendEmpty = document.createElement('li');
-        dividendEmpty.className = 'favorites-note';
-        dividendEmpty.textContent = 'Temettü verisi için portföye hisse ekleyin.';
-        dividendList.append(dividendEmpty);
-        return;
+      if(!portfolio.length){
+        const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Portföyünüz boş. Hisse arayıp + düğmesine basın.';portfolioList.append(empty);
+        const dividendEmpty=document.createElement('li');dividendEmpty.className='favorites-note';dividendEmpty.textContent='Temettü verisi için portföye hisse ekleyin.';dividendList.append(dividendEmpty);return;
       }
-      const loading = document.createElement('div');
-      loading.className = 'portfolio-empty';
-      loading.textContent = 'Portföy fiyatları güncelleniyor…';
-      portfolioList.append(loading);
-      const results = await Promise.all(portfolio.map(async position => {
-        try { return { ok:true, value:await fetchPortfolioItem(position) }; }
-        catch (error) { return { ok:false, position, error }; }
-      }));
-      if (renderId !== portfolioRenderId) return;
+      const loading=document.createElement('div');loading.className='portfolio-empty';loading.textContent='Portföy fiyatları güncelleniyor…';portfolioList.append(loading);
+      const results=await Promise.all(portfolio.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
+      if(renderId!==portfolioRenderId)return;
+      const valid=results.filter(result=>result.ok).map(result=>result.value);
+      const currencies=[...new Set(valid.map(item=>item.currency))];
+      const mixedCurrency=currencies.length>1;
+      const summaryCurrency=mixedCurrency?'USD':(currencies[0]||'USD');
+      const rates=new Map([['USD',1]]);
+      if(mixedCurrency){
+        await Promise.all(currencies.filter(code=>code!=='USD').map(async code=>{try{rates.set(code,(await latestPrice(code+'USD=X')).price)}catch{rates.set(code,0)}}));
+      }
+      if(renderId!==portfolioRenderId)return;
       portfolioList.replaceChildren();
-      let totalPositions = 0;
-      let profitablePositions = 0;
-      const allDividends = [];
-      results.forEach(result => {
-        const position = result.ok ? result.value : result.position;
-        const row = document.createElement('article');
-        row.className = 'portfolio-row';
-        const head = document.createElement('div');
-        head.className = 'portfolio-row-head';
-        const title = document.createElement('div');
-        title.className = 'portfolio-row-title';
-        const symbol = document.createElement('strong');
-        symbol.textContent = position.symbol;
-        const name = document.createElement('small');
-        name.textContent = result.ok ? position.name : result.error.message;
-        title.append(symbol,name);
-        const remove = document.createElement('button');
-        remove.type = 'button';
-        remove.className = 'portfolio-delete';
-        remove.title = position.symbol + ' pozisyonunu sil';
-        remove.textContent = '×';
-        remove.addEventListener('click', () => { portfolio = portfolio.filter(item => item.symbol !== position.symbol); savePortfolio(); renderPortfolio(); });
+      let totalCost=0,totalValue=0,totalWeekStartValue=0;
+      const allDividends=[];
+      results.forEach(result=>{
+        const position=result.ok?result.value:result.position;
+        const row=document.createElement('article');row.className='portfolio-row';
+        const head=document.createElement('div');head.className='portfolio-row-head';
+        const title=document.createElement('div');title.className='portfolio-row-title';
+        const symbol=document.createElement('strong');symbol.textContent=position.symbol;
+        const name=document.createElement('small');name.textContent=result.ok?position.name:result.error.message;title.append(symbol,name);
+        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.title=position.symbol+' pozisyonunu sil';remove.textContent='×';remove.addEventListener('click',()=>{portfolio=portfolio.filter(item=>item.symbol!==position.symbol);savePortfolio();renderPortfolio()});
         head.append(title,remove);
-        const stats = document.createElement('div');
-        stats.className = 'portfolio-stats';
-        const cost = position.quantity * position.unitCost;
+        const stats=document.createElement('div');stats.className='portfolio-stats';
+        const cost=position.quantity*position.unitCost;
         addPortfolioStat(stats,'Adet',new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(position.quantity));
-        addPortfolioStat(stats,'Toplam maliyet',money(cost,result.ok ? position.currency : 'TRY'));
-        if (result.ok) {
-          totalPositions++;
-          const value = position.quantity * position.price;
-          const profit = value - cost;
-          const percent = cost > 0 ? profit / cost * 100 : 0;
-          if (profit >= 0) profitablePositions++;
-          const tone = profit >= 0 ? 'positive' : 'negative';
+        addPortfolioStat(stats,'Toplam maliyet',money(cost,result.ok?position.currency:'TRY'));
+        if(result.ok){
+          const value=position.quantity*position.price,profit=value-cost,percent=cost>0?profit/cost*100:0,tone=profit>=0?'positive':'negative';
           addPortfolioStat(stats,'Güncel değer',money(value,position.currency));
-          addPortfolioStat(stats,'Kâr / zarar',money(profit,position.currency) + ' · ' + (percent >= 0 ? '+' : '') + percent.toFixed(2) + '%',tone);
+          addPortfolioStat(stats,'Kâr / zarar',money(profit,position.currency)+' · '+(percent>=0?'+':'')+percent.toFixed(2)+'%',tone);
+          const factor=mixedCurrency?(rates.get(position.currency)||0):1;
+          totalCost+=cost*factor;totalValue+=value*factor;totalWeekStartValue+=position.quantity*position.weekStartPrice*factor;
           allDividends.push(...position.dividends);
-          const saved = portfolio.find(item => item.symbol === position.symbol);
-          if (saved) saved.name = position.name;
-        } else {
-          addPortfolioStat(stats,'Güncel değer','Veri yok','negative');
-          addPortfolioStat(stats,'Kâr / zarar','Hesaplanamadı','negative');
+          const saved=portfolio.find(item=>item.symbol===position.symbol);if(saved)saved.name=position.name;
+        }else{
+          addPortfolioStat(stats,'Güncel değer','Veri yok','negative');addPortfolioStat(stats,'Kâr / zarar','Hesaplanamadı','negative');
         }
-        row.append(head,stats);
-        portfolioList.append(row);
+        row.append(head,stats);portfolioList.append(row);
       });
       savePortfolio();
-      const countCard = document.createElement('div');
-      countCard.className = 'summary-card';
-      countCard.innerHTML = '<small>Pozisyon</small><strong>' + portfolio.length + '</strong>';
-      const profitCard = document.createElement('div');
-      profitCard.className = 'summary-card';
-      profitCard.innerHTML = '<small>Kârda olan</small><strong>' + profitablePositions + ' / ' + totalPositions + '</strong>';
-      portfolioSummary.append(countCard,profitCard);
-      const dividends = allDividends.sort((a,b) => b.date - a.date).slice(0,5);
-      if (!dividends.length) {
-        const empty = document.createElement('li');
-        empty.className = 'favorites-note';
-        empty.textContent = 'Temettü kaydı bulunamadı.';
-        dividendList.append(empty);
-      } else {
-        dividends.forEach(item => {
-          const row = document.createElement('li');
-          row.className = 'dividend-row';
-          const date = document.createElement('time');
-          date.dateTime = new Date(item.date).toISOString().slice(0,10);
-          date.textContent = new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));
-          const symbol = document.createElement('span');
-          symbol.textContent = item.symbol;
-          const amount = document.createElement('strong');
-          amount.textContent = money(item.amount,item.currency);
-          row.append(date,symbol,amount);
-          dividendList.append(row);
-        });
-      }
+      const netProfit=totalValue-totalCost,profitPercent=totalCost>0?netProfit/totalCost*100:0;
+      const weekProfit=totalValue-totalWeekStartValue,weekPercent=totalWeekStartValue>0?weekProfit/totalWeekStartValue*100:0;
+      const table=document.createElement('table');table.className='analysis-table';
+      addAnalysisRow(table,'Toplam maliyet',money(totalCost,summaryCurrency));
+      addAnalysisRow(table,'Güncel toplam değer',money(totalValue,summaryCurrency));
+      addAnalysisRow(table,'Net kâr / zarar',money(netProfit,summaryCurrency),netProfit>=0?'positive':'negative');
+      addAnalysisRow(table,'Kâr / zarar (%)',(profitPercent>=0?'+':'')+profitPercent.toFixed(2)+'%',profitPercent>=0?'positive':'negative');
+      addAnalysisRow(table,'Hafta başından net kâr / zarar',money(weekProfit,summaryCurrency),weekProfit>=0?'positive':'negative');
+      addAnalysisRow(table,'Hafta başından kâr / zarar (%)',(weekPercent>=0?'+':'')+weekPercent.toFixed(2)+'%',weekPercent>=0?'positive':'negative');
+      portfolioSummary.append(table);
+      const dividends=allDividends.sort((a,b)=>b.date-a.date).slice(0,5);
+      if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';empty.textContent='Temettü kaydı bulunamadı.';dividendList.append(empty)}
+      else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol;const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency);row.append(date,symbol,amount);dividendList.append(row)});
     }
 
     function money(value, currency) {
@@ -1016,9 +1021,8 @@
       if('Notification' in window && Notification.permission==='default') Notification.requestPermission();
       checkAlarms();
     });
-    portfolioOpen.addEventListener('click', () => setPortfolioOpen(true));
-    portfolioClose.addEventListener('click', () => setPortfolioOpen(false));
-    portfolioBackdrop.addEventListener('click', () => setPortfolioOpen(false));
+    mainTab.addEventListener('click',()=>setActiveView('main'));
+    portfolioTab.addEventListener('click',()=>setActiveView('portfolio'));
     portfolioAdd.addEventListener('click', openPortfolioDialog);
     portfolioCancel.addEventListener('click', () => portfolioDialog.close());
     portfolioSymbol.addEventListener('input', () => {
