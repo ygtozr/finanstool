@@ -146,7 +146,7 @@
       if (document.getElementById('ma20').checked) datasets.push({ label: 'MA20', data: sma(lastPrices,20), borderColor:'#fbbf24', pointRadius:0, borderWidth:1.5, fill:false, yAxisID:'price' });
       if (document.getElementById('ma50').checked) datasets.push({ label: 'MA50', data: sma(lastPrices,50), borderColor:'#a78bfa', pointRadius:0, borderWidth:1.5, fill:false, yAxisID:'price' });
       if (document.getElementById('rsiToggle').checked) datasets.push({ label:'RSI (14)', data:calculateRsi(lastPrices), borderColor:'#52d5b1', borderDash:[6,4], pointRadius:0, borderWidth:1.5, fill:false, yAxisID:'rsi' });
-      if (compareData) datasets.push({ label:compareData.symbol, data:compareData.values, borderColor:'#fb7185', pointRadius:0, borderWidth:2, fill:false, yAxisID:'price' });
+      if (compareData) datasets.push({ label:compareData.symbol, data:compareData.values, borderColor:'#fb7185', pointRadius:0, borderWidth:2, fill:false, spanGaps:true, yAxisID:'price' });
       if (chart) chart.destroy();
       chart = new Chart(document.getElementById('priceChart'), { type:'line', data:{labels:lastLabels,datasets}, options:{ responsive:true, maintainAspectRatio:false, interaction:{intersect:false,mode:'index'}, plugins:{legend:{display:true},tooltip:{callbacks:{label: context => context.dataset.yAxisID === 'rsi' ? context.dataset.label + ': ' + context.parsed.y.toFixed(2) : context.dataset.label + ': ' + money(context.parsed.y,currentCurrency)}}}, scales:{x:{grid:{display:false},ticks:{color:'#aebbd0',maxTicksLimit:7}},price:{position:'left',grid:{color:'#2b3a55'},ticks:{color:'#aebbd0',callback:value=>money(value,currentCurrency)}},rsi:{display:document.getElementById('rsiToggle').checked,position:'right',min:0,max:100,grid:{drawOnChartArea:false},ticks:{color:'#52d5b1'}}}} });
     }
@@ -256,12 +256,23 @@
         const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query));
         const payload = await response.json();
         if (!response.ok) throw new Error(payload.error || 'Veri alınamadı');
-        const raw = payload.chart && payload.chart.result && payload.chart.result[0] && payload.chart.result[0].indicators.quote[0].close;
-        if (!raw) throw new Error('Fiyat verisi bulunamadı');
-        const values = raw.filter(Number.isFinite);
-        if (!values.length) throw new Error('Fiyat verisi bulunamadı');
+        const result = payload.chart && payload.chart.result && payload.chart.result[0];
+        const raw = result && result.indicators && result.indicators.quote && result.indicators.quote[0] && result.indicators.quote[0].close;
+        const timestamps = result && result.timestamp;
+        if (!raw || !timestamps) throw new Error('Fiyat verisi bulunamadı');
+        const formatter = new Intl.DateTimeFormat('tr-TR', { day:'2-digit', month:'short', year:'numeric' });
+        const pricesByDate = new Map();
+        timestamps.forEach((timestamp, index) => {
+          if (Number.isFinite(raw[index])) pricesByDate.set(formatter.format(new Date(timestamp * 1000)), raw[index]);
+        });
+        const firstValue = lastLabels.map(label => pricesByDate.get(label)).find(Number.isFinite);
+        if (!Number.isFinite(firstValue)) throw new Error('Tarih aralığında ortak fiyat verisi bulunamadı');
         const base = lastPrices[0];
-        compareData = { symbol, values: values.map(value => value / values[0] * base) };
+        const alignedValues = lastLabels.map(label => {
+          const value = pricesByDate.get(label);
+          return Number.isFinite(value) ? value / firstValue * base : null;
+        });
+        compareData = { symbol, values: alignedValues };
         renderChart(lastLabels,lastPrices,currentChartName,currentCurrency);
         renderFavorites();
       } catch (error) { alert('Karşılaştırma verisi alınamadı: ' + error.message); }
