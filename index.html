@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finans Grafiği v2.3</title>
+  <title>Finans Grafiği v2.4</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -105,19 +105,49 @@
     .dialog-cancel { color:var(--text); background:#26344d; }
     @media (max-width:760px) { .app-layout { grid-template-columns:1fr; } .favorites-panel { border-left:0; border-top:1px solid var(--line); padding:20px 0 0; } }
     @media (max-width:500px) { form { flex-wrap:wrap; } .search-field { flex-basis:100%; } #submitButton { width:100%; } .portfolio-drawer { width:100%; padding:18px; } .portfolio-stats { grid-template-columns:1fr; } .portfolio-open { top:auto; bottom:18px; transform:none; writing-mode:horizontal-tb; border-radius:0 12px 12px 0; } }
+
+    .theme-toggle { position:fixed; z-index:45; top:16px; right:16px; width:44px; height:44px; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); box-shadow:0 8px 22px #0006; }
+    html[data-theme="light"] { color-scheme:light; --bg:#eef3f8; --panel:#ffffff; --line:#cbd5e1; --text:#172033; --muted:#5f6f86; --accent:#0f9f7f; --danger:#c9344f; }
+    html[data-theme="light"] body { background:radial-gradient(circle at top,#dbeafe 0,#eef3f8 48%); }
+    html[data-theme="light"] main { background:rgba(255,255,255,.97); box-shadow:0 22px 60px #64748b33; }
+    html[data-theme="light"] input, html[data-theme="light"] select, html[data-theme="light"] .favorite-symbol, html[data-theme="light"] .search-suggestions, html[data-theme="light"] .portfolio-drawer, html[data-theme="light"] .portfolio-dialog, html[data-theme="light"] .portfolio-row, html[data-theme="light"] .summary-card, html[data-theme="light"] .portfolio-stat, html[data-theme="light"] .dividend-row, html[data-theme="light"] .advanced-result, html[data-theme="light"] .alarm-row { color:var(--text); background:#f8fafc; }
+    html[data-theme="light"] .toolbar button, html[data-theme="light"] .periods button, html[data-theme="light"] .portfolio-close, html[data-theme="light"] .dialog-cancel, html[data-theme="light"] .theme-toggle { color:var(--text); background:#e2e8f0; }
+    html[data-theme="light"] .search-suggestions { box-shadow:0 12px 25px #64748b44; }
+    html[data-theme="light"] .suggestion:hover { background:#e2e8f0; }
+    @media (max-width:760px) {
+      body { padding:12px; place-items:start center; }
+      main { margin-top:52px; padding:20px 16px; }
+      .toolbar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .toolbar label, .toolbar button { width:100%; min-height:42px; display:flex; align-items:center; justify-content:center; }
+      .meta { gap:7px 14px; }
+      .chart-wrap { height:390px; }
+      .rsi-wrap { height:190px; }
+      .periods button { flex:1 1 calc(33.333% - 8px); }
+    }
+    @media (max-width:420px) {
+      body { padding:8px; }
+      main { padding:16px 12px; border-radius:14px; }
+      h1 { font-size:1.45rem; }
+      .toolbar { grid-template-columns:1fr; }
+      .chart-wrap { height:340px; }
+      .rsi-wrap { height:175px; }
+      .periods button { flex-basis:calc(50% - 8px); }
+      .theme-toggle { top:10px; right:10px; }
+    }
   </style>
 </head>
 <body>
+  <button id="themeToggle" class="theme-toggle" type="button" aria-label="Açık temaya geç" title="Tema değiştir">☀️</button>
   <main>
     <div class="app-layout"><section class="chart-panel">
-    <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.3</span></h1>
+    <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.4</span></h1>
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
       <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
-    <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button></div><div id="meta" class="meta" aria-live="polite"></div>
+    <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button><button id="exportCsv" type="button">CSV indir</button><button id="exportPng" type="button">PNG indir</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img"></canvas></div>
     <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img"></canvas></div>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
@@ -193,6 +223,10 @@
     const symbolInput = document.getElementById('symbol');
     const button = document.getElementById('submitButton');
     const meta = document.getElementById('meta');
+    const themeToggle = document.getElementById('themeToggle');
+    const exportCsv = document.getElementById('exportCsv');
+    const exportPng = document.getElementById('exportPng');
+    const themeKey = 'finans-grafigi-theme';
     const periodButtons = [...document.querySelectorAll('[data-range]')];
     const customPeriod = document.getElementById('customPeriod');
     const datePicker = document.getElementById('datePicker');
@@ -258,6 +292,75 @@
     let selectedStart = '';
 
 
+
+
+    function applyTheme(theme) {
+      const next = theme === 'light' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem(themeKey,next);
+      themeToggle.textContent = next === 'light' ? '🌙' : '☀️';
+      themeToggle.setAttribute('aria-label', next === 'light' ? 'Koyu temaya geç' : 'Açık temaya geç');
+      if (lastLabels.length) renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,false);
+    }
+
+    function safeFileName(value) {
+      return String(value || 'finans-grafigi').replace(/[^a-z0-9._-]+/gi,'-').replace(/^-|-$/g,'');
+    }
+
+    function downloadBlob(blob, fileName) {
+      const url=URL.createObjectURL(blob);
+      const link=document.createElement('a');
+      link.href=url;
+      link.download=fileName;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+
+    function exportChartCsv() {
+      if (!lastLabels.length) return;
+      const includeMa=document.getElementById('maToggle').checked;
+      const includeRsi=document.getElementById('rsiToggle').checked;
+      const columns=[
+        {name:'Tarih',values:lastLabels},
+        {name:currentChartName+' ('+currentCurrency+')',values:lastPrices}
+      ];
+      if(compareData)columns.push({name:compareData.symbol,values:compareData.values});
+      if(includeMa){
+        columns.push({name:'MA50',values:movingAverageData?.ma50||sma(lastPrices,50)});
+        columns.push({name:'MA100',values:movingAverageData?.ma100||sma(lastPrices,100)});
+        columns.push({name:'MA200',values:movingAverageData?.ma200||sma(lastPrices,200)});
+      }
+      if(includeRsi)columns.push({name:'RSI (14)',values:calculateRsi(lastPrices)});
+      const quote=value=>'"'+String(value??'').replace(/"/g,'""')+'"';
+      const rows=[columns.map(column=>quote(column.name)).join(';')];
+      for(let index=0;index<lastLabels.length;index++)rows.push(columns.map(column=>quote(column.values[index])).join(';'));
+      downloadBlob(new Blob(['\ufeff'+rows.join('\n')],{type:'text/csv;charset=utf-8'}),safeFileName(currentChartName)+'-'+selectedRange+'.csv');
+    }
+
+    function exportChartPng() {
+      if (!chart) return;
+      const canvases=[document.getElementById('priceChart')];
+      if(document.getElementById('rsiWrap').classList.contains('visible'))canvases.push(document.getElementById('rsiChart'));
+      const width=Math.max(...canvases.map(canvas=>canvas.width));
+      const gap=24;
+      const height=canvases.reduce((sum,canvas)=>sum+canvas.height,0)+gap*(canvases.length-1);
+      const output=document.createElement('canvas');
+      output.width=width;
+      output.height=height;
+      const context=output.getContext('2d');
+      context.fillStyle=document.documentElement.dataset.theme==='light'?'#ffffff':'#192337';
+      context.fillRect(0,0,width,height);
+      let y=0;
+      canvases.forEach(canvas=>{context.drawImage(canvas,0,y);y+=canvas.height+gap});
+      const link=document.createElement('a');
+      link.download=safeFileName(currentChartName)+'-'+selectedRange+'.png';
+      link.href=output.toDataURL('image/png');
+      document.body.append(link);
+      link.click();
+      link.remove();
+    }
 
     const saveAlarms = () => localStorage.setItem(alarmKey, JSON.stringify(alarms));
 
@@ -838,6 +941,10 @@
     startDate.addEventListener('keydown', event => { if (event.key === 'Enter') applyStartDate(); });
 
 
+
+    themeToggle.addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light'));
+    exportCsv.addEventListener('click',exportChartCsv);
+    exportPng.addEventListener('click',exportChartPng);
     advancedSearchButton.addEventListener('click',()=>{advancedQuery.value=symbolInput.value;advancedResults.replaceChildren();advancedSearchDialog.showModal();advancedQuery.focus()});
     advancedClose.addEventListener('click',()=>advancedSearchDialog.close());
     advancedSearchForm.addEventListener('submit',async event=>{
@@ -907,6 +1014,7 @@
       showPortfolioSuggestions([]);
       renderPortfolio();
     });
+    applyTheme(localStorage.getItem(themeKey) || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
     renderFavorites();
     updateFavoriteButton();
     loadPrice('AAPL');
