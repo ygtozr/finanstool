@@ -5,7 +5,9 @@ module.exports = async (req, res) => {
   const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(symbol) + '?' + query;
   try {
     const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-    res.setHeader('Cache-Control', 's-maxage=300');
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('CDN-Cache-Control', 'no-store');
+    res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
     res.status(response.status).send(await response.text());
   } catch { res.status(502).json({ error: 'Veri sağlayıcısına ulaşılamadı.' }); }
 };
