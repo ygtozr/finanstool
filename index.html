@@ -85,6 +85,10 @@
     let lastLabels = [];
     let currentCurrency = 'TRY';
     let currentChartName = '';
+    let primaryPrices = [];
+    let primaryLabels = [];
+    let primaryCurrency = 'TRY';
+    let primaryChartName = '';
     const form = document.getElementById('symbolForm');
     const symbolInput = document.getElementById('symbol');
     const button = document.getElementById('submitButton');
@@ -105,7 +109,7 @@
     const currentSymbol = () => symbolInput.value.trim().toUpperCase();
     const isFavorite = symbol => favorites.some(item => item.symbol === symbol);
     function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
-    function renderFavorites() { favoritesList.replaceChildren(); favoritesEmpty.hidden = favorites.length > 0; favorites.forEach(item => { const row=document.createElement('li'); row.className='favorite-row'; const open=document.createElement('button'); open.type='button'; open.className='favorite-symbol'; open.textContent=item.name !== item.symbol ? item.symbol+' · '+item.name : item.symbol; open.addEventListener('click',()=>{symbolInput.value=item.symbol; updateFavoriteButton(); loadPrice(item.symbol);}); const compare=document.createElement('button'); compare.type='button'; compare.className='favorite-remove'; compare.classList.toggle('compare-active',compareData&&compareData.symbol===item.symbol); compare.textContent='📈'; compare.title=item.symbol+' ile karşılaştır'; compare.addEventListener('click',()=>{if(compareData&&compareData.symbol===item.symbol){compareData=null;renderChart(lastLabels,lastPrices,currentChartName,currentCurrency);renderFavorites()}else compareStock(item.symbol)}); const remove=document.createElement('button'); remove.type='button'; remove.className='favorite-remove'; remove.textContent='★'; remove.title=item.symbol+' favorilerden çıkar'; remove.addEventListener('click',()=>{favorites=favorites.filter(f=>f.symbol!==item.symbol);saveFavorites();renderFavorites();updateFavoriteButton();}); row.append(open,compare,remove); favoritesList.append(row); }); }
+    function renderFavorites() { favoritesList.replaceChildren(); favoritesEmpty.hidden = favorites.length > 0; favorites.forEach(item => { const row=document.createElement('li'); row.className='favorite-row'; const open=document.createElement('button'); open.type='button'; open.className='favorite-symbol'; open.textContent=item.name !== item.symbol ? item.symbol+' · '+item.name : item.symbol; open.addEventListener('click',()=>{symbolInput.value=item.symbol; updateFavoriteButton(); loadPrice(item.symbol);}); const compare=document.createElement('button'); compare.type='button'; compare.className='favorite-remove'; compare.classList.toggle('compare-active',compareData&&compareData.rawSymbol===item.symbol); compare.textContent='📈'; compare.title=item.symbol+' ile karşılaştır'; compare.addEventListener('click',()=>{if(compareData&&compareData.rawSymbol===item.symbol){compareData=null;renderChart(primaryLabels,primaryPrices,primaryChartName,primaryCurrency,false);renderFavorites()}else compareStock(item.symbol)}); const remove=document.createElement('button'); remove.type='button'; remove.className='favorite-remove'; remove.textContent='★'; remove.title=item.symbol+' favorilerden çıkar'; remove.addEventListener('click',()=>{favorites=favorites.filter(f=>f.symbol!==item.symbol);saveFavorites();renderFavorites();updateFavoriteButton();}); row.append(open,compare,remove); favoritesList.append(row); }); }
     let selectedRange = '6mo';
     let selectedStart = '';
 
@@ -136,8 +140,14 @@
       });
     }
 
-    function renderChart(labels, prices, name, currency) {
+    function renderChart(labels, prices, name, currency, rememberPrimary = true) {
       if (!labels.length || !prices.length) return;
+      if (rememberPrimary) {
+        primaryLabels = [...labels];
+        primaryPrices = [...prices];
+        primaryChartName = name || primaryChartName;
+        primaryCurrency = currency || primaryCurrency;
+      }
       lastLabels = [...labels];
       lastPrices = [...prices];
       currentChartName = name || currentChartName;
@@ -233,7 +243,9 @@
         changeStrong.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
         changePart.append(changeLabel(), changeStrong);
         meta.append(namePart, pricePart, changePart);
-        renderChart(labels, prices, name, currency);
+        compareData = null;
+        renderChart(labels, prices, name, currency, true);
+        renderFavorites();
       } catch (error) {
         meta.innerHTML = `<span class="error">${error.message} Kodu kontrol edip tekrar deneyin.</span>`;
         if (chart) { chart.destroy(); chart = null; }
@@ -244,40 +256,83 @@
     }
 
     function redrawIndicators() {
-      renderChart(lastLabels, lastPrices, currentChartName, currentCurrency);
+      renderChart(lastLabels, lastPrices, currentChartName, currentCurrency, false);
     }
     document.querySelectorAll('#ma20,#ma50,#rsiToggle').forEach(control => control.addEventListener('change', redrawIndicators));
 
+    function alignResultToLabels(result, labels) {
+      const raw = result?.indicators?.quote?.[0]?.close;
+      const timestamps = result?.timestamp;
+      if (!raw || !timestamps) throw new Error('Fiyat verisi bulunamadı');
+      const formatter = new Intl.DateTimeFormat('tr-TR', { day:'2-digit', month:'short', year:'numeric' });
+      const valuesByDate = new Map();
+      timestamps.forEach((timestamp, index) => {
+        if (Number.isFinite(raw[index])) valuesByDate.set(formatter.format(new Date(timestamp * 1000)), raw[index]);
+      });
+      return labels.map(label => valuesByDate.get(label) ?? null);
+    }
+
+    function fillMissingRates(values) {
+      const filled = [...values];
+      let lastRate = null;
+      for (let i = 0; i < filled.length; i++) {
+        if (Number.isFinite(filled[i])) lastRate = filled[i];
+        else if (Number.isFinite(lastRate)) filled[i] = lastRate;
+      }
+      let nextRate = null;
+      for (let i = filled.length - 1; i >= 0; i--) {
+        if (Number.isFinite(filled[i])) nextRate = filled[i];
+        else if (Number.isFinite(nextRate)) filled[i] = nextRate;
+      }
+      return filled;
+    }
+
+    async function convertSeriesToUsd(currency, values, labels, query) {
+      const code = String(currency || 'USD').toUpperCase();
+      if (code === 'USD') return [...values];
+      const fxSymbol = code + 'USD=X';
+      const response = await fetch('/api/price?symbol=' + encodeURIComponent(fxSymbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache: 'no-store' });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(code + '/USD kuru alınamadı');
+      const result = payload.chart?.result?.[0];
+      const rates = fillMissingRates(alignResultToLabels(result, labels));
+      if (!rates.some(Number.isFinite)) throw new Error(code + '/USD kuru bulunamadı');
+      return values.map((value, index) => Number.isFinite(value) && Number.isFinite(rates[index]) ? value * rates[index] : null);
+    }
+
     async function compareStock(inputSymbol) {
       const symbol = String(inputSymbol || '').trim().toUpperCase();
-      if (!symbol || !lastPrices.length) return;
+      if (!symbol || !primaryPrices.length) return;
       try {
         const query = selectedStart ? 'period1=' + Math.floor(new Date(selectedStart + 'T00:00:00Z').getTime()/1000) + '&period2=' + Math.floor(Date.now()/1000) + '&interval=1d' : 'range=' + selectedRange + '&interval=1d';
         const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache: 'no-store' });
         const payload = await response.json();
         if (!response.ok) throw new Error(payload.error || 'Veri alınamadı');
-        const result = payload.chart && payload.chart.result && payload.chart.result[0];
-        const raw = result && result.indicators && result.indicators.quote && result.indicators.quote[0] && result.indicators.quote[0].close;
-        const timestamps = result && result.timestamp;
-        if (!raw || !timestamps) throw new Error('Fiyat verisi bulunamadı');
-        const formatter = new Intl.DateTimeFormat('tr-TR', { day:'2-digit', month:'short', year:'numeric' });
-        const pricesByDate = new Map();
-        timestamps.forEach((timestamp, index) => {
-          if (Number.isFinite(raw[index])) pricesByDate.set(formatter.format(new Date(timestamp * 1000)), raw[index]);
-        });
-        const firstValue = lastLabels.map(label => pricesByDate.get(label)).find(Number.isFinite);
-        if (!Number.isFinite(firstValue)) throw new Error('Tarih aralığında ortak fiyat verisi bulunamadı');
-        const base = lastPrices[0];
-        const alignedValues = lastLabels.map(label => {
-          const value = pricesByDate.get(label);
-          return Number.isFinite(value) ? value / firstValue * base : null;
-        });
-        compareData = { symbol, values: alignedValues };
-        renderChart(lastLabels,lastPrices,currentChartName,currentCurrency);
+        const result = payload.chart?.result?.[0];
+        if (!result) throw new Error('Fiyat verisi bulunamadı');
+
+        const comparisonCurrency = String(result.meta?.currency || 'USD').toUpperCase();
+        let mainValues = [...primaryPrices];
+        let comparisonValues = alignResultToLabels(result, primaryLabels);
+        let axisCurrency = primaryCurrency;
+
+        if (String(primaryCurrency).toUpperCase() !== comparisonCurrency) {
+          [mainValues, comparisonValues] = await Promise.all([
+            convertSeriesToUsd(primaryCurrency, primaryPrices, primaryLabels, query),
+            convertSeriesToUsd(comparisonCurrency, comparisonValues, primaryLabels, query)
+          ]);
+          axisCurrency = 'USD';
+        }
+
+        compareData = { symbol: symbol + ' (' + axisCurrency + ')', rawSymbol: symbol, values: comparisonValues };
+        renderChart(primaryLabels, mainValues, primaryChartName, axisCurrency, false);
         renderFavorites();
-      } catch (error) { alert('Karşılaştırma verisi alınamadı: ' + error.message); }
+      } catch (error) {
+        alert('Karşılaştırma verisi alınamadı: ' + error.message);
+      }
     }
-        form.addEventListener('submit', event => {
+
+    form.addEventListener('submit', event => {
       event.preventDefault();
       loadPrice(symbolInput.value.trim().toUpperCase());
     });
