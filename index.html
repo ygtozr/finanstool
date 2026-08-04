@@ -327,6 +327,7 @@
     let marketSearchTimer;
     let marketSearchResults = [];
     let marketSummaryRequest = 0;
+    let chartRefreshInProgress = false;
     const saveMarketItems = () => localStorage.setItem(marketItemsKey,JSON.stringify(marketItems));
     const themeToggle = document.getElementById('themeToggle');
     const exportCsv = document.getElementById('exportCsv');
@@ -1015,10 +1016,13 @@
       loadPrice(symbolInput.value.trim().toUpperCase());
     }
 
-    async function loadPrice(symbol) {
-      button.disabled = true;
-      button.textContent = 'Yükleniyor…';
-      meta.textContent = '';
+    async function loadPrice(symbol,{silent=false,preserveComparisons=false}={}) {
+      const comparisonSymbols=preserveComparisons?compareData.map(item=>item.rawSymbol):[];
+      if(!silent){
+        button.disabled = true;
+        button.textContent = 'Yükleniyor…';
+        meta.textContent = '';
+      }
       try {
         const query = selectedStart
           ? `period1=${Math.floor(new Date(`${selectedStart}T00:00:00Z`).getTime() / 1000)}&period2=${Math.floor(Date.now() / 1000)}&interval=1d`
@@ -1068,15 +1072,27 @@
         renderChart(labels, prices, name, currency, true);
         renderFavorites();
         updateCompareButton();
+        for(const comparisonSymbol of comparisonSymbols)await compareStock(comparisonSymbol);
       } catch (error) {
-        meta.innerHTML = `<span class="error">${error.message} Kodu kontrol edip tekrar deneyin.</span>`;
-        if (chart) { chart.destroy(); chart = null; }
-        if (rsiChart) { rsiChart.destroy(); rsiChart = null; }
-        document.getElementById('rsiWrap').classList.remove('visible');
+        if(!silent){
+          meta.innerHTML = `<span class="error">${error.message} Kodu kontrol edip tekrar deneyin.</span>`;
+          if (chart) { chart.destroy(); chart = null; }
+          if (rsiChart) { rsiChart.destroy(); rsiChart = null; }
+          document.getElementById('rsiWrap').classList.remove('visible');
+        }
       } finally {
-        button.disabled = false;
-        button.textContent = 'Grafiği getir';
+        if(!silent){
+          button.disabled = false;
+          button.textContent = 'Grafiği getir';
+        }
       }
+    }
+
+    async function refreshCurrentChart(){
+      if(chartRefreshInProgress||!primarySymbol||document.hidden)return;
+      chartRefreshInProgress=true;
+      try{await loadPrice(primarySymbol,{silent:true,preserveComparisons:true})}
+      finally{chartRefreshInProgress=false}
     }
 
     async function redrawIndicators(event) {
@@ -1288,7 +1304,8 @@
     loadMarketSummary();
     renderAlarms();
     setInterval(checkAlarms, 60000);
-    setInterval(loadMarketSummary, 5000);
+    setInterval(loadMarketSummary, 15000);
+    setInterval(refreshCurrentChart, 15000);
   </script>
 </body>
 </html>
