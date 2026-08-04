@@ -179,6 +179,7 @@
   <script>
     let chart;
     let rsiChart;
+    let movingAverageData = null;
     let compareData = null;
     let lastPrices = [];
     let lastLabels = [];
@@ -533,6 +534,30 @@
       });
     }
 
+
+    async function prepareMovingAverages(symbol, labels) {
+      const query = 'range=10y&interval=1d';
+      const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache:'no-store' });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || 'Hareketli ortalama verisi alınamadı');
+      const result = payload.chart?.result?.[0];
+      const closes = result?.indicators?.quote?.[0]?.close;
+      const timestamps = result?.timestamp;
+      if (!closes || !timestamps) throw new Error('Hareketli ortalama verisi bulunamadı');
+      const points = timestamps.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close));
+      const values = points.map(point=>point.close);
+      const formatter = new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
+      const maps = [50,100,200].map(period => {
+        const averages = sma(values,period);
+        return new Map(points.map((point,index)=>[formatter.format(new Date(point.time*1000)),averages[index]]));
+      });
+      movingAverageData = {
+        ma50:labels.map(label=>maps[0].get(label) ?? null),
+        ma100:labels.map(label=>maps[1].get(label) ?? null),
+        ma200:labels.map(label=>maps[2].get(label) ?? null)
+      };
+    }
+
     function renderRsiChart(labels, prices) {
       const wrap = document.getElementById('rsiWrap');
       const enabled = document.getElementById('rsiToggle').checked;
@@ -582,9 +607,9 @@
       currentCurrency = currency || currentCurrency;
       const datasets = [{ label: currentChartName + ' kapanış fiyatı (' + currentCurrency + ')', data: lastPrices, borderColor: '#52d5b1', backgroundColor: 'rgba(82,213,177,.14)', fill: true, pointRadius: 0, pointHoverRadius: 5, tension: .18, borderWidth: 2, yAxisID: 'price' }];
       if (document.getElementById('maToggle').checked) {
-        datasets.push({ label:'MA50', data:sma(lastPrices,50), borderColor:'#22c55e', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
-        datasets.push({ label:'MA100', data:sma(lastPrices,100), borderColor:'#facc15', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
-        datasets.push({ label:'MA200', data:sma(lastPrices,200), borderColor:'#ef4444', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
+        datasets.push({ label:'MA50', data:movingAverageData?.ma50 || sma(lastPrices,50), borderColor:'#22c55e', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
+        datasets.push({ label:'MA100', data:movingAverageData?.ma100 || sma(lastPrices,100), borderColor:'#facc15', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
+        datasets.push({ label:'MA200', data:movingAverageData?.ma200 || sma(lastPrices,200), borderColor:'#ef4444', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
       }
       if (compareData) datasets.push({ label:compareData.symbol, data:compareData.values, borderColor:'#fb7185', pointRadius:0, borderWidth:2, fill:false, spanGaps:true, yAxisID:'price' });
       if (chart) chart.destroy();
@@ -688,6 +713,10 @@
         changePart.append(changeLabel(), changeStrong);
         meta.append(namePart, pricePart, changePart);
         compareData = null;
+        movingAverageData = null;
+        if (document.getElementById('maToggle').checked) {
+          try { await prepareMovingAverages(symbol, labels); } catch {}
+        }
         renderChart(labels, prices, name, currency, true);
         renderFavorites();
       } catch (error) {
@@ -701,7 +730,13 @@
       }
     }
 
-    function redrawIndicators() {
+    async function redrawIndicators(event) {
+      const control = event?.target;
+      if (control?.id === 'maToggle' && control.checked) {
+        control.disabled = true;
+        try { await prepareMovingAverages(currentSymbol(), lastLabels); } catch { movingAverageData = null; }
+        control.disabled = false;
+      }
       renderChart(lastLabels, lastPrices, currentChartName, currentCurrency, false);
     }
     document.querySelectorAll('#maToggle,#rsiToggle').forEach(control => control.addEventListener('change', redrawIndicators));
