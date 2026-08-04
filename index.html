@@ -339,27 +339,57 @@
       downloadBlob(new Blob(['\ufeff'+rows.join('\n')],{type:'text/csv;charset=utf-8'}),safeFileName(currentChartName)+'-'+selectedRange+'.csv');
     }
 
-    function exportChartPng() {
+    async function exportChartPng() {
       if (!chart) return;
-      const canvases=[document.getElementById('priceChart')];
-      if(document.getElementById('rsiWrap').classList.contains('visible'))canvases.push(document.getElementById('rsiChart'));
-      const width=Math.max(...canvases.map(canvas=>canvas.width));
-      const gap=24;
-      const height=canvases.reduce((sum,canvas)=>sum+canvas.height,0)+gap*(canvases.length-1);
-      const output=document.createElement('canvas');
-      output.width=width;
-      output.height=height;
-      const context=output.getContext('2d');
-      context.fillStyle=document.documentElement.dataset.theme==='light'?'#ffffff':'#192337';
-      context.fillRect(0,0,width,height);
-      let y=0;
-      canvases.forEach(canvas=>{context.drawImage(canvas,0,y);y+=canvas.height+gap});
-      const link=document.createElement('a');
-      link.download=safeFileName(currentChartName)+'-'+selectedRange+'.png';
-      link.href=output.toDataURL('image/png');
-      document.body.append(link);
-      link.click();
-      link.remove();
+      const originalText=exportPng.textContent;
+      exportPng.disabled=true;
+      exportPng.textContent='PNG hazırlanıyor…';
+      try {
+        const canvases=[document.getElementById('priceChart')];
+        if(document.getElementById('rsiWrap').classList.contains('visible'))canvases.push(document.getElementById('rsiChart'));
+        const width=Math.max(...canvases.map(canvas=>canvas.width));
+        const gap=24;
+        const height=canvases.reduce((sum,canvas)=>sum+canvas.height,0)+gap*(canvases.length-1);
+        const output=document.createElement('canvas');
+        output.width=width;
+        output.height=height;
+        const context=output.getContext('2d');
+        context.fillStyle=document.documentElement.dataset.theme==='light'?'#ffffff':'#192337';
+        context.fillRect(0,0,width,height);
+        let y=0;
+        canvases.forEach(canvas=>{context.drawImage(canvas,0,y);y+=canvas.height+gap});
+        const fileName=safeFileName(currentChartName)+'-'+selectedRange+'.png';
+        let fileHandle=null;
+        if(typeof window.showSaveFilePicker==='function'){
+          try{
+            fileHandle=await window.showSaveFilePicker({
+              suggestedName:fileName,
+              types:[{description:'PNG görseli',accept:{'image/png':['.png']}}]
+            });
+          }catch(error){
+            if(error?.name==='AbortError')return;
+          }
+        }
+        let blob=await new Promise(resolve=>output.toBlob(resolve,'image/png'));
+        if(!blob){
+          const response=await fetch(output.toDataURL('image/png'));
+          blob=await response.blob();
+        }
+        if(fileHandle){
+          const writable=await fileHandle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+        }else{
+          downloadBlob(blob,fileName);
+        }
+        exportPng.textContent='PNG indirildi ✓';
+        setTimeout(()=>{exportPng.textContent=originalText},1600);
+      }catch(error){
+        alert('PNG oluşturulamadı: '+error.message);
+      }finally{
+        exportPng.disabled=false;
+        if(exportPng.textContent==='PNG hazırlanıyor…')exportPng.textContent=originalText;
+      }
     }
 
     const saveAlarms = () => localStorage.setItem(alarmKey, JSON.stringify(alarms));
