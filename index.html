@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finans Grafiği v2.2</title>
+  <title>Finans Grafiği v2.3</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -83,6 +83,17 @@
     .dividend-list { list-style:none; display:grid; gap:7px; padding:0; margin:0; }
     .dividend-row { display:grid; grid-template-columns:90px 1fr auto; gap:8px; align-items:center; padding:9px 10px; border-radius:9px; background:#0d1523; font-size:.85rem; }
     .dividend-row span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    select { width:100%; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; }
+    .advanced-results { display:grid; gap:7px; max-height:300px; overflow:auto; margin-top:4px; }
+    .advanced-result { width:100%; padding:10px; text-align:left; color:var(--text); background:#0d1523; border:1px solid var(--line); }
+    .advanced-result small { display:block; color:var(--muted); }
+    .alarm-list { display:grid; gap:8px; margin-top:16px; }
+    .alarm-row { display:flex; gap:8px; align-items:center; padding:10px; border-radius:9px; background:#0d1523; }
+    .alarm-row span { flex:1; }
+    .alarm-row small { display:block; color:var(--muted); }
+    .alarm-remove { width:34px; height:34px; padding:0; color:var(--danger); background:#3b1720; }
+    .alarm-triggered { border:1px solid var(--accent); }
     .portfolio-dialog { width:min(420px,calc(100vw - 30px)); color:var(--text); background:#192337; border:1px solid var(--line); border-radius:16px; padding:22px; box-shadow:0 24px 70px #000b; }
     .portfolio-dialog::backdrop { background:#020617bb; }
     .portfolio-dialog h3 { margin:0 0 4px; }
@@ -99,14 +110,14 @@
 <body>
   <main>
     <div class="app-layout"><section class="chart-panel">
-    <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.2</span></h1>
+    <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.3</span></h1>
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
       <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
-    <div class="toolbar"><label><input id="ma20" type="checkbox"> MA20</label><label><input id="ma50" type="checkbox"> MA50</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label></div><div id="meta" class="meta" aria-live="polite"></div>
+    <div class="toolbar"><label><input id="ma20" type="checkbox"> MA20</label><label><input id="ma50" type="checkbox"> MA50</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img"></canvas></div>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     <section class="periods" aria-label="Grafik süresi">
@@ -142,6 +153,27 @@
       <label>Birim maliyet<input id="portfolioCost" type="number" min="0" step="any" required></label>
       <div class="dialog-actions"><button id="portfolioCancel" class="dialog-cancel" type="button">Vazgeç</button><button type="submit">Kaydet</button></div>
     </form>
+  </dialog>
+
+  <dialog id="advancedSearchDialog" class="portfolio-dialog">
+    <h3>Gelişmiş arama</h3><p class="portfolio-dialog-symbol">Hisse adı veya kodu, piyasa ve ürün türüyle arayın.</p>
+    <form id="advancedSearchForm" class="portfolio-form">
+      <label>Arama<input id="advancedQuery" type="search" autocomplete="off" placeholder="Örn. Apple veya THYAO" required></label>
+      <label>Piyasa<select id="advancedMarket"><option value="all">Tümü</option><option value="bist">Borsa İstanbul</option><option value="us">ABD piyasaları</option></select></label>
+      <label>Ürün türü<select id="advancedType"><option value="all">Tümü</option><option value="EQUITY">Hisse</option><option value="ETF">ETF</option></select></label>
+      <div class="dialog-actions"><button id="advancedClose" class="dialog-cancel" type="button">Kapat</button><button type="submit">Ara</button></div>
+      <div id="advancedResults" class="advanced-results" aria-live="polite"></div>
+    </form>
+  </dialog>
+  <dialog id="alarmDialog" class="portfolio-dialog">
+    <h3>Fiyat alarmı</h3><p class="portfolio-dialog-symbol">Uygulama açıkken fiyat hedefleri düzenli olarak kontrol edilir.</p>
+    <form id="alarmForm" class="portfolio-form">
+      <label>Finans kodu<input id="alarmSymbol" type="text" maxlength="20" required></label>
+      <label>Koşul<select id="alarmCondition"><option value="above">Fiyat bunun üzerine çıkınca</option><option value="below">Fiyat bunun altına inince</option></select></label>
+      <label>Hedef fiyat<input id="alarmTarget" type="number" min="0.000001" step="any" required></label>
+      <div class="dialog-actions"><button id="alarmClose" class="dialog-cancel" type="button">Kapat</button><button type="submit">Alarmı kaydet</button></div>
+    </form>
+    <div id="alarmList" class="alarm-list"></div>
   </dialog>
   <script>
     let chart;
@@ -185,6 +217,24 @@
     const portfolioQuantity = document.getElementById('portfolioQuantity');
     const portfolioCost = document.getElementById('portfolioCost');
     const portfolioCancel = document.getElementById('portfolioCancel');
+    const advancedSearchButton = document.getElementById('advancedSearchButton');
+    const advancedSearchDialog = document.getElementById('advancedSearchDialog');
+    const advancedSearchForm = document.getElementById('advancedSearchForm');
+    const advancedQuery = document.getElementById('advancedQuery');
+    const advancedMarket = document.getElementById('advancedMarket');
+    const advancedType = document.getElementById('advancedType');
+    const advancedResults = document.getElementById('advancedResults');
+    const advancedClose = document.getElementById('advancedClose');
+    const alarmButton = document.getElementById('alarmButton');
+    const alarmDialog = document.getElementById('alarmDialog');
+    const alarmForm = document.getElementById('alarmForm');
+    const alarmSymbol = document.getElementById('alarmSymbol');
+    const alarmCondition = document.getElementById('alarmCondition');
+    const alarmTarget = document.getElementById('alarmTarget');
+    const alarmClose = document.getElementById('alarmClose');
+    const alarmList = document.getElementById('alarmList');
+    const alarmKey = 'finans-grafigi-alarms';
+    let alarms = (() => { try { const saved=JSON.parse(localStorage.getItem(alarmKey)); return Array.isArray(saved) ? saved : []; } catch { return []; } })();
     const portfolioKey = 'finans-grafigi-portfolio';
     let portfolio = (() => { try { const saved = JSON.parse(localStorage.getItem(portfolioKey)); return Array.isArray(saved) ? saved.filter(item => item && item.symbol && Number(item.quantity) > 0).map(item => ({ symbol:String(item.symbol).toUpperCase(), name:item.name || item.symbol, quantity:Number(item.quantity), unitCost:Number(item.unitCost) || 0 })) : []; } catch { return []; } })();
     let portfolioSearchTimer;
@@ -204,6 +254,84 @@
     let selectedRange = '6mo';
     let selectedStart = '';
 
+
+
+    const saveAlarms = () => localStorage.setItem(alarmKey, JSON.stringify(alarms));
+
+    function renderAlarms() {
+      alarmList.replaceChildren();
+      if (!alarms.length) {
+        const empty=document.createElement('p');
+        empty.className='favorites-note';
+        empty.textContent='Henüz fiyat alarmı yok.';
+        alarmList.append(empty);
+        return;
+      }
+      alarms.forEach(alarm => {
+        const row=document.createElement('div');
+        row.className='alarm-row' + (alarm.triggered ? ' alarm-triggered' : '');
+        const text=document.createElement('span');
+        const title=document.createElement('strong');
+        title.textContent=alarm.symbol + ' · ' + alarm.target;
+        const detail=document.createElement('small');
+        detail.textContent=(alarm.condition==='above' ? 'Üzerine çıkınca' : 'Altına inince') + (alarm.triggered ? ' · Tetiklendi' : ' · Aktif');
+        text.append(title,detail);
+        const remove=document.createElement('button');
+        remove.type='button';
+        remove.className='alarm-remove';
+        remove.textContent='×';
+        remove.title=alarm.symbol+' alarmını sil';
+        remove.addEventListener('click',()=>{alarms=alarms.filter(item=>item.id!==alarm.id);saveAlarms();renderAlarms()});
+        row.append(text,remove);
+        alarmList.append(row);
+      });
+    }
+
+    async function latestPrice(symbol) {
+      const query='range=5d&interval=1d';
+      const response=await fetch('/api/price?symbol='+encodeURIComponent(symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'});
+      const payload=await response.json();
+      if(!response.ok) throw new Error(payload.error||'Fiyat alınamadı');
+      const result=payload.chart?.result?.[0];
+      const prices=result?.indicators?.quote?.[0]?.close?.filter(Number.isFinite)||[];
+      if(!prices.length) throw new Error('Fiyat bulunamadı');
+      return {price:prices.at(-1),currency:result.meta?.currency||'USD'};
+    }
+
+    async function checkAlarms() {
+      const active=alarms.filter(alarm=>!alarm.triggered);
+      await Promise.all(active.map(async alarm=>{
+        try{
+          const quote=await latestPrice(alarm.symbol);
+          const hit=alarm.condition==='above' ? quote.price>=alarm.target : quote.price<=alarm.target;
+          if(!hit)return;
+          alarm.triggered=true;
+          alarm.lastPrice=quote.price;
+          saveAlarms();
+          const message=alarm.symbol+' hedefe ulaştı: '+money(quote.price,quote.currency);
+          if('Notification' in window && Notification.permission==='granted') new Notification('Finans Tool fiyat alarmı',{body:message});
+          else alert(message);
+        }catch{}
+      }));
+      renderAlarms();
+    }
+
+    function renderAdvancedResults(items) {
+      advancedResults.replaceChildren();
+      if(!items.length){const empty=document.createElement('p');empty.className='favorites-note';empty.textContent='Uygun sonuç bulunamadı.';advancedResults.append(empty);return}
+      items.forEach(item=>{
+        const button=document.createElement('button');
+        button.type='button';
+        button.className='advanced-result';
+        const title=document.createElement('strong');
+        title.textContent=item.symbol+' · '+item.name;
+        const meta=document.createElement('small');
+        meta.textContent=[item.exchange,item.type].filter(Boolean).join(' · ');
+        button.append(title,meta);
+        button.addEventListener('click',()=>{symbolInput.value=item.symbol;advancedSearchDialog.close();updateFavoriteButton();loadPrice(item.symbol)});
+        advancedResults.append(button);
+      });
+    }
 
     const savePortfolio = () => localStorage.setItem(portfolioKey, JSON.stringify(portfolio));
 
@@ -619,6 +747,36 @@
     startDate.addEventListener('change', applyStartDate);
     startDate.addEventListener('keydown', event => { if (event.key === 'Enter') applyStartDate(); });
 
+
+    advancedSearchButton.addEventListener('click',()=>{advancedQuery.value=symbolInput.value;advancedResults.replaceChildren();advancedSearchDialog.showModal();advancedQuery.focus()});
+    advancedClose.addEventListener('click',()=>advancedSearchDialog.close());
+    advancedSearchForm.addEventListener('submit',async event=>{
+      event.preventDefault();
+      advancedResults.textContent='Aranıyor…';
+      try{
+        const response=await fetch('/api/search?q='+encodeURIComponent(advancedQuery.value.trim())+'&advanced=1',{cache:'no-store'});
+        const payload=await response.json();
+        let items=payload.quotes||[];
+        if(advancedMarket.value==='bist')items=items.filter(item=>item.symbol.endsWith('.IS'));
+        if(advancedMarket.value==='us')items=items.filter(item=>!item.symbol.includes('.')||['NYSE','NasdaqGS','NasdaqCM','NasdaqGM','NYSEArca'].includes(item.exchange));
+        if(advancedType.value!=='all')items=items.filter(item=>item.type===advancedType.value);
+        renderAdvancedResults(items);
+      }catch{renderAdvancedResults([])}
+    });
+    alarmButton.addEventListener('click',()=>{alarmSymbol.value=currentSymbol();alarmTarget.value='';renderAlarms();alarmDialog.showModal()});
+    alarmClose.addEventListener('click',()=>alarmDialog.close());
+    alarmForm.addEventListener('submit',async event=>{
+      event.preventDefault();
+      const symbol=alarmSymbol.value.trim().toUpperCase();
+      const target=Number(alarmTarget.value);
+      if(!symbol||!Number.isFinite(target)||target<=0)return;
+      alarms.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),symbol,target,condition:alarmCondition.value,triggered:false});
+      saveAlarms();
+      renderAlarms();
+      alarmTarget.value='';
+      if('Notification' in window && Notification.permission==='default') Notification.requestPermission();
+      checkAlarms();
+    });
     portfolioOpen.addEventListener('click', () => setPortfolioOpen(true));
     portfolioClose.addEventListener('click', () => setPortfolioOpen(false));
     portfolioBackdrop.addEventListener('click', () => setPortfolioOpen(false));
@@ -662,6 +820,8 @@
     renderFavorites();
     updateFavoriteButton();
     loadPrice('AAPL');
+    renderAlarms();
+    setInterval(checkAlarms, 60000);
   </script>
 </body>
 </html>
