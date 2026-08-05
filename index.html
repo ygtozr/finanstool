@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finans Grafiği v2.5</title>
+  <title>Finans Grafiği v3.1</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -113,6 +113,17 @@
     .portfolio-form input { width:100%; text-transform:none; }
     .dialog-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:4px; }
     .dialog-cancel { color:var(--text); background:#26344d; }
+    .data-dialog { width:min(560px,calc(100% - 28px)); }
+    .data-actions { display:grid; gap:10px; margin:18px 0; }
+    .data-actions button { width:100%; }
+    .backup-file-label { display:grid; gap:7px; color:var(--muted); font-size:.88rem; }
+    .backup-file-label input { width:100%; text-transform:none; padding:10px; border:1px dashed var(--line); border-radius:10px; }
+    .restore-mode { display:grid; gap:6px; margin-top:12px; color:var(--muted); font-size:.88rem; }
+    .restore-mode select { width:100%; }
+    .backup-preview { min-height:44px; margin:12px 0 0; padding:11px 13px; border:1px solid var(--line); border-radius:10px; color:var(--muted); background:#111a2b; font-size:.9rem; white-space:pre-line; }
+    .backup-preview.success { color:var(--accent); border-color:var(--accent); }
+    .backup-error { min-height:1.4em; margin:8px 0 0; color:var(--danger); font-size:.88rem; }
+    html[data-theme="light"] .backup-preview { background:#f8fafc; }
     @media (max-width:760px) { .app-layout { grid-template-columns:1fr; } .favorites-panel { border-left:0; border-top:1px solid var(--line); padding:20px 0 0; } }
     @media (max-width:500px) { form { flex-wrap:wrap; } .search-field { flex-basis:100%; } #submitButton { width:100%; } .portfolio-drawer { width:100%; padding:18px; } .portfolio-stats { grid-template-columns:1fr; } .portfolio-open { top:auto; bottom:18px; transform:none; writing-mode:horizontal-tb; border-radius:0 12px 12px 0; } }
 
@@ -150,6 +161,7 @@
 
     .app-tabs { display:flex; gap:8px; margin:0 0 24px; padding-bottom:14px; border-bottom:1px solid var(--line); }
     .app-tabs button { flex:0 1 180px; color:var(--text); background:#26344d; }
+    .app-tabs .data-button { flex:0 0 auto; margin-left:auto; padding-inline:18px; }
     .app-tabs button.active { color:#062019; background:var(--accent); }
     .app-view { display:none; }
     .app-view.active { display:block; }
@@ -166,7 +178,7 @@
     html[data-theme="light"] .app-tabs button { color:var(--text); background:#e2e8f0; }
     html[data-theme="light"] .app-tabs button.active { color:#fff; background:var(--accent); }
     html[data-theme="light"] .analysis-table { background:#f8fafc; }
-    @media (max-width:500px) { .app-tabs button { flex:1; } .analysis-table th, .analysis-table td { padding:9px 8px; font-size:.86rem; } }
+    @media (max-width:500px) { .app-tabs { flex-wrap:wrap; } .app-tabs button { flex:1; } .app-tabs .data-button { flex-basis:100%; margin-left:0; } .analysis-table th, .analysis-table td { padding:9px 8px; font-size:.86rem; } }
 
     .market-summary { margin:0 0 22px; padding:16px; border:1px solid var(--line); border-radius:14px; background:#111a2b; }
     .market-summary-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:12px; }
@@ -206,10 +218,10 @@
 <body>
   <button id="themeToggle" class="theme-toggle" type="button" aria-label="Açık temaya geç" title="Tema değiştir">☀️</button>
   <main>
-    <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Ana ekran</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button></nav>
+    <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Ana ekran</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
     <section id="mainView" class="app-view active">
     <div class="app-layout"><section class="chart-panel">
-    <h1>Hisse Fiyat Grafiği <span class="version-badge">v2.5</span></h1>
+    <h1>Hisse Fiyat Grafiği <span class="version-badge">v3.1</span></h1>
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -288,6 +300,20 @@
     </form>
     <div class="dialog-actions"><button id="marketSettingsClose" class="dialog-cancel" type="button">Kapat</button></div>
   </dialog>
+  <dialog id="dataDialog" class="portfolio-dialog data-dialog">
+    <h3>Veri yedekleme</h3>
+    <p class="portfolio-dialog-symbol">Favoriler, portföy, fiyat alarmları, piyasa özeti ve tema ayarınızı tek bir JSON dosyasında saklayın.</p>
+    <div class="data-actions"><button id="backupDownload" type="button">Yedek dosyasını indir</button></div>
+    <label class="backup-file-label">Geri yüklenecek JSON dosyası
+      <input id="backupFile" type="file" accept=".json,application/json">
+    </label>
+    <label class="restore-mode">Geri yükleme yöntemi
+      <select id="restoreMode"><option value="merge">Mevcut verilerle birleştir (önerilen)</option><option value="replace">Mevcut verilerin yerine koy</option></select>
+    </label>
+    <div id="backupPreview" class="backup-preview" aria-live="polite">Henüz bir yedek dosyası seçilmedi.</div>
+    <p id="backupError" class="backup-error" role="alert"></p>
+    <div class="dialog-actions"><button id="dataClose" class="dialog-cancel" type="button">Kapat</button><button id="restoreBackup" type="button" disabled>Geri yükle</button></div>
+  </dialog>
 
   <script>
     let chart;
@@ -337,6 +363,16 @@
     let chartRefreshInProgress = false;
     const saveMarketItems = () => localStorage.setItem(marketItemsKey,JSON.stringify(marketItems));
     const themeToggle = document.getElementById('themeToggle');
+    const dataButton = document.getElementById('dataButton');
+    const dataDialog = document.getElementById('dataDialog');
+    const backupDownload = document.getElementById('backupDownload');
+    const backupFile = document.getElementById('backupFile');
+    const restoreMode = document.getElementById('restoreMode');
+    const backupPreview = document.getElementById('backupPreview');
+    const backupError = document.getElementById('backupError');
+    const restoreBackup = document.getElementById('restoreBackup');
+    const dataClose = document.getElementById('dataClose');
+    let pendingRestoreData = null;
     const exportCsv = document.getElementById('exportCsv');
     const exportPng = document.getElementById('exportPng');
     const themeKey = 'finans-grafigi-theme';
@@ -556,6 +592,84 @@
       link.click();
       link.remove();
       setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+
+    function normalizeSymbol(value) {
+      return String(value || '').trim().toUpperCase().slice(0,40);
+    }
+
+    function uniqueBy(items,key) {
+      const seen=new Set();
+      return items.filter(item=>{const value=key(item);if(!value||seen.has(value))return false;seen.add(value);return true});
+    }
+
+    function normalizeBackup(payload) {
+      if(!payload || typeof payload!=='object' || Array.isArray(payload))throw new Error('Dosya geçerli bir yedek nesnesi değil.');
+      if(payload.schemaVersion!==1)throw new Error('Bu yedek sürümü desteklenmiyor.');
+      if(!payload.data || typeof payload.data!=='object' || Array.isArray(payload.data))throw new Error('Yedek veri bölümü eksik.');
+      const raw=payload.data;
+      const sourceArray=value=>Array.isArray(value)?value.slice(0,500):[];
+      const cleanText=(value,fallback)=>String(value||fallback||'').trim().slice(0,120);
+      const cleanFavorites=sourceArray(raw.favorites).map(item=>{const symbol=normalizeSymbol(item?.symbol);return{symbol,name:cleanText(item?.name,symbol)}}).filter(item=>item.symbol);
+      const cleanPortfolio=sourceArray(raw.portfolio).map(item=>{const symbol=normalizeSymbol(item?.symbol),quantity=Number(item?.quantity),unitCost=Number(item?.unitCost);return{symbol,name:cleanText(item?.name,symbol),quantity,unitCost}}).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0);
+      const cleanAlarms=sourceArray(raw.alarms).map(item=>{const symbol=normalizeSymbol(item?.symbol),target=Number(item?.target),condition=item?.condition==='below'?'below':'above';return{id:cleanText(item?.id,Date.now().toString(36)+Math.random().toString(36).slice(2)),symbol,target,condition,triggered:Boolean(item?.triggered)}}).filter(item=>item.symbol&&Number.isFinite(item.target)&&item.target>0);
+      const cleanMarketItems=sourceArray(raw.marketItems).map(item=>{const symbol=normalizeSymbol(item?.symbol);return{symbol,label:cleanText(item?.label||item?.name,symbol)}}).filter(item=>item.symbol);
+      return {
+        favorites:uniqueBy(cleanFavorites,item=>item.symbol),
+        portfolio:uniqueBy(cleanPortfolio,item=>item.symbol),
+        alarms:uniqueBy(cleanAlarms,item=>item.id||item.symbol+'|'+item.condition+'|'+item.target),
+        marketItems:uniqueBy(cleanMarketItems,item=>item.symbol),
+        theme:raw.theme==='light'?'light':'dark'
+      };
+    }
+
+    function createBackup() {
+      return {
+        schemaVersion:1,
+        appVersion:'3.1',
+        exportedAt:new Date().toISOString(),
+        data:{
+          favorites:favorites.map(({symbol,name})=>({symbol,name})),
+          portfolio:portfolio.map(({symbol,name,quantity,unitCost})=>({symbol,name,quantity,unitCost})),
+          alarms:alarms.map(({id,symbol,target,condition,triggered})=>({id,symbol,target,condition,triggered:Boolean(triggered)})),
+          marketItems:marketItems.map(({symbol,label})=>({symbol,label})),
+          theme:document.documentElement.dataset.theme==='light'?'light':'dark'
+        }
+      };
+    }
+
+    function backupSummary(data) {
+      return 'Favoriler: '+data.favorites.length+'\nPortföy pozisyonları: '+data.portfolio.length+'\nFiyat alarmları: '+data.alarms.length+'\nPiyasa özeti öğeleri: '+data.marketItems.length+'\nTema: '+(data.theme==='light'?'Açık':'Koyu');
+    }
+
+    function mergeUnique(current,incoming,key) {
+      const known=new Set(current.map(key));
+      return current.concat(incoming.filter(item=>{const value=key(item);if(known.has(value))return false;known.add(value);return true}));
+    }
+
+    function applyBackup(data,mode) {
+      if(mode==='replace'){
+        favorites=data.favorites;
+        portfolio=data.portfolio;
+        alarms=data.alarms;
+        marketItems=data.marketItems;
+        applyTheme(data.theme);
+      }else{
+        favorites=mergeUnique(favorites,data.favorites,item=>item.symbol);
+        portfolio=mergeUnique(portfolio,data.portfolio,item=>item.symbol);
+        alarms=mergeUnique(alarms,data.alarms,item=>item.id||item.symbol+'|'+item.condition+'|'+item.target);
+        marketItems=mergeUnique(marketItems,data.marketItems,item=>item.symbol);
+      }
+      saveFavorites();
+      savePortfolio();
+      saveAlarms();
+      saveMarketItems();
+      renderFavorites();
+      updateFavoriteButton();
+      renderAlarms();
+      renderMarketSettings();
+      renderPortfolio();
+      loadMarketSummary();
     }
 
     function exportChartCsv() {
@@ -1241,6 +1355,47 @@
       if(marketSearchResults.length)return addMarketItem(marketSearchResults[0]);
       const symbol=marketSettingsSearch.value.trim().toUpperCase();
       if(symbol)addMarketItem({symbol,name:symbol});
+    });
+    dataButton.addEventListener('click',()=>{
+      pendingRestoreData=null;
+      backupFile.value='';
+      backupError.textContent='';
+      backupPreview.textContent='Henüz bir yedek dosyası seçilmedi.';
+      backupPreview.classList.remove('success');
+      restoreBackup.disabled=true;
+      dataDialog.showModal();
+    });
+    dataClose.addEventListener('click',()=>dataDialog.close());
+    backupDownload.addEventListener('click',()=>{
+      const backup=createBackup();
+      const day=new Date().toISOString().slice(0,10);
+      downloadBlob(new Blob([JSON.stringify(backup,null,2)],{type:'application/json;charset=utf-8'}),'finans-grafigi-yedek-'+day+'.json');
+    });
+    backupFile.addEventListener('change',async()=>{
+      pendingRestoreData=null;
+      restoreBackup.disabled=true;
+      backupError.textContent='';
+      backupPreview.classList.remove('success');
+      const file=backupFile.files?.[0];
+      if(!file){backupPreview.textContent='Henüz bir yedek dosyası seçilmedi.';return}
+      if(file.size>1024*1024){backupPreview.textContent='Dosya okunamadı.';backupError.textContent='Yedek dosyası 1 MB sınırını aşıyor.';return}
+      try{
+        pendingRestoreData=normalizeBackup(JSON.parse(await file.text()));
+        backupPreview.textContent=backupSummary(pendingRestoreData);
+        restoreBackup.disabled=false;
+      }catch(error){
+        backupPreview.textContent='Dosya doğrulanamadı.';
+        backupError.textContent=error.message||'Geçersiz JSON dosyası.';
+      }
+    });
+    restoreBackup.addEventListener('click',()=>{
+      if(!pendingRestoreData)return;
+      applyBackup(pendingRestoreData,restoreMode.value);
+      backupPreview.textContent='Geri yükleme tamamlandı.\n'+backupSummary(pendingRestoreData);
+      backupPreview.classList.add('success');
+      backupError.textContent='';
+      restoreBackup.disabled=true;
+      pendingRestoreData=null;
     });
     themeToggle.addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light'));
     exportCsv.addEventListener('click',exportChartCsv);
