@@ -1,23 +1,68 @@
-module.exports = async (req, res) => {
-  try {
-    const q = String(req.query.q || '').slice(0, 40);
-    const advanced = String(req.query.advanced || '') === '1';
-    const response = await fetch('https://query1.finance.yahoo.com/v1/finance/search?q=' + encodeURIComponent(q), { headers: { 'User-Agent':'Mozilla/5.0' } });
-    const data = await response.json();
-    const limit = advanced ? 20 : 5;
-    res.setHeader('Cache-Control', 's-maxage=300');
-    res.status(200).json({
-      quotes: (data.quotes || [])
-        .filter(item => item.symbol && (item.shortname || item.longname))
-        .slice(0, limit)
-        .map(item => ({
-          symbol: item.symbol,
-          name: item.shortname || item.longname,
-          exchange: item.exchDisp || item.exchange || '',
-          type: item.quoteType || ''
-        }))
-    });
-  } catch {
-    res.status(502).json({ quotes: [] });
+const HEADERS={
+  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/3.2)',
+  'Accept':'application/json, text/plain, */*'
+};
+
+async function fetchJson(url,headers=HEADERS){
+  const response=await fetch(url,{headers,signal:AbortSignal.timeout(7000)});
+  if(!response.ok)throw new Error('Sağlayıcı hatası');
+  return response.json();
+}
+
+function yahooQuotes(data,limit){
+  return (data?.quotes||[])
+    .filter(item=>item.symbol&&(item.shortname||item.longname))
+    .slice(0,limit)
+    .map(item=>({
+      symbol:item.symbol,
+      name:item.shortname||item.longname,
+      exchange:item.exchDisp||item.exchange||'',
+      type:item.quoteType||''
+    }));
+}
+
+function nasdaqQuotes(data,limit){
+  return (Array.isArray(data?.data)?data.data:[])
+    .filter(item=>item?.symbol&&item?.name)
+    .slice(0,limit)
+    .map(item=>({
+      symbol:String(item.symbol).toUpperCase(),
+      name:item.name,
+      exchange:item.exchange||'',
+      type:item.asset==='STOCKS'?'EQUITY':(item.asset||'')
+    }));
+}
+
+module.exports=async(req,res)=>{
+  const q=String(req.query.q||'').trim().slice(0,40);
+  const advanced=String(req.query.advanced||'')==='1';
+  const forcedFallback=String(req.query.provider||'')==='fallback';
+  const limit=advanced?20:5;
+  res.setHeader('Cache-Control','s-maxage=300, stale-while-revalidate=600');
+  if(!q)return res.status(200).json({quotes:[]});
+  if(!forcedFallback){
+    try{
+      const data=await fetchJson('https://query1.finance.yahoo.com/v1/finance/search?q='+encodeURIComponent(q));
+      const quotes=yahooQuotes(data,limit);
+      if(quotes.length){
+        res.setHeader('X-Data-Provider','Yahoo Finance');
+        return res.status(200).json({quotes,provider:'Yahoo Finance'});
+      }
+    }catch{}
+  }
+  try{
+    const data=await fetchJson('https://api.nasdaq.com/api/autocomplete/slookup/20?search='+encodeURIComponent(q),{...HEADERS,Origin:'https://www.nasdaq.com',Referer:'https://www.nasdaq.com/'});
+    const quotes=nasdaqQuotes(data,limit);
+    res.setHeader('X-Data-Provider','Nasdaq');
+    return res.status(200).json({quotes,provider:'Nasdaq'});
+  }catch{
+    try{
+      const data=await fetchJson('https://query2.finance.yahoo.com/v1/finance/search?q='+encodeURIComponent(q));
+      const quotes=yahooQuotes(data,limit);
+      res.setHeader('X-Data-Provider','Yahoo Finance secondary');
+      return res.status(200).json({quotes,provider:'Yahoo Finance ikincil erişim'});
+    }catch{
+      return res.status(502).json({quotes:[],error:'Arama sağlayıcılarına ulaşılamadı.'});
+    }
   }
 };
