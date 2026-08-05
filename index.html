@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finans Grafiği v3.2</title>
+  <title>Finans Grafiği v3.3</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -14,11 +14,24 @@
     .favorites-panel { border-left:1px solid var(--line); padding-left:24px; }
     .favorites-panel h2 { margin:0 0 10px; font-size:1.15rem; }
     .favorites-note { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
-    .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:8px; }
-    .favorite-row { display:flex; gap:8px; align-items:center; }
-    .favorite-symbol { flex:1; min-width:0; padding:9px 10px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:8px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
+    .favorite-row { display:grid; grid-template-columns:minmax(0,1fr) 34px; gap:7px; align-items:stretch; }
+    .favorite-card { min-width:0; padding:10px; display:grid; gap:7px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:10px; }
+    .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
+    .favorite-card-head { min-width:0; display:grid; gap:1px; }
+    .favorite-card-symbol { font-size:.92rem; line-height:1.2; }
+    .favorite-card-name { color:var(--muted); font-size:.69rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .favorite-card-quote { display:flex; align-items:baseline; justify-content:space-between; gap:6px; }
+    .favorite-card-price { font-size:.9rem; }
+    .favorite-change { font-size:.72rem; font-weight:800; }
+    .favorite-change.positive { color:var(--accent); }
+    .favorite-change.negative { color:var(--danger); }
+    .favorite-sparkline { display:block; width:100%; height:36px; color:var(--accent); overflow:visible; }
+    .favorite-sparkline.negative { color:var(--danger); }
+    .favorite-card-status { color:var(--muted); font-size:.65rem; font-weight:500; }
+    .favorite-actions { display:grid; align-content:start; gap:7px; }
     .favorite-remove.compare-active { background:#be185d; border-color:#f9a8d4; color:#fff; }
-    .favorite-remove { width:36px; height:36px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.25rem; }
+    .favorite-remove { width:34px; height:34px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.15rem; }
     h1 { margin:0; font-size:clamp(1.5rem,4vw,2.15rem); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .version-badge { display:inline-flex; align-items:center; padding:3px 8px; border:1px solid var(--line); border-radius:999px; color:var(--accent); font-size:.72rem; font-weight:700; letter-spacing:.04em; }
     .intro { margin:6px 0 25px; color:var(--muted); }
@@ -131,7 +144,7 @@
     html[data-theme="light"] { color-scheme:light; --bg:#eef3f8; --panel:#ffffff; --line:#cbd5e1; --text:#172033; --muted:#5f6f86; --accent:#0f9f7f; --danger:#c9344f; }
     html[data-theme="light"] body { background:radial-gradient(circle at top,#dbeafe 0,#eef3f8 48%); }
     html[data-theme="light"] main { background:rgba(255,255,255,.97); box-shadow:0 22px 60px #64748b33; }
-    html[data-theme="light"] input, html[data-theme="light"] select, html[data-theme="light"] .favorite-symbol, html[data-theme="light"] .search-suggestions, html[data-theme="light"] .portfolio-drawer, html[data-theme="light"] .portfolio-dialog, html[data-theme="light"] .portfolio-row, html[data-theme="light"] .summary-card, html[data-theme="light"] .portfolio-stat, html[data-theme="light"] .dividend-row, html[data-theme="light"] .advanced-result, html[data-theme="light"] .alarm-row { color:var(--text); background:#f8fafc; }
+    html[data-theme="light"] input, html[data-theme="light"] select, html[data-theme="light"] .favorite-card, html[data-theme="light"] .search-suggestions, html[data-theme="light"] .portfolio-drawer, html[data-theme="light"] .portfolio-dialog, html[data-theme="light"] .portfolio-row, html[data-theme="light"] .summary-card, html[data-theme="light"] .portfolio-stat, html[data-theme="light"] .dividend-row, html[data-theme="light"] .advanced-result, html[data-theme="light"] .alarm-row { color:var(--text); background:#f8fafc; }
     html[data-theme="light"] .toolbar button, html[data-theme="light"] .toolbar label, html[data-theme="light"] .periods button, html[data-theme="light"] .portfolio-close, html[data-theme="light"] .dialog-cancel, html[data-theme="light"] .theme-toggle { color:var(--text); background:#e2e8f0; }
     html[data-theme="light"] .periods button.active { color:#fff; background:#0f766e; box-shadow:0 0 0 2px #99f6e4; }
     html[data-theme="light"] .search-suggestions { box-shadow:0 12px 25px #64748b44; }
@@ -221,7 +234,7 @@
     <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Ana ekran</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
     <section id="mainView" class="app-view active">
     <div class="app-layout"><section class="chart-panel">
-    <h1>Hisse Fiyat Grafiği <span class="version-badge">v3.2</span></h1>
+    <h1>Hisse Fiyat Grafiği <span class="version-badge">v3.3</span></h1>
     <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -250,7 +263,7 @@
         <div id="dateHelp" class="hint">Tarihi gün, ay ve yıl sırasıyla yazın.</div>
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
-    </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><h2>Favoriler</h2><p class="favorites-note">Yıldıza tıklayarak hisse ekleyin. Favoriler bu cihazda saklanır.</p><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
+    </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><h2>Favoriler</h2><p class="favorites-note">Fiyatlar ve mini grafikler 15 saniyede bir yenilenir. Favoriler bu cihazda saklanır.</p><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" aria-label="Portföy ekranı">
       <div class="portfolio-head"><div><h2>Portföyüm</h2><p class="favorites-note">Pozisyonlarınız bu cihazda saklanır.</p></div></div>
@@ -428,6 +441,9 @@
     let portfolioSelection = null;
     let portfolioRenderId = 0;
     let currentName = '';
+    const favoriteQuotes = new Map();
+    let favoriteRefreshInProgress = false;
+    let favoriteRefreshQueued = false;
     let favorites = (() => { try { const saved = JSON.parse(localStorage.getItem(favoritesKey) || (legacyFavoritesKey && localStorage.getItem(legacyFavoritesKey))); return Array.isArray(saved) ? saved.filter(item => item && item.symbol).map(item => ({symbol:item.symbol.toUpperCase(), name:item.name || item.symbol.toUpperCase()})) : []; } catch { return []; } })();
     if (legacyFavoritesKey && !localStorage.getItem(favoritesKey)) {
       localStorage.setItem(favoritesKey, JSON.stringify(favorites));
@@ -439,9 +455,160 @@
     function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
     const isCompared = symbol => compareData.some(item => item.rawSymbol === symbol);
     function updateCompareButton() { if(!compareButton)return; const symbol=currentSymbol(),on=isCompared(symbol),isPrimary=symbol&&symbol===primarySymbol; compareButton.classList.toggle('compare-active',on); compareButton.setAttribute('aria-pressed',String(on)); compareButton.disabled=!symbol||isPrimary||!primaryPrices.length; compareButton.title=isPrimary?'Bu ana grafik':(on?'Karşılaştırmadan çıkar':'Grafiğe karşılaştırma olarak ekle'); }
+    function createFavoriteSparkline(values,negative=false) {
+      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('viewBox','0 0 160 36');
+      svg.setAttribute('preserveAspectRatio','none');
+      svg.setAttribute('aria-hidden','true');
+      svg.classList.add('favorite-sparkline');
+      if(negative)svg.classList.add('negative');
+      const finite=values.filter(Number.isFinite);
+      const min=Math.min(...finite),max=Math.max(...finite),span=max-min||1;
+      const points=finite.map((value,index)=>{
+        const x=finite.length===1?80:index*(160/(finite.length-1));
+        const y=32-((value-min)/span)*28;
+        return x.toFixed(1)+','+y.toFixed(1);
+      }).join(' ');
+      const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+      line.setAttribute('points',points);
+      line.setAttribute('fill','none');
+      line.setAttribute('stroke','currentColor');
+      line.setAttribute('stroke-width','2.4');
+      line.setAttribute('stroke-linecap','round');
+      line.setAttribute('stroke-linejoin','round');
+      svg.append(line);
+      return svg;
+    }
+
     function renderFavorites() {
-      favoritesList.replaceChildren(); favoritesEmpty.hidden=favorites.length>0;
-      favorites.forEach(item=>{const row=document.createElement('li');row.className='favorite-row';const open=document.createElement('button');open.type='button';open.className='favorite-symbol';open.textContent=item.name!==item.symbol?item.symbol+' · '+item.name:item.symbol;open.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});const compare=document.createElement('button');compare.type='button';compare.className='favorite-remove';compare.classList.toggle('compare-active',isCompared(item.symbol));compare.textContent='📈';compare.title=isCompared(item.symbol)?item.symbol+' karşılaştırmadan çıkar':item.symbol+' ile karşılaştır';compare.addEventListener('click',()=>compareStock(item.symbol));const remove=document.createElement('button');remove.type='button';remove.className='favorite-remove';remove.textContent='★';remove.title=item.symbol+' favorilerden çıkar';remove.addEventListener('click',()=>{favorites=favorites.filter(f=>f.symbol!==item.symbol);saveFavorites();renderFavorites();updateFavoriteButton()});row.append(open,compare,remove);favoritesList.append(row)});
+      favoritesList.replaceChildren();
+      favoritesEmpty.hidden=favorites.length>0;
+      favorites.forEach(item=>{
+        const quote=favoriteQuotes.get(item.symbol);
+        const row=document.createElement('li');
+        row.className='favorite-row';
+        const open=document.createElement('button');
+        open.type='button';
+        open.className='favorite-card';
+        open.title=item.symbol+' grafiğini aç';
+        const head=document.createElement('span');
+        head.className='favorite-card-head';
+        const symbol=document.createElement('strong');
+        symbol.className='favorite-card-symbol';
+        symbol.textContent=item.symbol;
+        const name=document.createElement('small');
+        name.className='favorite-card-name';
+        name.textContent=item.name!==item.symbol?item.name:'Hisse';
+        head.append(symbol,name);
+        const quoteRow=document.createElement('span');
+        quoteRow.className='favorite-card-quote';
+        const price=document.createElement('strong');
+        price.className='favorite-card-price';
+        const change=document.createElement('span');
+        change.className='favorite-change';
+        const status=document.createElement('small');
+        status.className='favorite-card-status';
+        if(quote&&!quote.error){
+          price.textContent=money(quote.price,quote.currency);
+          change.textContent=(quote.change>=0?'+':'')+quote.change.toFixed(2)+'%';
+          change.classList.add(quote.change>=0?'positive':'negative');
+          status.textContent=(quote.stale?'Son veri · ':'Güncellendi · ')+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(quote.updatedAt));
+          quoteRow.append(price,change);
+          open.append(head,quoteRow,createFavoriteSparkline(quote.values,quote.change<0),status);
+        }else{
+          price.textContent=quote?.error?'Veri alınamadı':'Yükleniyor…';
+          change.textContent='';
+          status.textContent=quote?.error?'15 saniye sonra yeniden denenecek':'Canlı veri hazırlanıyor';
+          quoteRow.append(price,change);
+          open.append(head,quoteRow,status);
+        }
+        open.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+        const actions=document.createElement('div');
+        actions.className='favorite-actions';
+        const compare=document.createElement('button');
+        compare.type='button';
+        compare.className='favorite-remove';
+        compare.classList.toggle('compare-active',isCompared(item.symbol));
+        compare.textContent='📈';
+        compare.title=isCompared(item.symbol)?item.symbol+' karşılaştırmadan çıkar':item.symbol+' ile karşılaştır';
+        compare.setAttribute('aria-label',compare.title);
+        compare.addEventListener('click',()=>compareStock(item.symbol));
+        const remove=document.createElement('button');
+        remove.type='button';
+        remove.className='favorite-remove';
+        remove.textContent='★';
+        remove.title=item.symbol+' favorilerden çıkar';
+        remove.setAttribute('aria-label',remove.title);
+        remove.addEventListener('click',()=>{favorites=favorites.filter(f=>f.symbol!==item.symbol);favoriteQuotes.delete(item.symbol);saveFavorites();renderFavorites();updateFavoriteButton()});
+        actions.append(compare,remove);
+        row.append(open,actions);
+        favoritesList.append(row);
+      });
+    }
+
+    async function mapWithLimit(items,limit,worker) {
+      const results=new Array(items.length);
+      let next=0;
+      async function run(){
+        while(next<items.length){
+          const index=next++;
+          results[index]=await worker(items[index]);
+        }
+      }
+      await Promise.all(Array.from({length:Math.min(limit,items.length)},run));
+      return results;
+    }
+
+    async function fetchFavoriteQuote(item) {
+      const query='range=1mo&interval=1d';
+      const response=await fetch('/api/price?symbol='+encodeURIComponent(item.symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'});
+      const payload=await response.json();
+      if(!response.ok)throw new Error(payload.error||'Fiyat alınamadı');
+      const result=payload.chart?.result?.[0];
+      const closes=result?.indicators?.quote?.[0]?.close;
+      const timestamps=result?.timestamp;
+      if(!closes||!timestamps)throw new Error('Fiyat bulunamadı');
+      const points=timestamps.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close)).slice(-7);
+      if(points.length<2)throw new Error('Yetersiz fiyat verisi');
+      const price=points.at(-1).close;
+      const previous=points.at(-2).close;
+      return {
+        symbol:item.symbol,
+        name:result.meta?.longName||result.meta?.shortName||item.name||item.symbol,
+        currency:result.meta?.currency||'USD',
+        price,
+        change:(price/previous-1)*100,
+        values:points.map(point=>point.close),
+        updatedAt:Date.now()
+      };
+    }
+
+    async function refreshFavoriteQuotes() {
+      if(favoriteRefreshInProgress){favoriteRefreshQueued=true;return}
+      if(!favorites.length){favoriteQuotes.clear();renderFavorites();return}
+      favoriteRefreshInProgress=true;
+      const items=favorites.map(item=>({...item}));
+      try{
+        const results=await mapWithLimit(items,4,async item=>{try{return{ok:true,data:await fetchFavoriteQuote(item)}}catch{return{ok:false,item}}});
+        let namesChanged=false;
+        results.forEach(result=>{
+          const symbol=result.ok?result.data.symbol:result.item.symbol;
+          if(!favorites.some(item=>item.symbol===symbol))return;
+          if(result.ok){
+            favoriteQuotes.set(symbol,result.data);
+            const favorite=favorites.find(item=>item.symbol===symbol);
+            if(favorite&&favorite.name!==result.data.name){favorite.name=result.data.name;namesChanged=true}
+          }else{
+            const previous=favoriteQuotes.get(symbol);
+            favoriteQuotes.set(symbol,previous?{...previous,stale:true}:{error:true,updatedAt:Date.now()});
+          }
+        });
+        if(namesChanged)saveFavorites();
+        renderFavorites();
+      }finally{
+        favoriteRefreshInProgress=false;
+        if(favoriteRefreshQueued){favoriteRefreshQueued=false;refreshFavoriteQuotes()}
+      }
     }
     let selectedRange = '6mo';
     let selectedStart = '';
@@ -1321,7 +1488,7 @@
     function showSuggestions(items){suggestions.replaceChildren();items.slice(0,5).forEach(item=>{const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='suggestion';b.textContent=item.symbol+' · '+item.name;b.addEventListener('click',()=>{symbolInput.value=item.symbol;suggestions.classList.remove('visible');updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});li.append(b);suggestions.append(li)});suggestions.classList.toggle('visible',items.length>0)}
     symbolInput.addEventListener('input',()=>{updateFavoriteButton();updateCompareButton();clearTimeout(searchTimer);const q=symbolInput.value.trim();if(q.length<2)return showSuggestions([]);searchTimer=setTimeout(async()=>{try{const r=await fetch('/api/search?q='+encodeURIComponent(q));const d=await r.json();showSuggestions(d.quotes||[])}catch{showSuggestions([])}},250)});
     compareButton?.addEventListener('click',()=>compareStock(currentSymbol()));
-    favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol)) favorites=favorites.filter(item=>item.symbol!==symbol); else favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); });
+    favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol)) { favorites=favorites.filter(item=>item.symbol!==symbol); favoriteQuotes.delete(symbol); } else favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); refreshFavoriteQuotes(); });
     periodButtons.forEach(periodButton => periodButton.addEventListener('click', () => {
       selectedRange = periodButton.dataset.range;
       selectedStart = '';
@@ -1476,6 +1643,7 @@
     });
     applyTheme(localStorage.getItem(themeKey) || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
     renderFavorites();
+    refreshFavoriteQuotes();
     updateFavoriteButton();
     updateCompareButton();
     loadPrice('AAPL');
@@ -1484,6 +1652,7 @@
     setInterval(checkAlarms, 60000);
     setInterval(loadMarketSummary, 15000);
     setInterval(refreshCurrentChart, 15000);
+    setInterval(refreshFavoriteQuotes, 15000);
   </script>
 </body>
 </html>
