@@ -66,19 +66,26 @@
     .summary-card { padding:12px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
     .summary-card small { display:block; color:var(--muted); }
     .summary-card strong { display:block; margin-top:3px; }
-    .portfolio-list { display:grid; gap:10px; }
-    .portfolio-empty { padding:18px; text-align:center; color:var(--muted); border:1px dashed #40516e; border-radius:12px; }
-    .portfolio-row { padding:14px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
-    .portfolio-row-head { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
-    .portfolio-row-title { flex:1; min-width:0; }
-    .portfolio-row-title strong, .portfolio-row-title small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .portfolio-row-title small { color:var(--muted); }
-    .portfolio-delete { width:34px; height:34px; padding:0; color:var(--danger); background:#3b1720; }
+    .portfolio-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .portfolio-empty { grid-column:1/-1; padding:18px; text-align:center; color:var(--muted); border:1px dashed #40516e; border-radius:12px; }
+    .portfolio-row { min-width:0; padding:10px; border:1px solid var(--line); border-radius:10px; background:#0d1523; }
+    .portfolio-row-head { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+    .portfolio-row-title { display:flex; flex:1; min-width:0; align-items:baseline; gap:6px; }
+    .portfolio-row-title strong { flex:0 0 auto; }
+    .portfolio-row-title strong, .portfolio-row-title small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .portfolio-row-title small { min-width:0; color:var(--muted); }
+    .portfolio-delete { flex:0 0 28px; width:28px; height:28px; padding:0; color:var(--danger); background:#3b1720; }
+    .portfolio-compact-value { display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:4px; }
+    .portfolio-compact-value strong { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .portfolio-compact-profit { flex:0 0 auto; font-size:.86rem; white-space:nowrap; }
+    .portfolio-compact-detail { overflow:hidden; color:var(--muted); font-size:.8rem; text-overflow:ellipsis; white-space:nowrap; }
     .portfolio-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
     .portfolio-stat { padding:8px; border-radius:8px; background:#162238; }
     .portfolio-stat span, .portfolio-stat strong { display:block; }
     .portfolio-stat span { color:var(--muted); font-size:.75rem; }
     .portfolio-stat strong { margin-top:2px; font-size:.9rem; }
+    @media (max-width:760px) { .portfolio-list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:500px) { .portfolio-list { grid-template-columns:1fr; } }
     .positive { color:#52d5b1; }
     .negative { color:var(--danger); }
     .dividend-section { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
@@ -824,22 +831,32 @@
         const name=document.createElement('small');name.textContent=result.ok?position.name:result.error.message;title.append(symbol,name);
         const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.title=position.symbol+' pozisyonunu sil';remove.textContent='×';remove.addEventListener('click',()=>{portfolio=portfolio.filter(item=>item.symbol!==position.symbol);savePortfolio();renderPortfolio()});
         head.append(title,remove);
-        const stats=document.createElement('div');stats.className='portfolio-stats';
+        const valueLine=document.createElement('div');valueLine.className='portfolio-compact-value';
+        const currentValue=document.createElement('strong');
+        const profitValue=document.createElement('span');profitValue.className='portfolio-compact-profit';
+        const details=document.createElement('div');details.className='portfolio-compact-detail';
+        const quantityText=new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(position.quantity);
         const cost=position.quantity*position.unitCost;
-        addPortfolioStat(stats,'Adet',new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(position.quantity));
-        addPortfolioStat(stats,'Toplam maliyet',money(cost,result.ok?position.currency:'TRY'));
+        details.textContent=quantityText+' adet · Maliyet '+money(position.unitCost,result.ok?position.currency:'TRY');
+        details.setAttribute('aria-label',quantityText+' adet, birim maliyet '+money(position.unitCost,result.ok?position.currency:'TRY'));
         if(result.ok){
           const value=position.quantity*position.price,profit=value-cost,percent=cost>0?profit/cost*100:0,tone=profit>=0?'positive':'negative';
-          addPortfolioStat(stats,'Güncel değer',money(value,position.currency));
-          addPortfolioStat(stats,'Kâr / zarar',money(profit,position.currency)+' · '+(percent>=0?'+':'')+percent.toFixed(2)+'%',tone);
+          currentValue.textContent=money(value,position.currency);
+          currentValue.setAttribute('aria-label','Güncel toplam değer '+money(value,position.currency));
+          profitValue.textContent=money(profit,position.currency)+' · '+(percent>=0?'+':'')+percent.toFixed(2)+'%';
+          profitValue.classList.add(tone);
+          profitValue.setAttribute('aria-label','Kâr zarar '+money(profit,position.currency)+', yüzde '+(percent>=0?'+':'')+percent.toFixed(2));
           const factor=mixedCurrency?(rates.get(position.currency)||0):1;
           totalCost+=cost*factor;totalValue+=value*factor;totalWeekStartValue+=position.quantity*position.weekStartPrice*factor;
           allDividends.push(...position.dividends);
           const saved=portfolio.find(item=>item.symbol===position.symbol);if(saved)saved.name=position.name;
         }else{
-          addPortfolioStat(stats,'Güncel değer','Veri yok','negative');addPortfolioStat(stats,'Kâr / zarar','Hesaplanamadı','negative');
+          currentValue.textContent='Veri yok';
+          profitValue.textContent='Hesaplanamadı';
+          profitValue.classList.add('negative');
         }
-        row.append(head,stats);portfolioList.append(row);
+        valueLine.append(currentValue,profitValue);
+        row.append(head,valueLine,details);portfolioList.append(row);
       });
       savePortfolio();
       const netProfit=totalValue-totalCost,profitPercent=totalCost>0?netProfit/totalCost*100:0;
