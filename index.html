@@ -13,7 +13,8 @@
     .app-layout { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:24px; align-items:start; }
     .favorites-panel { border-left:1px solid var(--line); padding-left:24px; }
     .favorites-panel h2 { margin:0; font-size:1.15rem; }
-    .favorites-panel-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+    .favorites-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:14px; }
+    .favorites-panel-head .favorites-note { margin:2px 0 0; }
     .favorites-panel-head button { padding:7px 11px; color:#062019; background:var(--accent); border:1px solid var(--accent); font-size:.8rem; font-weight:700; }
     .favorites-note { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
     .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
@@ -264,7 +265,7 @@
         <div id="dateHelp" class="hint">Tarihi gün, ay ve yıl sırasıyla yazın.</div>
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
-    </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><h2>Favoriler</h2><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
+    </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" aria-label="Portföy ekranı">
       <div class="portfolio-head"><div><h2>Portföyüm</h2></div></div>
@@ -353,6 +354,7 @@
     const marketUpdated = document.getElementById('marketUpdated');
     const marketRefresh = document.getElementById('marketRefresh');
     const favoriteRefresh = document.getElementById('favoriteRefresh');
+    const favoriteUpdated = document.getElementById('favoriteUpdated');
     const marketSettingsButton = document.getElementById('marketSettingsButton');
     const marketSettingsDialog = document.getElementById('marketSettingsDialog');
     const marketSettingsList = document.getElementById('marketSettingsList');
@@ -625,7 +627,12 @@
 
     async function refreshFavoriteQuotes() {
       if(favoriteRefreshInProgress){favoriteRefreshQueued=true;return}
-      if(!favorites.length){favoriteQuotes.clear();renderFavorites();return}
+      if(!favorites.length){
+        favoriteQuotes.clear();
+        renderFavorites();
+        favoriteUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
+        return;
+      }
       favoriteRefreshInProgress=true;
       const items=favorites.map(item=>({...item}));
       try{
@@ -645,6 +652,7 @@
         });
         if(namesChanged)saveFavorites();
         favorites.forEach(item=>updateFavoriteQuoteCard(item.symbol));
+        favoriteUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
       }finally{
         favoriteRefreshInProgress=false;
         if(favoriteRefreshQueued){favoriteRefreshQueued=false;refreshFavoriteQuotes()}
@@ -804,11 +812,20 @@
       marketUpdated.textContent='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
     }
 
+    function formatUpdateTime(date) {
+      return new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(date);
+    }
+
     async function refreshMarketAndFavorites() {
+      marketRefresh.disabled=true;
       favoriteRefresh.disabled=true;
       try{
         await Promise.all([loadMarketSummary(),refreshFavoriteQuotes()]);
+        const updated='Son güncelleme: '+formatUpdateTime(new Date());
+        marketUpdated.textContent=updated;
+        favoriteUpdated.textContent=updated;
       }finally{
+        marketRefresh.disabled=false;
         favoriteRefresh.disabled=false;
       }
     }
