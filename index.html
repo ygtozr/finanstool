@@ -10,28 +10,26 @@
     * { box-sizing:border-box; }
     body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, #263b62 0, var(--bg) 45%); }
     main { width:min(1120px,100%); min-width:0; background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
-    .app-layout { display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:24px; align-items:start; }
+    .app-layout { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:24px; align-items:start; }
     .favorites-panel { border-left:1px solid var(--line); padding-left:24px; }
     .favorites-panel h2 { margin:0 0 10px; font-size:1.15rem; }
     .favorites-note { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
     .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
-    .favorite-row { display:grid; grid-template-columns:minmax(0,1fr) 34px; gap:7px; align-items:stretch; }
-    .favorite-card { min-width:0; padding:10px; display:grid; gap:7px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:10px; }
+    .favorite-row { display:grid; grid-template-columns:minmax(0,1fr) 32px; gap:7px; align-items:stretch; }
+    .favorite-card { min-width:0; min-height:76px; padding:11px 12px; display:grid; grid-template-columns:46px minmax(0,1fr) auto; align-items:center; gap:11px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; }
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
-    .favorite-card-head { min-width:0; display:grid; gap:1px; }
-    .favorite-card-symbol { font-size:.92rem; line-height:1.2; }
-    .favorite-card-name { color:var(--muted); font-size:.69rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .favorite-card-quote { display:flex; align-items:baseline; justify-content:space-between; gap:6px; }
-    .favorite-card-price { font-size:.9rem; }
-    .favorite-change { font-size:.72rem; font-weight:800; }
+    .favorite-card-badge { width:46px; height:46px; display:grid; place-items:center; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.76rem; font-weight:800; letter-spacing:.02em; }
+    .favorite-card-head { min-width:0; display:grid; gap:2px; }
+    .favorite-card-symbol { font-size:1rem; line-height:1.2; }
+    .favorite-card-name { color:var(--muted); font-size:.75rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .favorite-card-quote { min-width:82px; display:grid; justify-items:end; gap:3px; text-align:right; }
+    .favorite-card-price { font-size:1.02rem; line-height:1.2; white-space:nowrap; }
+    .favorite-change { font-size:.76rem; font-weight:750; white-space:nowrap; }
     .favorite-change.positive { color:var(--accent); }
     .favorite-change.negative { color:var(--danger); }
-    .favorite-sparkline { display:block; width:100%; height:36px; color:var(--accent); overflow:visible; }
-    .favorite-sparkline.negative { color:var(--danger); }
-    .favorite-card-status { color:var(--muted); font-size:.65rem; font-weight:500; }
-    .favorite-actions { display:grid; align-content:start; gap:7px; }
+    .favorite-actions { display:grid; align-content:center; gap:7px; }
     .favorite-remove.compare-active { background:#be185d; border-color:#f9a8d4; color:#fff; }
-    .favorite-remove { width:34px; height:34px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.15rem; }
+    .favorite-remove { width:32px; height:32px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.05rem; }
     h1 { margin:0; font-size:clamp(1.5rem,4vw,2.15rem); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .version-badge { display:inline-flex; align-items:center; padding:3px 8px; border:1px solid var(--line); border-radius:999px; color:var(--accent); font-size:.72rem; font-weight:700; letter-spacing:.04em; }
     .intro { margin:6px 0 25px; color:var(--muted); }
@@ -263,7 +261,7 @@
         <div id="dateHelp" class="hint">Tarihi gün, ay ve yıl sırasıyla yazın.</div>
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
-    </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><h2>Favoriler</h2><p class="favorites-note">Fiyatlar ve mini grafikler 15 saniyede bir yenilenir. Favoriler bu cihazda saklanır.</p><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
+    </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><h2>Favoriler</h2><p class="favorites-note">Fiyatlar ve günlük değişimler 15 saniyede bir yenilenir. Favoriler bu cihazda saklanır.</p><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" aria-label="Portföy ekranı">
       <div class="portfolio-head"><div><h2>Portföyüm</h2><p class="favorites-note">Pozisyonlarınız bu cihazda saklanır.</p></div></div>
@@ -455,31 +453,6 @@
     function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
     const isCompared = symbol => compareData.some(item => item.rawSymbol === symbol);
     function updateCompareButton() { if(!compareButton)return; const symbol=currentSymbol(),on=isCompared(symbol),isPrimary=symbol&&symbol===primarySymbol; compareButton.classList.toggle('compare-active',on); compareButton.setAttribute('aria-pressed',String(on)); compareButton.disabled=!symbol||isPrimary||!primaryPrices.length; compareButton.title=isPrimary?'Bu ana grafik':(on?'Karşılaştırmadan çıkar':'Grafiğe karşılaştırma olarak ekle'); }
-    function createFavoriteSparkline(values,negative=false) {
-      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-      svg.setAttribute('viewBox','0 0 160 36');
-      svg.setAttribute('preserveAspectRatio','none');
-      svg.setAttribute('aria-hidden','true');
-      svg.classList.add('favorite-sparkline');
-      if(negative)svg.classList.add('negative');
-      const finite=values.filter(Number.isFinite);
-      const min=Math.min(...finite),max=Math.max(...finite),span=max-min||1;
-      const points=finite.map((value,index)=>{
-        const x=finite.length===1?80:index*(160/(finite.length-1));
-        const y=32-((value-min)/span)*28;
-        return x.toFixed(1)+','+y.toFixed(1);
-      }).join(' ');
-      const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');
-      line.setAttribute('points',points);
-      line.setAttribute('fill','none');
-      line.setAttribute('stroke','currentColor');
-      line.setAttribute('stroke-width','2.4');
-      line.setAttribute('stroke-linecap','round');
-      line.setAttribute('stroke-linejoin','round');
-      svg.append(line);
-      return svg;
-    }
-
     function renderFavorites() {
       favoritesList.replaceChildren();
       favoritesEmpty.hidden=favorites.length>0;
@@ -490,7 +463,9 @@
         const open=document.createElement('button');
         open.type='button';
         open.className='favorite-card';
-        open.title=item.symbol+' grafiğini aç';
+        const badge=document.createElement('span');
+        badge.className='favorite-card-badge';
+        badge.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';
         const head=document.createElement('span');
         head.className='favorite-card-head';
         const symbol=document.createElement('strong');
@@ -506,22 +481,22 @@
         price.className='favorite-card-price';
         const change=document.createElement('span');
         change.className='favorite-change';
-        const status=document.createElement('small');
-        status.className='favorite-card-status';
         if(quote&&!quote.error){
+          const numberFormat=new Intl.NumberFormat('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2,signDisplay:'always'});
           price.textContent=money(quote.price,quote.currency);
-          change.textContent=(quote.change>=0?'+':'')+quote.change.toFixed(2)+'%';
+          change.textContent=numberFormat.format(quote.delta)+' '+numberFormat.format(quote.change)+'%';
           change.classList.add(quote.change>=0?'positive':'negative');
-          status.textContent=(quote.stale?'Son veri · ':'Güncellendi · ')+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(quote.updatedAt));
           quoteRow.append(price,change);
-          open.append(head,quoteRow,createFavoriteSparkline(quote.values,quote.change<0),status);
+          const updated=new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(quote.updatedAt));
+          open.title=(quote.stale?'Son başarılı veri · ':'Güncellendi · ')+updated+' · '+item.symbol+' grafiğini aç';
         }else{
           price.textContent=quote?.error?'Veri alınamadı':'Yükleniyor…';
-          change.textContent='';
-          status.textContent=quote?.error?'15 saniye sonra yeniden denenecek':'Canlı veri hazırlanıyor';
+          change.textContent=quote?.error?'Yeniden denenecek':'Canlı veri';
+          change.classList.add(quote?.error?'negative':'positive');
           quoteRow.append(price,change);
-          open.append(head,quoteRow,status);
+          open.title=item.symbol+' grafiğini aç';
         }
+        open.append(badge,head,quoteRow);
         open.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
         const actions=document.createElement('div');
         actions.className='favorite-actions';
@@ -577,8 +552,8 @@
         name:result.meta?.longName||result.meta?.shortName||item.name||item.symbol,
         currency:result.meta?.currency||'USD',
         price,
+        delta:price-previous,
         change:(price/previous-1)*100,
-        values:points.map(point=>point.close),
         updatedAt:Date.now()
       };
     }
