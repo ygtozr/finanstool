@@ -1,4 +1,4 @@
-# Finans Tool v3.2
+# Finans Tool v3.3
 
 Finans kodu girerek günlük kapanış fiyatlarını grafik üzerinde gösteren web uygulaması.
 
@@ -12,16 +12,20 @@ Finans kodu girerek günlük kapanış fiyatlarını grafik üzerinde gösteren 
 
 Uygulama Vercel üzerinde çalışır ve fiyat verilerini sunucu tarafındaki veri uç noktaları üzerinden alır.
 
+## Canlı favori kartları
+
+v3.3 ile favoriler güncel fiyatı, günlük yüzde değişimi ve son 7 işlem gününün mini fiyat grafiğini gösterir. Veriler 15 saniyede bir otomatik yenilenir.
+
 ## Veri sağlayıcı sürekliliği
 
-v3.2 ile Yahoo Finance birincil kaynak olarak kullanılır. Birincil kaynak başarısız olduğunda desteklenen ABD hisseleri ve ETF’lerde Nasdaq, diğer kodlarda ise ikincil Yahoo erişim noktası otomatik devreye girer. Arama servisi de Yahoo ile Nasdaq arasında otomatik geçiş yapar.
+v3.3 ile Yahoo Finance birincil kaynak olarak kullanılır. Birincil kaynak başarısız olduğunda desteklenen ABD hisseleri ve ETF’lerde Nasdaq, diğer kodlarda ise ikincil Yahoo erişim noktası otomatik devreye girer. Arama servisi de Yahoo ile Nasdaq arasında otomatik geçiş yapar.
 
 ## Veri yedekleme
 
-v3.2 ile favoriler, portföy pozisyonları, fiyat alarmları, piyasa özeti ve tema ayarı JSON dosyası olarak indirilebilir. Geri yüklerken mevcut verilerle birleştirme veya tüm verilerin yerine koyma seçilebilir.
+v3.3 ile favoriler, portföy pozisyonları, fiyat alarmları, piyasa özeti ve tema ayarı JSON dosyası olarak indirilebilir. Geri yüklerken mevcut verilerle birleştirme veya tüm verilerin yerine koyma seçilebilir.
 
 ## Sürüm düzeni
 
-Mevcut çalışma sürümü: **v3.2**
+Mevcut çalışma sürümü: **v3.3**
 
 Dört aşamalı geliştirme planının ilk aşaması tamamlandı: kalıcı portföy ekranı, güncel değer ve kâr/zarar hesapları ile temettü listesi eklendi. İkinci aşamada fiyat alarmları ve piyasa/ürün türü filtreli gelişmiş arama eklendi. Üçüncü aşamada CSV/PNG dışa aktarma, kalıcı açık/koyu tema ve mobil görünüm iyileştirmeleri eklendi. Dördüncü aşamada canlı piyasa özeti, bütünleşik testler ve son arayüz düzenlemeleri tamamlandı. Dört aşama da tamamlandığında kalıcı sürüm numarası kullanıcı onayıyla belirlenir.
