@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finans Grafiği v3.3</title>
+  <title>Finans Grafiği v3.4</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -184,6 +184,16 @@
     .portfolio-page { min-height:620px; }
     .portfolio-page .portfolio-head { margin-bottom:16px; }
     .portfolio-page .portfolio-search { max-width:720px; }
+    .portfolio-distribution { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+    .portfolio-distribution > h3 { margin:0 0 14px; }
+    .distribution-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .distribution-card { min-width:0; padding:14px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
+    .distribution-card h4 { margin:0 0 8px; font-size:.92rem; }
+    .distribution-chart-wrap { position:relative; height:260px; }
+    .distribution-empty { margin:0; height:100%; display:grid; place-items:center; color:var(--muted); text-align:center; }
+    .distribution-empty[hidden] { display:none; }
+    html[data-theme="light"] .distribution-card { background:#f8fafc; }
+    @media (max-width:700px) { .distribution-grid { grid-template-columns:1fr; } .distribution-chart-wrap { height:230px; } }
     .portfolio-analysis { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
     .portfolio-analysis h3 { margin:0; }
     .analysis-table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
@@ -237,7 +247,7 @@
     <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Ana ekran</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
     <section id="mainView" class="app-view active">
     <div class="app-layout"><section class="chart-panel">
-    <h1>Hisse Fiyat Grafiği <span class="version-badge">v3.3</span></h1>
+    <h1>Hisse Fiyat Grafiği <span class="version-badge">v3.4</span></h1>
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
       <div id="marketCards" class="market-cards" aria-live="polite"></div>
@@ -271,6 +281,13 @@
       <div class="portfolio-head"><div><h2>Portföyüm</h2></div></div>
       <div class="portfolio-search"><input id="portfolioSymbol" type="search" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" aria-label="Portföy hisse önerileri"></ul></div>
       <div id="portfolioList" class="portfolio-list"></div>
+      <section class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
+        <h3 id="portfolioDistributionTitle">Portföy Dağılımı</h3>
+        <div class="distribution-grid">
+          <article class="distribution-card"><h4>Varlık Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioAllocationChart" role="img" aria-label="Portföyün hisselere göre güncel değer dağılımı"></canvas><p id="portfolioAllocationEmpty" class="distribution-empty" hidden>Dağılım için portföye hisse ekleyin.</p></div></article>
+          <article class="distribution-card"><h4>Para Birimi Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioCurrencyChart" role="img" aria-label="Portföyün para birimlerine göre güncel değer dağılımı"></canvas><p id="portfolioCurrencyEmpty" class="distribution-empty" hidden>Para birimi dağılımı bulunamadı.</p></div></article>
+        </div>
+      </section>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <section class="dividend-section"><h3>Temettü Takvimi</h3><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
@@ -444,6 +461,8 @@
     let portfolioSearchTimer;
     let portfolioSelection = null;
     let portfolioRenderId = 0;
+    let portfolioAllocationChart = null;
+    let portfolioCurrencyChart = null;
     let currentName = '';
     const favoriteQuotes = new Map();
     let favoriteRefreshInProgress = false;
@@ -837,6 +856,7 @@
       themeToggle.textContent = next === 'light' ? '🌙' : '☀️';
       themeToggle.setAttribute('aria-label', next === 'light' ? 'Koyu temaya geç' : 'Açık temaya geç');
       if (lastLabels.length) renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,false);
+      refreshPortfolioDistributionTheme();
     }
 
     function safeFileName(value) {
@@ -886,7 +906,7 @@
     function createBackup() {
       return {
         schemaVersion:1,
-        appVersion:'3.1',
+        appVersion:'3.4',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
@@ -1172,6 +1192,63 @@
       table.append(row);
     }
 
+    const distributionColors=['#52d5b1','#60a5fa','#fb7185','#fbbf24','#a78bfa','#22d3ee','#f97316','#84cc16','#f472b6','#94a3b8'];
+
+    function destroyPortfolioDistributionCharts() {
+      if(portfolioAllocationChart){portfolioAllocationChart.destroy();portfolioAllocationChart=null}
+      if(portfolioCurrencyChart){portfolioCurrencyChart.destroy();portfolioCurrencyChart=null}
+    }
+
+    function distributionLegendColor() {
+      return getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#eef3fb';
+    }
+
+    function createDistributionChart(canvasId,labels,values,currency,label) {
+      return new Chart(document.getElementById(canvasId),{
+        type:'doughnut',
+        data:{labels,datasets:[{label,data:values,backgroundColor:labels.map((_,index)=>distributionColors[index%distributionColors.length]),borderColor:'rgba(255,255,255,.14)',borderWidth:1,hoverOffset:7}]},
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          cutout:'62%',
+          animation:{duration:450},
+          plugins:{
+            legend:{position:'bottom',labels:{color:distributionLegendColor(),boxWidth:11,boxHeight:11,padding:12,usePointStyle:true}},
+            tooltip:{callbacks:{label:context=>{
+              const total=context.dataset.data.reduce((sum,value)=>sum+Number(value||0),0);
+              const percent=total>0?Number(context.parsed||0)/total*100:0;
+              return context.label+': '+money(context.parsed,currency)+' · '+percent.toFixed(1)+'%';
+            }}}
+          }
+        }
+      });
+    }
+
+    function renderPortfolioDistribution(allocations,currencyTotals,summaryCurrency) {
+      destroyPortfolioDistributionCharts();
+      const allocationEmpty=document.getElementById('portfolioAllocationEmpty');
+      const currencyEmpty=document.getElementById('portfolioCurrencyEmpty');
+      const allocationCanvas=document.getElementById('portfolioAllocationChart');
+      const currencyCanvas=document.getElementById('portfolioCurrencyChart');
+      const sortedAllocations=allocations.filter(item=>item.value>0).sort((a,b)=>b.value-a.value);
+      const currencies=[...currencyTotals.entries()].filter(([,value])=>value>0).sort((a,b)=>b[1]-a[1]);
+      allocationEmpty.hidden=sortedAllocations.length>0;
+      allocationCanvas.hidden=!sortedAllocations.length;
+      currencyEmpty.hidden=currencies.length>0;
+      currencyCanvas.hidden=!currencies.length;
+      if(sortedAllocations.length)portfolioAllocationChart=createDistributionChart('portfolioAllocationChart',sortedAllocations.map(item=>item.label),sortedAllocations.map(item=>item.value),summaryCurrency,'Güncel değer');
+      if(currencies.length)portfolioCurrencyChart=createDistributionChart('portfolioCurrencyChart',currencies.map(item=>item[0]),currencies.map(item=>item[1]),summaryCurrency,'Para birimi değeri');
+    }
+
+    function refreshPortfolioDistributionTheme() {
+      const color=distributionLegendColor();
+      [portfolioAllocationChart,portfolioCurrencyChart].forEach(chart=>{
+        if(!chart)return;
+        chart.options.plugins.legend.labels.color=color;
+        chart.update('none');
+      });
+    }
+
     async function renderPortfolio() {
       const renderId=++portfolioRenderId;
       portfolioList.replaceChildren();
@@ -1179,7 +1256,9 @@
       dividendList.replaceChildren();
       if(!portfolio.length){
         const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Portföyünüz boş. Hisse arayıp + düğmesine basın.';portfolioList.append(empty);
-        const dividendEmpty=document.createElement('li');dividendEmpty.className='favorites-note';dividendEmpty.textContent='Temettü verisi için portföye hisse ekleyin.';dividendList.append(dividendEmpty);return;
+        const dividendEmpty=document.createElement('li');dividendEmpty.className='favorites-note';dividendEmpty.textContent='Temettü verisi için portföye hisse ekleyin.';dividendList.append(dividendEmpty);
+        renderPortfolioDistribution([],new Map(),'USD');
+        return;
       }
       const loading=document.createElement('div');loading.className='portfolio-empty';loading.textContent='Portföy fiyatları güncelleniyor…';portfolioList.append(loading);
       const results=await Promise.all(portfolio.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
@@ -1196,6 +1275,8 @@
       portfolioList.replaceChildren();
       let totalCost=0,totalValue=0,totalWeekStartValue=0;
       const allDividends=[];
+      const allocationValues=[];
+      const currencyValues=new Map();
       results.forEach(result=>{
         const position=result.ok?result.value:result.position;
         const row=document.createElement('article');row.className='portfolio-row';
@@ -1221,7 +1302,12 @@
           profitValue.classList.add(tone);
           profitValue.setAttribute('aria-label','Kâr zarar '+money(profit,position.currency)+', yüzde '+(percent>=0?'+':'')+percent.toFixed(2));
           const factor=mixedCurrency?(rates.get(position.currency)||0):1;
-          totalCost+=cost*factor;totalValue+=value*factor;totalWeekStartValue+=position.quantity*position.weekStartPrice*factor;
+          const convertedValue=value*factor;
+          totalCost+=cost*factor;totalValue+=convertedValue;totalWeekStartValue+=position.quantity*position.weekStartPrice*factor;
+          if(convertedValue>0){
+            allocationValues.push({label:position.symbol,value:convertedValue});
+            currencyValues.set(position.currency,(currencyValues.get(position.currency)||0)+convertedValue);
+          }
           allDividends.push(...position.dividends);
           const saved=portfolio.find(item=>item.symbol===position.symbol);if(saved)saved.name=position.name;
         }else{
@@ -1243,6 +1329,7 @@
       addAnalysisRow(table,'Hafta başından net kâr / zarar',money(weekProfit,summaryCurrency),weekProfit>=0?'positive':'negative');
       addAnalysisRow(table,'Hafta başından kâr / zarar (%)',(weekPercent>=0?'+':'')+weekPercent.toFixed(2)+'%',weekPercent>=0?'positive':'negative');
       portfolioSummary.append(table);
+      renderPortfolioDistribution(allocationValues,currencyValues,summaryCurrency);
       const dividends=allDividends.sort((a,b)=>b.date-a.date).slice(0,5);
       if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';empty.textContent='Temettü kaydı bulunamadı.';dividendList.append(empty)}
       else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol;const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency);row.append(date,symbol,amount);dividendList.append(row)});
