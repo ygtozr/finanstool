@@ -18,7 +18,9 @@
     .favorite-row { display:grid; grid-template-columns:minmax(0,1fr) 32px; gap:7px; align-items:stretch; }
     .favorite-card { min-width:0; min-height:76px; padding:11px 12px; display:grid; grid-template-columns:46px minmax(0,1fr) auto; align-items:center; gap:11px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; }
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
-    .favorite-card-badge { width:46px; height:46px; display:grid; place-items:center; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.76rem; font-weight:800; letter-spacing:.02em; }
+    .favorite-card-badge { width:46px; height:46px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.76rem; font-weight:800; letter-spacing:.02em; }
+    .favorite-card-badge > * { grid-area:1/1; }
+    .favorite-card-logo { width:100%; height:100%; padding:6px; object-fit:contain; background:#111a2a; }
     .favorite-card-head { min-width:0; display:grid; gap:2px; }
     .favorite-card-symbol { font-size:1rem; line-height:1.2; }
     .favorite-card-name { color:var(--muted); font-size:.75rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -453,6 +455,13 @@
     function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
     const isCompared = symbol => compareData.some(item => item.rawSymbol === symbol);
     function updateCompareButton() { if(!compareButton)return; const symbol=currentSymbol(),on=isCompared(symbol),isPrimary=symbol&&symbol===primarySymbol; compareButton.classList.toggle('compare-active',on); compareButton.setAttribute('aria-pressed',String(on)); compareButton.disabled=!symbol||isPrimary||!primaryPrices.length; compareButton.title=isPrimary?'Bu ana grafik':(on?'Karşılaştırmadan çıkar':'Grafiğe karşılaştırma olarak ekle'); }
+    function favoriteLogoUrl(symbol) {
+      const safe=normalizeSymbol(symbol);
+      return /^[A-Z0-9.^=-]{1,20}$/.test(safe)
+        ? 'https://financialmodelingprep.com/image-stock/'+encodeURIComponent(safe)+'.png'
+        : '';
+    }
+
     function renderFavorites() {
       favoritesList.replaceChildren();
       favoritesEmpty.hidden=favorites.length>0;
@@ -465,7 +474,20 @@
         open.className='favorite-card';
         const badge=document.createElement('span');
         badge.className='favorite-card-badge';
-        badge.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';
+        const initials=document.createElement('span');
+        initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';
+        badge.append(initials);
+        const logoUrl=favoriteLogoUrl(item.symbol);
+        if(logoUrl){
+          const logo=document.createElement('img');
+          logo.className='favorite-card-logo';
+          logo.src=logoUrl;
+          logo.alt='';
+          logo.loading='lazy';
+          logo.referrerPolicy='no-referrer';
+          logo.addEventListener('error',()=>logo.remove(),{once:true});
+          badge.append(logo);
+        }
         const head=document.createElement('span');
         head.className='favorite-card-head';
         const symbol=document.createElement('strong');
