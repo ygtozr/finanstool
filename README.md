@@ -1,4 +1,4 @@
-# Finans Tool v3.3
+# Finans Tool v3.4
 
 Finans kodu girerek günlük kapanış fiyatlarını grafik üzerinde gösteren web uygulaması.
 
@@ -16,6 +16,10 @@ Uygulama Vercel üzerinde çalışır ve fiyat verilerini sunucu tarafındaki ve
 
 v3.3 ile favoriler, referans görseldeki yatay kart düzeninde güncel fiyatı ve günlük net/yüzde değişimi gösterir. Veriler 15 saniyede bir otomatik yenilenir.
 
+## Portföy dağılım grafikleri
+
+v3.4 ile Portföy ekranına güncel değer bazlı varlık dağılımı ve para birimi dağılımı grafikleri eklendi. Farklı para birimleri bulunan portföylerde dağılımlar karşılaştırılabilir olması için USD bazında hesaplanır.
+
 ## Veri sağlayıcı sürekliliği
 
 v3.3 ile Yahoo Finance birincil kaynak olarak kullanılır. Birincil kaynak başarısız olduğunda desteklenen ABD hisseleri ve ETF’lerde Nasdaq, diğer kodlarda ise ikincil Yahoo erişim noktası otomatik devreye girer. Arama servisi de Yahoo ile Nasdaq arasında otomatik geçiş yapar.
@@ -26,6 +30,6 @@ v3.3 ile favoriler, portföy pozisyonları, fiyat alarmları, piyasa özeti ve t
 
 ## Sürüm düzeni
 
-Mevcut çalışma sürümü: **v3.3**
+Mevcut çalışma sürümü: **v3.4**
 
 Dört aşamalı geliştirme planının ilk aşaması tamamlandı: kalıcı portföy ekranı, güncel değer ve kâr/zarar hesapları ile temettü listesi eklendi. İkinci aşamada fiyat alarmları ve piyasa/ürün türü filtreli gelişmiş arama eklendi. Üçüncü aşamada CSV/PNG dışa aktarma, kalıcı açık/koyu tema ve mobil görünüm iyileştirmeleri eklendi. Dördüncü aşamada canlı piyasa özeti, bütünleşik testler ve son arayüz düzenlemeleri tamamlandı. Dört aşama da tamamlandığında kalıcı sürüm numarası kullanıcı onayıyla belirlenir.
