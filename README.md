@@ -14,7 +14,7 @@ Uygulama Vercel üzerinde çalışır ve fiyat verilerini sunucu tarafındaki ve
 
 ## Canlı favori kartları
 
-v3.3 ile favoriler güncel fiyatı, günlük yüzde değişimi ve son 7 işlem gününün mini fiyat grafiğini gösterir. Veriler 15 saniyede bir otomatik yenilenir.
+v3.3 ile favoriler, referans görseldeki yatay kart düzeninde güncel fiyatı ve günlük net/yüzde değişimi gösterir. Veriler 15 saniyede bir otomatik yenilenir.
 
 ## Veri sağlayıcı sürekliliği
 
