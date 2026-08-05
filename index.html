@@ -9,7 +9,7 @@
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
     * { box-sizing:border-box; }
     body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, #263b62 0, var(--bg) 45%); }
-    main { width:min(1120px,100%); background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
+    main { width:min(1120px,100%); min-width:0; background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
     .app-layout { display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:24px; align-items:start; }
     .favorites-panel { border-left:1px solid var(--line); padding-left:24px; }
     .favorites-panel h2 { margin:0 0 10px; font-size:1.15rem; }
