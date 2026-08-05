@@ -12,7 +12,9 @@
     main { width:min(1120px,100%); min-width:0; background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
     .app-layout { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:24px; align-items:start; }
     .favorites-panel { border-left:1px solid var(--line); padding-left:24px; }
-    .favorites-panel h2 { margin:0 0 10px; font-size:1.15rem; }
+    .favorites-panel h2 { margin:0; font-size:1.15rem; }
+    .favorites-panel-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+    .favorites-panel-head button { padding:7px 11px; color:#062019; background:var(--accent); border:1px solid var(--accent); font-size:.8rem; font-weight:700; }
     .favorites-note { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
     .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
     .favorite-row { display:grid; grid-template-columns:minmax(0,1fr) 32px; gap:7px; align-items:stretch; }
@@ -235,9 +237,8 @@
     <section id="mainView" class="app-view active">
     <div class="app-layout"><section class="chart-panel">
     <h1>Hisse Fiyat Grafiği <span class="version-badge">v3.3</span></h1>
-    <p class="intro">Finans kodunu girin; seçtiğiniz dönem için günlük kapanış fiyatlarını görüntüleyin.</p>
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
-      <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
+      <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
       <div id="marketCards" class="market-cards" aria-live="polite"></div>
     </section>
     <form id="symbolForm" role="search">
@@ -263,19 +264,19 @@
         <div id="dateHelp" class="hint">Tarihi gün, ay ve yıl sırasıyla yazın.</div>
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
-    </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><h2>Favoriler</h2><p class="favorites-note">Fiyatlar ve günlük değişimler 15 saniyede bir yenilenir. Favoriler bu cihazda saklanır.</p><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
+    </section></section><aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><h2>Favoriler</h2><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside></div>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" aria-label="Portföy ekranı">
-      <div class="portfolio-head"><div><h2>Portföyüm</h2><p class="favorites-note">Pozisyonlarınız bu cihazda saklanır.</p></div></div>
+      <div class="portfolio-head"><div><h2>Portföyüm</h2></div></div>
       <div class="portfolio-search"><input id="portfolioSymbol" type="search" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" aria-label="Portföy hisse önerileri"></ul></div>
       <div id="portfolioList" class="portfolio-list"></div>
-      <section class="portfolio-analysis"><h3>Portföy özet analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
-      <section class="dividend-section"><h3>Temettü takvimi</h3><p class="dividend-note">Portföy hisselerinin son açıklanan temettüleri, en fazla 5 satır.</p><ul id="dividendList" class="dividend-list"></ul></section>
+      <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
+      <section class="dividend-section"><h3>Temettü Takvimi</h3><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
   </main>
 
   <dialog id="portfolioDialog" class="portfolio-dialog">
-    <h3>Portföye ekle</h3><p id="portfolioDialogSymbol" class="portfolio-dialog-symbol"></p>
+    <h3>Portföye Ekle</h3><p id="portfolioDialogSymbol" class="portfolio-dialog-symbol"></p>
     <form id="portfolioForm" class="portfolio-form" method="dialog">
       <label>Adet<input id="portfolioQuantity" type="number" min="0.000001" step="any" required></label>
       <label>Birim maliyet<input id="portfolioCost" type="number" min="0" step="any" required></label>
@@ -284,7 +285,7 @@
   </dialog>
 
   <dialog id="advancedSearchDialog" class="portfolio-dialog">
-    <h3>Gelişmiş arama</h3><p class="portfolio-dialog-symbol">Hisse adı veya kodu, piyasa ve ürün türüyle arayın.</p>
+    <h3>Gelişmiş Arama</h3><p class="portfolio-dialog-symbol">Hisse adı veya kodu, piyasa ve ürün türüyle arayın.</p>
     <form id="advancedSearchForm" class="portfolio-form">
       <label>Arama<input id="advancedQuery" type="search" autocomplete="off" placeholder="Örn. Apple veya THYAO" required></label>
       <label>Piyasa<select id="advancedMarket"><option value="all">Tümü</option><option value="bist">Borsa İstanbul</option><option value="us">ABD piyasaları</option></select></label>
@@ -294,7 +295,7 @@
     </form>
   </dialog>
   <dialog id="alarmDialog" class="portfolio-dialog">
-    <h3>Fiyat alarmı</h3><p class="portfolio-dialog-symbol">Uygulama açıkken fiyat hedefleri düzenli olarak kontrol edilir.</p>
+    <h3>Fiyat Alarmı</h3><p class="portfolio-dialog-symbol">Uygulama açıkken fiyat hedefleri düzenli olarak kontrol edilir.</p>
     <form id="alarmForm" class="portfolio-form">
       <label>Finans kodu<input id="alarmSymbol" type="text" maxlength="20" required></label>
       <label>Koşul<select id="alarmCondition"><option value="above">Fiyat bunun üzerine çıkınca</option><option value="below">Fiyat bunun altına inince</option></select></label>
@@ -304,7 +305,7 @@
     <div id="alarmList" class="alarm-list"></div>
   </dialog>
   <dialog id="marketSettingsDialog" class="portfolio-dialog market-settings-dialog">
-    <h3>Piyasa özetini düzenle</h3><p class="portfolio-dialog-symbol">Gösterilecek verileri kaldırın veya arayarak yenisini ekleyin.</p>
+    <h3>Piyasa Özetini Düzenle</h3><p class="portfolio-dialog-symbol">Gösterilecek verileri kaldırın veya arayarak yenisini ekleyin.</p>
     <div id="marketSettingsList" class="market-settings-list"></div>
     <form id="marketSettingsForm" class="market-settings-search">
       <input id="marketSettingsSearch" type="search" autocomplete="off" placeholder="Piyasa verisi ara" aria-label="Piyasa verisi ara">
@@ -314,7 +315,7 @@
     <div class="dialog-actions"><button id="marketSettingsClose" class="dialog-cancel" type="button">Kapat</button></div>
   </dialog>
   <dialog id="dataDialog" class="portfolio-dialog data-dialog">
-    <h3>Veri yedekleme</h3>
+    <h3>Veri Yedekleme</h3>
     <p class="portfolio-dialog-symbol">Favoriler, portföy, fiyat alarmları, piyasa özeti ve tema ayarınızı tek bir JSON dosyasında saklayın.</p>
     <div class="data-actions"><button id="backupDownload" type="button">Yedek dosyasını indir</button></div>
     <label class="backup-file-label">Geri yüklenecek JSON dosyası
@@ -351,6 +352,7 @@
     const marketCards = document.getElementById('marketCards');
     const marketUpdated = document.getElementById('marketUpdated');
     const marketRefresh = document.getElementById('marketRefresh');
+    const favoriteRefresh = document.getElementById('favoriteRefresh');
     const marketSettingsButton = document.getElementById('marketSettingsButton');
     const marketSettingsDialog = document.getElementById('marketSettingsDialog');
     const marketSettingsList = document.getElementById('marketSettingsList');
@@ -526,6 +528,7 @@
         const compare=document.createElement('button');
         compare.type='button';
         compare.className='favorite-remove';
+        compare.dataset.action='compare';
         compare.classList.toggle('compare-active',isCompared(item.symbol));
         compare.textContent='📈';
         compare.title=isCompared(item.symbol)?item.symbol+' karşılaştırmadan çıkar':item.symbol+' ile karşılaştır';
@@ -569,6 +572,18 @@
         change.classList.add(quote?.error?'negative':'positive');
         open.title=item.symbol+' grafiğini aç';
       }
+    }
+
+    function updateFavoriteCompareButtons() {
+      [...favoritesList.children].forEach(row=>{
+        const symbol=row.dataset.symbol;
+        const compare=row.querySelector('[data-action="compare"]');
+        if(!symbol||!compare)return;
+        const active=isCompared(symbol);
+        compare.classList.toggle('compare-active',active);
+        compare.title=active?symbol+' karşılaştırmadan çıkar':symbol+' ile karşılaştır';
+        compare.setAttribute('aria-label',compare.title);
+      });
     }
 
     async function mapWithLimit(items,limit,worker) {
@@ -761,7 +776,6 @@
     async function loadMarketSummary() {
       const requestId=++marketSummaryRequest;
       const items=marketItems.map(item=>({...item}));
-      marketRefresh.disabled=true;
       if(!items.length){
         if(!marketCards.querySelector('.market-settings-empty')){
           const empty=document.createElement('p');
@@ -770,7 +784,6 @@
           marketCards.replaceChildren(empty);
         }
         marketUpdated.textContent='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
-        marketRefresh.disabled=false;
         return;
       }
       const cards=ensureMarketCards(items);
@@ -789,7 +802,15 @@
       if(requestId!==marketSummaryRequest)return;
       items.forEach((item,index)=>updateMarketCard(cards[index],item,results[index]));
       marketUpdated.textContent='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
-      marketRefresh.disabled=false;
+    }
+
+    async function refreshMarketAndFavorites() {
+      favoriteRefresh.disabled=true;
+      try{
+        await Promise.all([loadMarketSummary(),refreshFavoriteQuotes()]);
+      }finally{
+        favoriteRefresh.disabled=false;
+      }
     }
 
     function applyTheme(theme) {
@@ -1394,7 +1415,7 @@
         const name = info.longName || info.shortName || symbol;
         currentName = name;
         const favorite = favorites.find(item => item.symbol === symbol);
-        if (favorite && favorite.name !== name) { favorite.name=name; saveFavorites(); renderFavorites(); }
+        if (favorite && favorite.name !== name) { favorite.name=name; saveFavorites(); updateFavoriteQuoteCard(symbol); }
         updateFavoriteButton();
         const currency = info.currency || 'USD';
         currentCurrency = currency;
@@ -1429,7 +1450,8 @@
           try { await prepareMovingAverages(symbol, labels); } catch {}
         }
         renderChart(labels, prices, name, currency, true);
-        renderFavorites();
+        updateFavoriteQuoteCard(symbol);
+        updateFavoriteCompareButtons();
         updateCompareButton();
         for(const comparisonSymbol of comparisonSymbols)await compareStock(comparisonSymbol);
       } catch (error) {
@@ -1518,7 +1540,7 @@
         if(mixed){const [ma50,ma100,ma200]=await Promise.all([convertSeriesToUsd(primaryCurrency,movingAverageNativeData.ma50,primaryLabels,query),convertSeriesToUsd(primaryCurrency,movingAverageNativeData.ma100,primaryLabels,query),convertSeriesToUsd(primaryCurrency,movingAverageNativeData.ma200,primaryLabels,query)]);movingAverageData={ma50,ma100,ma200}}
         else movingAverageData={ma50:[...movingAverageNativeData.ma50],ma100:[...movingAverageNativeData.ma100],ma200:[...movingAverageNativeData.ma200]};
       }
-      renderChart(primaryLabels,mainValues,primaryChartName,axisCurrency,false);renderFavorites();updateCompareButton();
+      renderChart(primaryLabels,mainValues,primaryChartName,axisCurrency,false);updateFavoriteCompareButtons();updateCompareButton();
     }
 
     async function compareStock(inputSymbol){
@@ -1563,7 +1585,8 @@
 
 
 
-    marketRefresh.addEventListener('click',loadMarketSummary);
+    marketRefresh.addEventListener('click',refreshMarketAndFavorites);
+    favoriteRefresh.addEventListener('click',refreshMarketAndFavorites);
     marketSettingsButton.addEventListener('click',()=>{renderMarketSettings();marketSettingsDialog.showModal();marketSettingsSearch.focus()});
     marketSettingsClose.addEventListener('click',()=>marketSettingsDialog.close());
     marketSettingsSearch.addEventListener('input',()=>{
@@ -1698,16 +1721,14 @@
     });
     applyTheme(localStorage.getItem(themeKey) || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
     renderFavorites();
-    refreshFavoriteQuotes();
     updateFavoriteButton();
     updateCompareButton();
     loadPrice('AAPL');
-    loadMarketSummary();
+    refreshMarketAndFavorites();
     renderAlarms();
     setInterval(checkAlarms, 60000);
-    setInterval(loadMarketSummary, 15000);
+    setInterval(refreshMarketAndFavorites, 15000);
     setInterval(refreshCurrentChart, 15000);
-    setInterval(refreshFavoriteQuotes, 15000);
   </script>
 </body>
 </html>
