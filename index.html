@@ -530,7 +530,7 @@
         compare.className='favorite-remove';
         compare.dataset.action='compare';
         compare.classList.toggle('compare-active',isCompared(item.symbol));
-        compare.textContent='📈';
+        compare.textContent='⇄';
         compare.title=isCompared(item.symbol)?item.symbol+' karşılaştırmadan çıkar':item.symbol+' ile karşılaştır';
         compare.setAttribute('aria-label',compare.title);
         compare.addEventListener('click',()=>compareStock(item.symbol));
