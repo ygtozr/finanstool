@@ -20,7 +20,7 @@
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
     .favorite-card-badge { width:46px; height:46px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.76rem; font-weight:800; letter-spacing:.02em; }
     .favorite-card-badge > * { grid-area:1/1; }
-    .favorite-card-logo { width:100%; height:100%; padding:6px; object-fit:contain; background:#111a2a; }
+    .favorite-card-logo { width:100%; height:100%; padding:0; object-fit:cover; border-radius:50%; background:#111a2a; }
     .favorite-card-head { min-width:0; display:grid; gap:2px; }
     .favorite-card-symbol { font-size:1rem; line-height:1.2; }
     .favorite-card-name { color:var(--muted); font-size:.75rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -469,6 +469,7 @@
         const quote=favoriteQuotes.get(item.symbol);
         const row=document.createElement('li');
         row.className='favorite-row';
+        row.dataset.symbol=item.symbol;
         const open=document.createElement('button');
         open.type='button';
         open.className='favorite-card';
@@ -543,6 +544,33 @@
       });
     }
 
+    function updateFavoriteQuoteCard(symbol) {
+      const row=[...favoritesList.children].find(item=>item.dataset.symbol===symbol);
+      if(!row)return;
+      const item=favorites.find(entry=>entry.symbol===symbol);
+      const quote=favoriteQuotes.get(symbol);
+      const open=row.querySelector('.favorite-card');
+      const name=row.querySelector('.favorite-card-name');
+      const price=row.querySelector('.favorite-card-price');
+      const change=row.querySelector('.favorite-change');
+      if(!open||!name||!price||!change||!item)return;
+      name.textContent=item.name!==item.symbol?item.name:'Hisse';
+      change.classList.remove('positive','negative');
+      if(quote&&!quote.error){
+        const numberFormat=new Intl.NumberFormat('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2,signDisplay:'always'});
+        price.textContent=money(quote.price,quote.currency);
+        change.textContent=numberFormat.format(quote.delta)+' '+numberFormat.format(quote.change)+'%';
+        change.classList.add(quote.change>=0?'positive':'negative');
+        const updated=new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(quote.updatedAt));
+        open.title=(quote.stale?'Son başarılı veri · ':'Güncellendi · ')+updated+' · '+item.symbol+' grafiğini aç';
+      }else{
+        price.textContent=quote?.error?'Veri alınamadı':'Yükleniyor…';
+        change.textContent=quote?.error?'Yeniden denenecek':'Canlı veri';
+        change.classList.add(quote?.error?'negative':'positive');
+        open.title=item.symbol+' grafiğini aç';
+      }
+    }
+
     async function mapWithLimit(items,limit,worker) {
       const results=new Array(items.length);
       let next=0;
@@ -601,7 +629,7 @@
           }
         });
         if(namesChanged)saveFavorites();
-        renderFavorites();
+        favorites.forEach(item=>updateFavoriteQuoteCard(item.symbol));
       }finally{
         favoriteRefreshInProgress=false;
         if(favoriteRefreshQueued){favoriteRefreshQueued=false;refreshFavoriteQuotes()}
@@ -677,44 +705,75 @@
       loadMarketSummary();
     }
 
-    function createMarketCard(item,data) {
+    function createMarketCard(item) {
       const card=document.createElement('button');
       card.type='button';
       card.className='market-card';
-      const label=document.createElement('span');label.textContent=item.label+' · '+item.symbol;
+      card.dataset.symbol=item.symbol;
+      const label=document.createElement('span');
+      label.className='market-card-label';
+      label.textContent=item.label+' · '+item.symbol;
       const value=document.createElement('strong');
+      value.className='market-card-value';
+      value.textContent='Yükleniyor…';
       const change=document.createElement('small');
+      change.className='market-card-change positive';
+      change.textContent='Canlı veri';
+      card.disabled=true;
+      card.append(label,value,change);
+      return card;
+    }
+
+    function updateMarketCard(card,item,data) {
+      const label=card.querySelector('.market-card-label');
+      const value=card.querySelector('.market-card-value');
+      const change=card.querySelector('.market-card-change');
+      if(!label||!value||!change)return;
+      label.textContent=item.label+' · '+item.symbol;
+      change.classList.remove('positive','negative');
       if(data?.ok){
         value.textContent=money(data.price,data.currency);
         change.textContent=(data.change>=0?'+':'')+data.change.toFixed(2)+'%';
-        change.className=data.change>=0?'positive':'negative';
+        change.classList.add(data.change>=0?'positive':'negative');
         card.title=item.label+' grafiğini aç';
-        card.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+        card.disabled=false;
+        if(!card.dataset.bound){
+          card.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+          card.dataset.bound='true';
+        }
       }else{
         value.textContent='Veri alınamadı';
         change.textContent='Tekrar yenileyin';
-        change.className='negative';
+        change.classList.add('negative');
+        card.title='';
         card.disabled=true;
       }
-      card.append(label,value,change);
-      return card;
+    }
+
+    function ensureMarketCards(items) {
+      const current=[...marketCards.children];
+      const same=current.length===items.length&&current.every((card,index)=>card.dataset.symbol===items[index].symbol);
+      if(same)return current;
+      marketCards.replaceChildren(...items.map(createMarketCard));
+      return [...marketCards.children];
     }
 
     async function loadMarketSummary() {
       const requestId=++marketSummaryRequest;
       const items=marketItems.map(item=>({...item}));
       marketRefresh.disabled=true;
-      marketCards.replaceChildren();
       if(!items.length){
-        const empty=document.createElement('p');
-        empty.className='market-settings-empty';
-        empty.textContent='Dişli düğmesinden piyasa verisi ekleyin.';
-        marketCards.append(empty);
+        if(!marketCards.querySelector('.market-settings-empty')){
+          const empty=document.createElement('p');
+          empty.className='market-settings-empty';
+          empty.textContent='Dişli düğmesinden piyasa verisi ekleyin.';
+          marketCards.replaceChildren(empty);
+        }
         marketUpdated.textContent='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
         marketRefresh.disabled=false;
         return;
       }
-      items.forEach(()=>{const loading=document.createElement('div');loading.className='market-card loading';marketCards.append(loading)});
+      const cards=ensureMarketCards(items);
       const query='range=5d&interval=1d';
       const results=await Promise.all(items.map(async item=>{
         try{
@@ -728,8 +787,7 @@
         }catch{return{ok:false}}
       }));
       if(requestId!==marketSummaryRequest)return;
-      marketCards.replaceChildren();
-      items.forEach((item,index)=>marketCards.append(createMarketCard(item,results[index])));
+      items.forEach((item,index)=>updateMarketCard(cards[index],item,results[index]));
       marketUpdated.textContent='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
       marketRefresh.disabled=false;
     }
