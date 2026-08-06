@@ -1,4 +1,4 @@
-# Finans Tool v3.5
+# Finans Tool v3.6
 
 Finans kodu girerek günlük kapanış fiyatlarını grafik üzerinde gösteren web uygulaması.
 
@@ -24,6 +24,10 @@ v3.4 ile Portföy ekranına güncel değer bazlı varlık dağılımı ve para b
 
 v3.5 ile portföy performansı S&P 500, Nasdaq, BIST 100, Altın (GLD) veya aramayla seçilen başka bir ölçütle karşılaştırılabilir. Portföy ve ölçüt serileri aynı başlangıç noktasından yüzde değişim olarak gösterilir; 1 ay, 3 ay, 6 ay ve 1 yıl süreleri desteklenir.
 
+## Portföy görünümü
+
+v3.6 ile Portföyüm başlığının altında toplam portföy büyüklüğü ile son kapanışa göre günlük net ve yüzde değişim gösterilir. Varlık ve para birimi dağılım grafiklerinin kalıcı açıklamalarında her öğenin tutarı ve portföy içindeki yüzdesi yer alır.
+
 ## Veri sağlayıcı sürekliliği
 
 v3.3 ile Yahoo Finance birincil kaynak olarak kullanılır. Birincil kaynak başarısız olduğunda desteklenen ABD hisseleri ve ETF’lerde Nasdaq, diğer kodlarda ise ikincil Yahoo erişim noktası otomatik devreye girer. Arama servisi de Yahoo ile Nasdaq arasında otomatik geçiş yapar.
@@ -34,6 +38,6 @@ v3.3 ile favoriler, portföy pozisyonları, fiyat alarmları, piyasa özeti ve t
 
 ## Sürüm düzeni
 
-Mevcut çalışma sürümü: **v3.5**
+Mevcut çalışma sürümü: **v3.6**
 
 Dört aşamalı geliştirme planının ilk aşaması tamamlandı: kalıcı portföy ekranı, güncel değer ve kâr/zarar hesapları ile temettü listesi eklendi. İkinci aşamada fiyat alarmları ve piyasa/ürün türü filtreli gelişmiş arama eklendi. Üçüncü aşamada CSV/PNG dışa aktarma, kalıcı açık/koyu tema ve mobil görünüm iyileştirmeleri eklendi. Dördüncü aşamada canlı piyasa özeti, bütünleşik testler ve son arayüz düzenlemeleri tamamlandı. Dört aşama da tamamlandığında kalıcı sürüm numarası kullanıcı onayıyla belirlenir.
