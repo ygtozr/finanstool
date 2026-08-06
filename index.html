@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finans Grafiği v3.4</title>
+  <title>Finans Grafiği v3.5</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -194,6 +194,28 @@
     .distribution-empty[hidden] { display:none; }
     html[data-theme="light"] .distribution-card { background:#f8fafc; }
     @media (max-width:700px) { .distribution-grid { grid-template-columns:1fr; } .distribution-chart-wrap { height:230px; } }
+    .portfolio-benchmark { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+    .portfolio-benchmark-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px; }
+    .portfolio-benchmark-head h3 { margin:0; }
+    .benchmark-status { margin:2px 0 0; color:var(--muted); font-size:.82rem; }
+    .benchmark-controls { display:grid; gap:10px; margin-bottom:14px; }
+    .benchmark-presets,.benchmark-ranges { display:flex; flex-wrap:wrap; gap:7px; }
+    .benchmark-presets button,.benchmark-ranges button { padding:7px 10px; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:.8rem; }
+    .benchmark-presets button.active,.benchmark-ranges button.active { color:#062019; background:var(--accent); border-color:var(--accent); }
+    .benchmark-search { position:relative; display:flex; gap:8px; max-width:640px; }
+    .benchmark-search input { min-width:0; flex:1; }
+    .benchmark-search > button { flex:0 0 auto; padding-inline:14px; }
+    .benchmark-search .search-suggestions { top:calc(100% + 6px); left:0; right:116px; }
+    .benchmark-chart-wrap { position:relative; height:330px; padding:12px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
+    .benchmark-empty { height:100%; margin:0; display:grid; place-items:center; color:var(--muted); text-align:center; }
+    .benchmark-empty[hidden] { display:none; }
+    .benchmark-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .benchmark-stat { padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:#0d1523; }
+    .benchmark-stat span,.benchmark-stat strong { display:block; }
+    .benchmark-stat span { color:var(--muted); font-size:.78rem; }
+    .benchmark-stat strong { margin-top:3px; font-size:1rem; }
+    html[data-theme="light"] .benchmark-chart-wrap,html[data-theme="light"] .benchmark-stat { background:#f8fafc; }
+    @media (max-width:700px) { .benchmark-chart-wrap { height:280px; padding:8px; } .benchmark-stats { grid-template-columns:1fr; } .benchmark-search { max-width:none; } }
     .portfolio-analysis { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
     .portfolio-analysis h3 { margin:0; }
     .analysis-table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
@@ -247,7 +269,7 @@
     <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Ana ekran</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
     <section id="mainView" class="app-view active">
     <div class="app-layout"><section class="chart-panel">
-    <h1>Hisse Fiyat Grafiği <span class="version-badge">v3.4</span></h1>
+    <h1>Hisse Fiyat Grafiği <span class="version-badge">v3.5</span></h1>
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
       <div id="marketCards" class="market-cards" aria-live="polite"></div>
@@ -287,6 +309,16 @@
           <article class="distribution-card"><h4>Varlık Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioAllocationChart" role="img" aria-label="Portföyün hisselere göre güncel değer dağılımı"></canvas><p id="portfolioAllocationEmpty" class="distribution-empty" hidden>Dağılım için portföye hisse ekleyin.</p></div></article>
           <article class="distribution-card"><h4>Para Birimi Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioCurrencyChart" role="img" aria-label="Portföyün para birimlerine göre güncel değer dağılımı"></canvas><p id="portfolioCurrencyEmpty" class="distribution-empty" hidden>Para birimi dağılımı bulunamadı.</p></div></article>
         </div>
+      </section>
+      <section class="portfolio-benchmark" aria-labelledby="portfolioBenchmarkTitle">
+        <div class="portfolio-benchmark-head"><div><h3 id="portfolioBenchmarkTitle">Performans Karşılaştırması</h3><p id="benchmarkStatus" class="benchmark-status">Portföy verisi bekleniyor…</p></div></div>
+        <div class="benchmark-controls">
+          <div class="benchmark-presets" aria-label="Hazır karşılaştırma ölçütleri"><button type="button" data-benchmark-symbol="^GSPC" data-benchmark-name="S&P 500">S&P 500</button><button type="button" data-benchmark-symbol="^IXIC" data-benchmark-name="Nasdaq">Nasdaq</button><button type="button" data-benchmark-symbol="XU100.IS" data-benchmark-name="BIST 100">BIST 100</button><button type="button" data-benchmark-symbol="BTC-USD" data-benchmark-name="Bitcoin">Bitcoin</button></div>
+          <div class="benchmark-search"><input id="benchmarkSearch" type="search" maxlength="20" autocomplete="off" placeholder="Başka ölçüt ara"><button id="benchmarkApply" type="button">Karşılaştır</button><ul id="benchmarkSuggestions" class="search-suggestions" aria-label="Karşılaştırma ölçütü önerileri"></ul></div>
+          <div class="benchmark-ranges" aria-label="Karşılaştırma süresi"><button type="button" data-benchmark-range="1mo">1 Ay</button><button type="button" data-benchmark-range="3mo">3 Ay</button><button type="button" data-benchmark-range="6mo">6 Ay</button><button type="button" data-benchmark-range="1y">1 Yıl</button></div>
+        </div>
+        <div class="benchmark-chart-wrap"><canvas id="portfolioBenchmarkChart" role="img" aria-label="Portföy ve karşılaştırma ölçütü performans grafiği"></canvas><p id="benchmarkEmpty" class="benchmark-empty">Karşılaştırma için portföye hisse ekleyin.</p></div>
+        <div id="benchmarkStats" class="benchmark-stats"></div>
       </section>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <section class="dividend-section"><h3>Temettü Takvimi</h3><ul id="dividendList" class="dividend-list"></ul></section>
@@ -432,6 +464,14 @@
     const portfolioSummary = document.getElementById('portfolioSummary');
     const portfolioList = document.getElementById('portfolioList');
     const dividendList = document.getElementById('dividendList');
+    const benchmarkStatus = document.getElementById('benchmarkStatus');
+    const benchmarkSearch = document.getElementById('benchmarkSearch');
+    const benchmarkApply = document.getElementById('benchmarkApply');
+    const benchmarkSuggestions = document.getElementById('benchmarkSuggestions');
+    const benchmarkEmpty = document.getElementById('benchmarkEmpty');
+    const benchmarkStats = document.getElementById('benchmarkStats');
+    const benchmarkPresetButtons = [...document.querySelectorAll('[data-benchmark-symbol]')];
+    const benchmarkRangeButtons = [...document.querySelectorAll('[data-benchmark-range]')];
     const portfolioDialog = document.getElementById('portfolioDialog');
     const portfolioDialogSymbol = document.getElementById('portfolioDialogSymbol');
     const portfolioForm = document.getElementById('portfolioForm');
@@ -463,6 +503,12 @@
     let portfolioRenderId = 0;
     let portfolioAllocationChart = null;
     let portfolioCurrencyChart = null;
+    let portfolioBenchmarkChart = null;
+    let portfolioBenchmarkRequestId = 0;
+    let benchmarkSearchTimer;
+    let benchmarkSelection = null;
+    const benchmarkKey = 'finans-grafigi-portfolio-benchmark';
+    let benchmarkSettings = (()=>{try{const saved=JSON.parse(localStorage.getItem(benchmarkKey));return saved&&saved.symbol?{symbol:String(saved.symbol).toUpperCase(),name:saved.name||saved.symbol,range:['1mo','3mo','6mo','1y'].includes(saved.range)?saved.range:'6mo'}:{symbol:'^GSPC',name:'S&P 500',range:'6mo'}}catch{return{symbol:'^GSPC',name:'S&P 500',range:'6mo'}}})();
     let currentName = '';
     const favoriteQuotes = new Map();
     let favoriteRefreshInProgress = false;
@@ -857,6 +903,11 @@
       themeToggle.setAttribute('aria-label', next === 'light' ? 'Koyu temaya geç' : 'Açık temaya geç');
       if (lastLabels.length) renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,false);
       refreshPortfolioDistributionTheme();
+      if(portfolioBenchmarkChart){
+        const color=distributionLegendColor();
+        portfolioBenchmarkChart.options.plugins.legend.labels.color=color;
+        portfolioBenchmarkChart.update('none');
+      }
     }
 
     function safeFileName(value) {
@@ -906,7 +957,7 @@
     function createBackup() {
       return {
         schemaVersion:1,
-        appVersion:'3.4',
+        appVersion:'3.5',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
@@ -1249,6 +1300,162 @@
       });
     }
 
+    function saveBenchmarkSettings() {
+      localStorage.setItem(benchmarkKey,JSON.stringify(benchmarkSettings));
+    }
+
+    function updateBenchmarkControls() {
+      benchmarkPresetButtons.forEach(button=>button.classList.toggle('active',button.dataset.benchmarkSymbol===benchmarkSettings.symbol));
+      benchmarkRangeButtons.forEach(button=>button.classList.toggle('active',button.dataset.benchmarkRange===benchmarkSettings.range));
+      benchmarkSearch.value=benchmarkSettings.symbol;
+    }
+
+    function normalizePerformance(values) {
+      const base=values.find(value=>Number.isFinite(value)&&value>0);
+      if(!Number.isFinite(base))return values.map(()=>null);
+      return values.map(value=>Number.isFinite(value)&&value>0?(value/base-1)*100:null);
+    }
+
+    function benchmarkLastValue(values) {
+      for(let index=values.length-1;index>=0;index--)if(Number.isFinite(values[index]))return values[index];
+      return null;
+    }
+
+    function renderBenchmarkStats(portfolioPerformance,benchmarkPerformance) {
+      benchmarkStats.replaceChildren();
+      const portfolioReturn=benchmarkLastValue(portfolioPerformance);
+      const benchmarkReturn=benchmarkLastValue(benchmarkPerformance);
+      const difference=Number.isFinite(portfolioReturn)&&Number.isFinite(benchmarkReturn)?portfolioReturn-benchmarkReturn:null;
+      [
+        ['Portföy Getirisi',portfolioReturn],
+        [benchmarkSettings.name+' Getirisi',benchmarkReturn],
+        ['Göreceli Fark',difference]
+      ].forEach(([label,value])=>{
+        const card=document.createElement('div');
+        card.className='benchmark-stat';
+        const caption=document.createElement('span');
+        caption.textContent=label;
+        const strong=document.createElement('strong');
+        strong.textContent=Number.isFinite(value)?(value>=0?'+':'')+value.toFixed(2)+'%':'—';
+        if(Number.isFinite(value))strong.className=value>=0?'positive':'negative';
+        card.append(caption,strong);
+        benchmarkStats.append(card);
+      });
+    }
+
+    async function fetchBenchmarkResult(symbol,query) {
+      const response=await fetch('/api/price?symbol='+encodeURIComponent(symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'});
+      const payload=await response.json();
+      if(!response.ok)throw new Error(payload.error||'Performans verisi alınamadı');
+      const result=payload.chart?.result?.[0];
+      if(!result?.timestamp||!result?.indicators?.quote?.[0]?.close)throw new Error('Performans verisi bulunamadı');
+      return result;
+    }
+
+    function renderPortfolioBenchmarkChart(labels,portfolioPerformance,benchmarkPerformance) {
+      if(portfolioBenchmarkChart)portfolioBenchmarkChart.destroy();
+      portfolioBenchmarkChart=new Chart(document.getElementById('portfolioBenchmarkChart'),{
+        type:'line',
+        data:{labels,datasets:[
+          {label:'Portföy',data:portfolioPerformance,borderColor:'#52d5b1',backgroundColor:'rgba(82,213,177,.08)',borderWidth:2.4,pointRadius:0,pointHoverRadius:4,tension:.18,spanGaps:true},
+          {label:benchmarkSettings.name,data:benchmarkPerformance,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,.06)',borderWidth:2.2,pointRadius:0,pointHoverRadius:4,tension:.18,spanGaps:true}
+        ]},
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          interaction:{mode:'index',intersect:false},
+          plugins:{
+            legend:{labels:{color:distributionLegendColor(),usePointStyle:true,boxWidth:10}},
+            tooltip:{callbacks:{label:context=>context.dataset.label+': '+(Number.isFinite(context.parsed.y)?(context.parsed.y>=0?'+':'')+context.parsed.y.toFixed(2)+'%':'—')}}
+          },
+          scales:{
+            x:{ticks:{color:'#aebbd0',maxTicksLimit:8},grid:{color:'rgba(148,163,184,.10)'}},
+            y:{ticks:{color:'#aebbd0',callback:value=>(value>=0?'+':'')+value+'%'},grid:{color:'rgba(148,163,184,.14)'}}
+          }
+        }
+      });
+    }
+
+    async function renderPortfolioBenchmark() {
+      const requestId=++portfolioBenchmarkRequestId;
+      updateBenchmarkControls();
+      benchmarkStats.replaceChildren();
+      if(!portfolio.length){
+        if(portfolioBenchmarkChart){portfolioBenchmarkChart.destroy();portfolioBenchmarkChart=null}
+        document.getElementById('portfolioBenchmarkChart').hidden=true;
+        benchmarkEmpty.hidden=false;
+        benchmarkStatus.textContent='Portföy verisi bekleniyor…';
+        return;
+      }
+      benchmarkStatus.textContent='Performans hesaplanıyor…';
+      benchmarkEmpty.hidden=true;
+      const canvas=document.getElementById('portfolioBenchmarkChart');
+      canvas.hidden=false;
+      try{
+        const query='range='+benchmarkSettings.range+'&interval=1d';
+        const [benchmarkResult,positionResults]=await Promise.all([
+          fetchBenchmarkResult(benchmarkSettings.symbol,query),
+          Promise.all(portfolio.map(async position=>{try{return{position,result:await fetchBenchmarkResult(position.symbol,query)}}catch{return null}}))
+        ]);
+        if(requestId!==portfolioBenchmarkRequestId)return;
+        const benchmarkRaw=benchmarkResult.indicators.quote[0].close;
+        const benchmarkPoints=benchmarkResult.timestamp.map((time,index)=>({time,value:benchmarkRaw[index]})).filter(point=>Number.isFinite(point.value));
+        if(benchmarkPoints.length<2)throw new Error('Karşılaştırma ölçütünde yeterli veri yok');
+        const formatter=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
+        const labels=benchmarkPoints.map(point=>formatter.format(new Date(point.time*1000)));
+        const validPositions=positionResults.filter(Boolean);
+        if(!validPositions.length)throw new Error('Portföy hisselerinin performans verisi alınamadı');
+        const currencies=[...new Set(validPositions.map(item=>String(item.result.meta?.currency||'USD').toUpperCase()))];
+        const mixedCurrency=currencies.length>1;
+        const totalValues=labels.map(()=>0);
+        let included=0;
+        for(const item of validPositions){
+          try{
+            const currency=String(item.result.meta?.currency||'USD').toUpperCase();
+            let values=fillMissingRates(alignResultToLabels(item.result,labels));
+            if(mixedCurrency&&currency!=='USD')values=await convertSeriesToUsd(currency,values,labels,query);
+            values.forEach((value,index)=>{if(Number.isFinite(value))totalValues[index]+=value*item.position.quantity});
+            included++;
+          }catch{}
+        }
+        if(requestId!==portfolioBenchmarkRequestId)return;
+        if(!included||!totalValues.some(value=>value>0))throw new Error('Portföy performansı hesaplanamadı');
+        const portfolioPerformance=normalizePerformance(totalValues);
+        const benchmarkPerformance=normalizePerformance(benchmarkPoints.map(point=>point.value));
+        renderPortfolioBenchmarkChart(labels,portfolioPerformance,benchmarkPerformance);
+        renderBenchmarkStats(portfolioPerformance,benchmarkPerformance);
+        benchmarkStatus.textContent='Son güncelleme: '+formatUpdateTime(new Date())+' · '+included+'/'+portfolio.length+' pozisyon';
+      }catch(error){
+        if(requestId!==portfolioBenchmarkRequestId)return;
+        if(portfolioBenchmarkChart){portfolioBenchmarkChart.destroy();portfolioBenchmarkChart=null}
+        canvas.hidden=true;
+        benchmarkEmpty.hidden=false;
+        benchmarkEmpty.textContent=error.message;
+        benchmarkStatus.textContent='Karşılaştırma güncellenemedi';
+      }
+    }
+
+    function showBenchmarkSuggestions(items) {
+      benchmarkSuggestions.replaceChildren();
+      items.slice(0,5).forEach(item=>{
+        const li=document.createElement('li');
+        const button=document.createElement('button');
+        button.type='button';
+        button.className='suggestion';
+        button.textContent=item.symbol+' · '+item.name;
+        button.addEventListener('click',()=>{
+          benchmarkSelection={symbol:item.symbol,name:item.name};
+          benchmarkSettings={...benchmarkSettings,...benchmarkSelection};
+          saveBenchmarkSettings();
+          benchmarkSuggestions.classList.remove('visible');
+          renderPortfolioBenchmark();
+        });
+        li.append(button);
+        benchmarkSuggestions.append(li);
+      });
+      benchmarkSuggestions.classList.toggle('visible',items.length>0);
+    }
+
     async function renderPortfolio() {
       const renderId=++portfolioRenderId;
       portfolioList.replaceChildren();
@@ -1258,6 +1465,7 @@
         const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Portföyünüz boş. Hisse arayıp + düğmesine basın.';portfolioList.append(empty);
         const dividendEmpty=document.createElement('li');dividendEmpty.className='favorites-note';dividendEmpty.textContent='Temettü verisi için portföye hisse ekleyin.';dividendList.append(dividendEmpty);
         renderPortfolioDistribution([],new Map(),'USD');
+        renderPortfolioBenchmark();
         return;
       }
       const loading=document.createElement('div');loading.className='portfolio-empty';loading.textContent='Portföy fiyatları güncelleniyor…';portfolioList.append(loading);
@@ -1333,6 +1541,7 @@
       const dividends=allDividends.sort((a,b)=>b.date-a.date).slice(0,5);
       if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';empty.textContent='Temettü kaydı bulunamadı.';dividendList.append(empty)}
       else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol;const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency);row.append(date,symbol,amount);dividendList.append(row)});
+      renderPortfolioBenchmark();
     }
 
     function money(value, currency) {
@@ -1783,6 +1992,39 @@
       alarmTarget.value='';
       if('Notification' in window && Notification.permission==='default') Notification.requestPermission();
       checkAlarms();
+    });
+    benchmarkPresetButtons.forEach(button=>button.addEventListener('click',()=>{
+      benchmarkSettings={...benchmarkSettings,symbol:button.dataset.benchmarkSymbol,name:button.dataset.benchmarkName};
+      benchmarkSelection=null;
+      saveBenchmarkSettings();
+      renderPortfolioBenchmark();
+    }));
+    benchmarkRangeButtons.forEach(button=>button.addEventListener('click',()=>{
+      benchmarkSettings={...benchmarkSettings,range:button.dataset.benchmarkRange};
+      saveBenchmarkSettings();
+      renderPortfolioBenchmark();
+    }));
+    benchmarkSearch.addEventListener('input',()=>{
+      benchmarkSelection=null;
+      clearTimeout(benchmarkSearchTimer);
+      const query=benchmarkSearch.value.trim();
+      if(query.length<2)return showBenchmarkSuggestions([]);
+      benchmarkSearchTimer=setTimeout(async()=>{
+        try{
+          const response=await fetch('/api/search?q='+encodeURIComponent(query),{cache:'no-store'});
+          const payload=await response.json();
+          showBenchmarkSuggestions(payload.quotes||[]);
+        }catch{showBenchmarkSuggestions([])}
+      },250);
+    });
+    benchmarkApply.addEventListener('click',()=>{
+      const symbol=String(benchmarkSelection?.symbol||benchmarkSearch.value).trim().toUpperCase();
+      if(!symbol)return benchmarkSearch.focus();
+      benchmarkSettings={...benchmarkSettings,symbol,name:benchmarkSelection?.name||symbol};
+      benchmarkSelection=null;
+      saveBenchmarkSettings();
+      showBenchmarkSuggestions([]);
+      renderPortfolioBenchmark();
     });
     mainTab.addEventListener('click',()=>setActiveView('main'));
     portfolioTab.addEventListener('click',()=>setActiveView('portfolio'));
