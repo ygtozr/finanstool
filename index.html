@@ -196,6 +196,12 @@
     .distribution-card h4 { margin:0 0 8px; font-size:.92rem; }
     .distribution-chart-wrap { position:relative; height:310px; }
     .distribution-empty { margin:0; height:100%; display:grid; place-items:center; color:var(--muted); text-align:center; }
+    .distribution-summary { list-style:none; display:grid; gap:6px; margin:10px 0 0; padding:0; }
+    .distribution-summary:empty { display:none; }
+    .distribution-summary li { display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:8px; align-items:center; color:var(--muted); font-size:.78rem; }
+    .distribution-summary-dot { width:9px; height:9px; border-radius:50%; }
+    .distribution-summary-label { overflow:hidden; color:var(--text); font-weight:650; text-overflow:ellipsis; white-space:nowrap; }
+    .distribution-summary-value { white-space:nowrap; }
     .distribution-empty[hidden] { display:none; }
     html[data-theme="light"] .distribution-card { background:#f8fafc; }
     @media (max-width:700px) { .distribution-grid { grid-template-columns:1fr; } .distribution-chart-wrap { height:290px; } }
@@ -311,8 +317,8 @@
       <section class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
         <h3 id="portfolioDistributionTitle">Portföy Dağılımı</h3>
         <div class="distribution-grid">
-          <article class="distribution-card"><h4>Varlık Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioAllocationChart" role="img" aria-label="Portföyün hisselere göre güncel değer dağılımı"></canvas><p id="portfolioAllocationEmpty" class="distribution-empty" hidden>Dağılım için portföye hisse ekleyin.</p></div></article>
-          <article class="distribution-card"><h4>Para Birimi Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioCurrencyChart" role="img" aria-label="Portföyün para birimlerine göre güncel değer dağılımı"></canvas><p id="portfolioCurrencyEmpty" class="distribution-empty" hidden>Para birimi dağılımı bulunamadı.</p></div></article>
+          <article class="distribution-card"><h4>Varlık Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioAllocationChart" role="img" aria-label="Portföyün hisselere göre güncel değer dağılımı"></canvas><p id="portfolioAllocationEmpty" class="distribution-empty" hidden>Dağılım için portföye hisse ekleyin.</p></div><ul id="portfolioAllocationSummary" class="distribution-summary" aria-label="Varlık dağılımı özeti"></ul></article>
+          <article class="distribution-card"><h4>Para Birimi Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioCurrencyChart" role="img" aria-label="Portföyün para birimlerine göre güncel değer dağılımı"></canvas><p id="portfolioCurrencyEmpty" class="distribution-empty" hidden>Para birimi dağılımı bulunamadı.</p></div><ul id="portfolioCurrencySummary" class="distribution-summary" aria-label="Para birimi dağılımı özeti"></ul></article>
         </div>
       </section>
       <section class="portfolio-benchmark" aria-labelledby="portfolioBenchmarkTitle">
@@ -1269,18 +1275,7 @@
           cutout:'62%',
           animation:{duration:450},
           plugins:{
-            legend:{position:'bottom',labels:{
-              color:distributionLegendColor(),boxWidth:11,boxHeight:11,padding:10,usePointStyle:true,
-              generateLabels:chart=>{
-                const dataset=chart.data.datasets[0];
-                const total=dataset.data.reduce((sum,value)=>sum+Number(value||0),0);
-                return chart.data.labels.map((text,index)=>{
-                  const value=Number(dataset.data[index]||0);
-                  const percent=total>0?value/total*100:0;
-                  return {text:text+' · '+money(value,currency)+' · '+percent.toFixed(1)+'%',fillStyle:dataset.backgroundColor[index],strokeStyle:dataset.backgroundColor[index],lineWidth:0,hidden:false,index};
-                });
-              }
-            }},
+            legend:{display:false},
             tooltip:{callbacks:{label:context=>{
               const total=context.dataset.data.reduce((sum,value)=>sum+Number(value||0),0);
               const percent=total>0?Number(context.parsed||0)/total*100:0;
@@ -1291,18 +1286,36 @@
       });
     }
 
+    function renderDistributionSummary(element,items,currency) {
+      element.replaceChildren();
+      const total=items.reduce((sum,item)=>sum+Number(item.value||0),0);
+      items.forEach((item,index)=>{
+        const row=document.createElement('li');
+        const dot=document.createElement('span');dot.className='distribution-summary-dot';dot.style.backgroundColor=distributionColors[index%distributionColors.length];
+        const name=document.createElement('span');name.className='distribution-summary-label';name.textContent=item.label;
+        const value=document.createElement('span');value.className='distribution-summary-value';
+        const percent=total>0?Number(item.value||0)/total*100:0;
+        value.textContent=money(item.value,currency)+' · '+percent.toFixed(1)+'%';
+        row.append(dot,name,value);element.append(row);
+      });
+    }
+
     function renderPortfolioDistribution(allocations,currencyTotals,summaryCurrency) {
       destroyPortfolioDistributionCharts();
       const allocationEmpty=document.getElementById('portfolioAllocationEmpty');
       const currencyEmpty=document.getElementById('portfolioCurrencyEmpty');
       const allocationCanvas=document.getElementById('portfolioAllocationChart');
       const currencyCanvas=document.getElementById('portfolioCurrencyChart');
+      const allocationSummary=document.getElementById('portfolioAllocationSummary');
+      const currencySummary=document.getElementById('portfolioCurrencySummary');
       const sortedAllocations=allocations.filter(item=>item.value>0).sort((a,b)=>b.value-a.value);
       const currencies=[...currencyTotals.entries()].filter(([,value])=>value>0).sort((a,b)=>b[1]-a[1]);
       allocationEmpty.hidden=sortedAllocations.length>0;
       allocationCanvas.hidden=!sortedAllocations.length;
       currencyEmpty.hidden=currencies.length>0;
       currencyCanvas.hidden=!currencies.length;
+      renderDistributionSummary(allocationSummary,sortedAllocations,summaryCurrency);
+      renderDistributionSummary(currencySummary,currencies.map(([label,value])=>({label,value})),summaryCurrency);
       if(sortedAllocations.length)portfolioAllocationChart=createDistributionChart('portfolioAllocationChart',sortedAllocations.map(item=>item.label),sortedAllocations.map(item=>item.value),summaryCurrency,'Güncel değer');
       if(currencies.length)portfolioCurrencyChart=createDistributionChart('portfolioCurrencyChart',currencies.map(item=>item[0]),currencies.map(item=>item[1]),summaryCurrency,'Para birimi değeri');
     }
