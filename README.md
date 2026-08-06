@@ -22,7 +22,7 @@ v3.4 ile Portföy ekranına güncel değer bazlı varlık dağılımı ve para b
 
 ## Portföy performans karşılaştırması
 
-v3.5 ile portföy performansı S&P 500, Nasdaq, BIST 100, Bitcoin veya aramayla seçilen başka bir ölçütle karşılaştırılabilir. Portföy ve ölçüt serileri aynı başlangıç noktasından yüzde değişim olarak gösterilir; 1 ay, 3 ay, 6 ay ve 1 yıl süreleri desteklenir.
+v3.5 ile portföy performansı S&P 500, Nasdaq, BIST 100, Altın (GLD) veya aramayla seçilen başka bir ölçütle karşılaştırılabilir. Portföy ve ölçüt serileri aynı başlangıç noktasından yüzde değişim olarak gösterilir; 1 ay, 3 ay, 6 ay ve 1 yıl süreleri desteklenir.
 
 ## Veri sağlayıcı sürekliliği
 
