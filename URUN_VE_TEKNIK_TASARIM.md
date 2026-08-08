@@ -1,7 +1,7 @@
 # FinansTool — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 3.6  
-**Uygulama sürümü:** v3.6  
+**Belge sürümü:** 4.0  
+**Uygulama sürümü:** v4.0  
 **Durum:** Kullanıcı tarafından onaylandı  
 **Canlı adres:** https://finanstool.vercel.app  
 **Kaynak depo:** https://github.com/ygtozr/finanstool  
@@ -37,13 +37,13 @@ Kullanıcı tarafından belirlenen ve sonraki geliştirmelerde korunması gereke
 6. Arayüz dili Türkçedir.
 7. Kullanıcı tercihleri ve kişisel veriler uygulama kapatıldığında kaybolmamalıdır.
 8. Fiyatlar otomatik yenilenirken kartların, logoların ve metin yerleşiminin zıplamaması gerekir; yalnızca değişen sayısal alanlar güncellenir.
-9. Ana Sayfa ve Portföy sabit sekmelerdir; geçici açılır ana pencereler değildir.
+9. Özet, Grafik Ve Teknik Analiz ve Portföy bağımsız sabit sayfalardır; mobilde alt gezinme, masaüstünde sol menü kullanılır.
 10. Karma para birimli karşılaştırmalarda yanıltıcı eksen kullanılmaz; seriler USD bazında ortaklaştırılır.
 
 ### 2.1 Sürümleme ve arşiv standardı
 
-- Güncel onaylı sürüm: **v3.6**.
-- Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v3.7** olur.
+- Güncel onaylı sürüm: **v4.0**.
+- Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v4.1** olur.
 - Depo kökü her zaman canlı sürümü temsil eder.
 - Arşiv yolu: `archive/vX.Y/`.
 - Bir sürüm onaylandığında en az şu dosyalar arşivlenir:
@@ -58,10 +58,13 @@ Kullanıcı tarafından belirlenen ve sonraki geliştirmelerde korunması gereke
 
 ### 3.1 Ana gezinme
 
-Uygulamada iki ana, sabit sekme bulunur:
+Uygulamada üç bağımsız ana sayfa bulunur:
 
-- **Ana Sayfa:** Piyasa özeti, fiyat arama, ana grafik, göstergeler, dışa aktarma ve favoriler.
-- **Portföy:** Portföy büyüklüğü, varlık kartları, özet analiz, dağılım grafikleri, kıyaslama ve temettü geçmişi.
+- **Özet:** Piyasa Özeti ilk sırada, Favoriler hemen altında gösterilir. Mobilde piyasa kartları her satırda iki adet olacak şekilde aşağı doğru devam eder.
+- **Grafik Ve Teknik Analiz:** Arama, teknik analiz seçenekleri, fiyat grafiği, RSI ve dönem seçenekleri doğrudan görünür.
+- **Portföy:** Toplam portföy, Portföy Özet Analizi, hisseler, dağılım, performans karşılaştırması ve Temettü Takvimi sırasıyla gösterilir.
+
+Masaüstünde 216 px genişliğinde sabit sol menü; mobilde Özet, Grafik, Portföy ve Diğer seçeneklerinden oluşan sabit alt gezinme kullanılır.
 
 Veri yedekleme işlevi ayrıca erişilebilen bir iletişim kutusu olarak sunulur. Tema düğmesi sağ üstte sabit konumdadır.
 
@@ -89,9 +92,9 @@ Ana renk değişkenleri:
 
 Temel ölçüler:
 
-- Ana içerik genişliği: `min(1120px, 100%)`.
+- Ana içerik genişliği masaüstünde yaklaşık `min(1440px, 100%)`; içerik alanı sol menünün yanında akışkan genişliktedir.
 - Büyük panel köşe yarıçapı: yaklaşık `18px`.
-- Masaüstünde ana içerik/favoriler düzeni: `1fr 330px`.
+- Masaüstünde 216 px sol menü ve `minmax(0, 1fr)` içerik sütunu bulunur. Özet sayfasında Piyasa Özeti ve Favoriler dikey sıralanır.
 - Kartlar ve düğmeler yeterli dokunma alanı bırakmalı, dar ekranda taşmamalıdır.
 - Başlıklarda her anlamlı kelimenin ilk harfi büyük yazılır: “Hisse Fiyat Grafiği”, “Piyasa Özeti”, “Portföy Özet Analizi” gibi.
 - Başlıkların altındaki açıklama cümleleri kaldırılmıştır; ekran gereksiz metinle kalabalıklaştırılmaz.
@@ -105,13 +108,13 @@ Temel ölçüler:
 
 ### 3.4 Mobil davranış
 
-- Ana ekranın iki sütunlu yapısı mobilde tek sütuna düşer.
-- Favoriler paneli ana içeriğin altına yerleşir.
+- Mobilde Özet, Grafik, Portföy ve Diğer seçeneklerinden oluşan sabit alt gezinme bulunur.
+- Özet sayfasında Piyasa Özeti kartları iki sütunda gösterilir; Favoriler bütün piyasa kartlarının altında yer alır.
 - Portföy kartları yaklaşık 760 px altında iki, 500 px altında tek sütuna iner.
 - Arama önerileri, iletişim kutuları, grafikler ve tarih alanı ekran genişliğine sığar.
 - Dokunmatik kullanımda ikonlar birbirine çok yakın konumlandırılmaz.
 
-## 4. Ana Sayfa işlevleri
+## 4. Özet ve Grafik Sayfaları
 
 ### 4.1 Piyasa Özeti
 
@@ -151,7 +154,7 @@ Piyasa Özeti ve Favoriler yenile düğmeleri senkron çalışır. Bunlardan her
 
 ### 4.3 Fiyat grafiği
 
-Başlık **“Hisse Fiyat Grafiği v3.6”** biçimindedir. Grafik seçilen varlığın fiyat geçmişini gösterir.
+Grafik Ve Teknik Analiz sayfası seçilen varlığın fiyat geçmişini gösterir. Arama, gösterge kontrolleri, grafik ve dönem seçenekleri sayfa açıldığında görünürdür.
 
 Zaman aralığı seçenekleri:
 
@@ -367,7 +370,7 @@ Yedek kapsamı:
 ```json
 {
   "schemaVersion": 1,
-  "appVersion": "3.6",
+  "appVersion": "4.0",
   "exportedAt": "2026-08-08T00:00:00.000Z",
   "data": {
     "favorites": [
@@ -600,6 +603,7 @@ Mevcut ürün; ilk basit “sembol gir, son ayları çiz” aracından aşağıd
 - **v3.4:** Varlık ve para birimi bazında portföy dağılımı.
 - **v3.5:** S&P 500, Nasdaq, BIST 100, Altın ve özel ölçütle portföy performans karşılaştırması.
 - **v3.6:** Portföy başlığında toplam büyüklük ile günlük net/yüzde değişim; dağılım grafiklerinde kalıcı özet bilgiler.
+- **v4.0:** Mobil A ve Masaüstü B tasarımlarının üç sayfalı yapıda birleştirilmesi; Özet sayfasında iki sütunlu Piyasa Özeti ve Favoriler, açık Grafik Ve Teknik Analiz sayfası, istenen sırada tam Portföy sayfası.
 
 Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte kullanılan geçici masaüstü paket numaraları güncel web ürününün sürüm standardı değildir.
 
@@ -615,7 +619,7 @@ Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte ku
 
 ## 15. Kabul testi kontrol listesi
 
-### Ana Sayfa
+### Özet ve Grafik
 
 - [ ] Uygulama koyu ve açık temada hatasız açılıyor.
 - [ ] Seçili zaman düğmesi iki temada da açıkça görülüyor.
@@ -663,8 +667,8 @@ Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında me
 5. Kişisel veriler tarayıcıda kalıcıdır ve JSON ile taşınabilir.
 6. Yahoo/Nasdaq yedek sağlayıcı zinciri sunucu tarafında çalışır.
 7. Otomatik yenileme yalnız gerekli sayısal alanları değiştirir; görünür yerleşim hareket etmez.
-8. v3.6 kabul testi kontrol listesi geçer.
-9. Güncel belge depo kökünde, aynı belge `archive/v3.6/` altında bulunur.
+8. v4.0 kabul testi kontrol listesi geçer.
+9. Güncel belge depo kökünde, aynı belge `archive/v4.0/` altında bulunur.
 10. Kullanıcı canlı sürümü kontrol edip onaylamıştır.
 
 ## 17. Belge bakım kuralı
