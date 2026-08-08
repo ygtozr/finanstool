@@ -332,8 +332,9 @@
     }
 
     @media (max-width:760px) {
-      body { padding:8px; }
-      main { margin-top:48px; padding:14px 12px 88px; border-radius:16px; }
+      body { padding:8px; overflow-x:hidden; }
+      main { width:100%; max-width:100%; margin-top:48px; padding:14px 12px 88px; overflow-x:hidden; border-radius:16px; }
+      .app-layout,.chart-panel,.market-summary,.market-cards { min-width:0; width:100%; max-width:100%; }
       main > .app-tabs { display:none; }
       .chart-panel h1 { font-size:1.24rem; }
       .portfolio-glance { order:0; padding:15px; border-radius:18px; }
