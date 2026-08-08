@@ -361,6 +361,41 @@
       html[data-theme="light"] .mobile-bottom-nav { background:#fffffff2; }
       html[data-theme="light"] .mobile-bottom-nav button.is-active { background:#e2e8f0; }
     }
+
+    /* v3.7 üç sayfalı bilgi mimarisi */
+    .overview-page > h1,.chart-page > h2 { margin:0 0 18px; }
+    .overview-page .app-layout { grid-template-columns:minmax(0,1fr); }
+    .overview-page .favorites-panel { margin-top:18px; padding:18px 0 0; border-left:0; border-top:1px solid var(--line); }
+    .chart-page { min-width:0; }
+    .chart-page #symbolForm { max-width:920px; }
+    .chart-page .toolbar,.chart-page .meta,.chart-page .chart-wrap,.chart-page .periods,.chart-page .hint { display:flex; }
+    .chart-page .meta { display:flex; }
+    .chart-page .chart-wrap { display:block; }
+    .chart-page .periods { display:flex; }
+    .chart-page .hint { display:block; }
+    .portfolio-page .portfolio-analysis,
+    .portfolio-page .portfolio-distribution,
+    .portfolio-page .portfolio-benchmark,
+    .portfolio-page .dividend-section { display:block !important; }
+    .portfolio-positions-title { margin:22px 0 12px; padding-top:18px; border-top:1px solid var(--line); }
+    .portfolio-analysis { margin-top:14px; }
+    @media (min-width:901px) {
+      .overview-page .market-cards { grid-template-columns:repeat(4,minmax(0,1fr)); }
+      .overview-page .favorites-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .chart-page,.portfolio-page { max-width:1100px; }
+    }
+    @media (max-width:760px) {
+      .overview-page .market-summary { overflow:visible; }
+      .overview-page .market-cards { display:grid; grid-auto-flow:row; grid-auto-columns:auto; grid-template-columns:1fr; width:100%; overflow:visible; padding-bottom:0; }
+      .overview-page .market-card { width:100%; min-height:68px; }
+      .overview-page .favorite-row:nth-child(n+4) { display:grid; }
+      .overview-page .favorites-list { display:grid; gap:8px; }
+      .chart-page #symbolForm { display:flex; }
+      .chart-page .toolbar { display:grid; }
+      .chart-page .chart-wrap { height:340px; }
+      .portfolio-page .portfolio-analysis { margin-top:14px; padding-top:0; border-top:0; }
+      .portfolio-page .distribution-grid { grid-template-columns:1fr; }
+    }
   </style>
 </head>
 <body>
@@ -369,32 +404,31 @@
     <aside class="desktop-sidebar" aria-label="Masaüstü gezinme">
       <div class="desktop-brand"><span class="desktop-brand-mark">₺</span><span>FinansTool</span></div>
       <button id="desktopOverviewNav" class="is-active" type="button">⌂ <span>Özet</span></button>
+      <button id="desktopChartNav" type="button">⌁ <span>Grafik Ve Analiz</span></button>
       <button id="desktopPortfolioNav" type="button">▤ <span>Portföy</span></button>
-      <button id="desktopFavoritesNav" type="button">★ <span>Favoriler</span></button>
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopDataNav" type="button">⇩ <span>Veri Yedekleme</span></button>
       <small>v3.7 aday</small>
     </aside>
-    <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Ana ekran</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
-    <section id="mainView" class="app-view active">
-    <div class="app-layout"><section class="chart-panel">
-    <h1>FinansTool <span class="version-badge">v3.7 aday</span></h1>
-    <button id="portfolioGlance" class="portfolio-glance" type="button" aria-label="Portföy ayrıntılarını aç">
-      <span class="portfolio-glance-copy"><span class="portfolio-glance-label">Toplam Portföy</span><strong id="portfolioGlanceValue" class="portfolio-glance-value">—</strong><span id="portfolioGlanceChange" class="portfolio-glance-change">Bugün —</span></span>
-      <span class="portfolio-glance-action">Portföyü Aç →</span>
-    </button>
+    <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Özet</button><button id="chartTab" type="button" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
+    <section id="mainView" class="app-view active overview-page" aria-label="Özet ekranı">
+      <h1>FinansTool <span class="version-badge">v3.7 aday</span></h1>
+      <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
       <div id="marketCards" class="market-cards" aria-live="polite"></div>
     </section>
+      <aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside>
+      </section></div>
+    </section>
+    <section id="chartView" class="app-view chart-page" aria-label="Grafik ve teknik analiz ekranı">
+      <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
       <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
-    <button id="chartDetailToggle" class="detail-toggle" type="button" aria-expanded="false" aria-controls="chartDetailRegion">Grafik Ve Teknik Analiz</button>
-    <div id="chartDetailRegion">
     <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button><button id="exportCsv" type="button">CSV indir</button><button id="exportPng" type="button">PNG indir</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img"></canvas></div>
     <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img"></canvas></div>
@@ -414,18 +448,13 @@
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
     </section>
-    </div></section><aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul><button id="mobileFavoriteMore" class="mobile-list-more" type="button" aria-expanded="false">Tüm Favorileri Göster</button></aside></div>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" aria-label="Portföy ekranı">
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div></div>
+      <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <div class="portfolio-search"><input id="portfolioSymbol" type="search" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" aria-label="Portföy hisse önerileri"></ul></div>
+      <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
       <div id="portfolioList" class="portfolio-list"></div>
-      <div class="portfolio-detail-controls" aria-label="Portföy detayları">
-        <button type="button" data-portfolio-detail="analysis" aria-expanded="false">Özet Analizi</button>
-        <button type="button" data-portfolio-detail="distribution" aria-expanded="false">Dağılım</button>
-        <button type="button" data-portfolio-detail="performance" aria-expanded="false">Performans</button>
-        <button type="button" data-portfolio-detail="dividends" aria-expanded="false">Temettüler</button>
-      </div>
       <section class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
         <h3 id="portfolioDistributionTitle">Portföy Dağılımı</h3>
         <div class="distribution-grid">
@@ -443,13 +472,12 @@
         <div class="benchmark-chart-wrap"><canvas id="portfolioBenchmarkChart" role="img" aria-label="Portföy ve karşılaştırma ölçütü performans grafiği"></canvas><p id="benchmarkEmpty" class="benchmark-empty">Karşılaştırma için portföye hisse ekleyin.</p></div>
         <div id="benchmarkStats" class="benchmark-stats"></div>
       </section>
-      <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <section class="dividend-section"><h3>Temettü Takvimi</h3><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
   </main>
   <nav class="mobile-bottom-nav" aria-label="Mobil gezinme">
     <button id="mobileOverviewNav" class="is-active" type="button"><span>⌂</span>Özet</button>
-    <button id="mobileMarketNav" type="button"><span>↗</span>Piyasa</button>
+    <button id="mobileChartNav" type="button"><span>⌁</span>Grafik</button>
     <button id="mobilePortfolioNav" type="button"><span>▤</span>Portföy</button>
     <button id="mobileMoreNav" type="button"><span>•••</span>Diğer</button>
   </nav>
@@ -584,8 +612,10 @@
     const legacyFavoritesKey = Object.keys(localStorage).find(key => key.startsWith(favoritesKey + '-'));
     const suggestions = document.getElementById('suggestions'); let searchTimer;
     const mainTab = document.getElementById('mainTab');
+    const chartTab = document.getElementById('chartTab');
     const portfolioTab = document.getElementById('portfolioTab');
     const mainView = document.getElementById('mainView');
+    const chartView = document.getElementById('chartView');
     const portfolioView = document.getElementById('portfolioView');
     const portfolioSymbol = document.getElementById('portfolioSymbol');
     const portfolioAdd = document.getElementById('portfolioAdd');
@@ -1286,14 +1316,20 @@
     const savePortfolio = () => localStorage.setItem(portfolioKey, JSON.stringify(portfolio));
 
     function setActiveView(view) {
+      const showMain = view === 'main';
+      const showChart = view === 'chart';
       const showPortfolio = view === 'portfolio';
-      mainView.classList.toggle('active',!showPortfolio);
+      mainView.classList.toggle('active',showMain);
+      chartView.classList.toggle('active',showChart);
       portfolioView.classList.toggle('active',showPortfolio);
-      mainTab.classList.toggle('active',!showPortfolio);
+      mainTab.classList.toggle('active',showMain);
+      chartTab.classList.toggle('active',showChart);
       portfolioTab.classList.toggle('active',showPortfolio);
-      mainTab.setAttribute('aria-selected',String(!showPortfolio));
+      mainTab.setAttribute('aria-selected',String(showMain));
+      chartTab.setAttribute('aria-selected',String(showChart));
       portfolioTab.setAttribute('aria-selected',String(showPortfolio));
       if(showPortfolio) renderPortfolio();
+      if(showChart) requestAnimationFrame(()=>{if(chart)chart.resize();if(rsiChart)rsiChart.resize()});
     }
 
     function showPortfolioSuggestions(items) {
@@ -2183,6 +2219,7 @@
       renderPortfolioBenchmark();
     });
     mainTab.addEventListener('click',()=>setActiveView('main'));
+    chartTab.addEventListener('click',()=>setActiveView('chart'));
     portfolioTab.addEventListener('click',()=>setActiveView('portfolio'));
     portfolioAdd.addEventListener('click', openPortfolioDialog);
     portfolioCancel.addEventListener('click', () => portfolioDialog.close());
@@ -2235,80 +2272,44 @@
 
   <script>
     (function(){
-      const mainView=document.getElementById('mainView');
-      const portfolioView=document.getElementById('portfolioView');
-      const chartDetailToggle=document.getElementById('chartDetailToggle');
-      const detailNames=['analysis','distribution','performance','dividends'];
-
+      const mainTab=document.getElementById('mainTab');
+      const chartTab=document.getElementById('chartTab');
+      const portfolioTab=document.getElementById('portfolioTab');
+      const navGroups={
+        main:['desktopOverviewNav','mobileOverviewNav'],
+        chart:['desktopChartNav','mobileChartNav'],
+        portfolio:['desktopPortfolioNav','mobilePortfolioNav']
+      };
       function resizeVisibleCharts(){
         requestAnimationFrame(function(){
           [typeof chart!=='undefined'?chart:null,typeof rsiChart!=='undefined'?rsiChart:null,typeof portfolioAllocationChart!=='undefined'?portfolioAllocationChart:null,typeof portfolioCurrencyChart!=='undefined'?portfolioCurrencyChart:null,typeof portfolioBenchmarkChart!=='undefined'?portfolioBenchmarkChart:null].forEach(function(item){if(item&&typeof item.resize==='function')item.resize()});
         });
       }
-      function setChartDetail(open){
-        mainView.classList.toggle('show-chart-detail',open);
-        chartDetailToggle.setAttribute('aria-expanded',String(open));
-        chartDetailToggle.textContent=open?'Grafik Ve Teknik Analizi Kapat':'Grafik Ve Teknik Analiz';
-        if(open)resizeVisibleCharts();
-      }
-      chartDetailToggle.addEventListener('click',function(){setChartDetail(!mainView.classList.contains('show-chart-detail'))});
-      document.getElementById('symbolForm').addEventListener('submit',function(){setChartDetail(true)});
-      document.getElementById('favoritesList').addEventListener('click',function(event){if(event.target.closest('.favorite-card'))setChartDetail(true)});
-
-      document.querySelectorAll('[data-portfolio-detail]').forEach(function(button){
-        button.addEventListener('click',function(){
-          const name=button.dataset.portfolioDetail;
-          const willOpen=!portfolioView.classList.contains('show-'+name);
-          detailNames.forEach(function(item){portfolioView.classList.remove('show-'+item)});
-          document.querySelectorAll('[data-portfolio-detail]').forEach(function(item){item.setAttribute('aria-expanded','false')});
-          if(willOpen){
-            portfolioView.classList.add('show-'+name);
-            button.setAttribute('aria-expanded','true');
-            resizeVisibleCharts();
-            setTimeout(resizeVisibleCharts,80);
-          }
+      function markNavigation(view){
+        Object.entries(navGroups).forEach(function(entry){
+          entry[1].forEach(function(id){const item=document.getElementById(id);if(item)item.classList.toggle('is-active',entry[0]===view)});
         });
-      });
-
-      const portfolioTotal=document.getElementById('portfolioTotalValue');
-      const portfolioDaily=document.getElementById('portfolioDailyChange');
-      const glanceValue=document.getElementById('portfolioGlanceValue');
-      const glanceChange=document.getElementById('portfolioGlanceChange');
-      function syncPortfolioGlance(){
-        glanceValue.textContent=portfolioTotal.textContent;
-        glanceChange.textContent=portfolioDaily.textContent;
-        glanceChange.className='portfolio-glance-change'+(portfolioDaily.classList.contains('positive')?' positive':portfolioDaily.classList.contains('negative')?' negative':'');
       }
-      new MutationObserver(syncPortfolioGlance).observe(portfolioTotal,{childList:true,subtree:true,characterData:true});
-      new MutationObserver(syncPortfolioGlance).observe(portfolioDaily,{childList:true,subtree:true,characterData:true,attributes:true});
-      syncPortfolioGlance();
-      document.getElementById('portfolioGlance').addEventListener('click',function(){document.getElementById('portfolioTab').click();window.scrollTo({top:0,behavior:'smooth'})});
-
-      function setDesktopActive(id){
-        ['desktopOverviewNav','desktopPortfolioNav','desktopFavoritesNav'].forEach(function(item){document.getElementById(item).classList.toggle('is-active',item===id)});
+      function openView(view){
+        ({main:mainTab,chart:chartTab,portfolio:portfolioTab})[view].click();
+        markNavigation(view);
+        window.scrollTo({top:0,behavior:'smooth'});
+        if(view!=='main')setTimeout(resizeVisibleCharts,60);
       }
-      document.getElementById('desktopOverviewNav').addEventListener('click',function(){document.getElementById('mainTab').click();setDesktopActive('desktopOverviewNav');window.scrollTo({top:0,behavior:'smooth'})});
-      document.getElementById('desktopPortfolioNav').addEventListener('click',function(){document.getElementById('portfolioTab').click();setDesktopActive('desktopPortfolioNav');window.scrollTo({top:0,behavior:'smooth'})});
-      document.getElementById('desktopFavoritesNav').addEventListener('click',function(){document.getElementById('mainTab').click();setDesktopActive('desktopFavoritesNav');setTimeout(function(){document.querySelector('.favorites-panel').scrollIntoView({behavior:'smooth',block:'start'})},20)});
-      document.getElementById('desktopAlarmNav').addEventListener('click',function(){document.getElementById('alarmButton').click()});
+      document.getElementById('desktopOverviewNav').addEventListener('click',function(){openView('main')});
+      document.getElementById('desktopChartNav').addEventListener('click',function(){openView('chart')});
+      document.getElementById('desktopPortfolioNav').addEventListener('click',function(){openView('portfolio')});
+      document.getElementById('mobileOverviewNav').addEventListener('click',function(){openView('main')});
+      document.getElementById('mobileChartNav').addEventListener('click',function(){openView('chart')});
+      document.getElementById('mobilePortfolioNav').addEventListener('click',function(){openView('portfolio')});
+      mainTab.addEventListener('click',function(){markNavigation('main')});
+      chartTab.addEventListener('click',function(){markNavigation('chart');setTimeout(resizeVisibleCharts,40)});
+      portfolioTab.addEventListener('click',function(){markNavigation('portfolio');setTimeout(resizeVisibleCharts,40)});
+      document.getElementById('desktopAlarmNav').addEventListener('click',function(){openView('chart');document.getElementById('alarmButton').click()});
       document.getElementById('desktopDataNav').addEventListener('click',function(){document.getElementById('dataButton').click()});
-      document.getElementById('mainTab').addEventListener('click',function(){setDesktopActive('desktopOverviewNav')});
-      document.getElementById('portfolioTab').addEventListener('click',function(){setDesktopActive('desktopPortfolioNav');setTimeout(resizeVisibleCharts,40)});
-
-      function setMobileActive(id){
-        ['mobileOverviewNav','mobileMarketNav','mobilePortfolioNav','mobileMoreNav'].forEach(function(item){document.getElementById(item).classList.toggle('is-active',item===id)});
-      }
-      document.getElementById('mobileOverviewNav').addEventListener('click',function(){document.getElementById('mainTab').click();setMobileActive('mobileOverviewNav');window.scrollTo({top:0,behavior:'smooth'})});
-      document.getElementById('mobileMarketNav').addEventListener('click',function(){document.getElementById('mainTab').click();setMobileActive('mobileMarketNav');setTimeout(function(){document.querySelector('.market-summary').scrollIntoView({behavior:'smooth',block:'start'})},20)});
-      document.getElementById('mobilePortfolioNav').addEventListener('click',function(){document.getElementById('portfolioTab').click();setMobileActive('mobilePortfolioNav');window.scrollTo({top:0,behavior:'smooth'})});
-      document.getElementById('mobileMoreNav').addEventListener('click',function(){setMobileActive('mobileMoreNav');document.getElementById('dataButton').click()});
-      const favoritePanel=document.querySelector('.favorites-panel');
-      const favoriteMore=document.getElementById('mobileFavoriteMore');
-      favoriteMore.addEventListener('click',function(){
-        const open=favoritePanel.classList.toggle('show-all-favorites');
-        favoriteMore.setAttribute('aria-expanded',String(open));
-        favoriteMore.textContent=open?'Favorileri Daralt':'Tüm Favorileri Göster';
-      });
+      document.getElementById('mobileMoreNav').addEventListener('click',function(){document.getElementById('dataButton').click()});
+      document.getElementById('favoritesList').addEventListener('click',function(event){if(event.target.closest('.favorite-card'))openView('chart')});
+      document.getElementById('symbolForm').addEventListener('submit',function(){setTimeout(resizeVisibleCharts,40)});
     })();
   </script>
 </body>
