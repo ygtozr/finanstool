@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FinansTool v4.0</title>
+  <title>FinansTool v4.1 Aday</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -409,11 +409,11 @@
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopDataNav" type="button">⇩ <span>Veri Yedekleme</span></button>
-      <small>v4.0</small>
+      <small>v4.1 aday</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Özet</button><button id="chartTab" type="button" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
     <section id="mainView" class="app-view active overview-page" aria-label="Özet ekranı">
-      <h1>FinansTool <span class="version-badge">v4.0</span></h1>
+      <h1>FinansTool <span class="version-badge">v4.1 aday</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -579,7 +579,20 @@
       {symbol:'BTC-USD',label:'Bitcoin'}
     ];
     const marketItemsKey = 'finans-grafigi-market-items';
-    let marketItems = (() => { try { const saved=JSON.parse(localStorage.getItem(marketItemsKey)); return Array.isArray(saved) ? saved.filter(item=>item&&item.symbol).map(item=>({symbol:String(item.symbol).toUpperCase(),label:item.label||item.name||String(item.symbol).toUpperCase()})) : defaultMarketItems.map(item=>({...item})); } catch { return defaultMarketItems.map(item=>({...item})); } })();
+    const marketDefaultsVersionKey = 'finans-grafigi-market-defaults-version';
+    const marketDefaultsVersion = '4.1';
+    let marketItems = (() => {
+      const defaults=defaultMarketItems.map(item=>({...item}));
+      try {
+        if(localStorage.getItem(marketDefaultsVersionKey)!==marketDefaultsVersion){
+          localStorage.setItem(marketItemsKey,JSON.stringify(defaults));
+          localStorage.setItem(marketDefaultsVersionKey,marketDefaultsVersion);
+          return defaults;
+        }
+        const saved=JSON.parse(localStorage.getItem(marketItemsKey));
+        return Array.isArray(saved)&&saved.length ? saved.filter(item=>item&&item.symbol).map(item=>({symbol:String(item.symbol).toUpperCase(),label:item.label||item.name||String(item.symbol).toUpperCase()})) : defaults;
+      } catch { return defaults; }
+    })();
     let marketSearchTimer;
     let marketSearchResults = [];
     let marketSummaryRequest = 0;
@@ -1116,7 +1129,7 @@
     function createBackup() {
       return {
         schemaVersion:1,
-        appVersion:'4.0',
+        appVersion:'4.1-preview',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
