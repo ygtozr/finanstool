@@ -1,43 +1,69 @@
-# Finans Tool v3.6
+# FinansTool v4.0
 
-Finans kodu girerek günlük kapanış fiyatlarını grafik üzerinde gösteren web uygulaması.
+FinansTool; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
-## Kullanım
+## Canlı uygulama
 
-- ABD hisseleri: `AAPL`, `MSFT`
-- BIST hisseleri: `.IS` eki ile, örneğin `THYAO.IS`, `ASELS.IS`
-- Süre seçenekleri: 1 hafta, 1 ay, 3 ay, 6 ay, 1 yıl, 5 yıl veya özel başlangıç tarihi
-- Birden fazla ürün aynı grafikte karşılaştırılabilir; farklı para birimlerinde tüm seriler USD bazında gösterilir.
-- Ana ekrandaki piyasa özet kartları önemli endeks, kur ve varlıkların son durumunu gösterir.
+- Vercel: https://finanstool.vercel.app
+- Arayüz dili: Türkçe
+- Güncel kalıcı sürüm: **v4.0**
 
-Uygulama Vercel üzerinde çalışır ve fiyat verilerini sunucu tarafındaki veri uç noktaları üzerinden alır.
+## v4.0 arayüzü
 
-## Canlı favori kartları
+Uygulama üç ana sayfaya ayrılmıştır:
 
-v3.3 ile favoriler, referans görseldeki yatay kart düzeninde güncel fiyatı ve günlük net/yüzde değişimi gösterir. Veriler 15 saniyede bir otomatik yenilenir.
+1. **Özet**
+   - Piyasa Özeti ilk sırada gösterilir.
+   - Mobilde piyasa kartları her satırda iki kart olacak şekilde dört satır halinde görünür.
+   - Favoriler Piyasa Özeti'nin altında yer alır.
+2. **Grafik Ve Teknik Analiz**
+   - Sembol veya şirket/fon adıyla arama yapılır.
+   - Fiyat grafiği, dönem seçenekleri ve teknik analiz kontrolleri doğrudan görünür.
+   - MA50/100/200, RSI, gelişmiş arama, fiyat alarmı, CSV ve PNG dışa aktarma desteklenir.
+3. **Portföy**
+   - Toplam portföy büyüklüğü ve günlük değişim.
+   - Portföy Özet Analizi.
+   - Portföydeki hisseler.
+   - Varlık ve para birimi dağılımı.
+   - Performans karşılaştırması.
+   - Temettü Takvimi.
 
-## Portföy dağılım grafikleri
+Masaüstünde sabit sol menü; mobilde Özet, Grafik, Portföy ve Diğer seçeneklerinden oluşan alt gezinme kullanılır.
 
-v3.4 ile Portföy ekranına güncel değer bazlı varlık dağılımı ve para birimi dağılımı grafikleri eklendi. Farklı para birimleri bulunan portföylerde dağılımlar karşılaştırılabilir olması için USD bazında hesaplanır.
+## Finans verileri
 
-## Portföy performans karşılaştırması
+- ABD hisseleri ve ETF'leri: `AAPL`, `MSFT`, `VOO`, `GLD`
+- BIST hisseleri: `.IS` ekiyle, örneğin `THYAO.IS`, `ASELS.IS`
+- Grafik süreleri: 1 hafta, 1 ay, 3 ay, 6 ay, 1 yıl, 5 yıl veya özel başlangıç tarihi
+- Birden fazla ürün aynı grafikte karşılaştırılabilir.
+- Farklı para birimlerindeki karşılaştırmalar USD bazına dönüştürülür.
+- Piyasa, Favoriler ve açık grafik 15 saniyede bir yenilenir.
 
-v3.5 ile portföy performansı S&P 500, Nasdaq, BIST 100, Altın (GLD) veya aramayla seçilen başka bir ölçütle karşılaştırılabilir. Portföy ve ölçüt serileri aynı başlangıç noktasından yüzde değişim olarak gösterilir; 1 ay, 3 ay, 6 ay ve 1 yıl süreleri desteklenir.
+## Portföy özellikleri
 
-## Portföy görünümü
-
-v3.6 ile Portföyüm başlığının altında toplam portföy büyüklüğü ile son kapanışa göre günlük net ve yüzde değişim gösterilir. Varlık ve para birimi dağılım grafiklerinin kalıcı açıklamalarında her öğenin tutarı ve portföy içindeki yüzdesi yer alır.
+- Adet ve birim maliyetle varlık ekleme
+- Ağırlıklı ortalama maliyet
+- Güncel değer, net ve yüzde kâr/zarar
+- Günlük ve hafta başından itibaren değişim
+- Varlık ve para birimi dağılım grafikleri
+- S&P 500, Nasdaq, BIST 100, Altın veya özel ölçütle performans karşılaştırması
+- En fazla beş satırlık temettü/dağıtım listesi
 
 ## Veri sağlayıcı sürekliliği
 
-v3.3 ile Yahoo Finance birincil kaynak olarak kullanılır. Birincil kaynak başarısız olduğunda desteklenen ABD hisseleri ve ETF’lerde Nasdaq, diğer kodlarda ise ikincil Yahoo erişim noktası otomatik devreye girer. Arama servisi de Yahoo ile Nasdaq arasında otomatik geçiş yapar.
+Yahoo Finance birincil veri kaynağıdır. Desteklenen ABD hisse ve ETF'lerinde Nasdaq, diğer durumlarda ikincil Yahoo erişim noktası yedek olarak kullanılır. Arama servisi de Yahoo ve Nasdaq arasında otomatik geçiş yapar.
 
-## Veri yedekleme
+## Yerel veri ve yedekleme
 
-v3.3 ile favoriler, portföy pozisyonları, fiyat alarmları, piyasa özeti ve tema ayarı JSON dosyası olarak indirilebilir. Geri yüklerken mevcut verilerle birleştirme veya tüm verilerin yerine koyma seçilebilir.
+Favoriler, portföy, fiyat alarmları, Piyasa Özeti ve tema ayarı tarayıcının `localStorage` alanında saklanır. Veriler JSON dosyası olarak dışa aktarılabilir; geri yüklerken birleştirme veya değiştirme seçilebilir.
 
-## Sürüm düzeni
+## Teknik yapı
 
-Mevcut çalışma sürümü: **v3.6**
+- Tek sayfalı HTML/CSS/Vanilla JavaScript ön yüz
+- Chart.js 4.4.4
+- Vercel Serverless Functions
+- `api/price.js`: fiyat ve geçmiş veri
+- `api/search.js`: sembol ve şirket/fon araması
+- GitHub `main` dalından Vercel üretim yayını
 
-Dört aşamalı geliştirme planının ilk aşaması tamamlandı: kalıcı portföy ekranı, güncel değer ve kâr/zarar hesapları ile temettü listesi eklendi. İkinci aşamada fiyat alarmları ve piyasa/ürün türü filtreli gelişmiş arama eklendi. Üçüncü aşamada CSV/PNG dışa aktarma, kalıcı açık/koyu tema ve mobil görünüm iyileştirmeleri eklendi. Dördüncü aşamada canlı piyasa özeti, bütünleşik testler ve son arayüz düzenlemeleri tamamlandı. Dört aşama da tamamlandığında kalıcı sürüm numarası kullanıcı onayıyla belirlenir.
+Ayrıntılı ürün isterleri, tasarım sistemi, veri modeli, hesaplamalar ve kabul testleri için `URUN_VE_TEKNIK_TASARIM.md` belgesine bakın.
