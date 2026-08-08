@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finans Grafiği v3.7 Aday</title>
+  <title>FinansTool v4.0</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -273,7 +273,7 @@
     @media (max-width:760px) { .market-cards { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     @media (max-width:420px) { .market-summary { padding:12px; } .market-cards { grid-template-columns:1fr; } }
 
-    /* v3.7 aday arayüzü: Mobil A + Masaüstü B */
+    /* v4.0 responsive arayüzü: Mobil A + Masaüstü B */
     .desktop-sidebar { display:none; }
     .portfolio-glance { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:center; margin:0 0 16px; padding:16px 18px; color:var(--text); background:linear-gradient(135deg,#16283d,#12372f); border:1px solid #35685d; border-radius:16px; text-align:left; }
     .portfolio-glance-copy { min-width:0; display:grid; gap:3px; }
@@ -362,7 +362,7 @@
       html[data-theme="light"] .mobile-bottom-nav button.is-active { background:#e2e8f0; }
     }
 
-    /* v3.7 üç sayfalı bilgi mimarisi */
+    /* v4.0 üç sayfalı bilgi mimarisi */
     .overview-page > h1,.chart-page > h2 { margin:0 0 18px; }
     .overview-page .app-layout { grid-template-columns:minmax(0,1fr); }
     .overview-page .favorites-panel { margin-top:18px; padding:18px 0 0; border-left:0; border-top:1px solid var(--line); }
@@ -409,11 +409,11 @@
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopDataNav" type="button">⇩ <span>Veri Yedekleme</span></button>
-      <small>v3.7 aday</small>
+      <small>v4.0</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Özet</button><button id="chartTab" type="button" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
     <section id="mainView" class="app-view active overview-page" aria-label="Özet ekranı">
-      <h1>FinansTool <span class="version-badge">v3.7 aday</span></h1>
+      <h1>FinansTool <span class="version-badge">v4.0</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -1116,7 +1116,7 @@
     function createBackup() {
       return {
         schemaVersion:1,
-        appVersion:'3.7-preview',
+        appVersion:'4.0',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
