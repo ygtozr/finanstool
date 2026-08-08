@@ -30,6 +30,8 @@ Uygulama üç ana sayfaya ayrılmıştır:
 
 Masaüstünde sabit sol menü; mobilde Özet, Grafik, Portföy ve Diğer seçeneklerinden oluşan alt gezinme kullanılır.
 
+Piyasa Özeti, v4.0 güncellemesi ilk açıldığında eski veya eksik yerel listeyi bir kez onararak şu sabit sekiz değeri otomatik yükler: USD/TRY, EUR/TRY, GBP/TRY, EUR/USD, S&P 500, Nasdaq, BIST 100 ve Bitcoin. Bu ilk geçişten sonra kullanıcı listeyi dişli düğmesinden yeniden özelleştirebilir.
+
 ## Finans verileri
 
 - ABD hisseleri ve ETF'leri: `AAPL`, `MSFT`, `VOO`, `GLD`
