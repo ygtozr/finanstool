@@ -579,7 +579,20 @@
       {symbol:'BTC-USD',label:'Bitcoin'}
     ];
     const marketItemsKey = 'finans-grafigi-market-items';
-    let marketItems = (() => { try { const saved=JSON.parse(localStorage.getItem(marketItemsKey)); return Array.isArray(saved) ? saved.filter(item=>item&&item.symbol).map(item=>({symbol:String(item.symbol).toUpperCase(),label:item.label||item.name||String(item.symbol).toUpperCase()})) : defaultMarketItems.map(item=>({...item})); } catch { return defaultMarketItems.map(item=>({...item})); } })();
+    const marketDefaultsVersionKey = 'finans-grafigi-market-defaults-version';
+    const marketDefaultsVersion = '4.0-fixed-8';
+    let marketItems = (() => {
+      const defaults=defaultMarketItems.map(item=>({...item}));
+      try {
+        if(localStorage.getItem(marketDefaultsVersionKey)!==marketDefaultsVersion){
+          localStorage.setItem(marketItemsKey,JSON.stringify(defaults));
+          localStorage.setItem(marketDefaultsVersionKey,marketDefaultsVersion);
+          return defaults;
+        }
+        const saved=JSON.parse(localStorage.getItem(marketItemsKey));
+        return Array.isArray(saved)&&saved.length ? saved.filter(item=>item&&item.symbol).map(item=>({symbol:String(item.symbol).toUpperCase(),label:item.label||item.name||String(item.symbol).toUpperCase()})) : defaults;
+      } catch { return defaults; }
+    })();
     let marketSearchTimer;
     let marketSearchResults = [];
     let marketSummaryRequest = 0;

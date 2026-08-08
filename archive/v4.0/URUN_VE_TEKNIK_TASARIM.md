@@ -129,6 +129,8 @@ Varsayılan gösterim sırası:
 7. BIST 100
 8. Bitcoin
 
+v4.0 güncellemesi ilk açıldığında uygulama, önceki sürümden kalmış eksik veya farklı Piyasa Özeti listesini bir defaya mahsus bu sekiz varsayılana taşır. Taşıma tamamlandığında sürümlü bir yerel işaret yazılır; sonraki açılışlarda kullanıcının dişli düğmesiyle yaptığı özelleştirmeler korunur.
+
 Her kart güncel değeri ve uygun olduğunda değişim bilgisini gösterir. Bölümde:
 
 - Saniye dahil “Son Güncelleme” zamanı bulunur.
@@ -493,6 +495,7 @@ Yerel saklama anahtarları:
 | `finans-grafigi-alarms` | Fiyat alarmı kayıtları |
 | `finans-grafigi-portfolio` | Portföy adet ve maliyet kayıtları |
 | `finans-grafigi-market-items` | Özelleştirilmiş piyasa kartları |
+| `finans-grafigi-market-defaults-version` | Sekiz sabit piyasa değerinin bir defalık v4.0 taşıma işareti |
 | `finans-grafigi-portfolio-benchmark` | Seçili karşılaştırma ölçütü |
 
 Kişisel veriler varsayılan olarak sadece kullanıcının tarayıcısında kalır. Tarayıcı verileri temizlenirse JSON yedeği yoksa geri getirilemez.
@@ -603,7 +606,7 @@ Mevcut ürün; ilk basit “sembol gir, son ayları çiz” aracından aşağıd
 - **v3.4:** Varlık ve para birimi bazında portföy dağılımı.
 - **v3.5:** S&P 500, Nasdaq, BIST 100, Altın ve özel ölçütle portföy performans karşılaştırması.
 - **v3.6:** Portföy başlığında toplam büyüklük ile günlük net/yüzde değişim; dağılım grafiklerinde kalıcı özet bilgiler.
-- **v4.0:** Mobil A ve Masaüstü B tasarımlarının üç sayfalı yapıda birleştirilmesi; Özet sayfasında iki sütunlu Piyasa Özeti ve Favoriler, açık Grafik Ve Teknik Analiz sayfası, istenen sırada tam Portföy sayfası.
+- **v4.0:** Mobil A ve Masaüstü B tasarımlarının üç sayfalı yapıda birleştirilmesi; Özet sayfasında iki sütunlu Piyasa Özeti ve Favoriler, açık Grafik Ve Teknik Analiz sayfası, istenen sırada tam Portföy sayfası. Aynı onaylı sürüm içinde Piyasa Özeti'nin USD/TRY, EUR/TRY, GBP/TRY, EUR/USD, S&P 500, Nasdaq, BIST 100 ve Bitcoin değerlerine bir defalık otomatik geçişi kesinleştirilmiştir.
 
 Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte kullanılan geçici masaüstü paket numaraları güncel web ürününün sürüm standardı değildir.
 
@@ -632,6 +635,7 @@ Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte ku
 - [ ] 1 ve 5 yıllık karşılaştırma güncel son veriyi kaybetmiyor.
 - [ ] MA50/100/200 birlikte açılıyor ve doğru renklerde.
 - [ ] RSI altta, ana grafikle aynı dönemde çiziliyor.
+- [ ] İlk v4.0 açılışında Piyasa Özeti tam sekiz varsayılan değeri doğru sırada gösteriyor; sonraki kullanıcı özelleştirmeleri korunuyor.
 - [ ] Piyasa ve Favoriler 15 saniyede yenileniyor; kartlar zıplamıyor.
 - [ ] İki yenile düğmesi aynı işlemi tetikliyor.
 - [ ] CSV ve PNG indirmeleri geçerli dosya oluşturuyor.
