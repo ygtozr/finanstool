@@ -1,8 +1,8 @@
 # FinansTool — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 4.1 aday  
-**Uygulama sürümü:** v4.1 aday  
-**Durum:** Teknik doğrulama ve kullanıcı onayı bekliyor  
+**Belge sürümü:** 4.1  
+**Uygulama sürümü:** v4.1  
+**Durum:** Kullanıcı tarafından onaylandı  
 **Canlı adres:** https://finanstool.vercel.app  
 **Kaynak depo:** https://github.com/ygtozr/finanstool  
 **Son güncelleme:** 9 Ağustos 2026
@@ -607,10 +607,11 @@ Mevcut ürün; ilk basit “sembol gir, son ayları çiz” aracından aşağıd
 - **v3.5:** S&P 500, Nasdaq, BIST 100, Altın ve özel ölçütle portföy performans karşılaştırması.
 - **v3.6:** Portföy başlığında toplam büyüklük ile günlük net/yüzde değişim; dağılım grafiklerinde kalıcı özet bilgiler.
 - **v4.0:** Mobil A ve Masaüstü B tasarımlarının üç sayfalı yapıda birleştirilmesi; Özet sayfasında iki sütunlu Piyasa Özeti ve Favoriler, açık Grafik Ve Teknik Analiz sayfası, istenen sırada tam Portföy sayfası. Aynı onaylı sürüm içinde Piyasa Özeti'nin USD/TRY, EUR/TRY, GBP/TRY, EUR/USD, S&P 500, Nasdaq, BIST 100 ve Bitcoin değerlerine bir defalık otomatik geçişi kesinleştirilmiştir.
+- **v4.1:** Finansal hesaplama doğruluğu, istek yarışları, fiyat/kur önbelleği, sağlayıcı dayanıklılığı, portföy yenilemesi, Wilder RSI, para birimi sonrası MA, API koruması ve erişilebilirlik regresyonları giderilmiştir.
 
 Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte kullanılan geçici masaüstü paket numaraları güncel web ürününün sürüm standardı değildir.
 
-## 14. v4.1 Teknik Kararlılık Adayı
+## 14. v4.1 Teknik Kararlılık Sürümü
 
 Bu aşama yeni ürün özelliği içermez. v4.0 bağımsız kod denetimindeki önemli sorunları kapatır.
 
