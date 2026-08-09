@@ -1,10 +1,10 @@
 const HEADERS={
-  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/3.2)',
+  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/4.1)',
   'Accept':'application/json, text/plain, */*'
 };
 
 async function fetchJson(url,headers=HEADERS){
-  const response=await fetch(url,{headers,signal:AbortSignal.timeout(7000)});
+  const response=await fetch(url,{headers,signal:AbortSignal.timeout(4500)});
   if(!response.ok)throw new Error('Sağlayıcı hatası');
   return response.json();
 }
@@ -33,7 +33,19 @@ function nasdaqQuotes(data,limit){
     }));
 }
 
+const rateBuckets=new Map();
+function allowRequest(req){
+  const now=Date.now(),key=String(req.headers?.['x-forwarded-for']||req.socket?.remoteAddress||'unknown').split(',')[0].trim();
+  const current=rateBuckets.get(key);
+  if(!current||now-current.started>=60000){rateBuckets.set(key,{started:now,count:1});return true}
+  current.count++;
+  return current.count<=90;
+}
+
 module.exports=async(req,res)=>{
+  res.setHeader('Allow','GET');
+  if(req.method!=='GET')return res.status(405).json({quotes:[],error:'Yalnız GET yöntemi desteklenir.'});
+  if(!allowRequest(req))return res.status(429).json({quotes:[],error:'Çok fazla arama yapıldı. Kısa süre sonra yeniden deneyin.'});
   const q=String(req.query.q||'').trim().slice(0,40);
   const advanced=String(req.query.advanced||'')==='1';
   const forcedFallback=String(req.query.provider||'')==='fallback';
