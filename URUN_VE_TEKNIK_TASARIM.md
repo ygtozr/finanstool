@@ -1,11 +1,11 @@
 # FinansTool — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 4.0  
-**Uygulama sürümü:** v4.0  
-**Durum:** Kullanıcı tarafından onaylandı  
+**Belge sürümü:** 4.1 aday  
+**Uygulama sürümü:** v4.1 aday  
+**Durum:** Teknik doğrulama ve kullanıcı onayı bekliyor  
 **Canlı adres:** https://finanstool.vercel.app  
 **Kaynak depo:** https://github.com/ygtozr/finanstool  
-**Son güncelleme:** 8 Ağustos 2026
+**Son güncelleme:** 9 Ağustos 2026
 
 Bu belge FinansTool uygulamasının amacını, kullanıcı tercihlerini, mevcut işlevlerini, görsel tasarımını, veri modelini ve teknik mimarisini tek yerde tanımlar. Hedefi, mevcut kaynak kod görülmeden uygulama sıfırdan geliştirilse bile aynı davranışın ve mümkün olduğunca aynı görünümün yeniden üretilebilmesidir.
 
@@ -610,7 +610,55 @@ Mevcut ürün; ilk basit “sembol gir, son ayları çiz” aracından aşağıd
 
 Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte kullanılan geçici masaüstü paket numaraları güncel web ürününün sürüm standardı değildir.
 
-## 14. Bilinen sınırlar ve ertelenen işler
+## 14. v4.1 Teknik Kararlılık Adayı
+
+Bu aşama yeni ürün özelliği içermez. v4.0 bağımsız kod denetimindeki önemli sorunları kapatır.
+
+### 14.1 Veri doğruluğu
+
+- Piyasa kartı bir sembol seçtiğinde Grafik Ve Teknik Analiz görünümüne geçer.
+- Ana grafik yüklemesi istek kimliği ve iptal denetleyicisi kullanır; eski yanıt yeni sembolü veya dönemi ezemez.
+- Portföy ve performans ölçütü arasında para birimi farkı varsa hem portföy hem ölçüt USD bazına dönüştürülür.
+- Kur dizisinde yalnız aynı gün veya önceki geçerli kur ileri taşınabilir; gelecekteki kur geçmiş boşluklara yazılamaz.
+- Gerekli kur alınamazsa eksik pozisyonu dışlayan yanıltıcı toplam yerine açık hata durumu gösterilir.
+- Hareketli ortalamalar karma para biriminde günlük fiyatlar USD'ye çevrildikten sonra hesaplanır.
+- RSI(14), Wilder yumuşatma yöntemiyle hesaplanır.
+- Sağlayıcının `N/A` ve benzeri eksik değerleri sıfır fiyat kabul edilmez.
+
+### 14.2 Eşzamanlılık ve performans
+
+- Grafik ve dört otomatik tamamlama akışı eski yanıt korumasına sahiptir.
+- Aynı karşılaştırma sembolü istek sürerken ikinci kez eklenemez.
+- Aynı fiyat/kur isteği istemcide tek Promise altında birleştirilir ve yaklaşık 12 saniye paylaşılır.
+- Fiyat API cevabı Vercel CDN'de 15 saniye, eski-yanıt toleransıyla 30 saniye tutulabilir.
+- Sağlayıcı zaman aşımı 4,5 saniyedir; Nasdaq hisse/ETF denemeleri paralel yürür.
+- Chart.js nesneleri her yenilemede yok edilmez; veri `update('none')` ile yerinde güncellenir.
+- Sayfa görünür değilken Piyasa, Favoriler, Grafik ve Portföy otomatik yenilemeleri başlatılmaz.
+- Portföy açıkken değerler 15 saniyede yenilenir; aynı pozisyon verisi mümkün olduğunda benchmark hesabında yeniden kullanılır.
+
+### 14.3 Güvenlik ve erişilebilirlik
+
+- API uçları yalnız GET kabul eder ve temel IP bazlı oran sınırı uygular.
+- Chart.js dosyası SHA-384 Subresource Integrity ile doğrulanır ve istemciye sınırlayıcı CSP uygulanır.
+- Hata metinleri HTML olarak enjekte edilmez.
+- Ana sayfa sekmeleri WAI-ARIA tab semantiği, ok tuşları ve görünüm odağı desteğine sahiptir.
+- Otomatik tamamlama alanları combobox/listbox semantiğiyle Yukarı, Aşağı, Enter ve Escape tuşlarını destekler.
+- Sık yenilenen sekiz piyasa kartı topluca `aria-live` değildir; yalnız güncelleme zamanı duyurulur.
+- Grafik renkleri tema değişkenlerinden alınır, animasyon azaltma tercihi ve sayısal grafik özetleri desteklenir.
+
+### 14.4 Regresyon doğrulaması
+
+`tests/regression.test.js` aşağıdaki temel kuralları denetler:
+
+- İstemci ve API JavaScript sözdizimi,
+- Gelecek kurun geçmişe taşınmaması,
+- Eksik pencerede MA üretilmemesi,
+- RSI sonucunun geçerli aralıkta olması,
+- Eksik Nasdaq fiyatının sıfır kabul edilmemesi,
+- `fresh` önbellek kırıcı parametresinin kaldırılması,
+- Grafik yarış koruması, karşılaştırma kilidi ve listbox semantiğinin bulunması.
+
+## 15. Bilinen sınırlar ve ertelenen işler
 
 - Üçüncü taraf ücretsiz finans verilerinde gecikme, piyasa kapsamı ve oran sınırı olabilir.
 - Gerçek zamanlı borsa verisi garantisi verilmez; gösterilen değer sağlayıcının son kaydıdır.
@@ -620,7 +668,7 @@ Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte ku
 - Kullanıcı hesabı, bulut veritabanı, emir gönderme ve aracı kurum entegrasyonu mevcut kapsamda yoktur.
 - Mobil platform için yerel iOS/Android uygulaması yoktur; responsive web uygulaması kullanılır.
 
-## 15. Kabul testi kontrol listesi
+## 16. Kabul testi kontrol listesi
 
 ### Özet ve Grafik
 
@@ -660,7 +708,7 @@ Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte ku
 - [ ] Sağlayıcı yedeği birincil servis başarısız olduğunda devreye giriyor.
 - [ ] Tarayıcı konsolunda tanımsız değişken veya işlenmemiş Promise hatası yok.
 
-## 16. Sıfırdan yeniden geliştirme için tamamlanma tanımı
+## 17. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 
 Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında mevcut FinansTool ile eşdeğer kabul edilir:
 
@@ -675,7 +723,7 @@ Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında me
 9. Güncel belge depo kökünde, aynı belge `archive/v4.0/` altında bulunur.
 10. Kullanıcı canlı sürümü kontrol edip onaylamıştır.
 
-## 17. Belge bakım kuralı
+## 18. Belge bakım kuralı
 
 Her onaylı sürüm için şu işlem zorunludur:
 
