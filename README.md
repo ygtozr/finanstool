@@ -1,4 +1,4 @@
-# FinansTool v4.1 Aday
+# FinansTool v4.1
 
 FinansTool; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
@@ -8,9 +8,9 @@ FinansTool; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik g�
 - Arayüz dili: Türkçe
 - Güncel kalıcı sürüm: **v4.0**
 
-## v4.1 teknik kararlılık adayı
+## v4.1 teknik kararlılık
 
-Bu dal yeni ürün özelliği eklemez. v4.0 denetiminde bulunan fiyat, kur, portföy, gösterge, eşzamanlılık, performans ve erişilebilirlik sorunlarını düzeltir:
+Bu sürüm yeni ürün özelliği eklemez. v4.0 denetiminde bulunan fiyat, kur, portföy, gösterge, eşzamanlılık, performans ve erişilebilirlik sorunlarını düzeltir:
 
 - Eski grafik ve arama yanıtlarının yeni kullanıcı seçimini ezmesi engellenir.
 - Piyasa kartı seçildiğinde Grafik Ve Teknik Analiz sayfası açılır.
@@ -22,7 +22,7 @@ Bu dal yeni ürün özelliği eklemez. v4.0 denetiminde bulunan fiyat, kur, port
 - Arama önerileri klavye ve ekran okuyucu kullanımını destekler.
 - Chart.js bütünlük doğrulaması, API yöntem/oran koruması ve regresyon testleri eklenir.
 
-Kalıcı sürüm hâlâ **v4.0**'dır. Bu çalışma kullanıcı kontrolünden sonra v4.1 olarak kesinleştirilebilir.
+Güncel kalıcı sürüm **v4.1**'dir. Kullanıcı tarafından kontrol edilip onaylanmıştır.
 
 ## v4.0 arayüzü
 
