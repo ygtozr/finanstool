@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FinansTool v4.0</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
+  <title>FinansTool v4.1 Aday</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
     * { box-sizing:border-box; }
@@ -50,7 +51,7 @@
     input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:uppercase; }
     input:focus { outline:3px solid #52d5b166; border-color:var(--accent); }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-    button { border:0; border-radius:10px; padding:12px 20px; background:var(--accent); color:#062019; font:600 16px inherit; cursor:pointer; }
+    button { border:0; border-radius:10px; padding:12px 20px; background:var(--accent); color:#062019; font:600 16px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif; cursor:pointer; }
     button:disabled { opacity:.65; cursor:wait; }
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.toolbar label{display:inline-flex;align-items:center;justify-content:flex-start;gap:7px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:#26344d;font-size:.85rem;cursor:pointer}.toolbar label input{flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0;padding:0;accent-color:var(--accent)}.toolbar button{padding:8px 11px;background:#26344d;color:var(--text);font-size:.85rem}.rsi-wrap{height:150px;display:none;margin-top:14px}.rsi-wrap.visible{display:block}
     .meta { display:flex; flex-wrap:wrap; gap:10px 22px; min-height:28px; margin:0 0 14px; color:var(--muted); }
@@ -396,6 +397,8 @@
       .portfolio-page .portfolio-analysis { margin-top:14px; padding-top:0; border-top:0; }
       .portfolio-page .distribution-grid { grid-template-columns:1fr; }
     }
+      @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
+    .portfolio-warning { margin:0 0 12px; padding:10px 12px; border:1px solid var(--danger); border-radius:10px; color:var(--danger); }
   </style>
 </head>
 <body>
@@ -403,35 +406,35 @@
   <main>
     <aside class="desktop-sidebar" aria-label="Masaüstü gezinme">
       <div class="desktop-brand"><span class="desktop-brand-mark">₺</span><span>FinansTool</span></div>
-      <button id="desktopOverviewNav" class="is-active" type="button">⌂ <span>Özet</span></button>
+      <button id="desktopOverviewNav" class="is-active" type="button" aria-current="page">⌂ <span>Özet</span></button>
       <button id="desktopChartNav" type="button">⌁ <span>Grafik Ve Analiz</span></button>
       <button id="desktopPortfolioNav" type="button">▤ <span>Portföy</span></button>
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopDataNav" type="button">⇩ <span>Veri Yedekleme</span></button>
-      <small>v4.0</small>
+      <small>v4.1 aday</small>
     </aside>
-    <nav class="app-tabs" aria-label="Uygulama bölümleri"><button id="mainTab" class="active" type="button" aria-selected="true">Özet</button><button id="chartTab" type="button" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
-    <section id="mainView" class="app-view active overview-page" aria-label="Özet ekranı">
-      <h1>FinansTool <span class="version-badge">v4.0</span></h1>
+    <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
+    <section id="mainView" class="app-view active overview-page" role="tabpanel" tabindex="-1" aria-labelledby="mainTab">
+      <h1>FinansTool <span class="version-badge">v4.1 aday</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
-      <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
-      <div id="marketCards" class="market-cards" aria-live="polite"></div>
+      <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
+      <div id="marketCards" class="market-cards"></div>
     </section>
       <aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside>
       </section></div>
     </section>
-    <section id="chartView" class="app-view chart-page" aria-label="Grafik ve teknik analiz ekranı">
+    <section id="chartView" class="app-view chart-page" role="tabpanel" tabindex="-1" aria-labelledby="chartTab" hidden>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
-      <div class="search-field"><input id="symbol" name="symbol" type="search" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" aria-label="Hisse önerileri"></ul></div>
+      <div class="search-field"><input id="symbol" name="symbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="suggestions" aria-expanded="false" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" role="listbox" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
     <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button><button id="exportCsv" type="button">CSV indir</button><button id="exportPng" type="button">PNG indir</button></div><div id="meta" class="meta" aria-live="polite"></div>
-    <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img"></canvas></div>
-    <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img"></canvas></div>
+    <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img" aria-describedby="priceChartSummary"></canvas><p id="priceChartSummary" class="sr-only" aria-live="polite"></p></div>
+    <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     <section class="periods" aria-label="Grafik süresi">
       <button type="button" data-range="5d">1 hafta</button>
@@ -449,10 +452,10 @@
       </div>
     </section>
     </section>
-    <section id="portfolioView" class="app-view portfolio-page" aria-label="Portföy ekranı">
+    <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" tabindex="-1" aria-labelledby="portfolioTab" hidden>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div></div>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
-      <div class="portfolio-search"><input id="portfolioSymbol" type="search" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" aria-label="Portföy hisse önerileri"></ul></div>
+      <div class="portfolio-search"><input id="portfolioSymbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="portfolioSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" role="listbox" aria-label="Portföy hisse önerileri"></ul></div>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
       <div id="portfolioList" class="portfolio-list"></div>
       <section class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
@@ -466,7 +469,7 @@
         <div class="portfolio-benchmark-head"><div><h3 id="portfolioBenchmarkTitle">Performans Karşılaştırması</h3><p id="benchmarkStatus" class="benchmark-status">Portföy verisi bekleniyor…</p></div></div>
         <div class="benchmark-controls">
           <div class="benchmark-presets" aria-label="Hazır karşılaştırma ölçütleri"><button type="button" data-benchmark-symbol="^GSPC" data-benchmark-name="S&P 500">S&P 500</button><button type="button" data-benchmark-symbol="^IXIC" data-benchmark-name="Nasdaq">Nasdaq</button><button type="button" data-benchmark-symbol="XU100.IS" data-benchmark-name="BIST 100">BIST 100</button><button type="button" data-benchmark-symbol="GLD" data-benchmark-name="Altın">Altın</button></div>
-          <div class="benchmark-search"><input id="benchmarkSearch" type="search" maxlength="20" autocomplete="off" placeholder="Başka ölçüt ara"><button id="benchmarkApply" type="button">Karşılaştır</button><ul id="benchmarkSuggestions" class="search-suggestions" aria-label="Karşılaştırma ölçütü önerileri"></ul></div>
+          <div class="benchmark-search"><input id="benchmarkSearch" type="search" role="combobox" aria-autocomplete="list" aria-controls="benchmarkSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Başka ölçüt ara"><button id="benchmarkApply" type="button">Karşılaştır</button><ul id="benchmarkSuggestions" class="search-suggestions" role="listbox" aria-label="Karşılaştırma ölçütü önerileri"></ul></div>
           <div class="benchmark-ranges" aria-label="Karşılaştırma süresi"><button type="button" data-benchmark-range="1mo">1 Ay</button><button type="button" data-benchmark-range="3mo">3 Ay</button><button type="button" data-benchmark-range="6mo">6 Ay</button><button type="button" data-benchmark-range="1y">1 Yıl</button></div>
         </div>
         <div class="benchmark-chart-wrap"><canvas id="portfolioBenchmarkChart" role="img" aria-label="Portföy ve karşılaştırma ölçütü performans grafiği"></canvas><p id="benchmarkEmpty" class="benchmark-empty">Karşılaştırma için portföye hisse ekleyin.</p></div>
@@ -476,7 +479,7 @@
     </section>
   </main>
   <nav class="mobile-bottom-nav" aria-label="Mobil gezinme">
-    <button id="mobileOverviewNav" class="is-active" type="button"><span>⌂</span>Özet</button>
+    <button id="mobileOverviewNav" class="is-active" type="button" aria-current="page"><span>⌂</span>Özet</button>
     <button id="mobileChartNav" type="button"><span>⌁</span>Grafik</button>
     <button id="mobilePortfolioNav" type="button"><span>▤</span>Portföy</button>
     <button id="mobileMoreNav" type="button"><span>•••</span>Diğer</button>
@@ -515,9 +518,9 @@
     <h3>Piyasa Özetini Düzenle</h3><p class="portfolio-dialog-symbol">Gösterilecek verileri kaldırın veya arayarak yenisini ekleyin.</p>
     <div id="marketSettingsList" class="market-settings-list"></div>
     <form id="marketSettingsForm" class="market-settings-search">
-      <input id="marketSettingsSearch" type="search" autocomplete="off" placeholder="Piyasa verisi ara" aria-label="Piyasa verisi ara">
+      <input id="marketSettingsSearch" type="search" role="combobox" aria-autocomplete="list" aria-controls="marketSettingsSuggestions" aria-expanded="false" autocomplete="off" placeholder="Piyasa verisi ara" aria-label="Piyasa verisi ara">
       <button type="submit" aria-label="Piyasa verisi ekle" title="Ekle">+</button>
-      <ul id="marketSettingsSuggestions" class="search-suggestions" aria-label="Piyasa verisi önerileri"></ul>
+      <ul id="marketSettingsSuggestions" class="search-suggestions" role="listbox" aria-label="Piyasa verisi önerileri"></ul>
     </form>
     <div class="dialog-actions"><button id="marketSettingsClose" class="dialog-cancel" type="button">Kapat</button></div>
   </dialog>
@@ -597,6 +600,35 @@
     let marketSearchResults = [];
     let marketSummaryRequest = 0;
     let chartRefreshInProgress = false;
+    let priceRequestId = 0;
+    let priceAbortController = null;
+    let searchRequestId = 0;
+    let marketSearchRequestId = 0;
+    let benchmarkSearchRequestId = 0;
+    let portfolioSearchRequestId = 0;
+    const comparisonRequests = new Set();
+    const apiCache = new Map();
+    const apiInFlight = new Map();
+
+    async function cachedApiJson(url,{ttl=12000,force=false}={}) {
+      const now=Date.now();
+      const cached=apiCache.get(url);
+      if(!force&&cached&&now-cached.time<ttl)return cached.data;
+      if(!force&&apiInFlight.has(url))return apiInFlight.get(url);
+      const request=fetch(url,{cache:'no-store'}).then(async response=>{
+        const payload=await response.json().catch(()=>({}));
+        if(!response.ok)throw new Error(payload.error||'Veri sağlayıcısına ulaşılamadı.');
+        apiCache.set(url,{time:Date.now(),data:payload});
+        return payload;
+      }).finally(()=>apiInFlight.delete(url));
+      apiInFlight.set(url,request);
+      return request;
+    }
+
+    function priceApiUrl(symbol,query) {
+      return '/api/price?symbol='+encodeURIComponent(symbol)+'&query='+encodeURIComponent(query);
+    }
+
     const saveMarketItems = () => localStorage.setItem(marketItemsKey,JSON.stringify(marketItems));
     const themeToggle = document.getElementById('themeToggle');
     const dataButton = document.getElementById('dataButton');
@@ -618,7 +650,6 @@
     const startDate = document.getElementById('startDate');
     const dateError = document.getElementById('dateError');
     const favoriteButton = document.getElementById('favoriteButton');
-    const compareButton = document.getElementById('compareButton');
     const favoritesList = document.getElementById('favoritesList');
     const favoritesEmpty = document.getElementById('favoritesEmpty');
     const favoritesKey = 'finans-grafigi-favorites';
@@ -695,7 +726,7 @@
     const isFavorite = symbol => favorites.some(item => item.symbol === symbol);
     function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
     const isCompared = symbol => compareData.some(item => item.rawSymbol === symbol);
-    function updateCompareButton() { if(!compareButton)return; const symbol=currentSymbol(),on=isCompared(symbol),isPrimary=symbol&&symbol===primarySymbol; compareButton.classList.toggle('compare-active',on); compareButton.setAttribute('aria-pressed',String(on)); compareButton.disabled=!symbol||isPrimary||!primaryPrices.length; compareButton.title=isPrimary?'Bu ana grafik':(on?'Karşılaştırmadan çıkar':'Grafiğe karşılaştırma olarak ekle'); }
+    function updateCompareButton() {}
     function favoriteLogoUrl(symbol) {
       const safe=normalizeSymbol(symbol);
       return /^[A-Z0-9.^=-]{1,20}$/.test(safe)
@@ -840,25 +871,20 @@
 
     async function fetchFavoriteQuote(item) {
       const query='range=1mo&interval=1d';
-      const response=await fetch('/api/price?symbol='+encodeURIComponent(item.symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'});
-      const payload=await response.json();
-      if(!response.ok)throw new Error(payload.error||'Fiyat alınamadı');
+      const payload=await cachedApiJson(priceApiUrl(item.symbol,query));
       const result=payload.chart?.result?.[0];
       const closes=result?.indicators?.quote?.[0]?.close;
       const timestamps=result?.timestamp;
       if(!closes||!timestamps)throw new Error('Fiyat bulunamadı');
-      const points=timestamps.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close)).slice(-7);
+      const points=timestamps.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0).slice(-7);
       if(points.length<2)throw new Error('Yetersiz fiyat verisi');
       const price=points.at(-1).close;
       const previous=points.at(-2).close;
       return {
         symbol:item.symbol,
         name:result.meta?.longName||result.meta?.shortName||item.name||item.symbol,
-        currency:result.meta?.currency||'USD',
-        price,
-        delta:price-previous,
-        change:(price/previous-1)*100,
-        updatedAt:Date.now()
+        currency:String(result.meta?.currency||'USD').toUpperCase(),
+        price,delta:price-previous,change:(price/previous-1)*100,updatedAt:Date.now()
       };
     }
 
@@ -936,20 +962,52 @@
       });
     }
 
+    function updateComboboxState(input,list,visible) {
+      list.classList.toggle('visible',visible);
+      input.setAttribute('aria-expanded',String(visible));
+      if(!visible)input.removeAttribute('aria-activedescendant');
+    }
+
+    function prepareSuggestionButton(button,list,index) {
+      button.setAttribute('role','option');
+      button.id=list.id+'-option-'+index;
+      button.setAttribute('aria-selected','false');
+    }
+
+    function enableComboboxKeyboard(input,list) {
+      input.addEventListener('keydown',event=>{
+        const options=[...list.querySelectorAll('[role="option"]')];
+        if(event.key==='Escape'){
+          updateComboboxState(input,list,false);
+          return;
+        }
+        if(!options.length)return;
+        let index=options.findIndex(option=>option.getAttribute('aria-selected')==='true');
+        if(event.key==='ArrowDown'||event.key==='ArrowUp'){
+          event.preventDefault();
+          index=event.key==='ArrowDown'?(index+1)%options.length:(index<=0?options.length-1:index-1);
+          options.forEach((option,optionIndex)=>option.setAttribute('aria-selected',String(optionIndex===index)));
+          input.setAttribute('aria-activedescendant',options[index].id);
+          options[index].scrollIntoView({block:'nearest'});
+        }else if(event.key==='Enter'&&index>=0){
+          event.preventDefault();
+          options[index].click();
+        }
+      });
+    }
+
     function showMarketSuggestions(items) {
       marketSearchResults=items.slice(0,5);
       marketSettingsSuggestions.replaceChildren();
-      marketSearchResults.forEach(item=>{
+      marketSearchResults.forEach((item,index)=>{
         const li=document.createElement('li');
         const button=document.createElement('button');
-        button.type='button';
-        button.className='suggestion';
-        button.textContent=item.symbol+' · '+item.name;
+        button.type='button';button.className='suggestion';button.textContent=item.symbol+' · '+item.name;
+        prepareSuggestionButton(button,marketSettingsSuggestions,index);
         button.addEventListener('click',()=>addMarketItem(item));
-        li.append(button);
-        marketSettingsSuggestions.append(li);
+        li.append(button);marketSettingsSuggestions.append(li);
       });
-      marketSettingsSuggestions.classList.toggle('visible',marketSearchResults.length>0);
+      updateComboboxState(marketSettingsSearch,marketSettingsSuggestions,marketSearchResults.length>0);
     }
 
     function addMarketItem(item) {
@@ -998,7 +1056,7 @@
         card.title=item.label+' grafiğini aç';
         card.disabled=false;
         if(!card.dataset.bound){
-          card.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+          card.addEventListener('click',()=>{chartTab.click();symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
           card.dataset.bound='true';
         }
       }else{
@@ -1033,17 +1091,15 @@
       }
       const cards=ensureMarketCards(items);
       const query='range=5d&interval=1d';
-      const results=await Promise.all(items.map(async item=>{
+      const results=await mapWithLimit(items,4,async item=>{
         try{
-          const response=await fetch('/api/price?symbol='+encodeURIComponent(item.symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'});
-          const payload=await response.json();
-          if(!response.ok)throw new Error('Veri alınamadı');
-          const result=payload.chart?.result?.[0],prices=result?.indicators?.quote?.[0]?.close?.filter(Number.isFinite)||[];
+          const payload=await cachedApiJson(priceApiUrl(item.symbol,query));
+          const result=payload.chart?.result?.[0],prices=result?.indicators?.quote?.[0]?.close?.filter(value=>Number.isFinite(value)&&value>0)||[];
           if(prices.length<2)throw new Error('Yetersiz veri');
           const price=prices.at(-1),previous=prices.at(-2);
-          return{ok:true,price,currency:result.meta?.currency||'USD',change:(price/previous-1)*100};
+          return{ok:true,price,currency:String(result.meta?.currency||'USD').toUpperCase(),change:(price/previous-1)*100};
         }catch{return{ok:false}}
-      }));
+      });
       if(requestId!==marketSummaryRequest)return;
       items.forEach((item,index)=>updateMarketCard(cards[index],item,results[index]));
       marketUpdated.textContent='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
@@ -1129,7 +1185,7 @@
     function createBackup() {
       return {
         schemaVersion:1,
-        appVersion:'4.0',
+        appVersion:'4.1-preview',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
@@ -1282,13 +1338,11 @@
 
     async function latestPrice(symbol) {
       const query='range=5d&interval=1d';
-      const response=await fetch('/api/price?symbol='+encodeURIComponent(symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'});
-      const payload=await response.json();
-      if(!response.ok) throw new Error(payload.error||'Fiyat alınamadı');
+      const payload=await cachedApiJson(priceApiUrl(symbol,query));
       const result=payload.chart?.result?.[0];
-      const prices=result?.indicators?.quote?.[0]?.close?.filter(Number.isFinite)||[];
-      if(!prices.length) throw new Error('Fiyat bulunamadı');
-      return {price:prices.at(-1),currency:result.meta?.currency||'USD'};
+      const prices=result?.indicators?.quote?.[0]?.close?.filter(value=>Number.isFinite(value)&&value>0)||[];
+      if(!prices.length)throw new Error('Fiyat bulunamadı');
+      return {price:prices.at(-1),currency:String(result.meta?.currency||'USD').toUpperCase()};
     }
 
     async function checkAlarms() {
@@ -1329,40 +1383,36 @@
     const savePortfolio = () => localStorage.setItem(portfolioKey, JSON.stringify(portfolio));
 
     function setActiveView(view) {
-      const showMain = view === 'main';
-      const showChart = view === 'chart';
-      const showPortfolio = view === 'portfolio';
-      mainView.classList.toggle('active',showMain);
-      chartView.classList.toggle('active',showChart);
-      portfolioView.classList.toggle('active',showPortfolio);
-      mainTab.classList.toggle('active',showMain);
-      chartTab.classList.toggle('active',showChart);
-      portfolioTab.classList.toggle('active',showPortfolio);
-      mainTab.setAttribute('aria-selected',String(showMain));
-      chartTab.setAttribute('aria-selected',String(showChart));
-      portfolioTab.setAttribute('aria-selected',String(showPortfolio));
-      if(showPortfolio) renderPortfolio();
-      if(showChart) requestAnimationFrame(()=>{if(chart)chart.resize();if(rsiChart)rsiChart.resize()});
+      const states={main:view==='main',chart:view==='chart',portfolio:view==='portfolio'};
+      [[mainView,mainTab,states.main],[chartView,chartTab,states.chart],[portfolioView,portfolioTab,states.portfolio]].forEach(([panel,tab,active])=>{
+        panel.classList.toggle('active',active);
+        panel.hidden=!active;
+        tab.classList.toggle('active',active);
+        tab.setAttribute('aria-selected',String(active));
+        tab.tabIndex=active?0:-1;
+      });
+      const activeView=states.main?mainView:(states.chart?chartView:portfolioView);
+      requestAnimationFrame(()=>activeView.focus({preventScroll:true}));
+      if(states.portfolio)renderPortfolio();
+      if(states.chart)requestAnimationFrame(()=>{if(chart)chart.resize();if(rsiChart)rsiChart.resize()});
     }
 
     function showPortfolioSuggestions(items) {
       portfolioSuggestions.replaceChildren();
-      items.slice(0,5).forEach(item => {
-        const li = document.createElement('li');
-        const option = document.createElement('button');
-        option.type = 'button';
-        option.className = 'suggestion';
-        option.textContent = item.symbol + ' · ' + item.name;
-        option.addEventListener('click', () => {
-          portfolioSelection = { symbol:item.symbol, name:item.name };
-          portfolioSymbol.value = item.symbol;
-          portfolioSuggestions.classList.remove('visible');
+      items.slice(0,5).forEach((item,index)=>{
+        const li=document.createElement('li');
+        const option=document.createElement('button');
+        option.type='button';option.className='suggestion';option.textContent=item.symbol+' · '+item.name;
+        prepareSuggestionButton(option,portfolioSuggestions,index);
+        option.addEventListener('click',()=>{
+          portfolioSelection={symbol:item.symbol,name:item.name};
+          portfolioSymbol.value=item.symbol;
+          updateComboboxState(portfolioSymbol,portfolioSuggestions,false);
           openPortfolioDialog();
         });
-        li.append(option);
-        portfolioSuggestions.append(li);
+        li.append(option);portfolioSuggestions.append(li);
       });
-      portfolioSuggestions.classList.toggle('visible', items.length > 0);
+      updateComboboxState(portfolioSymbol,portfolioSuggestions,items.length>0);
     }
 
     function openPortfolioDialog() {
@@ -1377,24 +1427,22 @@
     }
 
     async function fetchPortfolioItem(position) {
-      const query = 'range=1y&interval=1d&events=div';
-      const response = await fetch('/api/price?symbol=' + encodeURIComponent(position.symbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache:'no-store' });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || 'Fiyat alınamadı');
-      const result = payload.chart?.result?.[0];
-      const rawCloses = result?.indicators?.quote?.[0]?.close;
-      const timestamps = result?.timestamp;
-      if (!rawCloses || !timestamps) throw new Error('Fiyat bulunamadı');
-      const points = timestamps.map((time,index)=>({time,close:rawCloses[index]})).filter(point=>Number.isFinite(point.close));
-      if (!points.length) throw new Error('Fiyat bulunamadı');
-      const monday = new Date();
+      const query='range=1y&interval=1d&events=div';
+      const payload=await cachedApiJson(priceApiUrl(position.symbol,query));
+      const result=payload.chart?.result?.[0];
+      const rawCloses=result?.indicators?.quote?.[0]?.close;
+      const timestamps=result?.timestamp;
+      if(!rawCloses||!timestamps)throw new Error('Fiyat bulunamadı');
+      const points=timestamps.map((time,index)=>({time,close:rawCloses[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0);
+      if(!points.length)throw new Error('Fiyat bulunamadı');
+      const monday=new Date();
       monday.setHours(0,0,0,0);
       monday.setDate(monday.getDate()-((monday.getDay()+6)%7));
-      const weekBase = [...points].reverse().find(point=>point.time*1000<monday.getTime()) || points[0];
-      const currency = result.meta?.currency || 'USD';
-      const name = result.meta?.longName || result.meta?.shortName || position.name || position.symbol;
-      const dividends = Object.values(result.events?.dividends || {}).map(event => ({ symbol:position.symbol, name, date:Number(event.date) * 1000, amount:Number(event.amount), currency })).filter(item => Number.isFinite(item.date) && Number.isFinite(item.amount));
-      return { ...position, name, currency, price:points.at(-1).close, previousPrice:(points.length>1?points.at(-2):points.at(-1)).close, weekStartPrice:weekBase.close, dividends };
+      const weekBase=[...points].reverse().find(point=>point.time*1000<monday.getTime())||points[0];
+      const currency=String(result.meta?.currency||'USD').toUpperCase();
+      const name=result.meta?.longName||result.meta?.shortName||position.name||position.symbol;
+      const dividends=Object.values(result.events?.dividends||{}).map(event=>({symbol:position.symbol,name,date:Number(event.date)*1000,amount:Number(event.amount),currency})).filter(item=>Number.isFinite(item.date)&&Number.isFinite(item.amount));
+      return {...position,name,currency,price:points.at(-1).close,previousPrice:(points.length>1?points.at(-2):points.at(-1)).close,weekStartPrice:weekBase.close,dividends,result};
     }
 
     function addPortfolioStat(parent, label, value, className='') {
@@ -1540,39 +1588,27 @@
     }
 
     async function fetchBenchmarkResult(symbol,query) {
-      const response=await fetch('/api/price?symbol='+encodeURIComponent(symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'});
-      const payload=await response.json();
-      if(!response.ok)throw new Error(payload.error||'Performans verisi alınamadı');
+      const payload=await cachedApiJson(priceApiUrl(symbol,query));
       const result=payload.chart?.result?.[0];
       if(!result?.timestamp||!result?.indicators?.quote?.[0]?.close)throw new Error('Performans verisi bulunamadı');
       return result;
     }
 
     function renderPortfolioBenchmarkChart(labels,portfolioPerformance,benchmarkPerformance) {
-      if(portfolioBenchmarkChart)portfolioBenchmarkChart.destroy();
-      portfolioBenchmarkChart=new Chart(document.getElementById('portfolioBenchmarkChart'),{
-        type:'line',
-        data:{labels,datasets:[
-          {label:'Portföy',data:portfolioPerformance,borderColor:'#52d5b1',backgroundColor:'rgba(82,213,177,.08)',borderWidth:2.4,pointRadius:0,pointHoverRadius:4,tension:.18,spanGaps:true},
-          {label:benchmarkSettings.name,data:benchmarkPerformance,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,.06)',borderWidth:2.2,pointRadius:0,pointHoverRadius:4,tension:.18,spanGaps:true}
-        ]},
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          interaction:{mode:'index',intersect:false},
-          plugins:{
-            legend:{labels:{color:distributionLegendColor(),usePointStyle:true,boxWidth:10}},
-            tooltip:{callbacks:{label:context=>context.dataset.label+': '+(Number.isFinite(context.parsed.y)?(context.parsed.y>=0?'+':'')+context.parsed.y.toFixed(2)+'%':'—')}}
-          },
-          scales:{
-            x:{ticks:{color:'#aebbd0',maxTicksLimit:8},grid:{color:'rgba(148,163,184,.10)'}},
-            y:{ticks:{color:'#aebbd0',callback:value=>(value>=0?'+':'')+value+'%'},grid:{color:'rgba(148,163,184,.14)'}}
-          }
-        }
-      });
+      const colors=chartThemeColors();
+      const datasets=[
+        {label:'Portföy',data:portfolioPerformance,borderColor:colors.accent,backgroundColor:'rgba(82,213,177,.08)',borderWidth:2.4,pointRadius:0,pointHoverRadius:4,tension:.18,spanGaps:true},
+        {label:benchmarkSettings.name,data:benchmarkPerformance,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.06)',borderWidth:2.2,pointRadius:0,pointHoverRadius:4,tension:.18,spanGaps:true}
+      ];
+      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:colors.text,usePointStyle:true,boxWidth:10}},tooltip:{callbacks:{label:context=>context.dataset.label+': '+(Number.isFinite(context.parsed.y)?(context.parsed.y>=0?'+':'')+context.parsed.y.toFixed(2)+'%':'—')}}},scales:{x:{ticks:{color:colors.text,maxTicksLimit:8},grid:{color:colors.grid}},y:{ticks:{color:colors.text,callback:value=>(value>=0?'+':'')+value+'%'},grid:{color:colors.grid}}}};
+      if(portfolioBenchmarkChart){
+        portfolioBenchmarkChart.data={labels:[...labels],datasets};
+        portfolioBenchmarkChart.options=options;
+        portfolioBenchmarkChart.update('none');
+      }else portfolioBenchmarkChart=new Chart(document.getElementById('portfolioBenchmarkChart'),{type:'line',data:{labels:[...labels],datasets},options});
     }
 
-    async function renderPortfolioBenchmark() {
+    async function renderPortfolioBenchmark(prefetchedPositions=[]) {
       const requestId=++portfolioBenchmarkRequestId;
       updateBenchmarkControls();
       benchmarkStats.replaceChildren();
@@ -1589,38 +1625,47 @@
       canvas.hidden=false;
       try{
         const query='range='+benchmarkSettings.range+'&interval=1d';
-        const [benchmarkResult,positionResults]=await Promise.all([
-          fetchBenchmarkResult(benchmarkSettings.symbol,query),
-          Promise.all(portfolio.map(async position=>{try{return{position,result:await fetchBenchmarkResult(position.symbol,query)}}catch{return null}}))
-        ]);
+        const benchmarkPromise=fetchBenchmarkResult(benchmarkSettings.symbol,query);
+        const positionPromises=portfolio.map(async position=>{
+          const prefetched=prefetchedPositions.find(item=>item.symbol===position.symbol&&item.result);
+          if(prefetched)return{position,result:prefetched.result};
+          try{return{position,result:await fetchBenchmarkResult(position.symbol,query)}}catch{return null}
+        });
+        const [benchmarkResult,positionResults]=await Promise.all([benchmarkPromise,Promise.all(positionPromises)]);
         if(requestId!==portfolioBenchmarkRequestId)return;
         const benchmarkRaw=benchmarkResult.indicators.quote[0].close;
-        const benchmarkPoints=benchmarkResult.timestamp.map((time,index)=>({time,value:benchmarkRaw[index]})).filter(point=>Number.isFinite(point.value));
+        const benchmarkPoints=benchmarkResult.timestamp.map((time,index)=>({time,value:benchmarkRaw[index]})).filter(point=>Number.isFinite(point.value)&&point.value>0);
         if(benchmarkPoints.length<2)throw new Error('Karşılaştırma ölçütünde yeterli veri yok');
         const formatter=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
         const labels=benchmarkPoints.map(point=>formatter.format(new Date(point.time*1000)));
         const validPositions=positionResults.filter(Boolean);
         if(!validPositions.length)throw new Error('Portföy hisselerinin performans verisi alınamadı');
-        const currencies=[...new Set(validPositions.map(item=>String(item.result.meta?.currency||'USD').toUpperCase()))];
-        const mixedCurrency=currencies.length>1;
-        const totalValues=labels.map(()=>0);
-        let included=0;
+        const benchmarkCurrency=String(benchmarkResult.meta?.currency||'USD').toUpperCase();
+        const positionCurrencies=validPositions.map(item=>String(item.result.meta?.currency||'USD').toUpperCase());
+        const useUsd=new Set([...positionCurrencies,benchmarkCurrency]).size>1;
+        const series=[];
         for(const item of validPositions){
           try{
             const currency=String(item.result.meta?.currency||'USD').toUpperCase();
             let values=fillMissingRates(alignResultToLabels(item.result,labels));
-            if(mixedCurrency&&currency!=='USD')values=await convertSeriesToUsd(currency,values,labels,query);
-            values.forEach((value,index)=>{if(Number.isFinite(value))totalValues[index]+=value*item.position.quantity});
-            included++;
+            if(useUsd&&currency!=='USD')values=await convertSeriesToUsd(currency,values,labels,query);
+            series.push({values,quantity:item.position.quantity});
           }catch{}
         }
         if(requestId!==portfolioBenchmarkRequestId)return;
-        if(!included||!totalValues.some(value=>value>0))throw new Error('Portföy performansı hesaplanamadı');
+        if(!series.length)throw new Error('Portföy performansı hesaplanamadı');
+        const totalValues=labels.map((_,index)=>{
+          const values=series.map(item=>Number.isFinite(item.values[index])?item.values[index]*item.quantity:null);
+          return values.every(Number.isFinite)?values.reduce((sum,value)=>sum+value,0):null;
+        });
+        let benchmarkValues=fillMissingRates(alignResultToLabels(benchmarkResult,labels));
+        if(useUsd&&benchmarkCurrency!=='USD')benchmarkValues=await convertSeriesToUsd(benchmarkCurrency,benchmarkValues,labels,query);
+        if(requestId!==portfolioBenchmarkRequestId)return;
         const portfolioPerformance=normalizePerformance(totalValues);
-        const benchmarkPerformance=normalizePerformance(benchmarkPoints.map(point=>point.value));
+        const benchmarkPerformance=normalizePerformance(benchmarkValues);
         renderPortfolioBenchmarkChart(labels,portfolioPerformance,benchmarkPerformance);
         renderBenchmarkStats(portfolioPerformance,benchmarkPerformance);
-        benchmarkStatus.textContent='Son güncelleme: '+formatUpdateTime(new Date())+' · '+included+'/'+portfolio.length+' pozisyon';
+        benchmarkStatus.textContent='Son güncelleme: '+formatUpdateTime(new Date())+' · '+series.length+'/'+portfolio.length+' pozisyon'+(useUsd?' · USD bazında':'');
       }catch(error){
         if(requestId!==portfolioBenchmarkRequestId)return;
         if(portfolioBenchmarkChart){portfolioBenchmarkChart.destroy();portfolioBenchmarkChart=null}
@@ -1633,23 +1678,21 @@
 
     function showBenchmarkSuggestions(items) {
       benchmarkSuggestions.replaceChildren();
-      items.slice(0,5).forEach(item=>{
+      items.slice(0,5).forEach((item,index)=>{
         const li=document.createElement('li');
         const button=document.createElement('button');
-        button.type='button';
-        button.className='suggestion';
-        button.textContent=item.symbol+' · '+item.name;
+        button.type='button';button.className='suggestion';button.textContent=item.symbol+' · '+item.name;
+        prepareSuggestionButton(button,benchmarkSuggestions,index);
         button.addEventListener('click',()=>{
           benchmarkSelection={symbol:item.symbol,name:item.name};
           benchmarkSettings={...benchmarkSettings,...benchmarkSelection};
           saveBenchmarkSettings();
-          benchmarkSuggestions.classList.remove('visible');
+          updateComboboxState(benchmarkSearch,benchmarkSuggestions,false);
           renderPortfolioBenchmark();
         });
-        li.append(button);
-        benchmarkSuggestions.append(li);
+        li.append(button);benchmarkSuggestions.append(li);
       });
-      benchmarkSuggestions.classList.toggle('visible',items.length>0);
+      updateComboboxState(benchmarkSearch,benchmarkSuggestions,items.length>0);
     }
 
     async function renderPortfolio() {
@@ -1677,8 +1720,15 @@
       const mixedCurrency=currencies.length>1;
       const summaryCurrency=mixedCurrency?'USD':(currencies[0]||'USD');
       const rates=new Map([['USD',1]]);
+      const missingRates=new Set();
       if(mixedCurrency){
-        await Promise.all(currencies.filter(code=>code!=='USD').map(async code=>{try{rates.set(code,(await latestPrice(code+'USD=X')).price)}catch{rates.set(code,0)}}));
+        await Promise.all(currencies.filter(code=>code!=='USD').map(async code=>{
+          try{
+            const rate=(await latestPrice(code+'USD=X')).price;
+            if(!Number.isFinite(rate)||rate<=0)throw new Error('Geçersiz kur');
+            rates.set(code,rate);
+          }catch{missingRates.add(code)}
+        }));
       }
       if(renderId!==portfolioRenderId)return;
       portfolioList.replaceChildren();
@@ -1710,13 +1760,15 @@
           profitValue.textContent=money(profit,position.currency)+' · '+(percent>=0?'+':'')+percent.toFixed(2)+'%';
           profitValue.classList.add(tone);
           profitValue.setAttribute('aria-label','Kâr zarar '+money(profit,position.currency)+', yüzde '+(percent>=0?'+':'')+percent.toFixed(2));
-          const factor=mixedCurrency?(rates.get(position.currency)||0):1;
-          const convertedValue=value*factor;
-          totalCost+=cost*factor;totalValue+=convertedValue;totalPreviousValue+=position.quantity*position.previousPrice*factor;totalWeekStartValue+=position.quantity*position.weekStartPrice*factor;
-          if(convertedValue>0){
-            allocationValues.push({label:position.symbol,value:convertedValue});
-            currencyValues.set(position.currency,(currencyValues.get(position.currency)||0)+convertedValue);
-          }
+          const factor=mixedCurrency?rates.get(position.currency):1;
+          if(Number.isFinite(factor)&&factor>0){
+            const convertedValue=value*factor;
+            totalCost+=cost*factor;totalValue+=convertedValue;totalPreviousValue+=position.quantity*position.previousPrice*factor;totalWeekStartValue+=position.quantity*position.weekStartPrice*factor;
+            if(convertedValue>0){
+              allocationValues.push({label:position.symbol,value:convertedValue});
+              currencyValues.set(position.currency,(currencyValues.get(position.currency)||0)+convertedValue);
+            }
+          }else missingRates.add(position.currency);
           allDividends.push(...position.dividends);
           const saved=portfolio.find(item=>item.symbol===position.symbol);if(saved)saved.name=position.name;
         }else{
@@ -1728,144 +1780,154 @@
         row.append(head,valueLine,details);portfolioList.append(row);
       });
       savePortfolio();
-      const dailyProfit=totalValue-totalPreviousValue,dailyPercent=totalPreviousValue>0?dailyProfit/totalPreviousValue*100:0;
-      portfolioTotalValue.textContent=money(totalValue,summaryCurrency);
-      portfolioDailyChange.textContent='Bugün '+money(dailyProfit,summaryCurrency)+' · '+(dailyPercent>=0?'+':'')+dailyPercent.toFixed(2)+'%';
-      portfolioDailyChange.classList.add(dailyProfit>=0?'positive':'negative');
-      const netProfit=totalValue-totalCost,profitPercent=totalCost>0?netProfit/totalCost*100:0;
-      const weekProfit=totalValue-totalWeekStartValue,weekPercent=totalWeekStartValue>0?weekProfit/totalWeekStartValue*100:0;
-      const table=document.createElement('table');table.className='analysis-table';
-      addAnalysisRow(table,'Toplam maliyet',money(totalCost,summaryCurrency));
-      addAnalysisRow(table,'Güncel toplam değer',money(totalValue,summaryCurrency));
-      addAnalysisRow(table,'Net kâr / zarar',money(netProfit,summaryCurrency),netProfit>=0?'positive':'negative');
-      addAnalysisRow(table,'Kâr / zarar (%)',(profitPercent>=0?'+':'')+profitPercent.toFixed(2)+'%',profitPercent>=0?'positive':'negative');
-      addAnalysisRow(table,'Hafta başından net kâr / zarar',money(weekProfit,summaryCurrency),weekProfit>=0?'positive':'negative');
-      addAnalysisRow(table,'Hafta başından kâr / zarar (%)',(weekPercent>=0?'+':'')+weekPercent.toFixed(2)+'%',weekPercent>=0?'positive':'negative');
-      portfolioSummary.append(table);
-      renderPortfolioDistribution(allocationValues,currencyValues,summaryCurrency);
+      if(missingRates.size){
+        const codes=[...missingRates].join(', ');
+        portfolioTotalValue.textContent='Kur verisi alınamadı';
+        portfolioDailyChange.textContent=codes+' para birimi toplam hesaba katılmadı; yanıltıcı toplam gösterilmiyor.';
+        portfolioDailyChange.classList.add('negative');
+        const warning=document.createElement('p');
+        warning.className='portfolio-warning';
+        warning.setAttribute('role','alert');
+        warning.textContent='Portföy özeti hesaplanamadı: '+codes+'/USD kuru alınamadı. Varlık kartlarındaki yerel değerler geçerlidir.';
+        portfolioSummary.append(warning);
+        renderPortfolioDistribution([],new Map(),'USD');
+      }else{
+        const dailyProfit=totalValue-totalPreviousValue,dailyPercent=totalPreviousValue>0?dailyProfit/totalPreviousValue*100:0;
+        portfolioTotalValue.textContent=money(totalValue,summaryCurrency);
+        portfolioDailyChange.textContent='Bugün '+money(dailyProfit,summaryCurrency)+' · '+(dailyPercent>=0?'+':'')+dailyPercent.toFixed(2)+'%';
+        portfolioDailyChange.classList.add(dailyProfit>=0?'positive':'negative');
+        const netProfit=totalValue-totalCost,profitPercent=totalCost>0?netProfit/totalCost*100:0;
+        const weekProfit=totalValue-totalWeekStartValue,weekPercent=totalWeekStartValue>0?weekProfit/totalWeekStartValue*100:0;
+        const table=document.createElement('table');table.className='analysis-table';
+        addAnalysisRow(table,'Toplam maliyet',money(totalCost,summaryCurrency));
+        addAnalysisRow(table,'Güncel toplam değer',money(totalValue,summaryCurrency));
+        addAnalysisRow(table,'Net kâr / zarar',money(netProfit,summaryCurrency),netProfit>=0?'positive':'negative');
+        addAnalysisRow(table,'Kâr / zarar (%)',(profitPercent>=0?'+':'')+profitPercent.toFixed(2)+'%',profitPercent>=0?'positive':'negative');
+        addAnalysisRow(table,'Hafta başından net kâr / zarar',money(weekProfit,summaryCurrency),weekProfit>=0?'positive':'negative');
+        addAnalysisRow(table,'Hafta başından kâr / zarar (%)',(weekPercent>=0?'+':'')+weekPercent.toFixed(2)+'%',weekPercent>=0?'positive':'negative');
+        portfolioSummary.append(table);
+        renderPortfolioDistribution(allocationValues,currencyValues,summaryCurrency);
+      }
       const dividends=allDividends.sort((a,b)=>b.date-a.date).slice(0,5);
       if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';empty.textContent='Temettü kaydı bulunamadı.';dividendList.append(empty)}
       else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol;const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency);row.append(date,symbol,amount);dividendList.append(row)});
-      renderPortfolioBenchmark();
+      renderPortfolioBenchmark(valid);
     }
 
     function money(value, currency) {
       return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: currency || 'USD', maximumFractionDigits: 2 }).format(value);
     }
 
-    function sma(values, period) {
-      return values.map((_, index) => {
-        if (index < period - 1) return null;
-        const windowValues = values.slice(index - period + 1, index + 1);
-        return windowValues.reduce((sum, value) => sum + value, 0) / period;
+    function sma(values,period) {
+      return values.map((_,index)=>{
+        if(index<period-1)return null;
+        const windowValues=values.slice(index-period+1,index+1);
+        if(!windowValues.every(Number.isFinite))return null;
+        return windowValues.reduce((sum,value)=>sum+value,0)/period;
       });
     }
 
-    function calculateRsi(values, period = 14) {
-      return values.map((_, index) => {
-        if (index < period) return null;
-        let gains = 0, losses = 0;
-        for (let i = index - period + 1; i <= index; i++) {
-          const change = values[i] - values[i - 1];
-          if (change >= 0) gains += change; else losses -= change;
-        }
-        const averageGain = gains / period;
-        const averageLoss = losses / period;
-        if (averageLoss === 0) return 100;
-        return 100 - (100 / (1 + averageGain / averageLoss));
-      });
+    function calculateRsi(values, period=14) {
+      const output=values.map(()=>null);
+      if(values.length<=period)return output;
+      let gains=0,losses=0;
+      for(let index=1;index<=period;index++){
+        const change=values[index]-values[index-1];
+        if(change>0)gains+=change;else losses-=change;
+      }
+      let averageGain=gains/period;
+      let averageLoss=losses/period;
+      const value=()=>averageLoss===0?100:(averageGain===0?0:100-(100/(1+averageGain/averageLoss)));
+      output[period]=value();
+      for(let index=period+1;index<values.length;index++){
+        const change=values[index]-values[index-1];
+        const gain=Math.max(change,0);
+        const loss=Math.max(-change,0);
+        averageGain=((averageGain*(period-1))+gain)/period;
+        averageLoss=((averageLoss*(period-1))+loss)/period;
+        output[index]=value();
+      }
+      return output;
     }
 
-
-    async function prepareMovingAverages(symbol, labels) {
-      const query = 'range=10y&interval=1d';
-      const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache:'no-store' });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || 'Hareketli ortalama verisi alınamadı');
-      const result = payload.chart?.result?.[0];
-      const closes = result?.indicators?.quote?.[0]?.close;
-      const timestamps = result?.timestamp;
-      if (!closes || !timestamps) throw new Error('Hareketli ortalama verisi bulunamadı');
-      const points = timestamps.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close));
-      const values = points.map(point=>point.close);
-      const formatter = new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
-      const maps = [50,100,200].map(period => {
-        const averages = sma(values,period);
-        return new Map(points.map((point,index)=>[formatter.format(new Date(point.time*1000)),averages[index]]));
+    async function prepareMovingAverages(symbol,labels,{currency=currentCurrency,toUsd=false}={}) {
+      const query='range=10y&interval=1d';
+      const payload=await cachedApiJson(priceApiUrl(symbol,query));
+      const result=payload.chart?.result?.[0];
+      const closes=result?.indicators?.quote?.[0]?.close;
+      const timestamps=result?.timestamp;
+      if(!closes||!timestamps)throw new Error('Hareketli ortalama verisi bulunamadı');
+      const points=timestamps.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0);
+      const formatter=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
+      const pointLabels=points.map(point=>formatter.format(new Date(point.time*1000)));
+      let values=points.map(point=>point.close);
+      if(toUsd&&String(currency).toUpperCase()!=='USD')values=await convertSeriesToUsd(currency,values,pointLabels,query);
+      const maps=[50,100,200].map(period=>{
+        const averages=sma(values,period);
+        return new Map(pointLabels.map((label,index)=>[label,averages[index]]));
       });
-      movingAverageData = { ma50:labels.map(label=>maps[0].get(label) ?? null), ma100:labels.map(label=>maps[1].get(label) ?? null), ma200:labels.map(label=>maps[2].get(label) ?? null) };
-      movingAverageNativeData = { ma50:[...movingAverageData.ma50], ma100:[...movingAverageData.ma100], ma200:[...movingAverageData.ma200] };
+      movingAverageData={ma50:labels.map(label=>maps[0].get(label)??null),ma100:labels.map(label=>maps[1].get(label)??null),ma200:labels.map(label=>maps[2].get(label)??null)};
+      movingAverageNativeData={ma50:[...movingAverageData.ma50],ma100:[...movingAverageData.ma100],ma200:[...movingAverageData.ma200]};
     }
 
-    function renderRsiChart(labels, prices) {
-      const wrap = document.getElementById('rsiWrap');
-      const enabled = document.getElementById('rsiToggle').checked;
-      wrap.classList.toggle('visible', enabled);
-      if (!enabled) {
-        if (rsiChart) { rsiChart.destroy(); rsiChart = null; }
+    function chartThemeColors() {
+      const style=getComputedStyle(document.documentElement);
+      return {
+        text:style.getPropertyValue('--muted').trim()||'#64748b',
+        grid:style.getPropertyValue('--line').trim()||'#cbd5e1',
+        accent:style.getPropertyValue('--accent').trim()||'#0f9f7f'
+      };
+    }
+
+    function renderRsiChart(labels,prices) {
+      const wrap=document.getElementById('rsiWrap');
+      const enabled=document.getElementById('rsiToggle').checked;
+      wrap.classList.toggle('visible',enabled);
+      if(!enabled){
+        if(rsiChart){rsiChart.destroy();rsiChart=null}
+        document.getElementById('rsiChartSummary').textContent='';
         return;
       }
-      const rsiValues = calculateRsi(prices);
-      const threshold70 = labels.map(() => 70);
-      const threshold30 = labels.map(() => 30);
-      if (rsiChart) rsiChart.destroy();
-      rsiChart = new Chart(document.getElementById('rsiChart'), {
-        type:'line',
-        data:{
-          labels,
-          datasets:[
-            { label:'RSI (14)', data:rsiValues, borderColor:'#52d5b1', backgroundColor:'rgba(82,213,177,.08)', fill:true, pointRadius:0, pointHoverRadius:4, borderWidth:2, tension:.18 },
-            { label:'Aşırı alım (70)', data:threshold70, borderColor:'#ef4444', borderDash:[5,5], pointRadius:0, borderWidth:1, fill:false },
-            { label:'Aşırı satım (30)', data:threshold30, borderColor:'#fbbf24', borderDash:[5,5], pointRadius:0, borderWidth:1, fill:false }
-          ]
-        },
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          interaction:{intersect:false,mode:'index'},
-          plugins:{legend:{display:true},tooltip:{callbacks:{label:context=>context.dataset.label+': '+Number(context.parsed.y).toFixed(2)}}},
-          scales:{
-            x:{grid:{display:false},ticks:{color:'#aebbd0',maxTicksLimit:7}},
-            y:{min:0,max:100,grid:{color:'#2b3a55'},ticks:{color:'#aebbd0',stepSize:20}}
-          }
-        }
-      });
+      const colors=chartThemeColors();
+      const rsiValues=calculateRsi(prices);
+      const datasets=[
+        {label:'RSI (14)',data:rsiValues,borderColor:colors.accent,backgroundColor:'rgba(82,213,177,.08)',fill:true,pointRadius:0,pointHoverRadius:4,borderWidth:2,tension:.18},
+        {label:'Aşırı alım (70)',data:labels.map(()=>70),borderColor:'#dc2626',borderDash:[5,5],pointRadius:0,borderWidth:1,fill:false},
+        {label:'Aşırı satım (30)',data:labels.map(()=>30),borderColor:'#ca8a04',borderDash:[5,5],pointRadius:0,borderWidth:1,fill:false}
+      ];
+      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:{color:colors.text}},tooltip:{callbacks:{label:context=>context.dataset.label+': '+Number(context.parsed.y).toFixed(2)}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},y:{min:0,max:100,grid:{color:colors.grid},ticks:{color:colors.text,stepSize:20}}}};
+      if(rsiChart){
+        rsiChart.data={labels:[...labels],datasets};
+        rsiChart.options=options;
+        rsiChart.update('none');
+      }else rsiChart=new Chart(document.getElementById('rsiChart'),{type:'line',data:{labels:[...labels],datasets},options});
+      const latest=benchmarkLastValue(rsiValues);
+      document.getElementById('rsiChartSummary').textContent=Number.isFinite(latest)?'Son RSI 14 değeri '+latest.toFixed(2)+'. 70 üzeri aşırı alım, 30 altı aşırı satım bölgesidir.':'RSI için yeterli veri yok.';
     }
 
-    function renderChart(labels, prices, name, currency, rememberPrimary = true) {
-      if (!labels.length || !prices.length) return;
-      if (rememberPrimary) {
-        primaryLabels = [...labels];
-        primaryPrices = [...prices];
-        primaryChartName = name || primaryChartName;
-        primaryCurrency = currency || primaryCurrency;
+    function renderChart(labels,prices,name,currency,rememberPrimary=true) {
+      if(!labels.length||!prices.length)return;
+      if(rememberPrimary){
+        primaryLabels=[...labels];primaryPrices=[...prices];primaryChartName=name||primaryChartName;primaryCurrency=currency||primaryCurrency;
       }
-      lastLabels = [...labels];
-      lastPrices = [...prices];
-      currentChartName = name || currentChartName;
-      currentCurrency = currency || currentCurrency;
-      const datasets = [{ label: currentChartName + ' kapanış fiyatı (' + currentCurrency + ')', data: lastPrices, borderColor: '#52d5b1', backgroundColor: 'rgba(82,213,177,.14)', fill: true, pointRadius: 0, pointHoverRadius: 5, tension: .18, borderWidth: 2, yAxisID: 'price' }];
-      if (document.getElementById('maToggle').checked) {
-        datasets.push({ label:'MA50', data:movingAverageData?.ma50 || sma(lastPrices,50), borderColor:'#22c55e', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
-        datasets.push({ label:'MA100', data:movingAverageData?.ma100 || sma(lastPrices,100), borderColor:'#facc15', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
-        datasets.push({ label:'MA200', data:movingAverageData?.ma200 || sma(lastPrices,200), borderColor:'#ef4444', pointRadius:0, borderWidth:1.8, fill:false, yAxisID:'price' });
+      lastLabels=[...labels];lastPrices=[...prices];currentChartName=name||currentChartName;currentCurrency=currency||currentCurrency;
+      const colors=chartThemeColors();
+      const datasets=[{label:currentChartName+' kapanış fiyatı ('+currentCurrency+')',data:lastPrices,borderColor:colors.accent,backgroundColor:'rgba(82,213,177,.14)',fill:true,pointRadius:0,pointHoverRadius:5,tension:.18,borderWidth:2,yAxisID:'price'}];
+      if(document.getElementById('maToggle').checked){
+        datasets.push({label:'MA50',data:movingAverageData?.ma50||sma(lastPrices,50),borderColor:'#16a34a',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
+        datasets.push({label:'MA100',data:movingAverageData?.ma100||sma(lastPrices,100),borderColor:'#ca8a04',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
+        datasets.push({label:'MA200',data:movingAverageData?.ma200||sma(lastPrices,200),borderColor:'#dc2626',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
       }
       compareData.forEach(item=>datasets.push({label:item.rawSymbol+' ('+currentCurrency+')',data:item.values,borderColor:item.color,pointRadius:0,borderWidth:2,fill:false,spanGaps:true,yAxisID:'price'}));
-      if (chart) chart.destroy();
-      chart = new Chart(document.getElementById('priceChart'), {
-        type:'line',
-        data:{labels:lastLabels,datasets},
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          interaction:{intersect:false,mode:'index'},
-          plugins:{legend:{display:true},tooltip:{callbacks:{label:context=>context.dataset.label+': '+money(context.parsed.y,currentCurrency)}}},
-          scales:{
-            x:{grid:{display:false},ticks:{color:'#aebbd0',maxTicksLimit:7}},
-            price:{position:'left',grid:{color:'#2b3a55'},ticks:{color:'#aebbd0',callback:value=>money(value,currentCurrency)}}
-          }
-        }
-      });
+      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:{color:colors.text}},tooltip:{callbacks:{label:context=>context.dataset.label+': '+money(context.parsed.y,currentCurrency)}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},price:{position:'left',grid:{color:colors.grid},ticks:{color:colors.text,callback:value=>money(value,currentCurrency)}}}};
+      if(chart){
+        chart.data={labels:lastLabels,datasets};
+        chart.options=options;
+        chart.update('none');
+      }else chart=new Chart(document.getElementById('priceChart'),{type:'line',data:{labels:lastLabels,datasets},options});
+      const first=lastPrices.find(Number.isFinite),last=benchmarkLastValue(lastPrices);
+      const change=Number.isFinite(first)&&Number.isFinite(last)&&first!==0?(last/first-1)*100:null;
+      document.getElementById('priceChartSummary').textContent=Number.isFinite(change)?currentChartName+' için '+labels[0]+' ile '+labels.at(-1)+' arasında '+(change>=0?'yüzde ':'eksi yüzde ')+Math.abs(change).toFixed(2)+' değişim. Grafikte '+datasets.length+' seri var.':'Grafik için sayısal özet oluşturulamadı.';
       renderRsiChart(lastLabels,lastPrices);
     }
 
@@ -1909,86 +1971,102 @@
     }
 
     async function loadPrice(symbol,{silent=false,preserveComparisons=false}={}) {
+      symbol=String(symbol||'').trim().toUpperCase();
+      if(!symbol)return;
+      const requestId=++priceRequestId;
+      if(priceAbortController)priceAbortController.abort();
+      const controller=new AbortController();
+      priceAbortController=controller;
       const comparisonSymbols=preserveComparisons?compareData.map(item=>item.rawSymbol):[];
       if(!silent){
-        button.disabled = true;
-        button.textContent = 'Yükleniyor…';
-        meta.textContent = '';
+        button.disabled=true;
+        button.textContent='Yükleniyor…';
+        meta.textContent='';
       }
-      try {
-        const query = selectedStart
-          ? `period1=${Math.floor(new Date(`${selectedStart}T00:00:00Z`).getTime() / 1000)}&period2=${Math.floor(Date.now() / 1000)}&interval=1d`
+      try{
+        const query=selectedStart
+          ? `period1=${Math.floor(new Date(`${selectedStart}T00:00:00Z`).getTime()/1000)}&period2=${Math.floor(Date.now()/1000)}&interval=1d`
           : `range=${encodeURIComponent(selectedRange)}&interval=1d`;
-        const response = await fetch('/api/price?symbol=' + encodeURIComponent(symbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache: 'no-store' });
-        if (!response.ok) throw new Error('Veri sağlayıcısına ulaşılamadı.');
-        const payload = await response.json();
-        const result = payload.chart?.result?.[0];
-        const closes = result?.indicators?.quote?.[0]?.close;
-        if (!result || !closes) throw new Error('Bu finans kodu için fiyat verisi bulunamadı.');
-        const points = result.timestamp.map((time, i) => ({ time, close: closes[i] })).filter(p => Number.isFinite(p.close));
-        if (!points.length) throw new Error('Bu finans kodu için kullanılabilir fiyat verisi bulunamadı.');
-        const labels = points.map(p => new Intl.DateTimeFormat('tr-TR', { day:'2-digit', month:'short', year:'numeric' }).format(new Date(p.time * 1000)));
-        const prices = points.map(p => p.close);
-        const info = result.meta || {};
-        const name = info.longName || info.shortName || symbol;
-        currentName = name;
-        const favorite = favorites.find(item => item.symbol === symbol);
-        if (favorite && favorite.name !== name) { favorite.name=name; saveFavorites(); updateFavoriteQuoteCard(symbol); }
+        const url=priceApiUrl(symbol,query);
+        const response=await fetch(url,{cache:'no-store',signal:controller.signal});
+        const payload=await response.json().catch(()=>({}));
+        if(!response.ok)throw new Error(payload.error||'Veri sağlayıcısına ulaşılamadı.');
+        if(requestId!==priceRequestId)return;
+        apiCache.set(url,{time:Date.now(),data:payload});
+        const result=payload.chart?.result?.[0];
+        const closes=result?.indicators?.quote?.[0]?.close;
+        if(!result||!closes)throw new Error('Bu finans kodu için fiyat verisi bulunamadı.');
+        const points=result.timestamp.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0);
+        if(!points.length)throw new Error('Bu finans kodu için kullanılabilir fiyat verisi bulunamadı.');
+        const labels=points.map(point=>new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(point.time*1000)));
+        const prices=points.map(point=>point.close);
+        const info=result.meta||{};
+        const name=info.longName||info.shortName||symbol;
+        const currency=String(info.currency||'USD').toUpperCase();
+        if(requestId!==priceRequestId)return;
+        currentName=name;
+        const favorite=favorites.find(item=>item.symbol===symbol);
+        if(favorite&&favorite.name!==name){favorite.name=name;saveFavorites();updateFavoriteQuoteCard(symbol)}
         updateFavoriteButton();
-        const currency = info.currency || 'USD';
-        currentCurrency = currency;
-        currentChartName = name;
-        primarySymbol = symbol;
-        const last = prices.at(-1);
-        const change = ((last / prices[0]) - 1) * 100;
+        currentCurrency=currency;
+        currentChartName=name;
+        primarySymbol=symbol;
+        const last=prices.at(-1);
+        const change=((last/prices[0])-1)*100;
         meta.replaceChildren();
-        const namePart = document.createElement('span');
-        const nameStrong = document.createElement('strong');
-        nameStrong.textContent = name;
+        const namePart=document.createElement('span');
+        const nameStrong=document.createElement('strong');
+        nameStrong.textContent=name;
         namePart.append(nameStrong);
-        const pricePart = document.createElement('span');
-        pricePart.className = 'price';
-        pricePart.textContent = `Son kapanış: ${money(last, currency)}`;
-        const changePart = document.createElement('span');
-        const changeStrong = document.createElement('strong');
-        changeStrong.className = change < 0 ? 'error' : '';
-        changeStrong.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-        changePart.append(changeLabel(), changeStrong);
-        meta.append(namePart, pricePart, changePart);
-        if(info.dataProvider && info.dataProvider==='Nasdaq'){
+        const pricePart=document.createElement('span');
+        pricePart.className='price';
+        pricePart.textContent=`Son kapanış: ${money(last,currency)}`;
+        const changePart=document.createElement('span');
+        const changeStrong=document.createElement('strong');
+        changeStrong.className=change<0?'error':'';
+        changeStrong.textContent=`${change>=0?'+':''}${change.toFixed(2)}%`;
+        changePart.append(changeLabel(),changeStrong);
+        meta.append(namePart,pricePart,changePart);
+        if(info.dataProvider){
           const providerPart=document.createElement('span');
           providerPart.className='favorites-note';
-          providerPart.textContent='Yedek kaynak: Nasdaq';
+          providerPart.textContent='Kaynak: '+info.dataProvider;
           meta.append(providerPart);
         }
-        compareData = [];
-        movingAverageData = null;
-        movingAverageNativeData = null;
-        if (document.getElementById('maToggle').checked) {
-          try { await prepareMovingAverages(symbol, labels); } catch {}
+        compareData=[];
+        movingAverageData=null;
+        movingAverageNativeData=null;
+        if(document.getElementById('maToggle').checked){
+          try{await prepareMovingAverages(symbol,labels)}catch{}
+          if(requestId!==priceRequestId)return;
         }
-        renderChart(labels, prices, name, currency, true);
+        renderChart(labels,prices,name,currency,true);
         updateFavoriteQuoteCard(symbol);
         updateFavoriteCompareButtons();
         updateCompareButton();
-        for(const comparisonSymbol of comparisonSymbols)await compareStock(comparisonSymbol);
-      } catch (error) {
-        if(!silent){
-          meta.innerHTML = `<span class="error">${error.message} Kodu kontrol edip tekrar deneyin.</span>`;
-          if (chart) { chart.destroy(); chart = null; }
-          if (rsiChart) { rsiChart.destroy(); rsiChart = null; }
-          document.getElementById('rsiWrap').classList.remove('visible');
+        for(const comparisonSymbol of comparisonSymbols){
+          if(requestId!==priceRequestId)return;
+          await compareStock(comparisonSymbol);
         }
-      } finally {
+      }catch(error){
+        if(error.name==='AbortError'||requestId!==priceRequestId)return;
         if(!silent){
-          button.disabled = false;
-          button.textContent = 'Grafiği getir';
+          meta.replaceChildren();
+          const errorPart=document.createElement('span');
+          errorPart.className='error';
+          errorPart.textContent=(error.message||'Veri alınamadı')+' Kodu kontrol edip tekrar deneyin.';
+          meta.append(errorPart);
+        }
+      }finally{
+        if(requestId===priceRequestId){
+          priceAbortController=null;
+          if(!silent){button.disabled=false;button.textContent='Grafiği getir'}
         }
       }
     }
 
     async function refreshCurrentChart(){
-      if(chartRefreshInProgress||!primarySymbol||document.hidden)return;
+      if(chartRefreshInProgress||!primarySymbol||document.hidden||button.disabled)return;
       chartRefreshInProgress=true;
       try{await loadPrice(primarySymbol,{silent:true,preserveComparisons:true})}
       finally{chartRefreshInProgress=false}
@@ -1996,12 +2074,13 @@
 
     async function redrawIndicators(event) {
       const control = event?.target;
-      if (control?.id === 'maToggle' && control.checked) {
-        control.disabled = true;
-        try { await prepareMovingAverages(currentSymbol(), lastLabels); } catch { movingAverageData = null; }
-        control.disabled = false;
+      if(control?.id==='maToggle'&&control.checked){
+        control.disabled=true;
+        const mixed=compareData.some(item=>String(item.currency).toUpperCase()!==String(primaryCurrency).toUpperCase());
+        try{await prepareMovingAverages(primarySymbol||currentSymbol(),lastLabels,{currency:primaryCurrency,toUsd:mixed})}catch{movingAverageData=null}
+        control.disabled=false;
       }
-      renderChart(lastLabels, lastPrices, currentChartName, currentCurrency, false);
+      renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,false);
     }
     document.querySelectorAll('#maToggle,#rsiToggle').forEach(control => control.addEventListener('change', redrawIndicators));
 
@@ -2018,16 +2097,12 @@
     }
 
     function fillMissingRates(values) {
-      const filled = [...values];
-      let lastRate = null;
-      for (let i = 0; i < filled.length; i++) {
-        if (Number.isFinite(filled[i])) lastRate = filled[i];
-        else if (Number.isFinite(lastRate)) filled[i] = lastRate;
-      }
-      let nextRate = null;
-      for (let i = filled.length - 1; i >= 0; i--) {
-        if (Number.isFinite(filled[i])) nextRate = filled[i];
-        else if (Number.isFinite(nextRate)) filled[i] = nextRate;
+      const filled=[...values];
+      let lastRate=null;
+      for(let index=0;index<filled.length;index++){
+        if(Number.isFinite(filled[index])&&filled[index]>0)lastRate=filled[index];
+        else if(Number.isFinite(lastRate))filled[index]=lastRate;
+        else filled[index]=null;
       }
       return filled;
     }
@@ -2036,9 +2111,7 @@
       const code = String(currency || 'USD').toUpperCase();
       if (code === 'USD') return [...values];
       const fxSymbol = code + 'USD=X';
-      const response = await fetch('/api/price?symbol=' + encodeURIComponent(fxSymbol) + '&query=' + encodeURIComponent(query) + '&fresh=' + Date.now(), { cache: 'no-store' });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(code + '/USD kuru alınamadı');
+      const payload=await cachedApiJson(priceApiUrl(fxSymbol,query));
       const result = payload.chart?.result?.[0];
       const rates = fillMissingRates(alignResultToLabels(result, labels));
       if (!rates.some(Number.isFinite)) throw new Error(code + '/USD kuru bulunamadı');
@@ -2054,35 +2127,71 @@
       let mainValues=[...primaryPrices],axisCurrency=primaryCurrency;
       if(mixed){axisCurrency='USD';mainValues=await convertSeriesToUsd(primaryCurrency,primaryPrices,primaryLabels,query)}
       await Promise.all(compareData.map(async item=>{item.values=mixed?await convertSeriesToUsd(item.currency,item.rawValues,primaryLabels,query):[...item.rawValues]}));
-      if(movingAverageNativeData){
-        if(mixed){const [ma50,ma100,ma200]=await Promise.all([convertSeriesToUsd(primaryCurrency,movingAverageNativeData.ma50,primaryLabels,query),convertSeriesToUsd(primaryCurrency,movingAverageNativeData.ma100,primaryLabels,query),convertSeriesToUsd(primaryCurrency,movingAverageNativeData.ma200,primaryLabels,query)]);movingAverageData={ma50,ma100,ma200}}
-        else movingAverageData={ma50:[...movingAverageNativeData.ma50],ma100:[...movingAverageNativeData.ma100],ma200:[...movingAverageNativeData.ma200]};
+      if(document.getElementById('maToggle').checked){
+        await prepareMovingAverages(primarySymbol,primaryLabels,{currency:primaryCurrency,toUsd:mixed});
       }
       renderChart(primaryLabels,mainValues,primaryChartName,axisCurrency,false);updateFavoriteCompareButtons();updateCompareButton();
     }
 
     async function compareStock(inputSymbol){
       const symbol=String(inputSymbol||'').trim().toUpperCase();
-      if(!symbol||!primaryPrices.length)return;
+      if(!symbol||!primaryPrices.length||comparisonRequests.has(symbol))return;
       if(symbol===primarySymbol)return updateCompareButton();
+      comparisonRequests.add(symbol);
+      updateFavoriteCompareButtons();
       try{
-        if(isCompared(symbol)){compareData=compareData.filter(item=>item.rawSymbol!==symbol);await refreshComparisons();return}
-        const query=comparisonQuery(),response=await fetch('/api/price?symbol='+encodeURIComponent(symbol)+'&query='+encodeURIComponent(query)+'&fresh='+Date.now(),{cache:'no-store'}),payload=await response.json();
-        if(!response.ok)throw new Error(payload.error||'Veri alınamadı');
-        const result=payload.chart?.result?.[0];if(!result)throw new Error('Fiyat verisi bulunamadı');
-        const used=new Set(compareData.map(item=>item.color)),color=comparisonColors.find(item=>!used.has(item))||comparisonColors[compareData.length%comparisonColors.length];
+        if(isCompared(symbol)){
+          compareData=compareData.filter(item=>item.rawSymbol!==symbol);
+          await refreshComparisons();
+          return;
+        }
+        const requestedPrimary=primarySymbol;
+        const query=comparisonQuery();
+        const payload=await cachedApiJson(priceApiUrl(symbol,query));
+        if(requestedPrimary!==primarySymbol)return;
+        const result=payload.chart?.result?.[0];
+        if(!result)throw new Error('Fiyat verisi bulunamadı');
+        if(isCompared(symbol))return;
+        const used=new Set(compareData.map(item=>item.color));
+        const color=comparisonColors.find(item=>!used.has(item))||comparisonColors[compareData.length%comparisonColors.length];
         compareData.push({rawSymbol:symbol,currency:String(result.meta?.currency||'USD').toUpperCase(),rawValues:alignResultToLabels(result,primaryLabels),values:[],color});
         await refreshComparisons();
-      }catch(error){alert('Karşılaştırma verisi alınamadı: '+error.message)}
+      }catch(error){
+        alert('Karşılaştırma verisi alınamadı: '+error.message);
+      }finally{
+        comparisonRequests.delete(symbol);
+        updateFavoriteCompareButtons();
+      }
     }
 
     form.addEventListener('submit', event => {
       event.preventDefault();
       loadPrice(symbolInput.value.trim().toUpperCase());
     });
-    function showSuggestions(items){suggestions.replaceChildren();items.slice(0,5).forEach(item=>{const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='suggestion';b.textContent=item.symbol+' · '+item.name;b.addEventListener('click',()=>{symbolInput.value=item.symbol;suggestions.classList.remove('visible');updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});li.append(b);suggestions.append(li)});suggestions.classList.toggle('visible',items.length>0)}
-    symbolInput.addEventListener('input',()=>{updateFavoriteButton();updateCompareButton();clearTimeout(searchTimer);const q=symbolInput.value.trim();if(q.length<2)return showSuggestions([]);searchTimer=setTimeout(async()=>{try{const r=await fetch('/api/search?q='+encodeURIComponent(q));const d=await r.json();showSuggestions(d.quotes||[])}catch{showSuggestions([])}},250)});
-    compareButton?.addEventListener('click',()=>compareStock(currentSymbol()));
+    function showSuggestions(items){
+      suggestions.replaceChildren();
+      items.slice(0,5).forEach((item,index)=>{
+        const li=document.createElement('li'),button=document.createElement('button');
+        button.type='button';button.className='suggestion';button.textContent=item.symbol+' · '+item.name;
+        prepareSuggestionButton(button,suggestions,index);
+        button.addEventListener('click',()=>{symbolInput.value=item.symbol;updateComboboxState(symbolInput,suggestions,false);updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+        li.append(button);suggestions.append(li);
+      });
+      updateComboboxState(symbolInput,suggestions,items.length>0);
+    }
+    symbolInput.addEventListener('input',()=>{
+      const requestId=++searchRequestId;
+      updateFavoriteButton();updateCompareButton();clearTimeout(searchTimer);
+      const query=symbolInput.value.trim();
+      if(query.length<2)return showSuggestions([]);
+      searchTimer=setTimeout(async()=>{
+        try{
+          const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
+          if(requestId!==searchRequestId||symbolInput.value.trim()!==query)return;
+          showSuggestions(payload.quotes||[]);
+        }catch{if(requestId===searchRequestId)showSuggestions([])}
+      },250);
+    });
     favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol)) { favorites=favorites.filter(item=>item.symbol!==symbol); favoriteQuotes.delete(symbol); } else favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); refreshFavoriteQuotes(); });
     periodButtons.forEach(periodButton => periodButton.addEventListener('click', () => {
       selectedRange = periodButton.dataset.range;
@@ -2103,20 +2212,27 @@
 
 
 
-    marketRefresh.addEventListener('click',refreshMarketAndFavorites);
-    favoriteRefresh.addEventListener('click',refreshMarketAndFavorites);
+    enableComboboxKeyboard(symbolInput,suggestions);
+    enableComboboxKeyboard(marketSettingsSearch,marketSettingsSuggestions);
+    enableComboboxKeyboard(benchmarkSearch,benchmarkSuggestions);
+    enableComboboxKeyboard(portfolioSymbol,portfolioSuggestions);
+
+    const manualRefreshMarketAndFavorites=()=>{apiCache.clear();return refreshMarketAndFavorites()};
+    marketRefresh.addEventListener('click',manualRefreshMarketAndFavorites);
+    favoriteRefresh.addEventListener('click',manualRefreshMarketAndFavorites);
     marketSettingsButton.addEventListener('click',()=>{renderMarketSettings();marketSettingsDialog.showModal();marketSettingsSearch.focus()});
     marketSettingsClose.addEventListener('click',()=>marketSettingsDialog.close());
     marketSettingsSearch.addEventListener('input',()=>{
+      const requestId=++marketSearchRequestId;
       clearTimeout(marketSearchTimer);
       const query=marketSettingsSearch.value.trim();
       if(query.length<2)return showMarketSuggestions([]);
       marketSearchTimer=setTimeout(async()=>{
         try{
-          const response=await fetch('/api/search?q='+encodeURIComponent(query),{cache:'no-store'});
-          const payload=await response.json();
+          const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
+          if(requestId!==marketSearchRequestId||marketSettingsSearch.value.trim()!==query)return;
           showMarketSuggestions(payload.quotes||[]);
-        }catch{showMarketSuggestions([])}
+        }catch{if(requestId===marketSearchRequestId)showMarketSuggestions([])}
       },250);
     });
     marketSettingsForm.addEventListener('submit',event=>{
@@ -2175,8 +2291,7 @@
       event.preventDefault();
       advancedResults.textContent='Aranıyor…';
       try{
-        const response=await fetch('/api/search?q='+encodeURIComponent(advancedQuery.value.trim())+'&advanced=1',{cache:'no-store'});
-        const payload=await response.json();
+        const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(advancedQuery.value.trim())+'&advanced=1',{ttl:60000});
         let items=payload.quotes||[];
         if(advancedMarket.value==='bist')items=items.filter(item=>item.symbol.endsWith('.IS'));
         if(advancedMarket.value==='us')items=items.filter(item=>!item.symbol.includes('.')||['NYSE','NasdaqGS','NasdaqCM','NasdaqGM','NYSEArca'].includes(item.exchange));
@@ -2210,16 +2325,17 @@
       renderPortfolioBenchmark();
     }));
     benchmarkSearch.addEventListener('input',()=>{
+      const requestId=++benchmarkSearchRequestId;
       benchmarkSelection=null;
       clearTimeout(benchmarkSearchTimer);
       const query=benchmarkSearch.value.trim();
       if(query.length<2)return showBenchmarkSuggestions([]);
       benchmarkSearchTimer=setTimeout(async()=>{
         try{
-          const response=await fetch('/api/search?q='+encodeURIComponent(query),{cache:'no-store'});
-          const payload=await response.json();
+          const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
+          if(requestId!==benchmarkSearchRequestId||benchmarkSearch.value.trim()!==query)return;
           showBenchmarkSuggestions(payload.quotes||[]);
-        }catch{showBenchmarkSuggestions([])}
+        }catch{if(requestId===benchmarkSearchRequestId)showBenchmarkSuggestions([])}
       },250);
     });
     benchmarkApply.addEventListener('click',()=>{
@@ -2234,22 +2350,35 @@
     mainTab.addEventListener('click',()=>setActiveView('main'));
     chartTab.addEventListener('click',()=>setActiveView('chart'));
     portfolioTab.addEventListener('click',()=>setActiveView('portfolio'));
+    document.querySelector('.app-tabs').addEventListener('keydown',event=>{
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+      const tabs=[mainTab,chartTab,portfolioTab];
+      const current=tabs.indexOf(document.activeElement);
+      if(current<0)return;
+      event.preventDefault();
+      const next=event.key==='Home'?0:(event.key==='End'?tabs.length-1:(current+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length);
+      tabs[next].focus();
+      tabs[next].click();
+    });
     portfolioAdd.addEventListener('click', openPortfolioDialog);
     portfolioCancel.addEventListener('click', () => portfolioDialog.close());
-    portfolioSymbol.addEventListener('input', () => {
-      portfolioSelection = null;
+    portfolioSymbol.addEventListener('input',()=>{
+      const requestId=++portfolioSearchRequestId;
+      portfolioSelection=null;
       clearTimeout(portfolioSearchTimer);
-      const query = portfolioSymbol.value.trim();
-      if (query.length < 2) return showPortfolioSuggestions([]);
-      portfolioSearchTimer = setTimeout(async () => {
-        try {
-          const response = await fetch('/api/search?q=' + encodeURIComponent(query));
-          const payload = await response.json();
-          showPortfolioSuggestions(payload.quotes || []);
-        } catch { showPortfolioSuggestions([]); }
+      const query=portfolioSymbol.value.trim();
+      if(query.length<2)return showPortfolioSuggestions([]);
+      portfolioSearchTimer=setTimeout(async()=>{
+        try{
+          const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
+          if(requestId!==portfolioSearchRequestId||portfolioSymbol.value.trim()!==query)return;
+          showPortfolioSuggestions(payload.quotes||[]);
+        }catch{if(requestId===portfolioSearchRequestId)showPortfolioSuggestions([])}
       },250);
     });
-    portfolioSymbol.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); openPortfolioDialog(); } });
+    portfolioSymbol.addEventListener('keydown',event=>{
+      if(event.key==='Enter'&&!portfolioSuggestions.classList.contains('visible')){event.preventDefault();openPortfolioDialog()}
+    });
     portfolioForm.addEventListener('submit', event => {
       event.preventDefault();
       const quantity = Number(portfolioQuantity.value);
@@ -2278,9 +2407,16 @@
     loadPrice('AAPL');
     refreshMarketAndFavorites();
     renderAlarms();
-    setInterval(checkAlarms, 60000);
-    setInterval(refreshMarketAndFavorites, 15000);
-    setInterval(refreshCurrentChart, 15000);
+    setInterval(checkAlarms,60000);
+    setInterval(()=>{if(!document.hidden)refreshMarketAndFavorites()},15000);
+    setInterval(refreshCurrentChart,15000);
+    setInterval(()=>{if(!document.hidden&&portfolioView.classList.contains('active'))renderPortfolio()},15000);
+    document.addEventListener('visibilitychange',()=>{
+      if(document.hidden)return;
+      if(mainView.classList.contains('active'))refreshMarketAndFavorites();
+      if(chartView.classList.contains('active'))refreshCurrentChart();
+      if(portfolioView.classList.contains('active'))renderPortfolio();
+    });
   </script>
 
   <script>
@@ -2300,7 +2436,7 @@
       }
       function markNavigation(view){
         Object.entries(navGroups).forEach(function(entry){
-          entry[1].forEach(function(id){const item=document.getElementById(id);if(item)item.classList.toggle('is-active',entry[0]===view)});
+          entry[1].forEach(function(id){const item=document.getElementById(id);if(item){const active=entry[0]===view;item.classList.toggle('is-active',active);if(active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current')}});
         });
       }
       function openView(view){
