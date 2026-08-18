@@ -466,16 +466,16 @@
   <main>
     <aside class="desktop-sidebar" aria-label="Masaüstü gezinme">
       <div class="desktop-brand"><span class="desktop-brand-mark">₺</span><span>FinansTool</span></div>
-      <button id="desktopOverviewNav" class="is-active" type="button" aria-current="page">⌂ <span>Özet</span></button>
-      <button id="desktopChartNav" type="button">⌁ <span>Grafik Ve Analiz</span></button>
+      <button id="desktopOverviewNav" type="button">⌂ <span>Özet</span></button>
+      <button id="desktopChartNav" class="is-active" type="button" aria-current="page">⌁ <span>Grafik Ve Analiz</span></button>
       <button id="desktopPortfolioNav" type="button">▤ <span>Portföy</span></button>
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopDataNav" type="button">⇩ <span>Veri Yedekleme</span></button>
       <small>v4.1</small>
     </aside>
-    <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
-    <section id="mainView" class="app-view active overview-page" role="tabpanel" tabindex="-1" aria-labelledby="mainTab">
+    <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" type="button" role="tab" aria-controls="mainView" aria-selected="false" tabindex="-1">Özet</button><button id="chartTab" class="active" type="button" role="tab" aria-controls="chartView" aria-selected="true">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
+    <section id="mainView" class="app-view overview-page" role="tabpanel" tabindex="-1" aria-labelledby="mainTab" hidden>
       <h1>FinansTool <span class="version-badge">v4.1</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
@@ -485,7 +485,7 @@
       <aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside>
       </section></div>
     </section>
-    <section id="chartView" class="app-view chart-page" role="tabpanel" tabindex="-1" aria-labelledby="chartTab" hidden>
+    <section id="chartView" class="app-view active chart-page" role="tabpanel" tabindex="-1" aria-labelledby="chartTab">
       <h2>Grafik Ve Teknik Analiz <span class="terminal-preview-badge">A Tasarımı Önizleme</span></h2>
     <div class="terminal-layout"><div class="terminal-primary">
     <section class="terminal-instrument" aria-label="Seçili finansal ürün">
@@ -549,8 +549,8 @@
     </section>
   </main>
   <nav class="mobile-bottom-nav" aria-label="Mobil gezinme">
-    <button id="mobileOverviewNav" class="is-active" type="button" aria-current="page"><span>⌂</span>Özet</button>
-    <button id="mobileChartNav" type="button"><span>⌁</span>Grafik</button>
+    <button id="mobileOverviewNav" type="button"><span>⌂</span>Özet</button>
+    <button id="mobileChartNav" class="is-active" type="button" aria-current="page"><span>⌁</span>Grafik</button>
     <button id="mobilePortfolioNav" type="button"><span>▤</span>Portföy</button>
     <button id="mobileMoreNav" type="button"><span>•••</span>Diğer</button>
   </nav>
