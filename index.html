@@ -202,7 +202,7 @@
     .app-tabs button.active { color:#062019; background:var(--accent); }
     .app-view { display:none; }
     .app-view.active { display:block; }
-    .portfolio-page { min-height:620px; }
+    .portfolio-page { min-height:620px; overflow-anchor:none; }
     .portfolio-page .portfolio-head { margin-bottom:16px; }
     .portfolio-head-metrics { display:grid; gap:2px; }
     .portfolio-head-value { display:block; margin-top:4px; font-size:1.35rem; line-height:1.25; }
@@ -454,6 +454,7 @@
     </form>
     <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button><button id="exportCsv" type="button">CSV indir</button><button id="exportPng" type="button">PNG indir</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img" aria-describedby="priceChartSummary"></canvas><p id="priceChartSummary" class="sr-only" aria-live="polite"></p></div>
+    <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
     <section class="periods" aria-label="Grafik süresi">
       <button type="button" data-range="5d">1 hafta</button>
       <button type="button" data-range="1mo">1 ay</button>
@@ -470,7 +471,6 @@
       </div>
     </section>
     <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt>Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl><div class="period-summary-range"><div class="period-summary-range-track" role="progressbar" aria-label="Güncel fiyatın dönem aralığındaki konumu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="periodRangeFill" class="period-summary-range-fill"></span></div><div class="period-summary-range-labels"><span>Düşük</span><span id="periodRangePosition">Güncel: —</span><span>Yüksek</span></div></div></section>
-    <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" tabindex="-1" aria-labelledby="portfolioTab" hidden>
@@ -1750,22 +1750,31 @@
 
     async function renderPortfolio() {
       const renderId=++portfolioRenderId;
-      portfolioList.replaceChildren();
-      portfolioSummary.replaceChildren();
-      dividendList.replaceChildren();
+      const keepExistingPortfolio=Boolean(portfolioList.querySelector('.portfolio-row'));
       const portfolioTotalValue=document.getElementById('portfolioTotalValue');
       const portfolioDailyChange=document.getElementById('portfolioDailyChange');
-      portfolioTotalValue.textContent=portfolio.length?'Hesaplanıyor…':money(0,'USD');
-      portfolioDailyChange.textContent=portfolio.length?'Bugün hesaplanıyor…':'Bugün —';
-      portfolioDailyChange.className='portfolio-daily-change';
       if(!portfolio.length){
+        portfolioList.replaceChildren();
+        portfolioSummary.replaceChildren();
+        dividendList.replaceChildren();
+        portfolioTotalValue.textContent=money(0,'USD');
+        portfolioDailyChange.textContent='Bugün —';
+        portfolioDailyChange.className='portfolio-daily-change';
         const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Portföyünüz boş. Hisse arayıp + düğmesine basın.';portfolioList.append(empty);
         const dividendEmpty=document.createElement('li');dividendEmpty.className='favorites-note';dividendEmpty.textContent='Temettü verisi için portföye hisse ekleyin.';dividendList.append(dividendEmpty);
         renderPortfolioDistribution([],new Map(),'USD');
         renderPortfolioBenchmark();
         return;
       }
-      const loading=document.createElement('div');loading.className='portfolio-empty';loading.textContent='Portföy fiyatları güncelleniyor…';portfolioList.append(loading);
+      if(!keepExistingPortfolio){
+        portfolioList.replaceChildren();
+        portfolioSummary.replaceChildren();
+        dividendList.replaceChildren();
+        portfolioTotalValue.textContent='Hesaplanıyor…';
+        portfolioDailyChange.textContent='Bugün hesaplanıyor…';
+        portfolioDailyChange.className='portfolio-daily-change';
+        const loading=document.createElement('div');loading.className='portfolio-empty';loading.textContent='Portföy fiyatları güncelleniyor…';portfolioList.append(loading);
+      }
       const results=await Promise.all(portfolio.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
       if(renderId!==portfolioRenderId)return;
       const valid=results.filter(result=>result.ok).map(result=>result.value);
@@ -1784,7 +1793,10 @@
         }));
       }
       if(renderId!==portfolioRenderId)return;
+      const scrollBeforeCommit=window.scrollY;
       portfolioList.replaceChildren();
+      portfolioSummary.replaceChildren();
+      dividendList.replaceChildren();
       let totalCost=0,totalValue=0,totalPreviousValue=0,totalWeekStartValue=0;
       const allDividends=[];
       const allocationValues=[];
@@ -1865,6 +1877,7 @@
       if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';empty.textContent='Temettü kaydı bulunamadı.';dividendList.append(empty)}
       else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol;const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency);row.append(date,symbol,amount);dividendList.append(row)});
       renderPortfolioBenchmark(valid);
+      if(keepExistingPortfolio&&portfolioView.classList.contains('active'))requestAnimationFrame(()=>window.scrollTo({top:scrollBeforeCommit,behavior:'auto'}));
     }
 
     function money(value, currency) {
