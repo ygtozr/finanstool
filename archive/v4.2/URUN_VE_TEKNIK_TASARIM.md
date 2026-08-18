@@ -439,7 +439,9 @@ Tarayıcı
       └─ api/price.js   → fiyat geçmişi, meta veri ve sağlayıcı yedekleme
 ```
 
-- Ön yüz tek sayfalı s…44 tokens truncated…tions üzerinde CommonJS modülleri olarak çalışır.
+- Ön yüz tek sayfalı statik bir `index.html` dosyasında HTML, CSS ve JavaScript olarak bulunur.
+- Harici grafik kütüphanesi Chart.js 4.4.4'tür.
+- Sunucu tarafı uçlar Vercel Serverless Functions üzerinde CommonJS modülleri olarak çalışır.
 - Mevcut yapıda ayrı bir veritabanı, kullanıcı hesabı veya sunucu tarafı oturum yönetimi yoktur.
 - `package.json` veya bir derleme sistemi zorunlu değildir; depo doğrudan Vercel tarafından yayımlanabilir.
 

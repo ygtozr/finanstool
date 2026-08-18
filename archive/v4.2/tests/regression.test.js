@@ -71,4 +71,3 @@ assert.match(html,/\.toolbar label,\.toolbar button\{[^}]*justify-content:center
 assert.match(toolbarMarkup,/Gelişmiş Arama[\s\S]*Fiyat Alarmı[\s\S]*MA50\/100\/200[\s\S]*> RSI<[\s\S]*CSV İndir[\s\S]*PNG İndir/,'Grafik aracı metinleri ortak biçimde olmalı');
 
 console.log('FinansTool v4.2 regresyon testleri başarılı.');
-

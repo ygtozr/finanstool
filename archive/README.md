@@ -9,5 +9,12 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v2.5](./v2.5/) | Arşivlendi | [30d1e82](https://github.com/ygtozr/finanstool/commit/30d1e8291c232add2d88069d28eeef727831a254) |
 | [v3.1](./v3.1/) | Arşivlendi | [36ef84a](https://github.com/ygtozr/finanstool/commit/36ef84aee6e9905fc3e06015078de75a269a3539) |
 | [v3.2](./v3.2/) | Arşivlendi | [2737e5b](https://github.com/ygtozr/finanstool/commit/2737e5b9e726ba780d9e4bcc15d46748d16f65f2) |
+| [v3.3](./v3.3/) | Arşivlendi | GitHub kaynak anı |
+| [v3.4](./v3.4/) | Arşivlendi | GitHub kaynak anı |
+| [v3.5](./v3.5/) | Arşivlendi | GitHub kaynak anı |
+| [v3.6](./v3.6/) | Arşivlendi | GitHub kaynak anı |
+| [v4.0](./v4.0/) | Arşivlendi | GitHub kaynak anı |
+| [v4.1](./v4.1/) | Arşivlendi | GitHub kaynak anı |
+| [v4.2](./v4.2/) | Kalıcı onaylı sürüm | v4.2 ana dal yayını |
 
 Bir sonraki onaylı sürüm yayınlanırken mevcut sürüm aynı düzenle arşivlenecektir.
