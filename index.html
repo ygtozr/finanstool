@@ -399,6 +399,87 @@
     }
       @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
     .portfolio-warning { margin:0 0 12px; padding:10px 12px; border:1px solid var(--danger); border-radius:10px; color:var(--danger); }
+
+    /* A tasarımı: profesyonel terminal grafik çalışma alanı */
+    .terminal-preview-badge { display:inline-flex; align-items:center; margin-left:8px; padding:4px 8px; border:1px solid var(--accent); border-radius:999px; color:var(--accent); font-size:.68rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; vertical-align:middle; }
+    .terminal-layout { min-width:0; }
+    .terminal-primary { min-width:0; }
+    .terminal-instrument { display:flex; align-items:center; justify-content:space-between; gap:18px; margin:0 0 12px; padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
+    .terminal-instrument-copy { min-width:0; display:grid; grid-template-columns:44px minmax(0,1fr); gap:11px; align-items:center; }
+    .terminal-instrument-mark { width:44px; height:44px; display:grid; place-items:center; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#162238; font-size:.74rem; font-weight:850; letter-spacing:.03em; }
+    .terminal-instrument-symbol { display:block; font-size:1.18rem; line-height:1.15; }
+    .terminal-instrument-name { display:block; overflow:hidden; margin-top:3px; color:var(--muted); font-size:.78rem; text-overflow:ellipsis; white-space:nowrap; }
+    .terminal-instrument-quote { flex:0 0 auto; text-align:right; }
+    .terminal-instrument-price { display:block; font-size:1.34rem; line-height:1.15; }
+    .terminal-instrument-change { display:block; margin-top:4px; color:var(--accent); font-size:.83rem; font-weight:750; }
+    .terminal-instrument-change.negative { color:var(--danger); }
+    .terminal-rail { display:none; }
+    .terminal-rail-card { padding:14px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
+    .terminal-rail-card h3 { margin:0 0 10px; font-size:.86rem; }
+    .terminal-stat-list { display:grid; gap:0; margin:0; }
+    .terminal-stat { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; padding:9px 0; border-top:1px solid var(--line); }
+    .terminal-stat:first-child { border-top:0; padding-top:0; }
+    .terminal-stat:last-child { padding-bottom:0; }
+    .terminal-stat dt { min-width:0; color:var(--muted); font-size:.76rem; }
+    .terminal-stat dd { margin:0; font-size:.78rem; font-weight:750; text-align:right; white-space:nowrap; }
+    .terminal-range { margin-top:10px; }
+    .terminal-range-track { position:relative; height:5px; margin:8px 0 5px; overflow:hidden; border-radius:999px; background:#26344d; }
+    .terminal-range-fill { display:block; width:0; height:100%; border-radius:inherit; background:var(--accent); }
+    .terminal-range-labels { display:flex; justify-content:space-between; gap:8px; color:var(--muted); font-size:.69rem; }
+    .terminal-rail-note { margin:0; color:var(--muted); font-size:.72rem; }
+    html[data-theme="light"] .terminal-instrument,html[data-theme="light"] .terminal-rail-card { background:#f8fafc; }
+    html[data-theme="light"] .terminal-instrument-mark { background:#e2e8f0; }
+    @media (min-width:901px) {
+      main { width:min(1680px,100%); grid-template-columns:228px minmax(0,1fr); column-gap:0; padding-right:0; }
+      main > .app-view { padding:24px 26px 38px; }
+      .desktop-sidebar { padding:24px 15px; background:linear-gradient(180deg,#091321,#0d1828); }
+      .desktop-brand { padding:0 8px; }
+      .desktop-brand-mark { border-radius:50%; }
+      .desktop-sidebar button { min-height:42px; border-radius:8px; }
+      .desktop-sidebar button:hover,.desktop-sidebar button.is-active { background:#14243a; border-color:#31506d; }
+      .chart-page { max-width:none; }
+      .chart-page > h2 { display:flex; align-items:center; margin-bottom:14px; font-size:1.15rem; }
+      .terminal-layout { display:grid; grid-template-columns:minmax(0,1fr) 238px; gap:14px; align-items:start; }
+      .terminal-rail { display:grid; gap:10px; position:sticky; top:18px; }
+      .chart-page #symbolForm { max-width:none; margin-bottom:10px; }
+      .chart-page .toolbar { margin-bottom:8px; padding:7px; border:1px solid var(--line); border-radius:10px; background:#111c2e; }
+      .chart-page .toolbar label,.chart-page .toolbar button { min-height:34px; padding:7px 9px; border-radius:7px; background:#1b2a42; }
+      .chart-page .meta { min-height:24px; margin-bottom:8px; font-size:.8rem; }
+      .chart-page .chart-wrap { height:clamp(470px,52vw,620px); padding:8px 8px 2px; border:1px solid var(--line); border-radius:12px; background:#0a1423; }
+      .chart-page .rsi-wrap { height:175px; padding:8px; border:1px solid var(--line); border-radius:12px; background:#0a1423; }
+      .chart-page .periods { margin-top:10px; padding:9px; border:1px solid var(--line); border-radius:10px; background:#111c2e; }
+      .chart-page .periods button { min-height:34px; padding:7px 10px; border-radius:7px; }
+      .chart-page .hint { margin-top:10px; font-size:.78rem; }
+      html[data-theme="light"] .desktop-sidebar { background:linear-gradient(180deg,#f8fafc,#eef3f8); }
+      html[data-theme="light"] .chart-page .toolbar,html[data-theme="light"] .chart-page .periods { background:#f1f5f9; }
+      html[data-theme="light"] .chart-page .chart-wrap,html[data-theme="light"] .chart-page .rsi-wrap { background:#fff; }
+    }
+    @media (max-width:900px) {
+      .chart-page > h2 { display:flex; align-items:center; gap:5px; flex-wrap:wrap; font-size:1.08rem; }
+      .terminal-preview-badge { display:inline-flex; margin-left:0; }
+      .terminal-layout { display:block; }
+      .terminal-instrument { padding:12px; border-color:#31506d; background:linear-gradient(135deg,#0b1728,#102940); }
+      .terminal-instrument-price { font-size:1.08rem; }
+      .terminal-rail { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-top:12px; }
+      .terminal-rail-card { min-width:0; padding:12px; }
+      .terminal-rail-card:last-child { grid-column:1/-1; }
+      .chart-page .toolbar { padding:7px; border:1px solid var(--line); border-radius:10px; background:#111c2e; }
+      .chart-page .chart-wrap { padding:7px 4px 2px; border:1px solid var(--line); border-radius:12px; background:#0a1423; }
+      .chart-page .periods { padding:8px; border:1px solid var(--line); border-radius:10px; background:#111c2e; }
+      html[data-theme="light"] .terminal-instrument { background:linear-gradient(135deg,#f8fafc,#e6f5f1); }
+      html[data-theme="light"] .chart-page .toolbar,html[data-theme="light"] .chart-page .periods { background:#f1f5f9; }
+      html[data-theme="light"] .chart-page .chart-wrap { background:#fff; }
+    }
+    @media (max-width:560px) {
+      .terminal-instrument { align-items:flex-start; }
+      .terminal-instrument-copy { grid-template-columns:38px minmax(0,1fr); gap:9px; }
+      .terminal-instrument-mark { width:38px; height:38px; font-size:.66rem; }
+      .terminal-instrument-symbol { font-size:1rem; }
+      .terminal-instrument-name { max-width:150px; }
+      .terminal-instrument-change { max-width:145px; font-size:.72rem; white-space:normal; }
+      .terminal-rail { grid-template-columns:1fr; }
+      .terminal-rail-card:last-child { grid-column:auto; }
+    }
   </style>
 </head>
 <body>
@@ -426,7 +507,12 @@
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" tabindex="-1" aria-labelledby="chartTab" hidden>
-      <h2>Grafik Ve Teknik Analiz</h2>
+      <h2>Grafik Ve Teknik Analiz <span class="terminal-preview-badge">A Tasarımı Önizleme</span></h2>
+    <div class="terminal-layout"><div class="terminal-primary">
+    <section class="terminal-instrument" aria-label="Seçili finansal ürün">
+      <div class="terminal-instrument-copy"><span id="terminalMark" class="terminal-instrument-mark">AAPL</span><span><strong id="terminalSymbol" class="terminal-instrument-symbol">AAPL</strong><span id="terminalName" class="terminal-instrument-name">Apple Inc.</span></span></div>
+      <div class="terminal-instrument-quote"><strong id="terminalPrice" class="terminal-instrument-price">—</strong><span id="terminalChange" class="terminal-instrument-change">Veri bekleniyor</span></div>
+    </section>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
       <div class="search-field"><input id="symbol" name="symbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="suggestions" aria-expanded="false" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" role="listbox" aria-label="Hisse önerileri"></ul></div>
@@ -451,6 +537,11 @@
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
     </section>
+    </div><aside class="terminal-rail" aria-label="Grafik özet bilgileri">
+      <section class="terminal-rail-card"><h3>Dönem Özeti</h3><dl class="terminal-stat-list"><div class="terminal-stat"><dt>Son kapanış</dt><dd id="terminalRailLast">—</dd></div><div class="terminal-stat"><dt>Dönem değişimi</dt><dd id="terminalRailChange">—</dd></div><div class="terminal-stat"><dt>Dönem düşük</dt><dd id="terminalRailLow">—</dd></div><div class="terminal-stat"><dt>Dönem yüksek</dt><dd id="terminalRailHigh">—</dd></div></dl><div class="terminal-range"><div class="terminal-range-track"><span id="terminalRangeFill" class="terminal-range-fill"></span></div><div class="terminal-range-labels"><span>Düşük</span><span>Yüksek</span></div></div></section>
+      <section class="terminal-rail-card"><h3>Veri Bilgisi</h3><dl class="terminal-stat-list"><div class="terminal-stat"><dt>Para birimi</dt><dd id="terminalRailCurrency">—</dd></div><div class="terminal-stat"><dt>Gözlem</dt><dd id="terminalRailPoints">—</dd></div><div class="terminal-stat"><dt>Son veri tarihi</dt><dd id="terminalRailDate">—</dd></div></dl></section>
+      <section class="terminal-rail-card"><p class="terminal-rail-note">Fiyatlar bilgilendirme amaçlıdır. Karşılaştırmalar farklı para birimlerinde USD bazına çevrilir.</p></section>
+    </aside></div>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" tabindex="-1" aria-labelledby="portfolioTab" hidden>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div></div>
@@ -1942,6 +2033,33 @@
       return labels[selectedRange] || 'Dönem değişimi: ';
     }
 
+    function updateTerminalSummary({symbol,name,currency,labels,prices}) {
+      const valid=prices.filter(Number.isFinite);
+      if(!valid.length)return;
+      const first=valid[0],last=valid.at(-1),low=Math.min(...valid),high=Math.max(...valid);
+      const change=first!==0?(last/first-1)*100:null;
+      const range=high>low?Math.max(0,Math.min(100,(last-low)/(high-low)*100)):100;
+      const shortSymbol=String(symbol||'—').replace(/\.IS$/i,'').slice(0,5);
+      const changeText=Number.isFinite(change)?`${change>=0?'+':''}${change.toFixed(2)}%`:'—';
+      document.getElementById('terminalMark').textContent=shortSymbol;
+      document.getElementById('terminalSymbol').textContent=symbol||'—';
+      document.getElementById('terminalName').textContent=name||symbol||'—';
+      document.getElementById('terminalPrice').textContent=money(last,currency);
+      const terminalChange=document.getElementById('terminalChange');
+      terminalChange.textContent=`${changeLabel().replace(': ','')} ${changeText}`;
+      terminalChange.classList.toggle('negative',Number.isFinite(change)&&change<0);
+      document.getElementById('terminalRailLast').textContent=money(last,currency);
+      const railChange=document.getElementById('terminalRailChange');
+      railChange.textContent=changeText;
+      railChange.className=Number.isFinite(change)?(change<0?'negative':'positive'):'';
+      document.getElementById('terminalRailLow').textContent=money(low,currency);
+      document.getElementById('terminalRailHigh').textContent=money(high,currency);
+      document.getElementById('terminalRailCurrency').textContent=currency;
+      document.getElementById('terminalRailPoints').textContent=String(valid.length);
+      document.getElementById('terminalRailDate').textContent=labels.at(-1)||'—';
+      document.getElementById('terminalRangeFill').style.width=`${range.toFixed(1)}%`;
+    }
+
     function tidyDate(value) {
       const digits = value.replace(/\D/g, '').slice(0, 8);
       if (digits.length < 3) return digits;
@@ -2041,6 +2159,7 @@
           if(requestId!==priceRequestId)return;
         }
         renderChart(labels,prices,name,currency,true);
+        updateTerminalSummary({symbol,name,currency,labels,prices});
         updateFavoriteQuoteCard(symbol);
         updateFavoriteCompareButtons();
         updateCompareButton();

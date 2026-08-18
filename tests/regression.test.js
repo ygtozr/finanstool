@@ -44,5 +44,9 @@ assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh param
 assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunmalı');
 assert.match(html,/const comparisonRequests = new Set\(\);/,'Karşılaştırma çift tıklama kilidi bulunmalı');
 assert.match(html,/role="listbox"/,'Arama önerileri listbox olmalı');
+assert.match(html,/class="terminal-layout"/,'Profesyonel terminal grafik düzeni bulunmalı');
+assert.match(html,/id="terminalRailLast"/,'Terminal dönem özeti bulunmalı');
+assert.match(html,/function updateTerminalSummary/,'Terminal özeti canlı veriye bağlı olmalı');
 
 console.log('FinansTool v4.1 regresyon testleri başarılı.');
+
