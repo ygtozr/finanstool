@@ -54,5 +54,10 @@ assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğ
 
 assert.match(html,/FinansTool v4\.2/,'Aday sürüm adı v4.2 olmalı');
 assert.match(html,/id="periodRangeFill"/,'Dönem içi fiyat konum barı bulunmalı');
+assert.match(html,/className='favorite-market-time'/,'Her favoride fiyat zamanı alanı bulunmalı');
+assert.ok(html.indexOf('class="periods"')<html.indexOf('id="periodSummaryTitle"'),'Süre seçimi dönem özetinden önce gelmeli');
+assert.ok(html.indexOf('id="portfolioList"')<html.indexOf('id="portfolioSymbol"'),'Portföy araması hisse listesinden sonra gelmeli');
+assert.match(html,/\.benchmark-stats \{ grid-template-columns:repeat\(3,minmax\(0,1fr\)\); gap:6px; \}/,'Mobil getiri kıyası üç sütun olmalı');
 
 console.log('FinansTool v4.2 regresyon testleri başarılı.');
+
