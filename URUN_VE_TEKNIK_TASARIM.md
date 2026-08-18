@@ -1,11 +1,11 @@
 # FinansTool — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 4.1  
-**Uygulama sürümü:** v4.1  
+**Belge sürümü:** 4.2  
+**Uygulama sürümü:** v4.2  
 **Durum:** Kullanıcı tarafından onaylandı  
 **Canlı adres:** https://finanstool.vercel.app  
 **Kaynak depo:** https://github.com/ygtozr/finanstool  
-**Son güncelleme:** 9 Ağustos 2026
+**Son güncelleme:** 18 Ağustos 2026
 
 Bu belge FinansTool uygulamasının amacını, kullanıcı tercihlerini, mevcut işlevlerini, görsel tasarımını, veri modelini ve teknik mimarisini tek yerde tanımlar. Hedefi, mevcut kaynak kod görülmeden uygulama sıfırdan geliştirilse bile aynı davranışın ve mümkün olduğunca aynı görünümün yeniden üretilebilmesidir.
 
@@ -42,8 +42,8 @@ Kullanıcı tarafından belirlenen ve sonraki geliştirmelerde korunması gereke
 
 ### 2.1 Sürümleme ve arşiv standardı
 
-- Güncel onaylı sürüm: **v4.0**.
-- Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v4.1** olur.
+- Güncel onaylı sürüm: **v4.2**.
+- Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v4.3** olur.
 - Depo kökü her zaman canlı sürümü temsil eder.
 - Arşiv yolu: `archive/vX.Y/`.
 - Bir sürüm onaylandığında en az şu dosyalar arşivlenir:
@@ -63,6 +63,8 @@ Uygulamada üç bağımsız ana sayfa bulunur:
 - **Özet:** Piyasa Özeti ilk sırada, Favoriler hemen altında gösterilir. Mobilde piyasa kartları her satırda iki adet olacak şekilde aşağı doğru devam eder.
 - **Grafik Ve Teknik Analiz:** Arama, teknik analiz seçenekleri, fiyat grafiği, RSI ve dönem seçenekleri doğrudan görünür.
 - **Portföy:** Toplam portföy, Portföy Özet Analizi, hisseler, dağılım, performans karşılaştırması ve Temettü Takvimi sırasıyla gösterilir.
+
+Uygulama her yeni açılışta varsayılan olarak **Özet** sayfasını gösterir. Önceki oturumda açık kalan Grafik veya Portföy görünümü açılış tercihini değiştirmez.
 
 Masaüstünde 216 px genişliğinde sabit sol menü; mobilde Özet, Grafik, Portföy ve Diğer seçeneklerinden oluşan sabit alt gezinme kullanılır.
 
@@ -158,6 +160,8 @@ Piyasa Özeti ve Favoriler yenile düğmeleri senkron çalışır. Bunlardan her
 
 Grafik Ve Teknik Analiz sayfası seçilen varlığın fiyat geçmişini gösterir. Arama, gösterge kontrolleri, grafik ve dönem seçenekleri sayfa açıldığında görünürdür.
 
+Kontrol araç çubuğu soldan sağa **Gelişmiş Arama**, **Fiyat Alarmı**, **MA50/100/200**, **RSI**, **CSV İndir** ve **PNG İndir** sırasındadır. Altı düğmenin yazı biçimi ve hizası aynıdır; etiketler yatay ve dikey olarak ortalanır.
+
 Zaman aralığı seçenekleri:
 
 - 1 Hafta
@@ -167,6 +171,8 @@ Zaman aralığı seçenekleri:
 - 1 Yıl
 - 5 Yıl
 - Şu Tarihten İtibaren
+
+Zaman aralığı düğmeleri grafik sayfasında Dönem Özeti kartının hemen üzerinde yer alır.
 
 Tarih alanı davranışı:
 
@@ -186,6 +192,8 @@ Grafik kuralları:
 - 1 ve 5 yıllık karşılaştırmalarda veri güncelliği korunur; kısa veya eksik ikinci seri ana seriyi kesmemelidir.
 - Grafik, otomatik yenilemede yeniden kurulup yanıp sönmemeli; mümkün olduğunda yalnızca veri kümeleri güncellenmelidir.
 
+Grafiğin altında **Dönem Özeti** kartı bulunur. Kartta Son Kapanış, Dönem Düşük ve Dönem Yüksek değerleri gösterilir; her değerin gerçekleştiği tarih aynı satırda küçük puntoyla yazılır. Düşük–yüksek aralığı üzerindeki konum çubuğu, güncel fiyatın seçili dönem içindeki yüzdesel konumunu sürekli görünür kılar.
+
 ### 4.4 Favoriler
 
 Favoriler sağ sütunda bağımsız bir paneldir. Veriler uygulama kapatıldığında silinmez.
@@ -199,7 +207,7 @@ Her favori kartı:
 - Ana grafiğe karşılaştırma serisi ekleyip çıkarmak için ayrı bir karşılaştırma ikonu içerir.
 - Karşılaştırma ikonunun seçili ve seçili değil durumları renk veya dolulukla açıkça ayrılır.
 
-Favoriler panelinde Piyasa Özeti ile aynı biçimde saniyeli “Son Güncelleme” bilgisi ve senkron yenile düğmesi bulunur.
+Favoriler panelinde Piyasa Özeti ile aynı biçimde saniyeli **Son Güncelleme** bilgisi ve senkron yenile düğmesi bulunur. Bu başlık zamanı yenileme işleminin tamamlandığı anı gösterir. Ayrıca her favori kartında, fiyatın veri sağlayıcıda oluştuğu gerçek zaman küçük puntoyla ayrı ayrı yazılır; piyasa kapalıysa son işlem kaydının tarihi ve saati korunur.
 
 Yenileme sırasında kart DOM'u, logo ve sabit metinler yeniden yaratılmaz; sadece fiyat ve değişim rakamları güncellenir. Böylece kartlar hareket etmez ve logolar tekrar yüklenmez.
 
@@ -219,7 +227,7 @@ Gösterge adları ve düğmeleri sola dayalı, birbirine bitişik bir kontrol gr
 
 #### RSI
 
-- RSI ana grafiğin içinde değil, hemen altında bağımsız bir grafik olarak çizilir.
+- RSI ana grafiğin içinde değil, ana fiyat grafiğine bitişik ve hemen altında bağımsız bir grafik olarak çizilir.
 - Zaman aralığı ana grafikle birebir aynıdır.
 - RSI serisi ana fiyat serisiyle aynı renktedir.
 - Yaygın 30 ve 70 eşikleri yardımcı çizgilerle gösterilir.
@@ -271,6 +279,7 @@ gösterilir. Günlük değişim mümkün olan son iki geçerli kapanış kullan�
 - Kullanıcı adet ve birim alış maliyetini girer.
 - Aynı sembol tekrar eklenirse yeni miktar toplam miktara eklenir ve birim maliyet ağırlıklı ortalamayla güncellenir.
 - Geçersiz, negatif veya sayısal olmayan girdiler kabul edilmez.
+- Portföye varlık arama ve ekleme alanı, mevcut portföy kartlarının en altındaki son varlıktan sonra konumlanır.
 
 Ağırlıklı maliyet formülü:
 
@@ -326,6 +335,8 @@ Haftalık değişim, haftanın ilk erişilebilir geçerli kapanışı ile günce
 
 Grafiklerin özet bilgileri tıklama gerektirmeden sürekli görünür. Her öğe için renk işareti, ad, dönüştürülmüş değer ve yüzde payı grafik yanında/altında listelenir.
 
+Portföy değerleri otomatik yenilenirken mevcut halka grafik nesneleri korunur ve veriler animasyonsuz güncellenir. Yenileme sayfayı dağılım bölümüne kaydırmaz, açık konumu veya kart düzenini değiştirmez.
+
 Karma para birimli portföyde toplamlar ortak hesap birimi olarak USD'ye çevrilir. Tek para birimli portföy doğal para biriminde gösterilebilir.
 
 ### 5.6 Performans Karşılaştırması
@@ -347,7 +358,7 @@ Karşılaştırma dönemleri:
 - 6 Ay
 - 1 Yıl
 
-Portföy ve kıyaslama serileri başlangıç gününde `%0` olacak şekilde normalize edilir. Sonuç alanı portföy getirisi, ölçüt getirisi ve aradaki göreceli farkı gösterir. Para birimleri farklıysa hesap USD bazında yapılır.
+Portföy ve kıyaslama serileri başlangıç gününde `%0` olacak şekilde normalize edilir. Sonuç alanındaki **Portföy Getirisi**, **Ölçüt Getirisi** ve **Fark** bilgileri tek satırda üç eşit, kompakt kutu halinde yan yana gösterilir. Para birimleri farklıysa hesap USD bazında yapılır.
 
 ### 5.7 Temettü Takvimi
 
@@ -428,9 +439,7 @@ Tarayıcı
       └─ api/price.js   → fiyat geçmişi, meta veri ve sağlayıcı yedekleme
 ```
 
-- Ön yüz tek sayfalı statik bir `index.html` dosyasında HTML, CSS ve JavaScript olarak bulunur.
-- Harici grafik kütüphanesi Chart.js 4.4.4'tür.
-- Sunucu tarafı uçlar Vercel Serverless Functions üzerinde CommonJS modülleri olarak çalışır.
+- Ön yüz tek sayfalı s…44 tokens truncated…tions üzerinde CommonJS modülleri olarak çalışır.
 - Mevcut yapıda ayrı bir veritabanı, kullanıcı hesabı veya sunucu tarafı oturum yönetimi yoktur.
 - `package.json` veya bir derleme sistemi zorunlu değildir; depo doğrudan Vercel tarafından yayımlanabilir.
 
@@ -608,6 +617,7 @@ Mevcut ürün; ilk basit “sembol gir, son ayları çiz” aracından aşağıd
 - **v3.6:** Portföy başlığında toplam büyüklük ile günlük net/yüzde değişim; dağılım grafiklerinde kalıcı özet bilgiler.
 - **v4.0:** Mobil A ve Masaüstü B tasarımlarının üç sayfalı yapıda birleştirilmesi; Özet sayfasında iki sütunlu Piyasa Özeti ve Favoriler, açık Grafik Ve Teknik Analiz sayfası, istenen sırada tam Portföy sayfası. Aynı onaylı sürüm içinde Piyasa Özeti'nin USD/TRY, EUR/TRY, GBP/TRY, EUR/USD, S&P 500, Nasdaq, BIST 100 ve Bitcoin değerlerine bir defalık otomatik geçişi kesinleştirilmiştir.
 - **v4.1:** Finansal hesaplama doğruluğu, istek yarışları, fiyat/kur önbelleği, sağlayıcı dayanıklılığı, portföy yenilemesi, Wilder RSI, para birimi sonrası MA, API koruması ve erişilebilirlik regresyonları giderilmiştir.
+- **v4.2:** Varsayılan Özet açılışı; tarihli Dönem Özeti ve düşük–yüksek konum çubuğu; favori bazında gerçek fiyat zamanı; dönem düğmelerinin özet üstüne taşınması; RSI'ın ana grafiğe bitiştirilmesi; grafik araç çubuğunun yeniden sıralanıp eşitlenmesi; portföy aramasının listenin altına alınması; üçlü getiri özetinin tek satıra sıkıştırılması; yenilemede kaydırma ve halka grafik animasyonunun kaldırılması.
 
 Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte kullanılan geçici masaüstü paket numaraları güncel web ürününün sürüm standardı değildir.
 
@@ -659,7 +669,19 @@ Bu aşama yeni ürün özelliği içermez. v4.0 bağımsız kod denetimindeki ö
 - `fresh` önbellek kırıcı parametresinin kaldırılması,
 - Grafik yarış koruması, karşılaştırma kilidi ve listbox semantiğinin bulunması.
 
-## 15. Bilinen sınırlar ve ertelenen işler
+## 15. v4.2 Dönem Özeti ve Arayüz Kararlılığı
+
+Bu sürüm v4.1'in doğruluk ve dayanıklılık temelini koruyarak grafik ve portföy kullanım akışlarını kesinleştirir.
+
+- Başlangıç görünümü her zaman Özet sayfasıdır.
+- Dönem düğmeleri, Dönem Özeti ve fiyat/RSI grafiklerinin dikey sırası sabittir.
+- Son kapanış, dönem düşük ve dönem yüksek değerleri kendi tarihleriyle sunulur; fiyatın dönem aralığındaki yeri görsel çubukla gösterilir.
+- Favoriler başlık zamanı yenileme anını, kart zamanı ise sağlayıcının son fiyat oluşum anını ifade eder.
+- Grafik araç çubuğundaki altı işlem aynı düğme tipografisini kullanır ve kararlaştırılan sırayı korur.
+- Portföy otomatik yenilemesi görünür sayfa konumunu değiştirmez; dağılım grafikleri animasyonsuz yerinde güncellenir.
+- Portföy arama alanı varlık listesinin sonunda, üç getiri metriği ise tek satırda gösterilir.
+
+## 16. Bilinen sınırlar ve ertelenen işler
 
 - Üçüncü taraf ücretsiz finans verilerinde gecikme, piyasa kapsamı ve oran sınırı olabilir.
 - Gerçek zamanlı borsa verisi garantisi verilmez; gösterilen değer sağlayıcının son kaydıdır.
@@ -669,7 +691,7 @@ Bu aşama yeni ürün özelliği içermez. v4.0 bağımsız kod denetimindeki ö
 - Kullanıcı hesabı, bulut veritabanı, emir gönderme ve aracı kurum entegrasyonu mevcut kapsamda yoktur.
 - Mobil platform için yerel iOS/Android uygulaması yoktur; responsive web uygulaması kullanılır.
 
-## 16. Kabul testi kontrol listesi
+## 17. Kabul testi kontrol listesi
 
 ### Özet ve Grafik
 
@@ -686,6 +708,11 @@ Bu aşama yeni ürün özelliği içermez. v4.0 bağımsız kod denetimindeki ö
 - [ ] RSI altta, ana grafikle aynı dönemde çiziliyor.
 - [ ] İlk v4.0 açılışında Piyasa Özeti tam sekiz varsayılan değeri doğru sırada gösteriyor; sonraki kullanıcı özelleştirmeleri korunuyor.
 - [ ] Piyasa ve Favoriler 15 saniyede yenileniyor; kartlar zıplamıyor.
+- [ ] Uygulama açıldığında Özet sayfası görünür.
+- [ ] Dönem Özeti değerleri tarihleriyle birlikte doğru; konum çubuğu güncel fiyatın düşük–yüksek aralığındaki yerini gösteriyor.
+- [ ] Favoriler başlığı yenileme anını, her kart ise gerçek son fiyat zamanını saniye hassasiyetinde gösteriyor.
+- [ ] Dönem düğmeleri özet kartının üzerinde; RSI ana grafiğe bitişik ve hemen altında.
+- [ ] Grafik araç çubuğundaki altı düğme doğru sırada, aynı biçimde ve ortalı.
 - [ ] İki yenile düğmesi aynı işlemi tetikliyor.
 - [ ] CSV ve PNG indirmeleri geçerli dosya oluşturuyor.
 
@@ -700,6 +727,9 @@ Bu aşama yeni ürün özelliği içermez. v4.0 bağımsız kod denetimindeki ö
 - [ ] Standart ölçütlerde Altın var, Bitcoin yok.
 - [ ] Performans serileri başlangıçta `%0` olacak şekilde normalize.
 - [ ] Temettü alanı en fazla beş satır gösteriyor.
+- [ ] Portföy arama alanı son varlık kartının altında.
+- [ ] Üç getiri metriği tek satırda üç kompakt kutu halinde.
+- [ ] Otomatik yenileme sayfayı dağılım grafiğine taşımıyor ve halka grafikleri yeniden oynatmıyor.
 
 ### Kalıcılık ve dayanıklılık
 
@@ -709,22 +739,22 @@ Bu aşama yeni ürün özelliği içermez. v4.0 bağımsız kod denetimindeki ö
 - [ ] Sağlayıcı yedeği birincil servis başarısız olduğunda devreye giriyor.
 - [ ] Tarayıcı konsolunda tanımsız değişken veya işlenmemiş Promise hatası yok.
 
-## 17. Sıfırdan yeniden geliştirme için tamamlanma tanımı
+## 18. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 
 Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında mevcut FinansTool ile eşdeğer kabul edilir:
 
-1. Bu belgedeki iki sabit sekme ve tüm ana bölümler uygulanmıştır.
+1. Bu belgedeki üç sabit sayfa ve tüm ana bölümler uygulanmıştır.
 2. Arama, fiyat, favori, çoklu karşılaştırma, göstergeler, portföy ve yedekleme uçtan uca çalışır.
 3. Karma para birimi ve tarih eşleme kuralları test edilmiştir.
 4. Koyu/açık tema ve mobil düzen görsel olarak doğrulanmıştır.
 5. Kişisel veriler tarayıcıda kalıcıdır ve JSON ile taşınabilir.
 6. Yahoo/Nasdaq yedek sağlayıcı zinciri sunucu tarafında çalışır.
 7. Otomatik yenileme yalnız gerekli sayısal alanları değiştirir; görünür yerleşim hareket etmez.
-8. v4.0 kabul testi kontrol listesi geçer.
-9. Güncel belge depo kökünde, aynı belge `archive/v4.0/` altında bulunur.
+8. v4.2 kabul testi kontrol listesi geçer.
+9. Güncel belge depo kökünde, aynı belge `archive/v4.2/` altında bulunur.
 10. Kullanıcı canlı sürümü kontrol edip onaylamıştır.
 
-## 18. Belge bakım kuralı
+## 19. Belge bakım kuralı
 
 Her onaylı sürüm için şu işlem zorunludur:
 
