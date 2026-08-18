@@ -927,13 +927,8 @@
       };
     }
 
-    function updateFavoriteDataTimestamp() {
-      const timestamps=[...favoriteQuotes.values()].filter(quote=>quote&&!quote.error&&Number.isFinite(quote.marketTimestamp)).map(quote=>quote.marketTimestamp);
-      if(timestamps.length){
-        favoriteUpdated.textContent='Son fiyat zamanı: '+formatMarketDataTime(Math.max(...timestamps));
-      }else{
-        favoriteUpdated.textContent=favorites.length?'Fiyat zamanı bekleniyor…':'Favori bulunmuyor';
-      }
+    function updateFavoriteRefreshTimestamp() {
+      favoriteUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
     }
 
     async function refreshFavoriteQuotes() {
@@ -941,7 +936,7 @@
       if(!favorites.length){
         favoriteQuotes.clear();
         renderFavorites();
-        updateFavoriteDataTimestamp();
+        updateFavoriteRefreshTimestamp();
         return;
       }
       favoriteRefreshInProgress=true;
@@ -963,7 +958,7 @@
         });
         if(namesChanged)saveFavorites();
         favorites.forEach(item=>updateFavoriteQuoteCard(item.symbol));
-        updateFavoriteDataTimestamp();
+        updateFavoriteRefreshTimestamp();
       }finally{
         favoriteRefreshInProgress=false;
         if(favoriteRefreshQueued){favoriteRefreshQueued=false;refreshFavoriteQuotes()}
@@ -1169,7 +1164,7 @@
       try{
         await Promise.all([loadMarketSummary(),refreshFavoriteQuotes()]);
         marketUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
-        updateFavoriteDataTimestamp();
+        updateFavoriteRefreshTimestamp();
       }finally{
         marketRefresh.disabled=false;
         favoriteRefresh.disabled=false;
@@ -1554,6 +1549,21 @@
       });
     }
 
+    function updateDistributionChart(chart,labels,values,currency,label) {
+      chart.data.labels=[...labels];
+      chart.data.datasets[0].label=label;
+      chart.data.datasets[0].data=[...values];
+      chart.data.datasets[0].backgroundColor=labels.map((_,index)=>distributionColors[index%distributionColors.length]);
+      chart.options.animation=false;
+      chart.options.plugins.tooltip.callbacks.label=context=>{
+        const total=context.dataset.data.reduce((sum,value)=>sum+Number(value||0),0);
+        const percent=total>0?Number(context.parsed||0)/total*100:0;
+        return context.label+': '+money(context.parsed,currency)+' · '+percent.toFixed(1)+'%';
+      };
+      chart.update('none');
+      return chart;
+    }
+
     function renderDistributionSummary(element,items,currency) {
       element.replaceChildren();
       const total=items.reduce((sum,item)=>sum+Number(item.value||0),0);
@@ -1569,7 +1579,6 @@
     }
 
     function renderPortfolioDistribution(allocations,currencyTotals,summaryCurrency) {
-      destroyPortfolioDistributionCharts();
       const allocationEmpty=document.getElementById('portfolioAllocationEmpty');
       const currencyEmpty=document.getElementById('portfolioCurrencyEmpty');
       const allocationCanvas=document.getElementById('portfolioAllocationChart');
@@ -1584,8 +1593,14 @@
       currencyCanvas.hidden=!currencies.length;
       renderDistributionSummary(allocationSummary,sortedAllocations,summaryCurrency);
       renderDistributionSummary(currencySummary,currencies.map(([label,value])=>({label,value})),summaryCurrency);
-      if(sortedAllocations.length)portfolioAllocationChart=createDistributionChart('portfolioAllocationChart',sortedAllocations.map(item=>item.label),sortedAllocations.map(item=>item.value),summaryCurrency,'Güncel değer');
-      if(currencies.length)portfolioCurrencyChart=createDistributionChart('portfolioCurrencyChart',currencies.map(item=>item[0]),currencies.map(item=>item[1]),summaryCurrency,'Para birimi değeri');
+      if(sortedAllocations.length){
+        const labels=sortedAllocations.map(item=>item.label),values=sortedAllocations.map(item=>item.value);
+        portfolioAllocationChart=portfolioAllocationChart?updateDistributionChart(portfolioAllocationChart,labels,values,summaryCurrency,'Güncel değer'):createDistributionChart('portfolioAllocationChart',labels,values,summaryCurrency,'Güncel değer');
+      }else if(portfolioAllocationChart){portfolioAllocationChart.destroy();portfolioAllocationChart=null}
+      if(currencies.length){
+        const labels=currencies.map(item=>item[0]),values=currencies.map(item=>item[1]);
+        portfolioCurrencyChart=portfolioCurrencyChart?updateDistributionChart(portfolioCurrencyChart,labels,values,summaryCurrency,'Para birimi değeri'):createDistributionChart('portfolioCurrencyChart',labels,values,summaryCurrency,'Para birimi değeri');
+      }else if(portfolioCurrencyChart){portfolioCurrencyChart.destroy();portfolioCurrencyChart=null}
     }
 
     function refreshPortfolioDistributionTheme() {
