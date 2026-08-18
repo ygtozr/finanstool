@@ -54,7 +54,7 @@
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     button { border:0; border-radius:10px; padding:12px 20px; background:var(--accent); color:#062019; font:600 16px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif; cursor:pointer; }
     button:disabled { opacity:.65; cursor:wait; }
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.toolbar label{display:inline-flex;align-items:center;justify-content:flex-start;gap:7px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:#26344d;font-size:.85rem;cursor:pointer}.toolbar label input{flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0;padding:0;accent-color:var(--accent)}.toolbar button{padding:8px 11px;background:#26344d;color:var(--text);font-size:.85rem}.rsi-wrap{height:150px;display:none;margin-top:14px}.rsi-wrap.visible{display:block}
+    .toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}.toolbar label,.toolbar button{width:100%;min-height:42px;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:#26344d;font-size:.85rem;font-weight:650;line-height:1.2;text-align:center}.toolbar label{cursor:pointer}.toolbar label input{flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0;padding:0;accent-color:var(--accent)}.rsi-wrap{height:150px;display:none;margin-top:14px}.rsi-wrap.visible{display:block}
     .meta { display:flex; flex-wrap:wrap; gap:10px 22px; min-height:28px; margin:0 0 14px; color:var(--muted); }
     .price { color:var(--text); font-weight:700; }
     .error { color:var(--danger); }
@@ -174,9 +174,6 @@
       body { padding:12px; place-items:start center; }
       main { margin-top:52px; padding:20px 16px; }
       .toolbar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
-      .toolbar label, .toolbar button { width:100%; min-height:42px; display:flex; align-items:center; }
-      .toolbar label { justify-content:flex-start; }
-      .toolbar button { justify-content:center; }
       .meta { gap:7px 14px; }
       .chart-wrap { height:390px; }
       .period-summary-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -187,7 +184,7 @@
       body { padding:8px; }
       main { padding:16px 12px; border-radius:14px; }
       h1 { font-size:1.45rem; }
-      .toolbar { grid-template-columns:1fr; }
+      .toolbar { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .chart-wrap { height:340px; }
       .period-summary { padding:12px; }
       .period-summary-list { grid-template-columns:1fr; }
@@ -452,7 +449,7 @@
       <div class="search-field"><input id="symbol" name="symbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="suggestions" aria-expanded="false" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" role="listbox" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
-    <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button><button id="exportCsv" type="button">CSV indir</button><button id="exportPng" type="button">PNG indir</button></div><div id="meta" class="meta" aria-live="polite"></div>
+    <div class="toolbar"><button id="advancedSearchButton" type="button">Gelişmiş Arama</button><button id="alarmButton" type="button">Fiyat Alarmı</button><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI</label><button id="exportCsv" type="button">CSV İndir</button><button id="exportPng" type="button">PNG İndir</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img" aria-describedby="priceChartSummary"></canvas><p id="priceChartSummary" class="sr-only" aria-live="polite"></p></div>
     <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
     <section class="periods" aria-label="Grafik süresi">
