@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>FinansTool Grafik Tasarım Önerileri</title>
+  <style>
+    body { margin: 0; padding: 18px; background: light-dark(#e7edf4, #040d19); }
+    @media (max-width: 680px) { body { padding: 8px; } }
+  </style>
+</head>
+<body>
+<div id="ft-graph-gallery">
+  <style>
+    #ft-graph-gallery {
+      --ft-page: light-dark(#eef3f8, #071425);
+      --ft-surface: light-dark(#ffffff, #0c1c31);
+      --ft-surface-2: light-dark(#f5f8fb, #10243d);
+      --ft-text: light-dark(#122033, #edf6ff);
+      --ft-muted: light-dark(#607089, #9fb0c8);
+      --ft-border: light-dark(#cfd9e5, #243b58);
+      --ft-grid: light-dark(#dce5ee, #203650);
+      --ft-cyan: light-dark(#008f99, #36d6d0);
+      --ft-gold: light-dark(#b87800, #f5b82e);
+      --ft-blue: light-dark(#2568d8, #4d8fff);
+      --ft-green: light-dark(#087b4d, #48d88b);
+      color: var(--ft-text);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      width: 100%;
+    }
+    #ft-graph-gallery * { box-sizing: border-box; }
+    #ft-graph-gallery .ft-picker { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+    #ft-graph-gallery .ft-picker button { appearance:none; border:1px solid var(--ft-border); background:var(--ft-surface); color:var(--ft-text); border-radius:10px; padding:9px 12px; font:inherit; cursor:pointer; }
+    #ft-graph-gallery .ft-picker button[aria-selected="true"] { background:var(--ft-cyan); color:var(--ft-page); border-color:var(--ft-cyan); }
+    #ft-graph-gallery .ft-window { background:var(--ft-page); border:1px solid var(--ft-border); border-radius:16px; overflow:hidden; min-height:510px; }
+    #ft-graph-gallery .ft-layout { display:grid; grid-template-columns:150px minmax(0,1fr); min-height:510px; }
+    #ft-graph-gallery .ft-side { background:var(--ft-surface); border-right:1px solid var(--ft-border); padding:18px 12px; }
+    #ft-graph-gallery .ft-brand { font-weight:700; margin-bottom:24px; }
+    #ft-graph-gallery .ft-brand span { color:var(--ft-cyan); }
+    #ft-graph-gallery .ft-nav { display:grid; gap:7px; }
+    #ft-graph-gallery .ft-nav div { color:var(--ft-muted); padding:9px 10px; border-radius:8px; }
+    #ft-graph-gallery .ft-nav .active { background:var(--ft-surface-2); color:var(--ft-cyan); }
+    #ft-graph-gallery .ft-main { min-width:0; padding:18px; }
+    #ft-graph-gallery .ft-title { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
+    #ft-graph-gallery .ft-symbol { display:flex; align-items:center; gap:12px; }
+    #ft-graph-gallery .ft-logo { width:42px; height:42px; border-radius:50%; display:grid; place-items:center; background:var(--ft-surface-2); color:var(--ft-cyan); font-weight:700; }
+    #ft-graph-gallery .ft-symbol strong { display:block; font-size:20px; }
+    #ft-graph-gallery .ft-symbol small, #ft-graph-gallery .ft-caption { color:var(--ft-muted); }
+    #ft-graph-gallery .ft-quote { text-align:right; white-space:nowrap; }
+    #ft-graph-gallery .ft-quote strong { display:block; font-size:22px; }
+    #ft-graph-gallery .ft-up { color:var(--ft-green); }
+    #ft-graph-gallery .ft-toolbar, #ft-graph-gallery .ft-periods, #ft-graph-gallery .ft-chips { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    #ft-graph-gallery .ft-toolbar { justify-content:space-between; margin-bottom:10px; }
+    #ft-graph-gallery .ft-chip, #ft-graph-gallery .ft-period { border:1px solid var(--ft-border); background:var(--ft-surface); color:var(--ft-text); padding:6px 9px; border-radius:8px; }
+    #ft-graph-gallery .ft-period.active { background:var(--ft-cyan); color:var(--ft-page); border-color:var(--ft-cyan); }
+    #ft-graph-gallery .ft-chart { background:var(--ft-surface); border:1px solid var(--ft-border); border-radius:13px; padding:12px; }
+    #ft-graph-gallery .ft-chart svg { width:100%; height:auto; display:block; }
+    #ft-graph-gallery .grid { stroke:var(--ft-grid); stroke-width:1; }
+    #ft-graph-gallery .line-cyan { fill:none; stroke:var(--ft-cyan); stroke-width:3; }
+    #ft-graph-gallery .line-gold { fill:none; stroke:var(--ft-gold); stroke-width:3; }
+    #ft-graph-gallery .line-blue { fill:none; stroke:var(--ft-blue); stroke-width:3; }
+    #ft-graph-gallery .fill-cyan { fill:var(--ft-cyan); opacity:.10; }
+    #ft-graph-gallery .axis { fill:var(--ft-muted); font-size:11px; }
+    #ft-graph-gallery .ft-bottom { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; flex-wrap:wrap; }
+    #ft-graph-gallery .ft-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:10px; }
+    #ft-graph-gallery .ft-stat { background:var(--ft-surface-2); padding:10px; border-radius:9px; }
+    #ft-graph-gallery .ft-stat small { display:block; color:var(--ft-muted); }
+    #ft-graph-gallery .ft-stat strong { display:block; margin-top:3px; }
+    #ft-graph-gallery .ft-detail { margin-top:10px; padding:12px; border-top:1px solid var(--ft-border); color:var(--ft-muted); }
+    #ft-graph-gallery .ft-panel { display:none; }
+    #ft-graph-gallery .ft-panel.active { display:block; }
+    #ft-graph-gallery .ft-dense .ft-main { display:grid; grid-template-columns:minmax(0,1fr) 190px; gap:12px; }
+    #ft-graph-gallery .ft-dense .ft-primary { min-width:0; }
+    #ft-graph-gallery .ft-rail { display:grid; gap:8px; }
+    #ft-graph-gallery .ft-rail .ft-stat { border:1px solid var(--ft-border); }
+    @media (max-width: 680px) {
+      #ft-graph-gallery .ft-layout { grid-template-columns:1fr; }
+      #ft-graph-gallery .ft-side { display:none; }
+      #ft-graph-gallery .ft-main { padding:12px; }
+      #ft-graph-gallery .ft-dense .ft-main { display:block; }
+      #ft-graph-gallery .ft-rail { grid-template-columns:repeat(3,1fr); margin-top:9px; }
+      #ft-graph-gallery .ft-title { align-items:center; }
+      #ft-graph-gallery .ft-stats { grid-template-columns:1fr; }
+    }
+  </style>
+
+  <div class="ft-picker" role="tablist" aria-label="Grafik tasarım alternatifleri">
+    <button type="button" role="tab" aria-selected="true" data-panel="a">A · Terminal</button>
+    <button type="button" role="tab" aria-selected="false" data-panel="b">B · Sade</button>
+    <button type="button" role="tab" aria-selected="false" data-panel="c">C · Performans</button>
+    <button type="button" role="tab" aria-selected="false" data-panel="d">Önerilen · B+C</button>
+  </div>
+
+  <div class="ft-window">
+    <section class="ft-panel active ft-dense" data-view="a" aria-label="Profesyonel terminal tasarımı">
+      <div class="ft-layout"><aside class="ft-side"><div class="ft-brand">Finans<span>Tool</span></div><div class="ft-nav"><div class="active">Piyasalar</div><div>Favoriler</div><div>Portföyüm</div><div>Grafikler</div><div>Alarmlar</div><div>Ayarlar</div></div></aside><main class="ft-main"><div class="ft-primary"><div class="ft-title"><div class="ft-symbol"><div class="ft-logo">NV</div><div><strong>NVDA</strong><small>NVIDIA Corporation</small></div></div><div class="ft-quote"><strong>$221,64</strong><span class="ft-up">+9,70 · +4,58%</span></div></div><div class="ft-toolbar"><div class="ft-chips"><span class="ft-chip">MA50</span><span class="ft-chip">MA100</span><span class="ft-chip">MA200</span><span class="ft-chip">RSI</span></div><span class="ft-chip">Kıyasla +</span></div><div class="ft-chart"><svg viewBox="0 0 760 340" role="img" aria-label="Detaylı fiyat, hacim ve RSI grafiği"><g class="grid"><path d="M45 45H740M45 105H740M45 165H740M45 225H740M45 285H740"/><path d="M45 25V300M185 25V300M325 25V300M465 25V300M605 25V300M740 25V300"/></g><path class="line-cyan" d="M45 230 L80 224 L115 238 L150 210 L185 198 L220 203 L255 176 L290 166 L325 185 L360 168 L395 145 L430 151 L465 122 L500 105 L535 111 L570 82 L605 95 L640 58 L675 78 L710 42 L740 48"/><path class="line-gold" d="M45 245 L120 238 L190 225 L270 211 L350 202 L430 184 L510 171 L590 153 L670 138 L740 126"/><path class="line-blue" d="M45 260 L120 252 L190 245 L270 239 L350 225 L430 214 L510 200 L590 188 L670 178 L740 166"/><text class="axis" x="45" y="320">2023</text><text class="axis" x="345" y="320">2024</text><text class="axis" x="675" y="320">2025</text></svg></div><div class="ft-bottom"><div class="ft-periods"><span class="ft-period">1H</span><span class="ft-period">1A</span><span class="ft-period">3A</span><span class="ft-period">6A</span><span class="ft-period active">1Y</span><span class="ft-period">5Y</span></div><span class="ft-caption">Yoğun analiz görünümü</span></div></div><aside class="ft-rail"><div class="ft-stat"><small>Piyasa değeri</small><strong>2,74T USD</strong></div><div class="ft-stat"><small>52 hafta</small><strong>87,05–222,69</strong></div><div class="ft-stat"><small>RSI</small><strong>68,72</strong></div></aside></main></div>
+    </section>
+
+    <section class="ft-panel" data-view="b" aria-label="Sade ve modern tasarım">
+      <div class="ft-layout"><aside class="ft-side"><div class="ft-brand">Finans<span>Tool</span></div><div class="ft-nav"><div class="active">Grafik</div><div>Favoriler</div><div>Portföyüm</div></div></aside><main class="ft-main"><div class="ft-title"><div class="ft-symbol"><div class="ft-logo">NV</div><div><strong>NVDA</strong><small>NVIDIA</small></div></div><div class="ft-quote"><strong>$221,64</strong><span class="ft-up">+4,58%</span></div></div><div class="ft-chart"><svg viewBox="0 0 900 370" role="img" aria-label="Sade fiyat grafiği"><g class="grid"><path d="M45 55H875M45 125H875M45 195H875M45 265H875M45 335H875"/><path d="M45 30V335M250 30V335M455 30V335M660 30V335M875 30V335"/></g><path class="fill-cyan" d="M45 285 L90 274 L135 260 L180 269 L225 240 L270 225 L315 234 L360 205 L405 218 L450 193 L495 172 L540 184 L585 145 L630 128 L675 137 L720 92 L765 106 L810 58 L855 76 L875 64 L875 335 L45 335Z"/><path class="line-cyan" d="M45 285 L90 274 L135 260 L180 269 L225 240 L270 225 L315 234 L360 205 L405 218 L450 193 L495 172 L540 184 L585 145 L630 128 L675 137 L720 92 L765 106 L810 58 L855 76 L875 64"/><text class="axis" x="45" y="355">May '23</text><text class="axis" x="410" y="355">Oca '24</text><text class="axis" x="810" y="355">May '24</text></svg></div><div class="ft-bottom"><div class="ft-periods"><span class="ft-period">1H</span><span class="ft-period">1A</span><span class="ft-period">3A</span><span class="ft-period">6A</span><span class="ft-period active">1Y</span><span class="ft-period">5Y</span></div><div class="ft-chips"><span class="ft-chip">Göstergeler</span><span class="ft-chip">Dışa aktar</span></div></div></main></div>
+    </section>
+
+    <section class="ft-panel" data-view="c" aria-label="Performans odaklı tasarım">
+      <div class="ft-layout"><aside class="ft-side"><div class="ft-brand">Finans<span>Tool</span></div><div class="ft-nav"><div>Piyasa</div><div class="active">Karşılaştırma</div><div>Portföyüm</div></div></aside><main class="ft-main"><div class="ft-title"><div class="ft-symbol"><div class="ft-logo">NV</div><div><strong>NVDA</strong><small>NVIDIA Corporation</small></div></div><div class="ft-quote"><strong>$221,64</strong><span class="ft-up">+4,58%</span></div></div><div class="ft-toolbar"><div class="ft-chips"><span class="ft-chip">● NVDA ×</span><span class="ft-chip">● GLD ×</span><span class="ft-chip">● S&amp;P 500 ×</span></div><div class="ft-chips"><span class="ft-chip">Fiyat</span><span class="ft-period active">% Getiri</span></div></div><div class="ft-chart"><svg viewBox="0 0 900 340" role="img" aria-label="Üç varlığın yüzde getiri karşılaştırması"><g class="grid"><path d="M45 45H875M45 105H875M45 165H875M45 225H875M45 285H875"/><path d="M45 25V300M250 25V300M455 25V300M660 25V300M875 25V300"/></g><path class="line-cyan" d="M45 260 L100 248 L155 225 L210 230 L265 196 L320 182 L375 205 L430 168 L485 143 L540 156 L595 110 L650 125 L705 74 L760 95 L815 42 L875 55"/><path class="line-gold" d="M45 260 L100 256 L155 250 L210 246 L265 235 L320 229 L375 219 L430 213 L485 202 L540 191 L595 181 L650 167 L705 153 L760 139 L815 121 L875 110"/><path class="line-blue" d="M45 260 L100 266 L155 257 L210 252 L265 249 L320 241 L375 238 L430 230 L485 226 L540 218 L595 211 L650 203 L705 195 L760 188 L815 181 L875 171"/><text class="axis" x="45" y="320">2023 · 0%</text><text class="axis" x="410" y="320">2024</text><text class="axis" x="820" y="320">2025</text></svg></div><div class="ft-stats"><div class="ft-stat"><small>NVDA dönem getirisi</small><strong class="ft-up">+202,81%</strong></div><div class="ft-stat"><small>GLD dönem getirisi</small><strong>+56,32%</strong></div><div class="ft-stat"><small>S&amp;P 500 dönem getirisi</small><strong>+29,14%</strong></div></div></main></div>
+    </section>
+
+    <section class="ft-panel" data-view="d" aria-label="Önerilen sade ve performans hibrit tasarım">
+      <div class="ft-layout"><aside class="ft-side"><div class="ft-brand">Finans<span>Tool</span></div><div class="ft-nav"><div class="active">Grafik</div><div>Favoriler</div><div>Portföyüm</div></div></aside><main class="ft-main"><div class="ft-title"><div class="ft-symbol"><div class="ft-logo">NV</div><div><strong>NVDA</strong><small>NVIDIA Corporation</small></div></div><div class="ft-quote"><strong>$221,64</strong><span class="ft-up">+9,70 · +4,58%</span></div></div><div class="ft-toolbar"><div class="ft-chips"><span class="ft-chip">NVDA ×</span><span class="ft-chip">GLD ×</span><span class="ft-chip">S&amp;P 500 ×</span></div><div class="ft-chips"><span class="ft-period">Fiyat</span><span class="ft-period active">% Getiri</span></div></div><div class="ft-chart"><svg viewBox="0 0 900 350" role="img" aria-label="Sade hibrit karşılaştırma grafiği"><g class="grid"><path d="M45 45H875M45 110H875M45 175H875M45 240H875M45 305H875"/><path d="M45 25V305M250 25V305M455 25V305M660 25V305M875 25V305"/></g><path class="line-cyan" d="M45 270 L100 255 L155 246 L210 226 L265 235 L320 205 L375 216 L430 178 L485 185 L540 151 L595 163 L650 111 L705 133 L760 74 L815 94 L875 48"/><path class="line-gold" d="M45 270 L100 264 L155 256 L210 249 L265 241 L320 230 L375 224 L430 212 L485 201 L540 193 L595 181 L650 166 L705 151 L760 137 L815 119 L875 101"/><path class="line-blue" d="M45 270 L100 275 L155 266 L210 261 L265 254 L320 249 L375 241 L430 236 L485 228 L540 220 L595 211 L650 202 L705 194 L760 185 L815 176 L875 162"/><text class="axis" x="45" y="326">May '20</text><text class="axis" x="420" y="326">Oca '23</text><text class="axis" x="815" y="326">May '25</text></svg></div><div class="ft-bottom"><div class="ft-periods"><span class="ft-period">1H</span><span class="ft-period">1A</span><span class="ft-period">3A</span><span class="ft-period">6A</span><span class="ft-period">1Y</span><span class="ft-period active">5Y</span></div><div class="ft-chips"><span class="ft-chip">Göstergeler</span><span class="ft-chip">Tam ekran</span></div></div><div class="ft-detail">Karşılaştırma Özeti ▾</div></main></div>
+    </section>
+  </div>
+  <script>
+    (() => {
+      const root = document.getElementById('ft-graph-gallery');
+      const buttons = [...root.querySelectorAll('[data-panel]')];
+      const panels = [...root.querySelectorAll('[data-view]')];
+      buttons.forEach((button) => button.addEventListener('click', () => {
+        buttons.forEach((item) => item.setAttribute('aria-selected', String(item === button)));
+        panels.forEach((panel) => panel.classList.toggle('active', panel.dataset.view === button.dataset.panel));
+      }));
+    })();
+  </script>
+</div>
+</body>
+</html>
+
