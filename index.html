@@ -31,6 +31,7 @@
     .favorite-card-quote { min-width:82px; display:grid; justify-items:end; gap:3px; text-align:right; }
     .favorite-card-price { font-size:1.02rem; line-height:1.2; white-space:nowrap; }
     .favorite-change { font-size:.76rem; font-weight:750; white-space:nowrap; }
+    .favorite-market-time { color:var(--muted); font-size:.62rem; font-weight:500; white-space:nowrap; }
     .favorite-change.positive { color:var(--accent); }
     .favorite-change.negative { color:var(--danger); }
     .favorite-actions { display:grid; align-content:center; gap:7px; }
@@ -91,6 +92,7 @@
     .portfolio-head h2, .dividend-section h3 { margin:0; }
     .portfolio-close { width:40px; height:40px; padding:0; color:var(--text); background:#26344d; font-size:1.35rem; }
     .portfolio-search { display:flex; gap:8px; position:relative; margin-bottom:18px; }
+    .portfolio-list + .portfolio-search { margin-top:12px; }
     .portfolio-search input { width:100%; }
     .portfolio-add { flex:0 0 48px; padding:0; font-size:1.5rem; }
     .portfolio-suggestions { left:0; right:56px; top:calc(100% + 4px); }
@@ -245,7 +247,7 @@
     .benchmark-stat span { color:var(--muted); font-size:.78rem; }
     .benchmark-stat strong { margin-top:3px; font-size:1rem; }
     html[data-theme="light"] .benchmark-chart-wrap,html[data-theme="light"] .benchmark-stat { background:#f8fafc; }
-    @media (max-width:700px) { .benchmark-chart-wrap { height:280px; padding:8px; } .benchmark-stats { grid-template-columns:1fr; } .benchmark-search { max-width:none; } }
+    @media (max-width:700px) { .benchmark-chart-wrap { height:280px; padding:8px; } .benchmark-stats { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; } .benchmark-stat { padding:8px 6px; text-align:center; } .benchmark-stat span { font-size:.66rem; } .benchmark-stat strong { font-size:.84rem; } .benchmark-search { max-width:none; } }
     .portfolio-analysis { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
     .portfolio-analysis h3 { margin:0; }
     .analysis-table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
@@ -452,9 +454,6 @@
     </form>
     <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button><button id="exportCsv" type="button">CSV indir</button><button id="exportPng" type="button">PNG indir</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img" aria-describedby="priceChartSummary"></canvas><p id="priceChartSummary" class="sr-only" aria-live="polite"></p></div>
-    <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt>Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl><div class="period-summary-range"><div class="period-summary-range-track" role="progressbar" aria-label="Güncel fiyatın dönem aralığındaki konumu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="periodRangeFill" class="period-summary-range-fill"></span></div><div class="period-summary-range-labels"><span>Düşük</span><span id="periodRangePosition">Güncel: —</span><span>Yüksek</span></div></div></section>
-    <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
-    <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     <section class="periods" aria-label="Grafik süresi">
       <button type="button" data-range="5d">1 hafta</button>
       <button type="button" data-range="1mo">1 ay</button>
@@ -470,13 +469,16 @@
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
     </section>
+    <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt>Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl><div class="period-summary-range"><div class="period-summary-range-track" role="progressbar" aria-label="Güncel fiyatın dönem aralığındaki konumu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="periodRangeFill" class="period-summary-range-fill"></span></div><div class="period-summary-range-labels"><span>Düşük</span><span id="periodRangePosition">Güncel: —</span><span>Yüksek</span></div></div></section>
+    <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
+    <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" tabindex="-1" aria-labelledby="portfolioTab" hidden>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div></div>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
-      <div class="portfolio-search"><input id="portfolioSymbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="portfolioSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" role="listbox" aria-label="Portföy hisse önerileri"></ul></div>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
       <div id="portfolioList" class="portfolio-list"></div>
+      <div class="portfolio-search"><input id="portfolioSymbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="portfolioSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" role="listbox" aria-label="Portföy hisse önerileri"></ul></div>
       <section class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
         <h3 id="portfolioDistributionTitle">Portföy Dağılımı</h3>
         <div class="distribution-grid">
@@ -804,19 +806,23 @@
         price.className='favorite-card-price';
         const change=document.createElement('span');
         change.className='favorite-change';
+        const marketTime=document.createElement('small');
+        marketTime.className='favorite-market-time';
         if(quote&&!quote.error){
           const numberFormat=new Intl.NumberFormat('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2,signDisplay:'always'});
           price.textContent=money(quote.price,quote.currency);
           change.textContent=numberFormat.format(quote.delta)+' '+numberFormat.format(quote.change)+'%';
           change.classList.add(quote.change>=0?'positive':'negative');
-          quoteRow.append(price,change);
           const updated=formatMarketDataTime(quote.marketTimestamp);
+          marketTime.textContent=updated;
+          quoteRow.append(price,change,marketTime);
           open.title=(quote.stale?'Son başarılı fiyat · ':'Fiyat zamanı · ')+updated+' · '+item.symbol+' grafiğini aç';
         }else{
           price.textContent=quote?.error?'Veri alınamadı':'Yükleniyor…';
           change.textContent=quote?.error?'Yeniden denenecek':'Canlı veri';
           change.classList.add(quote?.error?'negative':'positive');
-          quoteRow.append(price,change);
+          marketTime.textContent=quote?.error?'Fiyat zamanı alınamadı':'Fiyat zamanı bekleniyor';
+          quoteRow.append(price,change,marketTime);
           open.title=item.symbol+' grafiğini aç';
         }
         open.append(badge,head,quoteRow);
@@ -854,7 +860,8 @@
       const name=row.querySelector('.favorite-card-name');
       const price=row.querySelector('.favorite-card-price');
       const change=row.querySelector('.favorite-change');
-      if(!open||!name||!price||!change||!item)return;
+      const marketTime=row.querySelector('.favorite-market-time');
+      if(!open||!name||!price||!change||!marketTime||!item)return;
       name.textContent=item.name!==item.symbol?item.name:'Hisse';
       change.classList.remove('positive','negative');
       if(quote&&!quote.error){
@@ -863,11 +870,13 @@
         change.textContent=numberFormat.format(quote.delta)+' '+numberFormat.format(quote.change)+'%';
         change.classList.add(quote.change>=0?'positive':'negative');
         const updated=formatMarketDataTime(quote.marketTimestamp);
+        marketTime.textContent=updated;
         open.title=(quote.stale?'Son başarılı fiyat · ':'Fiyat zamanı · ')+updated+' · '+item.symbol+' grafiğini aç';
       }else{
         price.textContent=quote?.error?'Veri alınamadı':'Yükleniyor…';
         change.textContent=quote?.error?'Yeniden denenecek':'Canlı veri';
         change.classList.add(quote?.error?'negative':'positive');
+        marketTime.textContent=quote?.error?'Fiyat zamanı alınamadı':'Fiyat zamanı bekleniyor';
         open.title=item.symbol+' grafiğini aç';
       }
     }
