@@ -58,6 +58,9 @@ assert.match(html,/className='favorite-market-time'/,'Her favoride fiyat zamanı
 assert.ok(html.indexOf('class="periods"')<html.indexOf('id="periodSummaryTitle"'),'Süre seçimi dönem özetinden önce gelmeli');
 assert.ok(html.indexOf('id="portfolioList"')<html.indexOf('id="portfolioSymbol"'),'Portföy araması hisse listesinden sonra gelmeli');
 assert.match(html,/\.benchmark-stats \{ grid-template-columns:repeat\(3,minmax\(0,1fr\)\); gap:6px; \}/,'Mobil getiri kıyası üç sütun olmalı');
+assert.ok(html.indexOf('class="chart-wrap"')<html.indexOf('id="rsiWrap"')&&html.indexOf('id="rsiWrap"')<html.indexOf('class="periods"'),'RSI ana grafiğin hemen altında olmalı');
+assert.match(html,/const keepExistingPortfolio=Boolean\(portfolioList\.querySelector\('\.portfolio-row'\)\)/,'Portföy yenilemesi mevcut kartları veri gelene kadar korumalı');
+assert.match(html,/window\.scrollTo\(\{top:scrollBeforeCommit,behavior:'auto'\}\)/,'Portföy yenilemesi kaydırma konumunu korumalı');
 
 console.log('FinansTool v4.2 regresyon testleri başarılı.');
 
