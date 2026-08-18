@@ -26,13 +26,16 @@ const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].ma
 scripts.forEach((script,index)=>assert.doesNotThrow(()=>new Function(script),'İstemci betiği '+(index+1)+' sözdizimi'));
 assert.doesNotThrow(()=>new Function('module','exports','require',priceApi),'Fiyat API sözdizimi');
 
-const clientFunctions=['fillMissingRates','calculateRsi','sma'].map(name=>extractFunction(scripts[0],name)).join('\n');
-const {fillMissingRates,calculateRsi,sma}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma};')();
+const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary'].map(name=>extractFunction(scripts[0],name)).join('\n');
+const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary};')();
 
 assert.deepEqual(fillMissingRates([null,null,2,null,3,null]),[null,null,2,2,3,3],'Gelecekteki kur geçmişe taşınmamalı');
 assert.deepEqual(sma([null,1,2,3],3),[null,null,null,2],'Eksik değer içeren MA penceresi hesaplanmamalı');
 const rsi=calculateRsi([1,2,3,2,4,5,4,6,7,8,7,9,10,11,12,13,14,13,15,16],14);
 assert.ok(Number.isFinite(rsi.at(-1))&&rsi.at(-1)>=0&&rsi.at(-1)<=100,'Wilder RSI geçerli aralıkta olmalı');
+const period=calculatePeriodSummary([{time:1,close:100},{time:2,close:80},{time:3,close:125},{time:4,close:110}]);
+assert.deepEqual({last:period.last,low:period.low,high:period.high},{last:{time:4,close:110},low:{time:2,close:80},high:{time:3,close:125}},'Dönem özeti değer ve tarih noktalarını doğru seçmeli');
+assert.ok(Math.abs(period.change-10)<1e-9,'Dönem değişimi doğru hesaplanmalı');
 
 const sandbox={module:{exports:{}},exports:{},require,URLSearchParams,URL,AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
 vm.runInNewContext(priceApi+'\nmodule.exports._test={numberValue,cleanQuery};',sandbox);
@@ -44,5 +47,9 @@ assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh param
 assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunmalı');
 assert.match(html,/const comparisonRequests = new Set\(\);/,'Karşılaştırma çift tıklama kilidi bulunmalı');
 assert.match(html,/role="listbox"/,'Arama önerileri listbox olmalı');
+assert.match(html,/marketTimestamp:Number\(result\.meta\?\.regularMarketTime\)\|\|points\.at\(-1\)\.time/,'Favori zamanı gerçek piyasa verisinden gelmeli');
+assert.match(html,/Son fiyat zamanı:/,'Favorilerde son fiyat tarihi gösterilmeli');
+assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
 console.log('FinansTool v4.1 regresyon testleri başarılı.');
+
