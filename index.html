@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>FinansTool v4.1</title>
+  <title>FinansTool v4.2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -65,6 +65,12 @@
     .period-summary-item dt { color:var(--muted); font-size:.72rem; }
     .period-summary-item dd { display:flex; align-items:baseline; gap:6px; min-width:0; margin:3px 0 0; font-size:.94rem; font-weight:750; white-space:nowrap; }
     .period-summary-date { overflow:hidden; color:var(--muted); font-size:.66rem; font-weight:500; text-overflow:ellipsis; }
+    .period-summary-range { margin-top:12px; }
+    .period-summary-range-track { height:8px; overflow:hidden; border-radius:999px; background:#26344d; }
+    .period-summary-range-fill { display:block; width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,#f59e0b,var(--accent)); transition:width .25s ease; }
+    .period-summary-range-labels { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; margin-top:5px; color:var(--muted); font-size:.66rem; }
+    .period-summary-range-labels span:nth-child(2) { color:var(--text); font-weight:650; text-align:center; }
+    .period-summary-range-labels span:last-child { text-align:right; }
     html[data-theme="light"] .period-summary { background:#f8fafc; }
     html[data-theme="light"] .period-summary-item { background:#eaf0f6; }
     .hint { margin:18px 0 0; color:var(--muted); font-size:.9rem; }
@@ -424,11 +430,11 @@
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopDataNav" type="button">⇩ <span>Veri Yedekleme</span></button>
-      <small>v4.1</small>
+      <small>v4.2</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" tabindex="-1" aria-labelledby="mainTab">
-      <h1>FinansTool <span class="version-badge">v4.1</span></h1>
+      <h1>FinansTool <span class="version-badge">v4.2</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -446,7 +452,7 @@
     </form>
     <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button><button id="exportCsv" type="button">CSV indir</button><button id="exportPng" type="button">PNG indir</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img" aria-describedby="priceChartSummary"></canvas><p id="priceChartSummary" class="sr-only" aria-live="polite"></p></div>
-    <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt>Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl></section>
+    <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt>Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl><div class="period-summary-range"><div class="period-summary-range-track" role="progressbar" aria-label="Güncel fiyatın dönem aralığındaki konumu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="periodRangeFill" class="period-summary-range-fill"></span></div><div class="period-summary-range-labels"><span>Düşük</span><span id="periodRangePosition">Güncel: —</span><span>Yüksek</span></div></div></section>
     <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     <section class="periods" aria-label="Grafik süresi">
@@ -584,6 +590,8 @@
     const periodLowDate = document.getElementById('periodLowDate');
     const periodHigh = document.getElementById('periodHigh');
     const periodHighDate = document.getElementById('periodHighDate');
+    const periodRangeFill = document.getElementById('periodRangeFill');
+    const periodRangePosition = document.getElementById('periodRangePosition');
     const marketSettingsButton = document.getElementById('marketSettingsButton');
     const marketSettingsDialog = document.getElementById('marketSettingsDialog');
     const marketSettingsList = document.getElementById('marketSettingsList');
@@ -1985,6 +1993,9 @@
     function resetPeriodSummary() {
       [periodLast,periodLastDate,periodChange,periodLow,periodLowDate,periodHigh,periodHighDate].forEach(item=>item.textContent='—');
       periodChange.classList.remove('positive','negative');
+      periodRangeFill.style.width='0%';
+      periodRangePosition.textContent='Güncel: —';
+      periodRangeFill.parentElement.setAttribute('aria-valuenow','0');
     }
 
     function calculatePeriodSummary(points) {
@@ -1993,13 +2004,15 @@
       const last=points.at(-1);
       const low=points.reduce((best,point)=>point.close<best.close?point:best,points[0]);
       const high=points.reduce((best,point)=>point.close>best.close?point:best,points[0]);
-      return {last,low,high,change:first.close!==0?(last.close/first.close-1)*100:null};
+      const spread=high.close-low.close;
+      const position=spread>0?Math.max(0,Math.min(100,(last.close-low.close)/spread*100)):50;
+      return {last,low,high,position,change:first.close!==0?(last.close/first.close-1)*100:null};
     }
 
     function updatePeriodSummary(points,currency) {
       const summary=calculatePeriodSummary(points);
       if(!summary)return resetPeriodSummary();
-      const {last,low,high,change}=summary;
+      const {last,low,high,change,position}=summary;
       periodLast.textContent=money(last.close,currency);
       periodLastDate.textContent=formatPeriodPointDate(last.time);
       periodLow.textContent=money(low.close,currency);
@@ -2011,6 +2024,9 @@
         periodChange.textContent=(change>=0?'+':'')+change.toFixed(2)+'%';
         periodChange.classList.add(change>=0?'positive':'negative');
       }else periodChange.textContent='—';
+      periodRangeFill.style.width=position.toFixed(1)+'%';
+      periodRangePosition.textContent='Güncel: %'+position.toFixed(0);
+      periodRangeFill.parentElement.setAttribute('aria-valuenow',position.toFixed(0));
     }
 
     function tidyDate(value) {
