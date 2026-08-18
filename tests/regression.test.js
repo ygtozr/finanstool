@@ -49,7 +49,8 @@ assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunm
 assert.match(html,/const comparisonRequests = new Set\(\);/,'Karşılaştırma çift tıklama kilidi bulunmalı');
 assert.match(html,/role="listbox"/,'Arama önerileri listbox olmalı');
 assert.match(html,/marketTimestamp:Number\(result\.meta\?\.regularMarketTime\)\|\|points\.at\(-1\)\.time/,'Favori zamanı gerçek piyasa verisinden gelmeli');
-assert.match(html,/Son fiyat zamanı:/,'Favorilerde son fiyat tarihi gösterilmeli');
+assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler başlığında yenileme zamanı gösterilmeli');
+assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
 assert.match(html,/FinansTool v4\.2/,'Aday sürüm adı v4.2 olmalı');
@@ -61,6 +62,9 @@ assert.match(html,/\.benchmark-stats \{ grid-template-columns:repeat\(3,minmax\(
 assert.ok(html.indexOf('class="chart-wrap"')<html.indexOf('id="rsiWrap"')&&html.indexOf('id="rsiWrap"')<html.indexOf('class="periods"'),'RSI ana grafiğin hemen altında olmalı');
 assert.match(html,/const keepExistingPortfolio=Boolean\(portfolioList\.querySelector\('\.portfolio-row'\)\)/,'Portföy yenilemesi mevcut kartları veri gelene kadar korumalı');
 assert.match(html,/window\.scrollTo\(\{top:scrollBeforeCommit,behavior:'auto'\}\)/,'Portföy yenilemesi kaydırma konumunu korumalı');
+assert.match(html,/portfolioAllocationChart\?updateDistributionChart\(portfolioAllocationChart/,'Varlık pasta grafiği yeniden oluşturulmadan güncellenmeli');
+assert.match(html,/portfolioCurrencyChart\?updateDistributionChart\(portfolioCurrencyChart/,'Para birimi pasta grafiği yeniden oluşturulmadan güncellenmeli');
+assert.match(html,/chart\.update\('none'\)/,'Pasta grafik güncellemesi animasyonsuz olmalı');
 
 console.log('FinansTool v4.2 regresyon testleri başarılı.');
 
