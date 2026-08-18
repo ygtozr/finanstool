@@ -58,6 +58,15 @@
     .price { color:var(--text); font-weight:700; }
     .error { color:var(--danger); }
     .chart-wrap { position:relative; height:clamp(290px,55vw,460px); }
+    .period-summary { margin-top:14px; padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
+    .period-summary h3 { margin:0 0 10px; font-size:.9rem; }
+    .period-summary-list { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:0; }
+    .period-summary-item { min-width:0; padding:10px 11px; border-radius:9px; background:#162238; }
+    .period-summary-item dt { color:var(--muted); font-size:.72rem; }
+    .period-summary-item dd { display:flex; align-items:baseline; gap:6px; min-width:0; margin:3px 0 0; font-size:.94rem; font-weight:750; white-space:nowrap; }
+    .period-summary-date { overflow:hidden; color:var(--muted); font-size:.66rem; font-weight:500; text-overflow:ellipsis; }
+    html[data-theme="light"] .period-summary { background:#f8fafc; }
+    html[data-theme="light"] .period-summary-item { background:#eaf0f6; }
     .hint { margin:18px 0 0; color:var(--muted); font-size:.9rem; }
     .periods { display:flex; flex-wrap:wrap; gap:8px; margin-top:26px; padding-top:22px; border-top:1px solid var(--line); }
     .periods button { padding:9px 13px; color:var(--text); background:#26344d; font-size:.9rem; }
@@ -162,6 +171,7 @@
       .toolbar button { justify-content:center; }
       .meta { gap:7px 14px; }
       .chart-wrap { height:390px; }
+      .period-summary-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .rsi-wrap { height:190px; }
       .periods button { flex:1 1 calc(33.333% - 8px); }
     }
@@ -171,6 +181,8 @@
       h1 { font-size:1.45rem; }
       .toolbar { grid-template-columns:1fr; }
       .chart-wrap { height:340px; }
+      .period-summary { padding:12px; }
+      .period-summary-list { grid-template-columns:1fr; }
       .rsi-wrap { height:175px; }
       .periods button { flex-basis:calc(50% - 8px); }
       .theme-toggle { top:10px; right:10px; }
@@ -434,6 +446,7 @@
     </form>
     <div class="toolbar"><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI göster</label><button id="advancedSearchButton" type="button">⌕ Gelişmiş arama</button><button id="alarmButton" type="button">🔔 Fiyat alarmı</button><button id="exportCsv" type="button">CSV indir</button><button id="exportPng" type="button">PNG indir</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img" aria-describedby="priceChartSummary"></canvas><p id="priceChartSummary" class="sr-only" aria-live="polite"></p></div>
+    <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt>Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl></section>
     <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     <section class="periods" aria-label="Grafik süresi">
@@ -564,6 +577,13 @@
     const marketRefresh = document.getElementById('marketRefresh');
     const favoriteRefresh = document.getElementById('favoriteRefresh');
     const favoriteUpdated = document.getElementById('favoriteUpdated');
+    const periodLast = document.getElementById('periodLast');
+    const periodLastDate = document.getElementById('periodLastDate');
+    const periodChange = document.getElementById('periodChange');
+    const periodLow = document.getElementById('periodLow');
+    const periodLowDate = document.getElementById('periodLowDate');
+    const periodHigh = document.getElementById('periodHigh');
+    const periodHighDate = document.getElementById('periodHighDate');
     const marketSettingsButton = document.getElementById('marketSettingsButton');
     const marketSettingsDialog = document.getElementById('marketSettingsDialog');
     const marketSettingsList = document.getElementById('marketSettingsList');
@@ -782,8 +802,8 @@
           change.textContent=numberFormat.format(quote.delta)+' '+numberFormat.format(quote.change)+'%';
           change.classList.add(quote.change>=0?'positive':'negative');
           quoteRow.append(price,change);
-          const updated=new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(quote.updatedAt));
-          open.title=(quote.stale?'Son başarılı veri · ':'Güncellendi · ')+updated+' · '+item.symbol+' grafiğini aç';
+          const updated=formatMarketDataTime(quote.marketTimestamp);
+          open.title=(quote.stale?'Son başarılı fiyat · ':'Fiyat zamanı · ')+updated+' · '+item.symbol+' grafiğini aç';
         }else{
           price.textContent=quote?.error?'Veri alınamadı':'Yükleniyor…';
           change.textContent=quote?.error?'Yeniden denenecek':'Canlı veri';
@@ -834,8 +854,8 @@
         price.textContent=money(quote.price,quote.currency);
         change.textContent=numberFormat.format(quote.delta)+' '+numberFormat.format(quote.change)+'%';
         change.classList.add(quote.change>=0?'positive':'negative');
-        const updated=new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(quote.updatedAt));
-        open.title=(quote.stale?'Son başarılı veri · ':'Güncellendi · ')+updated+' · '+item.symbol+' grafiğini aç';
+        const updated=formatMarketDataTime(quote.marketTimestamp);
+        open.title=(quote.stale?'Son başarılı fiyat · ':'Fiyat zamanı · ')+updated+' · '+item.symbol+' grafiğini aç';
       }else{
         price.textContent=quote?.error?'Veri alınamadı':'Yükleniyor…';
         change.textContent=quote?.error?'Yeniden denenecek':'Canlı veri';
@@ -884,8 +904,19 @@
         symbol:item.symbol,
         name:result.meta?.longName||result.meta?.shortName||item.name||item.symbol,
         currency:String(result.meta?.currency||'USD').toUpperCase(),
-        price,delta:price-previous,change:(price/previous-1)*100,updatedAt:Date.now()
+        price,delta:price-previous,change:(price/previous-1)*100,
+        marketTimestamp:Number(result.meta?.regularMarketTime)||points.at(-1).time,
+        updatedAt:Date.now()
       };
+    }
+
+    function updateFavoriteDataTimestamp() {
+      const timestamps=[...favoriteQuotes.values()].filter(quote=>quote&&!quote.error&&Number.isFinite(quote.marketTimestamp)).map(quote=>quote.marketTimestamp);
+      if(timestamps.length){
+        favoriteUpdated.textContent='Son fiyat zamanı: '+formatMarketDataTime(Math.max(...timestamps));
+      }else{
+        favoriteUpdated.textContent=favorites.length?'Fiyat zamanı bekleniyor…':'Favori bulunmuyor';
+      }
     }
 
     async function refreshFavoriteQuotes() {
@@ -893,7 +924,7 @@
       if(!favorites.length){
         favoriteQuotes.clear();
         renderFavorites();
-        favoriteUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
+        updateFavoriteDataTimestamp();
         return;
       }
       favoriteRefreshInProgress=true;
@@ -915,7 +946,7 @@
         });
         if(namesChanged)saveFavorites();
         favorites.forEach(item=>updateFavoriteQuoteCard(item.symbol));
-        favoriteUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
+        updateFavoriteDataTimestamp();
       }finally{
         favoriteRefreshInProgress=false;
         if(favoriteRefreshQueued){favoriteRefreshQueued=false;refreshFavoriteQuotes()}
@@ -1109,14 +1140,19 @@
       return new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(date);
     }
 
+    function formatMarketDataTime(timestamp) {
+      const milliseconds=Number(timestamp)*1000;
+      if(!Number.isFinite(milliseconds))return 'bilinmiyor';
+      return new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(milliseconds));
+    }
+
     async function refreshMarketAndFavorites() {
       marketRefresh.disabled=true;
       favoriteRefresh.disabled=true;
       try{
         await Promise.all([loadMarketSummary(),refreshFavoriteQuotes()]);
-        const updated='Son güncelleme: '+formatUpdateTime(new Date());
-        marketUpdated.textContent=updated;
-        favoriteUpdated.textContent=updated;
+        marketUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
+        updateFavoriteDataTimestamp();
       }finally{
         marketRefresh.disabled=false;
         favoriteRefresh.disabled=false;
@@ -1942,6 +1978,41 @@
       return labels[selectedRange] || 'Dönem değişimi: ';
     }
 
+    function formatPeriodPointDate(timestamp) {
+      return new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(timestamp*1000));
+    }
+
+    function resetPeriodSummary() {
+      [periodLast,periodLastDate,periodChange,periodLow,periodLowDate,periodHigh,periodHighDate].forEach(item=>item.textContent='—');
+      periodChange.classList.remove('positive','negative');
+    }
+
+    function calculatePeriodSummary(points) {
+      if(!points.length)return null;
+      const first=points[0];
+      const last=points.at(-1);
+      const low=points.reduce((best,point)=>point.close<best.close?point:best,points[0]);
+      const high=points.reduce((best,point)=>point.close>best.close?point:best,points[0]);
+      return {last,low,high,change:first.close!==0?(last.close/first.close-1)*100:null};
+    }
+
+    function updatePeriodSummary(points,currency) {
+      const summary=calculatePeriodSummary(points);
+      if(!summary)return resetPeriodSummary();
+      const {last,low,high,change}=summary;
+      periodLast.textContent=money(last.close,currency);
+      periodLastDate.textContent=formatPeriodPointDate(last.time);
+      periodLow.textContent=money(low.close,currency);
+      periodLowDate.textContent=formatPeriodPointDate(low.time);
+      periodHigh.textContent=money(high.close,currency);
+      periodHighDate.textContent=formatPeriodPointDate(high.time);
+      periodChange.classList.remove('positive','negative');
+      if(Number.isFinite(change)){
+        periodChange.textContent=(change>=0?'+':'')+change.toFixed(2)+'%';
+        periodChange.classList.add(change>=0?'positive':'negative');
+      }else periodChange.textContent='—';
+    }
+
     function tidyDate(value) {
       const digits = value.replace(/\D/g, '').slice(0, 8);
       if (digits.length < 3) return digits;
@@ -1982,6 +2053,7 @@
         button.disabled=true;
         button.textContent='Yükleniyor…';
         meta.textContent='';
+        resetPeriodSummary();
       }
       try{
         const query=selectedStart
@@ -2013,6 +2085,7 @@
         primarySymbol=symbol;
         const last=prices.at(-1);
         const change=((last/prices[0])-1)*100;
+        updatePeriodSummary(points,currency);
         meta.replaceChildren();
         const namePart=document.createElement('span');
         const nameStrong=document.createElement('strong');
