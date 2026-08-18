@@ -65,6 +65,10 @@ assert.match(html,/window\.scrollTo\(\{top:scrollBeforeCommit,behavior:'auto'\}\
 assert.match(html,/portfolioAllocationChart\?updateDistributionChart\(portfolioAllocationChart/,'Varlık pasta grafiği yeniden oluşturulmadan güncellenmeli');
 assert.match(html,/portfolioCurrencyChart\?updateDistributionChart\(portfolioCurrencyChart/,'Para birimi pasta grafiği yeniden oluşturulmadan güncellenmeli');
 assert.match(html,/chart\.update\('none'\)/,'Pasta grafik güncellemesi animasyonsuz olmalı');
+const toolbarMarkup=html.match(/<div class="toolbar">([\s\S]*?)<\/div><div id="meta"/)?.[1]||'';
+assert.ok(toolbarMarkup.indexOf('advancedSearchButton')<toolbarMarkup.indexOf('alarmButton')&&toolbarMarkup.indexOf('alarmButton')<toolbarMarkup.indexOf('maToggle')&&toolbarMarkup.indexOf('maToggle')<toolbarMarkup.indexOf('rsiToggle'),'Grafik araçları istenen sırada olmalı');
+assert.match(html,/\.toolbar label,\.toolbar button\{[^}]*justify-content:center[^}]*text-align:center/,'Altı grafik aracı ortalı ve ortak biçimde olmalı');
+assert.match(toolbarMarkup,/Gelişmiş Arama[\s\S]*Fiyat Alarmı[\s\S]*MA50\/100\/200[\s\S]*> RSI<[\s\S]*CSV İndir[\s\S]*PNG İndir/,'Grafik aracı metinleri ortak biçimde olmalı');
 
 console.log('FinansTool v4.2 regresyon testleri başarılı.');
 
