@@ -36,6 +36,7 @@ assert.ok(Number.isFinite(rsi.at(-1))&&rsi.at(-1)>=0&&rsi.at(-1)<=100,'Wilder RS
 const period=calculatePeriodSummary([{time:1,close:100},{time:2,close:80},{time:3,close:125},{time:4,close:110}]);
 assert.deepEqual({last:period.last,low:period.low,high:period.high},{last:{time:4,close:110},low:{time:2,close:80},high:{time:3,close:125}},'Dönem özeti değer ve tarih noktalarını doğru seçmeli');
 assert.ok(Math.abs(period.change-10)<1e-9,'Dönem değişimi doğru hesaplanmalı');
+assert.ok(Math.abs(period.position-66.6666666667)<1e-9,'Güncel fiyatın dönem aralığındaki konumu doğru hesaplanmalı');
 
 const sandbox={module:{exports:{}},exports:{},require,URLSearchParams,URL,AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
 vm.runInNewContext(priceApi+'\nmodule.exports._test={numberValue,cleanQuery};',sandbox);
@@ -51,5 +52,7 @@ assert.match(html,/marketTimestamp:Number\(result\.meta\?\.regularMarketTime\)\|
 assert.match(html,/Son fiyat zamanı:/,'Favorilerde son fiyat tarihi gösterilmeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-console.log('FinansTool v4.1 regresyon testleri başarılı.');
+assert.match(html,/FinansTool v4\.2/,'Aday sürüm adı v4.2 olmalı');
+assert.match(html,/id="periodRangeFill"/,'Dönem içi fiyat konum barı bulunmalı');
 
+console.log('FinansTool v4.2 regresyon testleri başarılı.');
