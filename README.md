@@ -1,4 +1,4 @@
-# FinansTool v4.1
+# FinansTool v4.2
 
 FinansTool; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
@@ -6,7 +6,18 @@ FinansTool; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik g�
 
 - Vercel: https://finanstool.vercel.app
 - Arayüz dili: Türkçe
-- Güncel kalıcı sürüm: **v4.0**
+- Güncel kalıcı sürüm: **v4.2**
+
+## v4.2 dönem özeti ve arayüz kararlılığı
+
+- Uygulama her açılışta Özet sayfasıyla başlar.
+- Grafik dönem düğmeleri Dönem Özeti'nin üzerine taşınmıştır.
+- Son kapanış, dönem düşük ve dönem yüksek değerleri kendi tarihleriyle; güncel fiyatın dönem içindeki yeri ise düşük–yüksek konum çubuğuyla gösterilir.
+- Favoriler başlığı yenileme anını, her favori kartı sağlayıcıdaki gerçek son fiyat zamanını gösterir.
+- RSI ana fiyat grafiğine bitişik ve hemen altındadır.
+- Grafik araç çubuğu Gelişmiş Arama, Fiyat Alarmı, MA50/100/200, RSI, CSV ve PNG sırasındadır; düğmeler ortak tipografi ve ortalı hizalama kullanır.
+- Portföy araması varlık listesinin altındadır; üç performans sonucu tek satırda gösterilir.
+- Portföy yenilemesi görünümü kaydırmaz ve dağılım grafiklerini tekrar oynatmaz.
 
 ## v4.1 teknik kararlılık
 
@@ -22,7 +33,7 @@ Bu sürüm yeni ürün özelliği eklemez. v4.0 denetiminde bulunan fiyat, kur, 
 - Arama önerileri klavye ve ekran okuyucu kullanımını destekler.
 - Chart.js bütünlük doğrulaması, API yöntem/oran koruması ve regresyon testleri eklenir.
 
-Güncel kalıcı sürüm **v4.1**'dir. Kullanıcı tarafından kontrol edilip onaylanmıştır.
+v4.1 teknik kararlılık düzeltmeleri v4.2'de korunur.
 
 ## v4.0 arayüzü
 
