@@ -46,7 +46,11 @@ assert.equal(sandbox.module.exports._test.numberValue('$1,234.56'),1234.56);
 
 assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh parametresi kalmamalı');
 assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunmalı');
-assert.match(html,/const comparisonRequests = new Set\(\);/,'Karşılaştırma çift tıklama kilidi bulunmalı');
+assert.doesNotMatch(html,/function compareStock\s*\(/,'Ana grafik karşılaştırma işlevi kaldırılmalı');
+assert.doesNotMatch(html,/let compareData\s*=/,'Ana grafik karşılaştırma durumu kaldırılmalı');
+assert.doesNotMatch(html,/data-action=['"]compare['"]/,'Favorilerde karşılaştırma düğmesi kalmamalı');
+assert.match(html,/className='favorite-menu-trigger'/,'Favorilerde hızlı işlem düğmesi bulunmalı');
+assert.match(html,/menuAction\('Grafiği Aç'[^]*menuAction\('Fiyat Alarmı Kur'[^]*menuAction\('Portföye Ekle'[^]*menuAction\('Favorilerden Çıkar'/,'Hızlı işlem menüsü dört temel eylemi içermeli');
 assert.match(html,/role="listbox"/,'Arama önerileri listbox olmalı');
 assert.match(html,/marketTimestamp:Number\(result\.meta\?\.regularMarketTime\)\|\|points\.at\(-1\)\.time/,'Favori zamanı gerçek piyasa verisinden gelmeli');
 assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler başlığında yenileme zamanı gösterilmeli');

@@ -24,7 +24,7 @@
     .favorites-panel-head button { padding:7px 11px; color:#062019; background:var(--accent); border:1px solid var(--accent); font-size:.8rem; font-weight:700; }
     .favorites-note { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
     .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
-    .favorite-row { display:grid; grid-template-columns:minmax(0,1fr) 32px; gap:7px; align-items:stretch; }
+    .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 32px; gap:7px; align-items:stretch; }
     .favorite-card { min-width:0; min-height:76px; padding:11px 12px; display:grid; grid-template-columns:46px minmax(0,1fr) auto; align-items:center; gap:11px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; }
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
     .favorite-card-badge { width:46px; height:46px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.76rem; font-weight:800; letter-spacing:.02em; }
@@ -39,19 +39,26 @@
     .favorite-market-time { color:var(--muted); font-size:.62rem; font-weight:500; white-space:nowrap; }
     .favorite-change.positive { color:var(--accent); }
     .favorite-change.negative { color:var(--danger); }
-    .favorite-actions { display:grid; align-content:center; gap:7px; }
-    .favorite-remove.compare-active { background:#be185d; border-color:#f9a8d4; color:#fff; }
+    .favorite-actions { position:relative; display:grid; align-content:center; gap:7px; }
+    .favorite-menu-trigger { width:32px; height:32px; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1.1rem; line-height:1; }
     .favorite-remove { width:32px; height:32px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.05rem; }
+    .favorite-menu-trigger[aria-expanded="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
+    .favorite-quick-menu { position:absolute; z-index:30; top:0; right:calc(100% + 7px); width:184px; display:none; gap:3px; padding:6px; background:#111a2b; border:1px solid var(--line); border-radius:11px; box-shadow:0 14px 34px #0009; }
+    .favorite-quick-menu.open { display:grid; }
+    .favorite-quick-menu button { width:100%; min-height:36px; padding:7px 9px; justify-content:flex-start; color:var(--text); background:transparent; border:0; border-radius:7px; text-align:left; font-size:.78rem; font-weight:650; }
+    .favorite-quick-menu button:hover,.favorite-quick-menu button:focus-visible { background:#26344d; }
+    .favorite-quick-menu .danger { color:var(--danger); }
+    html[data-theme="light"] .favorite-menu-trigger { background:#e2e8f0; }
+    html[data-theme="light"] .favorite-quick-menu { background:#fff; box-shadow:0 14px 34px #33415533; }
+    html[data-theme="light"] .favorite-quick-menu button:hover,html[data-theme="light"] .favorite-quick-menu button:focus-visible { background:#e2e8f0; }
     h1 { margin:0; font-size:clamp(1.5rem,4vw,2.15rem); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .version-badge { display:inline-flex; align-items:center; padding:3px 8px; border:1px solid var(--line); border-radius:999px; color:var(--accent); font-size:.72rem; font-weight:700; letter-spacing:.04em; }
     .intro { margin:6px 0 25px; color:var(--muted); }
     form { display:flex; gap:10px; margin-bottom:22px; }
     .search-field { display:flex; flex:1; min-width:0; gap:8px; }
-    .favorite-toggle, .compare-toggle { flex:0 0 46px; width:46px; padding:0; font-size:1.4rem; }
+    .favorite-toggle { flex:0 0 46px; width:46px; padding:0; font-size:1.4rem; }
     .favorite-toggle { color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.55rem; }
     .favorite-toggle.is-favorite { background:#5b4817; border-color:#d7aa38; }
-    .compare-toggle { color:#f9a8d4; background:#3a1830; border:1px solid #7f315f; }
-    .compare-toggle.compare-active { color:#fff; background:#be185d; border-color:#f9a8d4; }
     .search-field { position:relative; }
     .search-suggestions {display:none;position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:54px;margin:0;padding:5px;list-style:none;border:1px solid var(--line);border-radius:10px;background:#101827;box-shadow:0 12px 25px #0008}.search-suggestions.visible{display:grid;gap:3px}.suggestion{width:100%;padding:8px 10px;text-align:left;color:var(--text);background:transparent;border-radius:7px;font-size:.88rem}.suggestion:hover{background:#26344d}
     input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:uppercase; }
@@ -571,18 +578,11 @@
     let chart;
     let rsiChart;
     let movingAverageData = null;
-    let movingAverageNativeData = null;
-    let compareData = [];
     let lastPrices = [];
     let lastLabels = [];
     let currentCurrency = 'TRY';
     let currentChartName = '';
-    let primaryPrices = [];
-    let primaryLabels = [];
-    let primaryCurrency = 'TRY';
-    let primaryChartName = '';
     let primarySymbol = '';
-    const comparisonColors = ['#fb7185','#60a5fa','#f97316','#a78bfa','#84cc16','#22d3ee','#f472b6'];
     const form = document.getElementById('symbolForm');
     const symbolInput = document.getElementById('symbol');
     const button = document.getElementById('submitButton');
@@ -643,7 +643,6 @@
     let marketSearchRequestId = 0;
     let benchmarkSearchRequestId = 0;
     let portfolioSearchRequestId = 0;
-    const comparisonRequests = new Set();
     const apiCache = new Map();
     const apiInFlight = new Map();
 
@@ -762,8 +761,39 @@
     const currentSymbol = () => symbolInput.value.trim().toUpperCase();
     const isFavorite = symbol => favorites.some(item => item.symbol === symbol);
     function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
-    const isCompared = symbol => compareData.some(item => item.rawSymbol === symbol);
-    function updateCompareButton() {}
+
+    function closeFavoriteMenus(except=null) {
+      favoritesList.querySelectorAll('.favorite-quick-menu.open').forEach(menu=>{
+        if(menu===except)return;
+        menu.classList.remove('open');
+        const trigger=menu.parentElement?.querySelector('.favorite-menu-trigger');
+        if(trigger)trigger.setAttribute('aria-expanded','false');
+      });
+    }
+
+    function openFavoriteChart(item) {
+      closeFavoriteMenus();
+      symbolInput.value=item.symbol;
+      updateFavoriteButton();
+      chartTab.click();
+      loadPrice(item.symbol);
+    }
+
+    function openFavoriteAlarm(item) {
+      closeFavoriteMenus();
+      alarmSymbol.value=item.symbol;
+      alarmTarget.value='';
+      renderAlarms();
+      alarmDialog.showModal();
+      alarmTarget.focus();
+    }
+
+    function openFavoritePortfolio(item) {
+      closeFavoriteMenus();
+      portfolioSelection={symbol:item.symbol,name:item.name||item.symbol};
+      portfolioSymbol.value=item.symbol;
+      openPortfolioDialog();
+    }
     function favoriteLogoUrl(symbol) {
       const safe=normalizeSymbol(symbol);
       return /^[A-Z0-9.^=-]{1,20}$/.test(safe)
@@ -833,26 +863,62 @@
           open.title=item.symbol+' grafiğini aç';
         }
         open.append(badge,head,quoteRow);
-        open.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+        open.addEventListener('click',()=>openFavoriteChart(item));
         const actions=document.createElement('div');
         actions.className='favorite-actions';
-        const compare=document.createElement('button');
-        compare.type='button';
-        compare.className='favorite-remove';
-        compare.dataset.action='compare';
-        compare.classList.toggle('compare-active',isCompared(item.symbol));
-        compare.textContent='⇄';
-        compare.title=isCompared(item.symbol)?item.symbol+' karşılaştırmadan çıkar':item.symbol+' ile karşılaştır';
-        compare.setAttribute('aria-label',compare.title);
-        compare.addEventListener('click',()=>compareStock(item.symbol));
+        const trigger=document.createElement('button');
+        trigger.type='button';
+        trigger.className='favorite-menu-trigger';
+        trigger.textContent='⋯';
+        trigger.title=item.symbol+' hızlı işlemler';
+        trigger.setAttribute('aria-label',trigger.title);
+        trigger.setAttribute('aria-haspopup','menu');
+        trigger.setAttribute('aria-expanded','false');
+        const menu=document.createElement('div');
+        menu.className='favorite-quick-menu';
+        menu.setAttribute('role','menu');
+        const menuAction=(label,handler,className='')=>{
+          const action=document.createElement('button');
+          action.type='button';
+          action.textContent=label;
+          action.setAttribute('role','menuitem');
+          if(className)action.className=className;
+          action.addEventListener('click',handler);
+          menu.append(action);
+        };
+        menuAction('Grafiği Aç',()=>openFavoriteChart(item));
+        menuAction('Fiyat Alarmı Kur',()=>openFavoriteAlarm(item));
+        menuAction('Portföye Ekle',()=>openFavoritePortfolio(item));
+        menuAction('Favorilerden Çıkar',()=>{
+          favorites=favorites.filter(f=>f.symbol!==item.symbol);
+          favoriteQuotes.delete(item.symbol);
+          saveFavorites();
+          renderFavorites();
+          updateFavoriteButton();
+        },'danger');
         const remove=document.createElement('button');
         remove.type='button';
         remove.className='favorite-remove';
         remove.textContent='★';
         remove.title=item.symbol+' favorilerden çıkar';
         remove.setAttribute('aria-label',remove.title);
-        remove.addEventListener('click',()=>{favorites=favorites.filter(f=>f.symbol!==item.symbol);favoriteQuotes.delete(item.symbol);saveFavorites();renderFavorites();updateFavoriteButton()});
-        actions.append(compare,remove);
+        remove.addEventListener('click',()=>{
+          favorites=favorites.filter(f=>f.symbol!==item.symbol);
+          favoriteQuotes.delete(item.symbol);
+          saveFavorites();
+          renderFavorites();
+          updateFavoriteButton();
+        });
+        trigger.addEventListener('click',event=>{
+          event.stopPropagation();
+          const opening=!menu.classList.contains('open');
+          closeFavoriteMenus(menu);
+          menu.classList.toggle('open',opening);
+          trigger.setAttribute('aria-expanded',String(opening));
+          if(opening)menu.querySelector('[role="menuitem"]')?.focus();
+        });
+        menu.addEventListener('click',event=>event.stopPropagation());
+        actions.append(trigger,remove,menu);
         row.append(open,actions);
         favoritesList.append(row);
       });
@@ -886,18 +952,6 @@
         marketTime.textContent=quote?.error?'Fiyat zamanı alınamadı':'Fiyat zamanı bekleniyor';
         open.title=item.symbol+' grafiğini aç';
       }
-    }
-
-    function updateFavoriteCompareButtons() {
-      [...favoritesList.children].forEach(row=>{
-        const symbol=row.dataset.symbol;
-        const compare=row.querySelector('[data-action="compare"]');
-        if(!symbol||!compare)return;
-        const active=isCompared(symbol);
-        compare.classList.toggle('compare-active',active);
-        compare.title=active?symbol+' karşılaştırmadan çıkar':symbol+' ile karşılaştır';
-        compare.setAttribute('aria-label',compare.title);
-      });
     }
 
     async function mapWithLimit(items,limit,worker) {
@@ -1106,7 +1160,7 @@
         card.title=item.label+' grafiğini aç';
         card.disabled=false;
         if(!card.dataset.bound){
-          card.addEventListener('click',()=>{chartTab.click();symbolInput.value=item.symbol;updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+          card.addEventListener('click',()=>{chartTab.click();symbolInput.value=item.symbol;updateFavoriteButton();loadPrice(item.symbol)});
           card.dataset.bound='true';
         }
       }else{
@@ -1184,7 +1238,7 @@
       localStorage.setItem(themeKey,next);
       themeToggle.textContent = next === 'light' ? '🌙' : '☀️';
       themeToggle.setAttribute('aria-label', next === 'light' ? 'Koyu temaya geç' : 'Açık temaya geç');
-      if (lastLabels.length) renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,false);
+      if (lastLabels.length) renderChart(lastLabels,lastPrices,currentChartName,currentCurrency);
       refreshPortfolioDistributionTheme();
       if(portfolioBenchmarkChart){
         const color=distributionLegendColor();
@@ -1294,7 +1348,6 @@
         {name:'Tarih',values:lastLabels},
         {name:currentChartName+' ('+currentCurrency+')',values:lastPrices}
       ];
-      compareData.forEach(item=>columns.push({name:item.rawSymbol+' ('+currentCurrency+')',values:item.values}));
       if(includeMa){
         columns.push({name:'MA50',values:movingAverageData?.ma50||sma(lastPrices,50)});
         columns.push({name:'MA100',values:movingAverageData?.ma100||sma(lastPrices,100)});
@@ -1430,7 +1483,7 @@
         const meta=document.createElement('small');
         meta.textContent=[item.exchange,item.type].filter(Boolean).join(' · ');
         button.append(title,meta);
-        button.addEventListener('click',()=>{symbolInput.value=item.symbol;advancedSearchDialog.close();updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+        button.addEventListener('click',()=>{symbolInput.value=item.symbol;advancedSearchDialog.close();updateFavoriteButton();loadPrice(item.symbol)});
         advancedResults.append(button);
       });
     }
@@ -1938,7 +1991,7 @@
       return output;
     }
 
-    async function prepareMovingAverages(symbol,labels,{currency=currentCurrency,toUsd=false}={}) {
+    async function prepareMovingAverages(symbol,labels) {
       const query='range=10y&interval=1d';
       const payload=await cachedApiJson(priceApiUrl(symbol,query));
       const result=payload.chart?.result?.[0];
@@ -1948,14 +2001,12 @@
       const points=timestamps.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0);
       const formatter=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
       const pointLabels=points.map(point=>formatter.format(new Date(point.time*1000)));
-      let values=points.map(point=>point.close);
-      if(toUsd&&String(currency).toUpperCase()!=='USD')values=await convertSeriesToUsd(currency,values,pointLabels,query);
+      const values=points.map(point=>point.close);
       const maps=[50,100,200].map(period=>{
         const averages=sma(values,period);
         return new Map(pointLabels.map((label,index)=>[label,averages[index]]));
       });
       movingAverageData={ma50:labels.map(label=>maps[0].get(label)??null),ma100:labels.map(label=>maps[1].get(label)??null),ma200:labels.map(label=>maps[2].get(label)??null)};
-      movingAverageNativeData={ma50:[...movingAverageData.ma50],ma100:[...movingAverageData.ma100],ma200:[...movingAverageData.ma200]};
     }
 
     function chartThemeColors() {
@@ -1993,11 +2044,8 @@
       document.getElementById('rsiChartSummary').textContent=Number.isFinite(latest)?'Son RSI 14 değeri '+latest.toFixed(2)+'. 70 üzeri aşırı alım, 30 altı aşırı satım bölgesidir.':'RSI için yeterli veri yok.';
     }
 
-    function renderChart(labels,prices,name,currency,rememberPrimary=true) {
+    function renderChart(labels,prices,name,currency) {
       if(!labels.length||!prices.length)return;
-      if(rememberPrimary){
-        primaryLabels=[...labels];primaryPrices=[...prices];primaryChartName=name||primaryChartName;primaryCurrency=currency||primaryCurrency;
-      }
       lastLabels=[...labels];lastPrices=[...prices];currentChartName=name||currentChartName;currentCurrency=currency||currentCurrency;
       const colors=chartThemeColors();
       const datasets=[{label:currentChartName+' kapanış fiyatı ('+currentCurrency+')',data:lastPrices,borderColor:colors.accent,backgroundColor:'rgba(82,213,177,.14)',fill:true,pointRadius:0,pointHoverRadius:5,tension:.18,borderWidth:2,yAxisID:'price'}];
@@ -2006,7 +2054,6 @@
         datasets.push({label:'MA100',data:movingAverageData?.ma100||sma(lastPrices,100),borderColor:'#ca8a04',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
         datasets.push({label:'MA200',data:movingAverageData?.ma200||sma(lastPrices,200),borderColor:'#dc2626',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
       }
-      compareData.forEach(item=>datasets.push({label:item.rawSymbol+' ('+currentCurrency+')',data:item.values,borderColor:item.color,pointRadius:0,borderWidth:2,fill:false,spanGaps:true,yAxisID:'price'}));
       const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:{color:colors.text}},tooltip:{callbacks:{label:context=>context.dataset.label+': '+money(context.parsed.y,currentCurrency)}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},price:{position:'left',grid:{color:colors.grid},ticks:{color:colors.text,callback:value=>money(value,currentCurrency)}}}};
       if(chart){
         chart.data={labels:lastLabels,datasets};
@@ -2101,14 +2148,13 @@
       loadPrice(symbolInput.value.trim().toUpperCase());
     }
 
-    async function loadPrice(symbol,{silent=false,preserveComparisons=false}={}) {
+    async function loadPrice(symbol,{silent=false}={}) {
       symbol=String(symbol||'').trim().toUpperCase();
       if(!symbol)return;
       const requestId=++priceRequestId;
       if(priceAbortController)priceAbortController.abort();
       const controller=new AbortController();
       priceAbortController=controller;
-      const comparisonSymbols=preserveComparisons?compareData.map(item=>item.rawSymbol):[];
       if(!silent){
         button.disabled=true;
         button.textContent='Yükleniyor…';
@@ -2166,21 +2212,13 @@
           providerPart.textContent='Kaynak: '+info.dataProvider;
           meta.append(providerPart);
         }
-        compareData=[];
         movingAverageData=null;
-        movingAverageNativeData=null;
         if(document.getElementById('maToggle').checked){
           try{await prepareMovingAverages(symbol,labels)}catch{}
           if(requestId!==priceRequestId)return;
         }
-        renderChart(labels,prices,name,currency,true);
+        renderChart(labels,prices,name,currency);
         updateFavoriteQuoteCard(symbol);
-        updateFavoriteCompareButtons();
-        updateCompareButton();
-        for(const comparisonSymbol of comparisonSymbols){
-          if(requestId!==priceRequestId)return;
-          await compareStock(comparisonSymbol);
-        }
       }catch(error){
         if(error.name==='AbortError'||requestId!==priceRequestId)return;
         if(!silent){
@@ -2201,7 +2239,7 @@
     async function refreshCurrentChart(){
       if(chartRefreshInProgress||!primarySymbol||document.hidden||button.disabled)return;
       chartRefreshInProgress=true;
-      try{await loadPrice(primarySymbol,{silent:true,preserveComparisons:true})}
+      try{await loadPrice(primarySymbol,{silent:true})}
       finally{chartRefreshInProgress=false}
     }
 
@@ -2209,11 +2247,10 @@
       const control = event?.target;
       if(control?.id==='maToggle'&&control.checked){
         control.disabled=true;
-        const mixed=compareData.some(item=>String(item.currency).toUpperCase()!==String(primaryCurrency).toUpperCase());
-        try{await prepareMovingAverages(primarySymbol||currentSymbol(),lastLabels,{currency:primaryCurrency,toUsd:mixed})}catch{movingAverageData=null}
+        try{await prepareMovingAverages(primarySymbol||currentSymbol(),lastLabels)}catch{movingAverageData=null}
         control.disabled=false;
       }
-      renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,false);
+      renderChart(lastLabels,lastPrices,currentChartName,currentCurrency);
     }
     document.querySelectorAll('#maToggle,#rsiToggle').forEach(control => control.addEventListener('change', redrawIndicators));
 
@@ -2251,52 +2288,6 @@
       return values.map((value, index) => Number.isFinite(value) && Number.isFinite(rates[index]) ? value * rates[index] : null);
     }
 
-    function comparisonQuery(){return selectedStart?'period1='+Math.floor(new Date(selectedStart+'T00:00:00Z').getTime()/1000)+'&period2='+Math.floor(Date.now()/1000)+'&interval=1d':'range='+selectedRange+'&interval=1d'}
-
-    async function refreshComparisons(){
-      if(!primaryPrices.length)return;
-      const query=comparisonQuery();
-      const mixed=compareData.some(item=>String(item.currency).toUpperCase()!==String(primaryCurrency).toUpperCase());
-      let mainValues=[...primaryPrices],axisCurrency=primaryCurrency;
-      if(mixed){axisCurrency='USD';mainValues=await convertSeriesToUsd(primaryCurrency,primaryPrices,primaryLabels,query)}
-      await Promise.all(compareData.map(async item=>{item.values=mixed?await convertSeriesToUsd(item.currency,item.rawValues,primaryLabels,query):[...item.rawValues]}));
-      if(document.getElementById('maToggle').checked){
-        await prepareMovingAverages(primarySymbol,primaryLabels,{currency:primaryCurrency,toUsd:mixed});
-      }
-      renderChart(primaryLabels,mainValues,primaryChartName,axisCurrency,false);updateFavoriteCompareButtons();updateCompareButton();
-    }
-
-    async function compareStock(inputSymbol){
-      const symbol=String(inputSymbol||'').trim().toUpperCase();
-      if(!symbol||!primaryPrices.length||comparisonRequests.has(symbol))return;
-      if(symbol===primarySymbol)return updateCompareButton();
-      comparisonRequests.add(symbol);
-      updateFavoriteCompareButtons();
-      try{
-        if(isCompared(symbol)){
-          compareData=compareData.filter(item=>item.rawSymbol!==symbol);
-          await refreshComparisons();
-          return;
-        }
-        const requestedPrimary=primarySymbol;
-        const query=comparisonQuery();
-        const payload=await cachedApiJson(priceApiUrl(symbol,query));
-        if(requestedPrimary!==primarySymbol)return;
-        const result=payload.chart?.result?.[0];
-        if(!result)throw new Error('Fiyat verisi bulunamadı');
-        if(isCompared(symbol))return;
-        const used=new Set(compareData.map(item=>item.color));
-        const color=comparisonColors.find(item=>!used.has(item))||comparisonColors[compareData.length%comparisonColors.length];
-        compareData.push({rawSymbol:symbol,currency:String(result.meta?.currency||'USD').toUpperCase(),rawValues:alignResultToLabels(result,primaryLabels),values:[],color});
-        await refreshComparisons();
-      }catch(error){
-        alert('Karşılaştırma verisi alınamadı: '+error.message);
-      }finally{
-        comparisonRequests.delete(symbol);
-        updateFavoriteCompareButtons();
-      }
-    }
-
     form.addEventListener('submit', event => {
       event.preventDefault();
       loadPrice(symbolInput.value.trim().toUpperCase());
@@ -2307,14 +2298,14 @@
         const li=document.createElement('li'),button=document.createElement('button');
         button.type='button';button.className='suggestion';button.textContent=item.symbol+' · '+item.name;
         prepareSuggestionButton(button,suggestions,index);
-        button.addEventListener('click',()=>{symbolInput.value=item.symbol;updateComboboxState(symbolInput,suggestions,false);updateFavoriteButton();updateCompareButton();loadPrice(item.symbol)});
+        button.addEventListener('click',()=>{symbolInput.value=item.symbol;updateComboboxState(symbolInput,suggestions,false);updateFavoriteButton();loadPrice(item.symbol)});
         li.append(button);suggestions.append(li);
       });
       updateComboboxState(symbolInput,suggestions,items.length>0);
     }
     symbolInput.addEventListener('input',()=>{
       const requestId=++searchRequestId;
-      updateFavoriteButton();updateCompareButton();clearTimeout(searchTimer);
+      updateFavoriteButton();clearTimeout(searchTimer);
       const query=symbolInput.value.trim();
       if(query.length<2)return showSuggestions([]);
       searchTimer=setTimeout(async()=>{
@@ -2349,6 +2340,18 @@
     enableComboboxKeyboard(marketSettingsSearch,marketSettingsSuggestions);
     enableComboboxKeyboard(benchmarkSearch,benchmarkSuggestions);
     enableComboboxKeyboard(portfolioSymbol,portfolioSuggestions);
+
+    document.addEventListener('click',event=>{
+      if(!event.target.closest('.favorite-actions'))closeFavoriteMenus();
+    });
+    document.addEventListener('keydown',event=>{
+      if(event.key!=='Escape')return;
+      const openMenu=favoritesList.querySelector('.favorite-quick-menu.open');
+      if(!openMenu)return;
+      const trigger=openMenu.parentElement?.querySelector('.favorite-menu-trigger');
+      closeFavoriteMenus();
+      trigger?.focus();
+    });
 
     const manualRefreshMarketAndFavorites=()=>{apiCache.clear();return refreshMarketAndFavorites()};
     marketRefresh.addEventListener('click',manualRefreshMarketAndFavorites);
@@ -2537,7 +2540,6 @@
     applyTheme(localStorage.getItem(themeKey) || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
     renderFavorites();
     updateFavoriteButton();
-    updateCompareButton();
     loadPrice('AAPL');
     refreshMarketAndFavorites();
     renderAlarms();
