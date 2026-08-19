@@ -1,5 +1,5 @@
 const PROVIDER_HEADERS = {
-  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/4.2)',
+  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/4.3)',
   'Accept':'application/json, text/plain, */*'
 };
 
