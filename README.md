@@ -1,4 +1,4 @@
-# FinansTool v4.2
+# FinansTool v4.3 Aday
 
 FinansTool; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
@@ -7,6 +7,14 @@ FinansTool; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik g�
 - Vercel: https://finanstool.vercel.app
 - Arayüz dili: Türkçe
 - Güncel kalıcı sürüm: **v4.2**
+- İncelenen aday sürüm: **v4.3**
+
+## v4.3 iOS ana ekran düzeltmesi
+
+- Mobil alt gezinme iOS bağımsız web uygulamasında ekranın fiziksel altına sabitlenir.
+- Çentik ve ana ekran göstergesi güvenli alanı menünün konumunu değiştirmek yerine iç dolguya eklenir.
+- Dinamik viewport birimleri, `viewport-fit=cover` ve Apple web uygulaması meta bilgileri kullanılır.
+- Sayfa içeriği alt menünün altında kalmaması için güvenli alan kadar boşluk bırakır.
 
 ## v4.2 dönem özeti ve arayüz kararlılığı
 
