@@ -425,7 +425,59 @@ Geri yükleme seçenekleri:
 Yüklenen dosya JSON olarak doğrulanır, beklenmeyen alanlar ayıklanır ve yaklaşık 1 MB dosya sınırı uygulanır.
 
 ## 7. Teknik mimari
-…497 tokens truncated…aktır.
+
+### 7.1 Genel yapı
+
+Uygulama hafif, bağımlılığı az bir mimariye sahiptir:
+
+```text
+Tarayıcı
+  ├─ index.html
+  │   ├─ HTML arayüz
+  │   ├─ CSS tema ve responsive düzen
+  │   └─ Vanilla JavaScript uygulama durumu
+  ├─ Chart.js 4.4.4 (jsDelivr CDN)
+  └─ /api/* istekleri
+      ├─ api/search.js  → sembol/ad arama ve sağlayıcı yedekleme
+      └─ api/price.js   → fiyat geçmişi, meta veri ve sağlayıcı yedekleme
+```
+
+- Ön yüz tek sayfalı statik bir `index.html` dosyasında HTML, CSS ve JavaScript olarak bulunur.
+- Harici grafik kütüphanesi Chart.js 4.4.4'tür.
+- Sunucu tarafı uçlar Vercel Serverless Functions üzerinde CommonJS modülleri olarak çalışır.
+- Mevcut yapıda ayrı bir veritabanı, kullanıcı hesabı veya sunucu tarafı oturum yönetimi yoktur.
+- `package.json` veya bir derleme sistemi zorunlu değildir; depo doğrudan Vercel tarafından yayımlanabilir.
+
+### 7.2 API uçları
+
+#### `GET /api/search`
+
+Amaç: Sembol veya şirket/fon adına göre arama önerileri üretmek.
+
+Beklenen davranış:
+
+- Girdi normalize edilir ve güvenli uzunlukta tutulur.
+- Yahoo Finance araması birincil kaynaktır.
+- Nasdaq otomatik tamamlama desteklenen ABD varlıklarında yedek kaynaktır.
+- İkinci Yahoo alan adı son yedek olarak denenebilir.
+- Sonuçlar sembol, kısa/uzun ad, piyasa ve tür bilgisine indirgenir.
+- Yinelenen semboller kaldırılır.
+- İstemci ana aramada ilk beş sonucu gösterir.
+- Hata durumunda kullanıcıya yalnızca “Failed to fetch” değil, anlaşılır Türkçe geri bildirim verilir.
+
+#### `GET /api/price`
+
+Amaç: Bir sembol için grafik verisi ve meta veri sağlamak.
+
+Beklenen sorgular:
+
+- `symbol`: doğrulanmış finans sembolü.
+- `range`: `5d`, `1mo`, `3mo`, `6mo`, `1y`, `2y`, `5y`, `10y`, `ytd` veya `max`.
+- `interval`: çoğunlukla `1d`, gerektiğinde `1wk`.
+
+Beklenen davranış:
+
+- Yahoo chart API birincil kaynaktır.
 - Desteklenen ABD hisse/ETF'lerinde Nasdaq geçmiş fiyat uç noktası yedek kaynaktır.
 - İkinci Yahoo alan adı ek yedek olarak kullanılır.
 - Nasdaq cevabı istemcinin beklediği Yahoo-benzeri grafik yapısına dönüştürülür.

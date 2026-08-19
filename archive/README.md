@@ -16,5 +16,6 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v4.0](./v4.0/) | Arşivlendi | GitHub kaynak anı |
 | [v4.1](./v4.1/) | Arşivlendi | GitHub kaynak anı |
 | [v4.2](./v4.2/) | Kalıcı onaylı sürüm | v4.2 ana dal yayını |
+| [v4.3](./v4.3/) | Kalıcı onaylı sürüm | v4.3 ana dal yayını |
 
 Bir sonraki onaylı sürüm yayınlanırken mevcut sürüm aynı düzenle arşivlenecektir.
