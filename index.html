@@ -2,14 +2,19 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="FinansTool">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>FinansTool v4.2</title>
+  <title>FinansTool v4.3</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
     * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, #263b62 0, var(--bg) 45%); }
+    html { min-height:100%; background:var(--bg); }
+    body { margin:0; min-height:100vh; min-height:100dvh; display:grid; place-items:center; padding:24px; font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, #263b62 0, var(--bg) 45%); }
     main { width:min(1120px,100%); min-width:0; background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
     .app-layout { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:24px; align-items:start; }
     .favorites-panel { border-left:1px solid var(--line); padding-left:24px; }
@@ -350,8 +355,8 @@
     }
 
     @media (max-width:760px) {
-      body { padding:8px; overflow-x:hidden; }
-      main { width:100%; max-width:100%; margin-top:48px; padding:14px 12px 88px; overflow-x:hidden; border-radius:16px; }
+      body { min-height:100svh; min-height:100dvh; display:block; padding:8px 8px calc(92px + env(safe-area-inset-bottom,0px)); overflow-x:hidden; }
+      main { width:100%; max-width:100%; margin:48px auto 0; padding:14px 12px 88px; overflow-x:hidden; border-radius:16px; }
       .app-layout,.chart-panel,.market-summary,.market-cards { min-width:0; width:100%; max-width:100%; }
       main > .app-tabs { display:none; }
       .chart-panel h1 { font-size:1.24rem; }
@@ -368,7 +373,7 @@
       .favorite-row:nth-child(n+4) { display:none; }
       .favorites-panel.show-all-favorites .favorite-row { display:grid; }
       .mobile-list-more { display:block; width:100%; margin-top:10px; color:var(--text); background:#26344d; border:1px solid var(--line); }
-      .mobile-bottom-nav { position:fixed; z-index:44; left:8px; right:8px; bottom:max(8px,env(safe-area-inset-bottom)); display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; padding:6px; background:#111a2bf2; border:1px solid var(--line); border-radius:16px; box-shadow:0 14px 34px #0009; backdrop-filter:blur(12px); }
+      .mobile-bottom-nav { position:fixed !important; z-index:44; left:max(8px,env(safe-area-inset-left,0px)); right:max(8px,env(safe-area-inset-right,0px)); bottom:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px)); background:#111a2bf2; border:1px solid var(--line); border-bottom:0; border-radius:16px 16px 0 0; box-shadow:0 14px 34px #0009; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); transform:translate3d(0,0,0); -webkit-transform:translate3d(0,0,0); isolation:isolate; }
       .mobile-bottom-nav button { min-width:0; padding:9px 4px; display:grid; justify-items:center; gap:2px; color:var(--muted); background:transparent; font-size:.7rem; }
       .mobile-bottom-nav button.is-active { color:var(--text); background:#26344d; }
       .mobile-bottom-nav span { font-size:1.05rem; }
@@ -378,6 +383,11 @@
       .favorites-list { display:grid; }
       html[data-theme="light"] .mobile-bottom-nav { background:#fffffff2; }
       html[data-theme="light"] .mobile-bottom-nav button.is-active { background:#e2e8f0; }
+    }
+
+    @media (display-mode:standalone) and (max-width:760px) {
+      body { min-height:100dvh; padding-bottom:calc(96px + env(safe-area-inset-bottom,0px)); }
+      .mobile-bottom-nav { bottom:0 !important; }
     }
 
     /* v4.0 üç sayfalı bilgi mimarisi */
@@ -429,11 +439,11 @@
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopDataNav" type="button">⇩ <span>Veri Yedekleme</span></button>
-      <small>v4.2</small>
+      <small>v4.3</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" tabindex="-1" aria-labelledby="mainTab">
-      <h1>FinansTool <span class="version-badge">v4.2</span></h1>
+      <h1>FinansTool <span class="version-badge">v4.3</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
