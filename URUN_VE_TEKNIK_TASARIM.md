@@ -1,11 +1,11 @@
 # FinansTool — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 4.2  
-**Uygulama sürümü:** v4.2  
+**Belge sürümü:** 4.3  
+**Uygulama sürümü:** v4.3  
 **Durum:** Kullanıcı tarafından onaylandı  
 **Canlı adres:** https://finanstool.vercel.app  
 **Kaynak depo:** https://github.com/ygtozr/finanstool  
-**Son güncelleme:** 18 Ağustos 2026
+**Son güncelleme:** 19 Ağustos 2026
 
 Bu belge FinansTool uygulamasının amacını, kullanıcı tercihlerini, mevcut işlevlerini, görsel tasarımını, veri modelini ve teknik mimarisini tek yerde tanımlar. Hedefi, mevcut kaynak kod görülmeden uygulama sıfırdan geliştirilse bile aynı davranışın ve mümkün olduğunca aynı görünümün yeniden üretilebilmesidir.
 
@@ -42,8 +42,8 @@ Kullanıcı tarafından belirlenen ve sonraki geliştirmelerde korunması gereke
 
 ### 2.1 Sürümleme ve arşiv standardı
 
-- Güncel onaylı sürüm: **v4.2**.
-- Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v4.3** olur.
+- Güncel onaylı sürüm: **v4.3**.
+- Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v4.4** olur.
 - Depo kökü her zaman canlı sürümü temsil eder.
 - Arşiv yolu: `archive/vX.Y/`.
 - Bir sürüm onaylandığında en az şu dosyalar arşivlenir:
@@ -115,6 +115,9 @@ Temel ölçüler:
 - Portföy kartları yaklaşık 760 px altında iki, 500 px altında tek sütuna iner.
 - Arama önerileri, iletişim kutuları, grafikler ve tarih alanı ekran genişliğine sığar.
 - Dokunmatik kullanımda ikonlar birbirine çok yakın konumlandırılmaz.
+- iOS'ta Ana Ekrana Ekle ile bağımsız uygulama görünümünde alt gezinme ekranın fiziksel altına sabit kalır; sayfa kaydırma veya dinamik viewport değişimi sırasında içeriğin ortasına sıçramaz.
+- Çentik ve ana ekran göstergesi için güvenli alan, menünün tamamını yukarı taşımak yerine menünün iç alt dolgusuna eklenir.
+- Mobil gövde `100svh` ve `100dvh` ile dinamik ekran yüksekliğini izler; içerik alt menünün arkasında kalmaması için güvenli alanlı alt boşluk bırakır.
 
 ## 4. Özet ve Grafik Sayfaları
 
@@ -422,57 +425,7 @@ Geri yükleme seçenekleri:
 Yüklenen dosya JSON olarak doğrulanır, beklenmeyen alanlar ayıklanır ve yaklaşık 1 MB dosya sınırı uygulanır.
 
 ## 7. Teknik mimari
-
-### 7.1 Genel yapı
-
-Uygulama hafif, bağımlılığı az bir mimariye sahiptir:
-
-```text
-Tarayıcı
-  ├─ index.html
-  │   ├─ HTML arayüz
-  │   ├─ CSS tema ve responsive düzen
-  │   └─ Vanilla JavaScript uygulama durumu
-  ├─ Chart.js 4.4.4 (jsDelivr CDN)
-  └─ /api/* istekleri
-      ├─ api/search.js  → sembol/ad arama ve sağlayıcı yedekleme
-      └─ api/price.js   → fiyat geçmişi, meta veri ve sağlayıcı yedekleme
-```
-
-- Ön yüz tek sayfalı s…44 tokens truncated…tions üzerinde CommonJS modülleri olarak çalışır.
-- Mevcut yapıda ayrı bir veritabanı, kullanıcı hesabı veya sunucu tarafı oturum yönetimi yoktur.
-- `package.json` veya bir derleme sistemi zorunlu değildir; depo doğrudan Vercel tarafından yayımlanabilir.
-
-### 7.2 API uçları
-
-#### `GET /api/search`
-
-Amaç: Sembol veya şirket/fon adına göre arama önerileri üretmek.
-
-Beklenen davranış:
-
-- Girdi normalize edilir ve güvenli uzunlukta tutulur.
-- Yahoo Finance araması birincil kaynaktır.
-- Nasdaq otomatik tamamlama desteklenen ABD varlıklarında yedek kaynaktır.
-- İkinci Yahoo alan adı son yedek olarak denenebilir.
-- Sonuçlar sembol, kısa/uzun ad, piyasa ve tür bilgisine indirgenir.
-- Yinelenen semboller kaldırılır.
-- İstemci ana aramada ilk beş sonucu gösterir.
-- Hata durumunda kullanıcıya yalnızca “Failed to fetch” değil, anlaşılır Türkçe geri bildirim verilir.
-
-#### `GET /api/price`
-
-Amaç: Bir sembol için grafik verisi ve meta veri sağlamak.
-
-Beklenen sorgular:
-
-- `symbol`: doğrulanmış finans sembolü.
-- `range`: `5d`, `1mo`, `3mo`, `6mo`, `1y`, `2y`, `5y`, `10y`, `ytd` veya `max`.
-- `interval`: çoğunlukla `1d`, gerektiğinde `1wk`.
-
-Beklenen davranış:
-
-- Yahoo chart API birincil kaynaktır.
+…497 tokens truncated…aktır.
 - Desteklenen ABD hisse/ETF'lerinde Nasdaq geçmiş fiyat uç noktası yedek kaynaktır.
 - İkinci Yahoo alan adı ek yedek olarak kullanılır.
 - Nasdaq cevabı istemcinin beklediği Yahoo-benzeri grafik yapısına dönüştürülür.
@@ -618,6 +571,7 @@ Mevcut ürün; ilk basit “sembol gir, son ayları çiz” aracından aşağıd
 - **v4.0:** Mobil A ve Masaüstü B tasarımlarının üç sayfalı yapıda birleştirilmesi; Özet sayfasında iki sütunlu Piyasa Özeti ve Favoriler, açık Grafik Ve Teknik Analiz sayfası, istenen sırada tam Portföy sayfası. Aynı onaylı sürüm içinde Piyasa Özeti'nin USD/TRY, EUR/TRY, GBP/TRY, EUR/USD, S&P 500, Nasdaq, BIST 100 ve Bitcoin değerlerine bir defalık otomatik geçişi kesinleştirilmiştir.
 - **v4.1:** Finansal hesaplama doğruluğu, istek yarışları, fiyat/kur önbelleği, sağlayıcı dayanıklılığı, portföy yenilemesi, Wilder RSI, para birimi sonrası MA, API koruması ve erişilebilirlik regresyonları giderilmiştir.
 - **v4.2:** Varsayılan Özet açılışı; tarihli Dönem Özeti ve düşük–yüksek konum çubuğu; favori bazında gerçek fiyat zamanı; dönem düğmelerinin özet üstüne taşınması; RSI'ın ana grafiğe bitiştirilmesi; grafik araç çubuğunun yeniden sıralanıp eşitlenmesi; portföy aramasının listenin altına alınması; üçlü getiri özetinin tek satıra sıkıştırılması; yenilemede kaydırma ve halka grafik animasyonunun kaldırılması.
+- **v4.3:** iOS Ana Ekrana Ekle görünümünde alt gezinmenin içerik ortasına sıçraması giderildi; `viewport-fit=cover`, Apple web uygulaması meta bilgileri, dinamik viewport yüksekliği ve güvenli alanı menü iç dolgusuna alan sabit alt yerleşim eklendi.
 
 Bu bölüm yalnız doğrulanmış sürüm özelliklerini kaydeder; geçmişte kullanılan geçici masaüstü paket numaraları güncel web ürününün sürüm standardı değildir.
 
@@ -681,7 +635,19 @@ Bu sürüm v4.1'in doğruluk ve dayanıklılık temelini koruyarak grafik ve por
 - Portföy otomatik yenilemesi görünür sayfa konumunu değiştirmez; dağılım grafikleri animasyonsuz yerinde güncellenir.
 - Portföy arama alanı varlık listesinin sonunda, üç getiri metriği ise tek satırda gösterilir.
 
-## 16. Bilinen sınırlar ve ertelenen işler
+## 16. v4.3 iOS Ana Ekran Yerleşim Düzeltmesi
+
+Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız web uygulamasının alt gezinmesini kararlı hale getirir.
+
+- Viewport tanımı `viewport-fit=cover` içerir.
+- Apple bağımsız web uygulaması ve durum çubuğu meta bilgileri bulunur.
+- Mobil alt gezinme `bottom: 0` ile fiziksel ekran altına sabitlenir.
+- `safe-area-inset-bottom` menünün konumuna değil iç dolgusuna uygulanır.
+- Mobil gövde grid yerine blok akış kullanır ve `100svh` / `100dvh` yüksekliğini izler.
+- Sayfa alt boşluğu menü yüksekliği ile güvenli alanı birlikte hesaba katar.
+- WebKit kompozit katmanı ve backdrop uyumluluğu menünün kaydırma sırasında kararlı kalmasını destekler.
+
+## 17. Bilinen sınırlar ve ertelenen işler
 
 - Üçüncü taraf ücretsiz finans verilerinde gecikme, piyasa kapsamı ve oran sınırı olabilir.
 - Gerçek zamanlı borsa verisi garantisi verilmez; gösterilen değer sağlayıcının son kaydıdır.
@@ -691,7 +657,7 @@ Bu sürüm v4.1'in doğruluk ve dayanıklılık temelini koruyarak grafik ve por
 - Kullanıcı hesabı, bulut veritabanı, emir gönderme ve aracı kurum entegrasyonu mevcut kapsamda yoktur.
 - Mobil platform için yerel iOS/Android uygulaması yoktur; responsive web uygulaması kullanılır.
 
-## 17. Kabul testi kontrol listesi
+## 18. Kabul testi kontrol listesi
 
 ### Özet ve Grafik
 
@@ -713,6 +679,8 @@ Bu sürüm v4.1'in doğruluk ve dayanıklılık temelini koruyarak grafik ve por
 - [ ] Favoriler başlığı yenileme anını, her kart ise gerçek son fiyat zamanını saniye hassasiyetinde gösteriyor.
 - [ ] Dönem düğmeleri özet kartının üzerinde; RSI ana grafiğe bitişik ve hemen altında.
 - [ ] Grafik araç çubuğundaki altı düğme doğru sırada, aynı biçimde ve ortalı.
+- [ ] iPhone'da Ana Ekrana Ekle ile açıldığında alt gezinme ekranın altında kalıyor; kaydırmada içerik ortasına sıçramıyor.
+- [ ] Ana ekran göstergesi/çentik güvenli alanı menü etiketlerini kapatmıyor ve son içerik menünün arkasında kalmıyor.
 - [ ] İki yenile düğmesi aynı işlemi tetikliyor.
 - [ ] CSV ve PNG indirmeleri geçerli dosya oluşturuyor.
 
@@ -739,7 +707,7 @@ Bu sürüm v4.1'in doğruluk ve dayanıklılık temelini koruyarak grafik ve por
 - [ ] Sağlayıcı yedeği birincil servis başarısız olduğunda devreye giriyor.
 - [ ] Tarayıcı konsolunda tanımsız değişken veya işlenmemiş Promise hatası yok.
 
-## 18. Sıfırdan yeniden geliştirme için tamamlanma tanımı
+## 19. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 
 Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında mevcut FinansTool ile eşdeğer kabul edilir:
 
@@ -750,11 +718,11 @@ Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında me
 5. Kişisel veriler tarayıcıda kalıcıdır ve JSON ile taşınabilir.
 6. Yahoo/Nasdaq yedek sağlayıcı zinciri sunucu tarafında çalışır.
 7. Otomatik yenileme yalnız gerekli sayısal alanları değiştirir; görünür yerleşim hareket etmez.
-8. v4.2 kabul testi kontrol listesi geçer.
-9. Güncel belge depo kökünde, aynı belge `archive/v4.2/` altında bulunur.
+8. v4.3 kabul testi kontrol listesi geçer.
+9. Güncel belge depo kökünde, aynı belge `archive/v4.3/` altında bulunur.
 10. Kullanıcı canlı sürümü kontrol edip onaylamıştır.
 
-## 19. Belge bakım kuralı
+## 20. Belge bakım kuralı
 
 Her onaylı sürüm için şu işlem zorunludur:
 
