@@ -53,7 +53,12 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/FinansTool v4\.2/,'Aday sürüm adı v4.2 olmalı');
+assert.match(html,/FinansTool v4\.3/,'Aday sürüm adı v4.3 olmalı');
+assert.match(html,/viewport-fit=cover/,'iOS güvenli alanı için viewport-fit=cover bulunmalı');
+assert.match(html,/apple-mobile-web-app-capable/,'iOS bağımsız web uygulaması meta bilgisi bulunmalı');
+assert.match(html,/\.mobile-bottom-nav \{ position:fixed !important;[^}]*bottom:0;/,'Mobil alt menü ekranın fiziksel altına sabitlenmeli');
+assert.match(html,/padding:6px 6px calc\(6px \+ env\(safe-area-inset-bottom,0px\)\)/,'Güvenli alan menüyü yukarı taşımak yerine iç dolgu olarak uygulanmalı');
+assert.doesNotMatch(html,/bottom:max\(8px,env\(safe-area-inset-bottom\)\)/,'Güvenli alan menünün tamamını yukarı taşımamalı');
 assert.match(html,/id="periodRangeFill"/,'Dönem içi fiyat konum barı bulunmalı');
 assert.match(html,/className='favorite-market-time'/,'Her favoride fiyat zamanı alanı bulunmalı');
 assert.ok(html.indexOf('class="periods"')<html.indexOf('id="periodSummaryTitle"'),'Süre seçimi dönem özetinden önce gelmeli');
@@ -70,5 +75,4 @@ assert.ok(toolbarMarkup.indexOf('advancedSearchButton')<toolbarMarkup.indexOf('a
 assert.match(html,/\.toolbar label,\.toolbar button\{[^}]*justify-content:center[^}]*text-align:center/,'Altı grafik aracı ortalı ve ortak biçimde olmalı');
 assert.match(toolbarMarkup,/Gelişmiş Arama[\s\S]*Fiyat Alarmı[\s\S]*MA50\/100\/200[\s\S]*> RSI<[\s\S]*CSV İndir[\s\S]*PNG İndir/,'Grafik aracı metinleri ortak biçimde olmalı');
 
-console.log('FinansTool v4.2 regresyon testleri başarılı.');
-
+console.log('FinansTool v4.3 regresyon testleri başarılı.');
