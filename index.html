@@ -26,6 +26,10 @@
     .favorites-panel-head button { padding:7px 11px; color:#062019; background:var(--accent); border:1px solid var(--accent); font-size:.8rem; font-weight:700; }
     .favorites-note { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
     .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
+    .favorite-add-search { position:relative; display:flex; gap:8px; margin:12px 0 0; }
+    .favorite-add-search input { min-height:42px; padding:9px 11px; font-size:.84rem; }
+    .favorite-add-search > button { flex:0 0 42px; width:42px; padding:0; font-size:1.15rem; }
+    .favorite-add-search .search-suggestions { right:50px; }
     .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 32px; gap:7px; align-items:stretch; }
     .favorite-card { min-width:0; min-height:76px; padding:11px 12px; display:grid; grid-template-columns:46px minmax(0,1fr) auto; align-items:center; gap:11px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; }
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
@@ -73,7 +77,7 @@
     .price { color:var(--text); font-weight:700; }
     .error { color:var(--danger); }
     .chart-wrap { position:relative; height:clamp(290px,55vw,460px); }
-    .chart-ma-toggle { position:absolute; z-index:3; top:8px; left:8px; min-height:28px; padding:5px 8px; color:var(--text); background:#192337dd; border:1px solid var(--line); border-radius:7px; font-size:.66rem; font-weight:700; box-shadow:0 4px 12px #0005; }
+    .chart-ma-toggle { position:absolute; z-index:3; top:48px; left:58px; min-height:28px; padding:5px 8px; color:var(--text); background:#192337dd; border:1px solid var(--line); border-radius:7px; font-size:.66rem; font-weight:700; box-shadow:0 4px 12px #0005; }
     .chart-ma-toggle[aria-pressed="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
     .chart-asset-switcher { margin-top:22px; padding-top:16px; border-top:1px solid var(--line); }
     .chart-asset-switcher-buttons { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
@@ -411,7 +415,7 @@
 
     @media (max-width:760px) {
       body { min-height:100svh; min-height:100dvh; display:block; padding:8px 8px calc(92px + env(safe-area-inset-bottom,0px)); overflow-x:hidden; }
-      main { width:100%; max-width:100%; margin:48px auto 0; padding:14px 12px 88px; overflow-x:hidden; border-radius:16px; }
+      main { width:100%; max-width:100%; margin:48px auto 0; padding:14px 12px 24px; overflow-x:hidden; border-radius:16px; }
       .app-layout,.chart-panel,.market-summary,.market-cards { min-width:0; width:100%; max-width:100%; }
       main > .app-tabs { display:none; }
       .chart-panel h1 { font-size:1.24rem; }
@@ -504,7 +508,7 @@
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
       <div id="marketCards" class="market-cards"></div>
     </section>
-      <aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside>
+      <aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul><form id="favoriteAddForm" class="favorite-add-search" role="search"><input id="favoriteSearch" type="search" role="combobox" aria-autocomplete="list" aria-controls="favoriteSearchSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Favorilere hisse ekle"><button type="submit" aria-label="Hisseyi favorilere ekle">+</button><ul id="favoriteSearchSuggestions" class="search-suggestions" role="listbox" aria-label="Favorilere eklenecek hisse önerileri"></ul></form></aside>
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
@@ -710,6 +714,7 @@
     let priceRequestId = 0;
     let priceAbortController = null;
     let searchRequestId = 0;
+    let favoriteSearchRequestId = 0;
     let marketSearchRequestId = 0;
     let benchmarkSearchRequestId = 0;
     let portfolioSearchRequestId = 0;
@@ -758,9 +763,13 @@
     const favoriteButton = document.getElementById('favoriteButton');
     const favoritesList = document.getElementById('favoritesList');
     const favoritesEmpty = document.getElementById('favoritesEmpty');
+    const favoriteAddForm = document.getElementById('favoriteAddForm');
+    const favoriteSearch = document.getElementById('favoriteSearch');
+    const favoriteSearchSuggestions = document.getElementById('favoriteSearchSuggestions');
     const favoritesKey = 'finans-grafigi-favorites';
     const legacyFavoritesKey = Object.keys(localStorage).find(key => key.startsWith(favoritesKey + '-'));
     const suggestions = document.getElementById('suggestions'); let searchTimer;
+    let favoriteSearchTimer;
     const mainTab = document.getElementById('mainTab');
     const chartTab = document.getElementById('chartTab');
     const portfolioTab = document.getElementById('portfolioTab');
@@ -2466,6 +2475,31 @@
       });
       updateComboboxState(symbolInput,suggestions,items.length>0);
     }
+    function addOverviewFavorite(item){
+      const symbol=normalizeSymbol(item?.symbol||favoriteSearch.value);
+      if(!symbol)return favoriteSearch.focus();
+      const name=String(item?.name||symbol).trim()||symbol;
+      if(!isFavorite(symbol)){
+        favorites.push({symbol,name});
+        saveFavorites();
+        renderFavorites();
+        updateFavoriteButton();
+        refreshFavoriteQuotes();
+      }
+      favoriteSearch.value='';
+      updateComboboxState(favoriteSearch,favoriteSearchSuggestions,false);
+    }
+    function showFavoriteSearchSuggestions(items){
+      favoriteSearchSuggestions.replaceChildren();
+      items.slice(0,5).forEach((item,index)=>{
+        const li=document.createElement('li'),option=document.createElement('button');
+        option.type='button';option.className='suggestion';option.textContent=item.symbol+' · '+item.name;
+        prepareSuggestionButton(option,favoriteSearchSuggestions,index);
+        option.addEventListener('click',()=>addOverviewFavorite(item));
+        li.append(option);favoriteSearchSuggestions.append(li);
+      });
+      updateComboboxState(favoriteSearch,favoriteSearchSuggestions,items.length>0);
+    }
     symbolInput.addEventListener('input',()=>{
       const requestId=++searchRequestId;
       updateFavoriteButton();clearTimeout(searchTimer);
@@ -2479,6 +2513,20 @@
         }catch{if(requestId===searchRequestId)showSuggestions([])}
       },250);
     });
+    favoriteSearch.addEventListener('input',()=>{
+      const requestId=++favoriteSearchRequestId;
+      clearTimeout(favoriteSearchTimer);
+      const query=favoriteSearch.value.trim();
+      if(query.length<2)return showFavoriteSearchSuggestions([]);
+      favoriteSearchTimer=setTimeout(async()=>{
+        try{
+          const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
+          if(requestId!==favoriteSearchRequestId||favoriteSearch.value.trim()!==query)return;
+          showFavoriteSearchSuggestions(payload.quotes||[]);
+        }catch{if(requestId===favoriteSearchRequestId)showFavoriteSearchSuggestions([])}
+      },250);
+    });
+    favoriteAddForm.addEventListener('submit',event=>{event.preventDefault();addOverviewFavorite({symbol:favoriteSearch.value,name:favoriteSearch.value})});
     favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol)) { favorites=favorites.filter(item=>item.symbol!==symbol); favoriteQuotes.delete(symbol); } else favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); refreshFavoriteQuotes(); });
     periodButtons.forEach(periodButton => periodButton.addEventListener('click', () => {
       selectedRange = periodButton.dataset.range;
@@ -2500,6 +2548,7 @@
 
 
     enableComboboxKeyboard(symbolInput,suggestions);
+    enableComboboxKeyboard(favoriteSearch,favoriteSearchSuggestions);
     enableComboboxKeyboard(marketSettingsSearch,marketSettingsSuggestions);
     enableComboboxKeyboard(benchmarkSearch,benchmarkSuggestions);
     enableComboboxKeyboard(portfolioSymbol,portfolioSuggestions);
