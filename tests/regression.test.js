@@ -30,8 +30,8 @@ assert.doesNotThrow(()=>new Function('module','exports','require',priceApi),'Fiy
 assert.doesNotThrow(()=>new Function('module','exports','require',fundamentalsApi),'Temel veri API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',dividendsApi),'Temettü API sözdizimi');
 
-const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary'].map(name=>extractFunction(scripts[0],name)).join('\n');
-const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary};')();
+const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary','normalizePerformance','resultPriceValues','commonPerformanceWindow','isPortfolioSummaryComplete'].map(name=>extractFunction(scripts[0],name)).join('\n');
+const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete};')();
 
 assert.deepEqual(fillMissingRates([null,null,2,null,3,null]),[null,null,2,2,3,3],'Gelecekteki kur geçmişe taşınmamalı');
 assert.deepEqual(sma([null,1,2,3],3),[null,null,null,2],'Eksik değer içeren MA penceresi hesaplanmamalı');
@@ -41,21 +41,38 @@ const period=calculatePeriodSummary([{time:1,close:100},{time:2,close:80},{time:
 assert.deepEqual({last:period.last,low:period.low,high:period.high},{last:{time:4,close:110},low:{time:2,close:80},high:{time:3,close:125}},'Dönem özeti değer ve tarih noktalarını doğru seçmeli');
 assert.ok(Math.abs(period.change-10)<1e-9,'Dönem değişimi doğru hesaplanmalı');
 assert.ok(Math.abs(period.position-66.6666666667)<1e-9,'Güncel fiyatın dönem aralığındaki konumu doğru hesaplanmalı');
+const intradayPeriod=calculatePeriodSummary([{time:1,close:100,low:95,high:105},{time:2,close:102,low:90,high:110}]);
+assert.equal(intradayPeriod.low.close,90,'Dönem düşüğü gün içi düşük serisinden gelmeli');
+assert.equal(intradayPeriod.high.close,110,'Dönem yükseği gün içi yüksek serisinden gelmeli');
+const adjusted=resultPriceValues({indicators:{quote:[{close:[100,90]}],adjclose:[{adjclose:[50,60]}]}},{adjusted:true});
+assert.deepEqual(adjusted,[50,60],'Performans hesaplaması düzeltilmiş kapanışı tercih etmeli');
+const common=commonPerformanceWindow(['a','b','c'],[null,100,110],[50,60,66]);
+assert.deepEqual(common.labels,['b','c'],'Portföy ve ölçüt aynı ilk ortak tarihte başlamalı');
+assert.ok(Math.abs(common.portfolio[0])<1e-9&&Math.abs(common.benchmark[0])<1e-9&&Math.abs(common.portfolio[1]-10)<1e-9&&Math.abs(common.benchmark[1]-10)<1e-9,'Ortak başlangıçta her iki seri yüzde sıfıra bazlanmalı');
+assert.equal(isPortfolioSummaryComplete([],new Set()),true,'Eksiksiz portföy özeti yayınlanabilmeli');
+assert.equal(isPortfolioSummaryComplete(['AAPL'],new Set()),false,'Fiyatı eksik pozisyon varken toplam yayınlanmamalı');
 
 const sandbox={module:{exports:{}},exports:{},require,URLSearchParams,URL,AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
 vm.runInNewContext(priceApi+'\nmodule.exports._test={numberValue,cleanQuery};',sandbox);
 assert.equal(sandbox.module.exports._test.numberValue('N/A'),null,'N/A sıfır fiyat olmamalı');
 assert.equal(sandbox.module.exports._test.numberValue('-'),null,'Eksik fiyat sıfır olmamalı');
 assert.equal(sandbox.module.exports._test.numberValue('$1,234.56'),1234.56);
+assert.match(priceApi,/TradingView anlık yedek/,'BIST ve FX için bağımsız anlık yedek sağlayıcı bulunmalı');
+assert.match(priceApi,/s-maxage=10, stale-while-revalidate=5/,'Fiyat önbelleği seçilebilir 15 saniyelik yenilemeyle uyumlu olmalı');
+assert.match(priceApi,/lastKnownGood/,'Sağlayıcı kesintisi için son başarılı veri koruması bulunmalı');
 const fundamentalSandbox={module:{exports:{}},exports:{},AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
 vm.runInNewContext(fundamentalsApi+'\nmodule.exports._test={numberValue,trailingEps};',fundamentalSandbox);
 assert.equal(fundamentalSandbox.module.exports._test.numberValue('0.35%'),0.35,'Temettü yüzdesi doğru ayrıştırılmalı');
 assert.equal(fundamentalSandbox.module.exports._test.numberValue('4,623,874,049,400'),4623874049400,'Piyasa değeri doğru ayrıştırılmalı');
 assert.equal(fundamentalSandbox.module.exports._test.trailingEps({data:{earningsPerShare:[{type:'PreviousQuarter',earnings:1},{type:'PreviousQuarter',earnings:2},{type:'PreviousQuarter',earnings:3},{type:'PreviousQuarter',earnings:4}]}}),10,'TTM EPS son dört gerçekleşmiş çeyrekten hesaplanmalı');
+assert.match(fundamentalsApi,/status:'provider_error'/,'Temel veri sağlayıcı hatası veri yok durumundan ayrılmalı');
+assert.match(fundamentalsApi,/status:bist\|\|us\?'no_data':'unsupported'/,'Temel veride desteklenmeme ve gerçek veri yok durumları ayrılmalı');
 const dividendSandbox={module:{exports:{}},exports:{},AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
 vm.runInNewContext(dividendsApi+'\nmodule.exports._test={parseDate,parseAmount};',dividendSandbox);
 assert.equal(dividendSandbox.module.exports._test.parseAmount('$0.27'),0.27,'Temettü tutarı doğru ayrıştırılmalı');
 assert.equal(new Date(dividendSandbox.module.exports._test.parseDate('09/15/2026')).toISOString().slice(0,10),'2026-09-15','Temettü tarihi doğru ayrıştırılmalı');
+assert.match(dividendsApi,/status:'unsupported'/,'Desteklenmeyen temettü ürünleri ayrılmalı');
+assert.match(dividendsApi,/status:'provider_error'/,'Temettü sağlayıcı hatası ayrı durum olmalı');
 
 assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh parametresi kalmamalı');
 assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunmalı');
@@ -105,7 +122,7 @@ const toolbarMarkup=html.match(/<div class="toolbar">([\s\S]*?)<\/div><div id="m
 assert.match(toolbarMarkup,/Gelişmiş Arama[\s\S]*Fiyat Alarmı[\s\S]*CSV İndir[\s\S]*PNG İndir/,'Grafik araç çubuğu dört temel işlemi içermeli');
 assert.doesNotMatch(toolbarMarkup,/maToggle|rsiToggle/,'MA ve RSI kontrolleri üst araç çubuğunda kalmamalı');
 assert.match(html,/class="chart-wrap"><button id="maToggle" class="chart-ma-toggle"[^>]*aria-pressed="false">MA50\/100\/200<\/button><canvas id="priceChart"/,'MA düğmesi ana grafiğin sol üstüne gömülmeli');
-assert.match(html,/\.chart-ma-toggle \{[^}]*top:48px; left:58px;/,'MA düğmesi eksen ve açıklamalardan uzağa sağ alta alınmalı');
+assert.match(html,/\.chart-ma-toggle \{[^}]*top:48px; left:58px;[^}]*min-height:40px;/,'MA düğmesi eksenlerden uzakta ve erişilebilir dokunma yüksekliğinde olmalı');
 assert.doesNotMatch(html,/id="rsiToggle"/,'RSI açma kapama düğmesi kaldırılmalı');
 assert.match(html,/\.rsi-wrap\{height:150px;display:block;margin-top:0\}/,'RSI grafiği daima görünür ve ana grafiğe bitişik olmalı');
 assert.match(html,/columns\.push\(\{name:'RSI \(14\)'/,'RSI verisi dışa aktarmada daima yer almalı');
@@ -122,7 +139,7 @@ assert.match(html,/function benchmarkQuery\(\)[\s\S]*period1=[\s\S]*period2=/,'�
 assert.match(html,/\/api\/dividends\?symbol=/,'Portföy yaklaşan temettü uç noktasını kullanmalı');
 assert.match(dividendsApi,/exOrEffDate[\s\S]*paymentDate[\s\S]*sort\(\(a,b\)=>\(a\.exDate\|\|a\.paymentDate\)-\(b\.exDate\|\|b\.paymentDate\)\)/,'Temettü API hak kullanım ve ödeme tarihlerini yakından uzağa sıralamalı');
 assert.match(html,/allDividends\.sort\(\(a,b\)=>a\.date-b\.date\)\.slice\(0,5\)/,'Takvim yalnız yaklaşan en yakın beş temettüyü göstermeli');
-assert.match(html,/\.portfolio-row-head \{ display:grid; grid-template-columns:34px minmax\(0,1fr\) auto 28px;/,'Portföy kartı logo, kimlik, değer ve silme düğmesini tek kompakt satıra yerleştirmeli');
+assert.match(html,/\.portfolio-row-head \{ display:grid; grid-template-columns:34px minmax\(0,1fr\) auto 44px;/,'Portföy kartı bilgi kaybetmeden erişilebilir silme alanı kullanmalı');
 assert.match(html,/className='portfolio-compact-line'[\s\S]*compactLine\.append\(details,profitValue\)/,'Adet, maliyet ve kâr zarar ikinci kompakt satırda bilgi kaybı olmadan gösterilmeli');
 assert.match(html,/assetSymbol:primarySymbol\|\|currentSymbol\(\)/,'Ana grafik veri serisi sade balon için hisse kodunu taşımalı');
 assert.match(html,/context\.dataset\.assetSymbol\|\|context\.dataset\.label/,'Grafik veri balonu şirketin uzun adı yerine hisse kodunu kullanmalı');
@@ -138,6 +155,19 @@ assert.match(html,/id="otherView"[\s\S]*id="backupDownload"[\s\S]*id="restoreBac
 assert.match(html,/function startRefreshTimers\(\)[\s\S]*refreshInterval/,'Otomatik yenileme süresi kullanıcı tercihine göre yeniden başlatılmalı');
 assert.match(html,/savedRefreshInterval===null\?15000:Number\(savedRefreshInterval\)/,'Yeni kullanıcılar için otomatik yenileme varsayılan olarak 15 saniye olmalı');
 assert.match(html,/themeMedia\.addEventListener\('change'[\s\S]*themePreference==='system'/,'Sistem teması cihaz görünümü değiştiğinde otomatik uygulanmalı');
+assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#f8fafc':'#101827'/,'PWA üst çubuğu seçili temayla eşleşmeli');
+assert.match(html,/for="favoriteSearch">Favorilere eklenecek hisseyi ara/,'Favori aramasının kalıcı erişilebilir adı olmalı');
+assert.match(html,/for="portfolioSymbol">Portföye eklenecek hisseyi ara/,'Portföy aramasının kalıcı erişilebilir adı olmalı');
+assert.match(html,/for="benchmarkSearch">Karşılaştırma ölçütü ara/,'Ölçüt aramasının kalıcı erişilebilir adı olmalı');
+assert.match(html,/dialog\.addEventListener\('cancel',event=>\{event\.preventDefault\(\);dialog\.close\(\)\}\)/,'Tüm paneller Escape ile kapanmalı');
+assert.match(html,/document\.addEventListener\('keydown',event=>\{[\s\S]*event\.key!=='Escape'[\s\S]*dialog\.close\(\)/,'Native cancel üretmeyen tarayıcılarda Escape yedeği bulunmalı');
+assert.match(html,/id="backupFileName"/,'Özel Türkçe dosya seçici seçilen dosya adını göstermeli');
+assert.match(html,/id="portfolioCostCurrency"[\s\S]*id="portfolioPurchaseDate"/,'Portföy maliyet para birimi ve alım tarihi kaydedilebilmeli');
+assert.match(html,/historicalUsdRate\(costCurrency,position\.purchaseDate\)/,'Maliyet, alım tarihindeki kurla özet para birimine çevrilmeli');
+assert.match(html,/Kısmi sonuç gösterilmedi\. Eksik veri/,'Eksik varlıkla performans kıyası sessizce yayınlanmamalı');
+assert.match(html,/prepareVisibleRsi\(symbol,points\)/,'Kısa dönem RSI için görünür dönem öncesi veri kullanılmalı');
+assert.match(html,/En yeni fiyat:/,'Piyasa özetinde istek zamanından ayrı gerçek fiyat zamanı gösterilmeli');
+assert.match(html,/@media \(min-width:761px\) and \(max-width:900px\)/,'Tablet geçişi için ayrı düzen bulunmalı');
 assert.match(html,/mobileMoreNav'\)\.addEventListener\('click',[\s\S]*openView\('other'\)/,'Mobil Diğer düğmesi sabit ayarlar ekranını açmalı');
 assert.match(html,/\.settings-grid \{ display:grid; grid-template-columns:1fr;/,'Diğer ekranındaki ayar kartları yatay satırlar halinde sıralanmalı');
 assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:minmax\(210px,\.8fr\) minmax\(320px,1\.2fr\)/,'İlk dört ayar kartının içeriği masaüstünde yatay yerleşmeli');

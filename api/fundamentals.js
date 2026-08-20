@@ -1,5 +1,5 @@
 const PROVIDER_HEADERS={
-  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/4.3)','Accept':'application/json, text/plain, */*','Origin':'https://www.nasdaq.com','Referer':'https://www.nasdaq.com/'
+  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/5)','Accept':'application/json, text/plain, */*','Origin':'https://www.nasdaq.com','Referer':'https://www.nasdaq.com/'
 };
 const TIMEOUT_MS=4500;
 const inFlight=new Map(),rateBuckets=new Map(),RATE_WINDOW_MS=60000,RATE_LIMIT=120;
@@ -15,18 +15,18 @@ async function fetchNasdaq(symbol){
   const stock=stockSummary.status==='fulfilled'?stockSummary.value?.data:null,etf=etfSummary.status==='fulfilled'?etfSummary.value?.data:null,selected=stock?.summaryData?stock:(etf?.summaryData?etf:null);
   if(!selected)return null;
   const summary=selected.summaryData,assetType=String(selected.assetClass||'').toUpperCase()==='ETF'?'ETF':'EQUITY';
-  return {available:true,source:'Nasdaq',assetType,currency:'USD',marketCap:summaryValue(summary,'MarketCap'),trailingEps:assetType==='EQUITY'&&eps.status==='fulfilled'?trailingEps(eps.value):null,dividendYieldPercent:summaryValue(summary,'Yield'),peApplicable:assetType==='EQUITY',marketCapApplicable:true,dividendApplicable:true};
+  return {available:true,status:'ok',source:'Nasdaq',assetType,currency:'USD',marketCap:summaryValue(summary,'MarketCap'),trailingEps:assetType==='EQUITY'&&eps.status==='fulfilled'?trailingEps(eps.value):null,dividendYieldPercent:summaryValue(summary,'Yield'),peApplicable:assetType==='EQUITY',marketCapApplicable:true,dividendApplicable:true};
 }
 async function fetchBist(symbol){
   const ticker=symbol.replace(/\.IS$/,''),body={symbols:{tickers:['BIST:'+ticker],query:{types:[]}},columns:['name','description','market_cap_basic','price_earnings_ttm','dividends_yield_current']};
   const data=await fetchJson('https://scanner.tradingview.com/turkey/scan',{method:'POST',headers:{'User-Agent':PROVIDER_HEADERS['User-Agent'],'Accept':'application/json','Content-Type':'application/json','Origin':'https://www.tradingview.com'},body:JSON.stringify(body)}),values=data?.data?.[0]?.d;
   if(!Array.isArray(values))return null;
-  return {available:true,source:'TradingView',assetType:'EQUITY',currency:'TRY',marketCap:numberValue(values[2]),pe:numberValue(values[3]),dividendYieldPercent:numberValue(values[4]),peApplicable:true,marketCapApplicable:true,dividendApplicable:true};
+  return {available:true,status:'ok',source:'TradingView',assetType:'EQUITY',currency:'TRY',marketCap:numberValue(values[2]),pe:numberValue(values[3]),dividendYieldPercent:numberValue(values[4]),peApplicable:true,marketCapApplicable:true,dividendApplicable:true};
 }
 module.exports=async(req,res)=>{
   res.setHeader('Allow','GET');if(req.method!=='GET')return res.status(405).json({error:'Yalnız GET yöntemi desteklenir.'});
   if(!allowRequest(req))return res.status(429).json({error:'Çok fazla istek gönderildi. Kısa süre sonra yeniden deneyin.'});
   const symbol=String(req.query.symbol||'').trim().toUpperCase();if(!/^[A-Z0-9.^=-]{1,30}$/.test(symbol))return res.status(400).json({error:'Geçersiz hisse kodu.'});setCache(res);
-  try{let request=inFlight.get(symbol);if(!request){request=(async()=>{let result=null;const bist=/^[A-Z][A-Z0-9-]{0,14}\.IS$/.test(symbol),us=/^[A-Z][A-Z0-9-]{0,14}$/.test(symbol);if(bist)result=await fetchBist(symbol);else if(us)result=await fetchNasdaq(symbol);return result?{symbol,...result}:{symbol,available:false,source:null,peApplicable:bist||us?null:false,marketCapApplicable:bist||us?null:false,dividendApplicable:bist||us?null:false}})().finally(()=>inFlight.delete(symbol));inFlight.set(symbol,request)}return res.status(200).json(await request)}
-  catch{return res.status(200).json({symbol,available:false,source:null,peApplicable:null,marketCapApplicable:null,dividendApplicable:null})}
+  try{let request=inFlight.get(symbol);if(!request){request=(async()=>{let result=null;const bist=/^[A-Z][A-Z0-9-]{0,14}\.IS$/.test(symbol),us=/^[A-Z][A-Z0-9-]{0,14}$/.test(symbol);if(bist)result=await fetchBist(symbol);else if(us)result=await fetchNasdaq(symbol);return result?{symbol,...result}:{symbol,available:false,status:bist||us?'no_data':'unsupported',source:null,peApplicable:bist||us?null:false,marketCapApplicable:bist||us?null:false,dividendApplicable:bist||us?null:false}})().finally(()=>inFlight.delete(symbol));inFlight.set(symbol,request)}return res.status(200).json(await request)}
+  catch(error){res.setHeader('Cache-Control','no-store');res.setHeader('Vercel-CDN-Cache-Control','no-store');return res.status(503).json({symbol,available:false,status:'provider_error',source:null,error:error.message||'Temel veri sağlayıcısına ulaşılamadı.',peApplicable:null,marketCapApplicable:null,dividendApplicable:null})}
 };

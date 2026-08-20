@@ -1,5 +1,5 @@
 const HEADERS={
-  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/4.3)',
+  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/5)',
   'Accept':'application/json, text/plain, */*',
   'Origin':'https://www.nasdaq.com',
   'Referer':'https://www.nasdaq.com/'
@@ -41,12 +41,13 @@ async function fetchClass(symbol,assetClass){
 }
 
 async function resolve(symbol){
-  if(symbol.includes('.'))return{symbol,events:[],provider:null,supported:false};
+  if(symbol.includes('.'))return{symbol,events:[],provider:null,supported:false,status:'unsupported'};
   const attempts=await Promise.allSettled(['stocks','etf'].map(assetClass=>fetchClass(symbol,assetClass)));
+  if(!attempts.some(result=>result.status==='fulfilled'))throw new Error('Temettü sağlayıcısına ulaşılamadı.');
   const events=attempts.flatMap(result=>result.status==='fulfilled'?result.value:[]);
   const seen=new Set();
   const unique=events.filter(item=>{const key=[item.exDate,item.paymentDate,item.amount,item.currency].join('|');if(seen.has(key))return false;seen.add(key);return true}).sort((a,b)=>(a.exDate||a.paymentDate)-(b.exDate||b.paymentDate)).slice(0,5);
-  return{symbol,events:unique,provider:'Nasdaq',supported:attempts.some(result=>result.status==='fulfilled')};
+  return{symbol,events:unique,provider:'Nasdaq',supported:true,status:unique.length?'ok':'no_events'};
 }
 
 module.exports=async(req,res)=>{
@@ -58,5 +59,5 @@ module.exports=async(req,res)=>{
   let request=inFlight.get(symbol);
   if(!request){request=resolve(symbol).finally(()=>inFlight.delete(symbol));inFlight.set(symbol,request)}
   try{return res.status(200).json(await request)}
-  catch{return res.status(200).json({symbol,events:[],provider:null,supported:false})}
+  catch(error){res.setHeader('Cache-Control','no-store');res.setHeader('Vercel-CDN-Cache-Control','no-store');return res.status(503).json({symbol,events:[],provider:'Nasdaq',supported:true,status:'provider_error',error:error.message||'Temettü sağlayıcısına ulaşılamadı.'})}
 };

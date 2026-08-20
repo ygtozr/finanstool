@@ -1,18 +1,20 @@
 const PROVIDER_HEADERS = {
-  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/4.3)',
+  'User-Agent':'Mozilla/5.0 (compatible; FinansTool/5)',
   'Accept':'application/json, text/plain, */*'
 };
 
 const inFlight = new Map();
+const lastKnownGood = new Map();
 const rateBuckets = new Map();
 const PROVIDER_TIMEOUT_MS = 4500;
 const RATE_WINDOW_MS = 60000;
 const RATE_LIMIT = 180;
+const LAST_GOOD_TTL_MS = 6*60*60*1000;
 
 function setCache(res) {
-  res.setHeader('Cache-Control','public, max-age=0, s-maxage=15, stale-while-revalidate=30');
-  res.setHeader('CDN-Cache-Control','public, s-maxage=15, stale-while-revalidate=30');
-  res.setHeader('Vercel-CDN-Cache-Control','public, s-maxage=15, stale-while-revalidate=30');
+  res.setHeader('Cache-Control','public, max-age=0, s-maxage=10, stale-while-revalidate=5');
+  res.setHeader('CDN-Cache-Control','public, s-maxage=10, stale-while-revalidate=5');
+  res.setHeader('Vercel-CDN-Cache-Control','public, s-maxage=10, stale-while-revalidate=5');
 }
 
 function clientAddress(req) {
@@ -48,8 +50,8 @@ function cleanQuery(raw) {
   return clean;
 }
 
-async function fetchJson(url,headers=PROVIDER_HEADERS) {
-  const response=await fetch(url,{headers,signal:AbortSignal.timeout(PROVIDER_TIMEOUT_MS)});
+async function fetchJson(url,headers=PROVIDER_HEADERS,options={}) {
+  const response=await fetch(url,{...options,headers,signal:AbortSignal.timeout(PROVIDER_TIMEOUT_MS)});
   const text=await response.text();
   let data;
   try{data=JSON.parse(text)}catch{throw new Error('Sağlayıcı geçersiz yanıt verdi.')}
@@ -147,13 +149,44 @@ async function fetchYahoo(host,symbol,params,label) {
   return data;
 }
 
+function tradingViewDescriptor(symbol) {
+  if(/^[A-Z][A-Z0-9-]{0,14}\.IS$/.test(symbol))return{endpoint:'turkey',ticker:'BIST:'+symbol.replace(/\.IS$/,''),currency:'TRY'};
+  const aliases={'TRY=X':'USDTRY','EURTRY=X':'EURTRY','GBPTRY=X':'GBPTRY','EURUSD=X':'EURUSD','TRYUSD=X':'TRYUSD'};
+  const pair=aliases[symbol]||(/^([A-Z]{3})([A-Z]{3})=X$/.test(symbol)?symbol.replace('=X',''):null);
+  return pair?{endpoint:'forex',ticker:'FX_IDC:'+pair,currency:pair.slice(3)}:null;
+}
+
+async function fetchTradingViewLatest(symbol,params) {
+  if(params.get('interval')!=='1d')return null;
+  const descriptor=tradingViewDescriptor(symbol);
+  if(!descriptor)return null;
+  const body={symbols:{tickers:[descriptor.ticker],query:{types:[]}},columns:['name','description','close','change','currency']};
+  const data=await fetchJson('https://scanner.tradingview.com/'+descriptor.endpoint+'/scan',{'User-Agent':PROVIDER_HEADERS['User-Agent'],'Accept':'application/json','Content-Type':'application/json','Origin':'https://www.tradingview.com'},{method:'POST',body:JSON.stringify(body)});
+  const values=data?.data?.[0]?.d,price=numberValue(values?.[2]),change=numberValue(values?.[3]);
+  if(!Number.isFinite(price)||price<=0)return null;
+  const previous=Number.isFinite(change)&&change>-99?price/(1+change/100):price;
+  const now=Math.floor(Date.now()/1000),previousTime=now-86400;
+  return{chart:{result:[{meta:{currency:String(values?.[4]||descriptor.currency||'USD').toUpperCase(),symbol,longName:String(values?.[1]||values?.[0]||symbol),shortName:String(values?.[0]||symbol),regularMarketTime:now,regularMarketPrice:price,chartPreviousClose:previous,priceHint:price<1?6:2,dataGranularity:'1d',dataProvider:'TradingView anlık yedek',fallbackLimited:true},timestamp:[previousTime,now],indicators:{quote:[{open:[previous,price],high:[previous,price],low:[previous,price],close:[previous,price],volume:[null,null]}],adjclose:[{adjclose:[previous,price]}]},events:{}}],error:null}};
+}
+
 async function resolvePrice(symbol,params,forcedFallback) {
   if(!forcedFallback){
     try{return await fetchYahoo('query1.finance.yahoo.com',symbol,params,'Yahoo Finance')}catch{}
   }
-  const nasdaq=await fetchNasdaq(symbol,params);
+  const alternatives=await Promise.allSettled([fetchNasdaq(symbol,params),fetchYahoo('query2.finance.yahoo.com',symbol,params,'Yahoo Finance ikincil erişim')]);
+  const yahoo=alternatives[1].status==='fulfilled'?alternatives[1].value:null;
+  if(yahoo)return yahoo;
+  const nasdaq=alternatives[0].status==='fulfilled'?alternatives[0].value:null;
   if(nasdaq)return nasdaq;
-  return fetchYahoo('query2.finance.yahoo.com',symbol,params,'Yahoo Finance ikincil erişim');
+  const tradingView=await fetchTradingViewLatest(symbol,params);
+  if(tradingView)return tradingView;
+  throw new Error('Fiyat verisi bulunamadı.');
+}
+
+function annotate(data,{stale=false,servedAt=Date.now()}={}) {
+  const result=data?.chart?.result?.[0],provider=result?.meta?.dataProvider||'Bilinmeyen',asOf=Number(result?.meta?.regularMarketTime)||Number(result?.timestamp?.at(-1))||null;
+  data._finansTool={provider,asOf,servedAt,stale:Boolean(stale),fallbackLimited:Boolean(result?.meta?.fallbackLimited)};
+  return data;
 }
 
 module.exports=async(req,res)=>{
@@ -172,11 +205,19 @@ module.exports=async(req,res)=>{
     inFlight.set(key,request);
   }
   try{
-    const data=await request;
+    const data=annotate(await request);
+    lastKnownGood.set(key,{time:Date.now(),data});
     const provider=data?.chart?.result?.[0]?.meta?.dataProvider||'Bilinmeyen';
     res.setHeader('X-Data-Provider',provider);
     return res.status(200).json(data);
   }catch{
+    const saved=lastKnownGood.get(key);
+    if(saved&&Date.now()-saved.time<LAST_GOOD_TTL_MS){
+      const data=annotate(saved.data,{stale:true});
+      res.setHeader('X-Data-Provider',data._finansTool.provider);
+      res.setHeader('X-Data-Stale','true');
+      return res.status(200).json(data);
+    }
     return res.status(502).json({error:'Birincil ve ikincil veri sağlayıcılarına ulaşılamadı.'});
   }
 };

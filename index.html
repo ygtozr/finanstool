@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#101827">
+  <meta id="themeColorMeta" name="theme-color" content="#101827">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="FinansTool">
@@ -23,14 +23,14 @@
     .favorites-panel h2 { margin:0; font-size:1.15rem; }
     .favorites-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:14px; }
     .favorites-panel-head .favorites-note { margin:2px 0 0; }
-    .favorites-panel-head button { padding:7px 11px; color:#062019; background:var(--accent); border:1px solid var(--accent); font-size:.8rem; font-weight:700; }
+    .favorites-panel-head button { min-height:44px; padding:7px 11px; color:#062019; background:var(--accent); border:1px solid var(--accent); font-size:.8rem; font-weight:700; }
     .favorites-note { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
     .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
     .favorite-add-search { position:relative; display:flex; gap:8px; margin:12px 0 0; }
     .favorite-add-search input { min-height:42px; padding:9px 11px; font-size:.84rem; }
-    .favorite-add-search > button { flex:0 0 42px; width:42px; padding:0; font-size:1.15rem; }
+    .favorite-add-search > button { flex:0 0 44px; width:44px; min-height:44px; padding:0; font-size:1.15rem; }
     .favorite-add-search .search-suggestions { right:50px; }
-    .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 32px; gap:7px; align-items:stretch; }
+    .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 44px; gap:7px; align-items:stretch; }
     .favorite-card { min-width:0; min-height:76px; padding:11px 12px; display:grid; grid-template-columns:46px minmax(0,1fr) auto; align-items:center; gap:11px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; }
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
     .favorite-card-badge { width:46px; height:46px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.76rem; font-weight:800; letter-spacing:.02em; }
@@ -46,8 +46,8 @@
     .favorite-change.positive { color:var(--accent); }
     .favorite-change.negative { color:var(--danger); }
     .favorite-actions { position:relative; display:grid; align-content:center; gap:7px; }
-    .favorite-menu-trigger { width:32px; height:32px; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1.1rem; line-height:1; }
-    .favorite-remove { width:32px; height:32px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.05rem; }
+    .favorite-menu-trigger { width:44px; height:44px; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1.1rem; line-height:1; }
+    .favorite-remove { width:44px; height:44px; padding:0; color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.05rem; }
     .favorite-menu-trigger[aria-expanded="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
     .favorite-quick-menu { position:absolute; z-index:30; top:0; right:calc(100% + 7px); width:184px; display:none; gap:3px; padding:6px; background:#111a2b; border:1px solid var(--line); border-radius:11px; box-shadow:0 14px 34px #0009; }
     .favorite-quick-menu.open { display:grid; }
@@ -77,7 +77,7 @@
     .price { color:var(--text); font-weight:700; }
     .error { color:var(--danger); }
     .chart-wrap { position:relative; height:clamp(290px,55vw,460px); }
-    .chart-ma-toggle { position:absolute; z-index:3; top:48px; left:58px; min-height:28px; padding:5px 8px; color:var(--text); background:#192337dd; border:1px solid var(--line); border-radius:7px; font-size:.66rem; font-weight:700; box-shadow:0 4px 12px #0005; }
+    .chart-ma-toggle { position:absolute; z-index:3; top:48px; left:58px; min-height:40px; padding:6px 10px; color:var(--text); background:#192337dd; border:1px solid var(--line); border-radius:7px; font-size:.68rem; font-weight:700; box-shadow:0 4px 12px #0005; }
     .chart-ma-toggle[aria-pressed="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
     .chart-asset-switcher { margin-top:22px; padding-top:16px; border-top:1px solid var(--line); }
     .chart-asset-switcher-buttons { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
@@ -141,7 +141,7 @@
     .portfolio-cash-value { min-width:0; display:grid; gap:1px; }
     .portfolio-cash-value small { color:var(--muted); font-size:.68rem; }
     .portfolio-cash-value strong { overflow:hidden; font-size:.88rem; text-overflow:ellipsis; white-space:nowrap; }
-    .portfolio-cash-delete { width:28px; height:28px; padding:0; color:var(--danger); background:#3b1720; }
+    .portfolio-cash-delete { width:44px; height:44px; padding:0; color:var(--danger); background:#3b1720; }
     .portfolio-cash-empty { margin:0; color:var(--muted); font-size:.78rem; }
     .portfolio-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
     .summary-card { padding:12px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
@@ -150,7 +150,7 @@
     .portfolio-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
     .portfolio-empty { grid-column:1/-1; padding:18px; text-align:center; color:var(--muted); border:1px dashed #40516e; border-radius:12px; }
     .portfolio-row { min-width:0; padding:8px 9px; border:1px solid var(--line); border-radius:10px; background:#0d1523; }
-    .portfolio-row-head { display:grid; grid-template-columns:34px minmax(0,1fr) auto 28px; align-items:center; gap:7px; margin-bottom:5px; }
+    .portfolio-row-head { display:grid; grid-template-columns:34px minmax(0,1fr) auto 44px; align-items:center; gap:7px; margin-bottom:5px; }
     .portfolio-row-logo { width:34px; height:34px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.58rem; font-weight:800; }
     .portfolio-row-logo > * { grid-area:1/1; }
     .portfolio-row-logo img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
@@ -158,7 +158,7 @@
     .portfolio-row-title strong, .portfolio-row-title small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .portfolio-row-title strong { font-size:.86rem; }
     .portfolio-row-title small { min-width:0; color:var(--muted); font-size:.68rem; }
-    .portfolio-delete { flex:0 0 28px; width:28px; height:28px; padding:0; color:var(--danger); background:#3b1720; }
+    .portfolio-delete { flex:0 0 44px; width:44px; height:44px; padding:0; color:var(--danger); background:#3b1720; }
     .portfolio-current-value { max-width:100px; overflow:hidden; font-size:.84rem; text-overflow:ellipsis; white-space:nowrap; }
     .portfolio-compact-line { min-width:0; display:flex; align-items:center; justify-content:space-between; gap:7px; padding-left:41px; }
     .portfolio-compact-profit { flex:0 0 auto; font-size:.72rem; font-weight:750; white-space:nowrap; }
@@ -186,7 +186,7 @@
     .alarm-row { display:flex; gap:8px; align-items:center; padding:10px; border-radius:9px; background:#0d1523; }
     .alarm-row span { flex:1; }
     .alarm-row small { display:block; color:var(--muted); }
-    .alarm-remove { width:34px; height:34px; padding:0; color:var(--danger); background:#3b1720; }
+    .alarm-remove { width:44px; height:44px; padding:0; color:var(--danger); background:#3b1720; }
     .alarm-triggered { border:1px solid var(--accent); }
     .portfolio-dialog { width:min(420px,calc(100vw - 30px)); color:var(--text); background:#192337; border:1px solid var(--line); border-radius:16px; padding:22px; box-shadow:0 24px 70px #000b; }
     .portfolio-dialog::backdrop { background:#020617bb; }
@@ -198,7 +198,7 @@
     .favorite-detail-identity .favorite-card-badge { grid-row:1/3; }
     .favorite-detail-identity h3 { margin:0; font-size:1.2rem; }
     .favorite-detail-identity p { margin:2px 0 0; color:var(--muted); font-size:.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .favorite-detail-close { flex:0 0 36px; width:36px; height:36px; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1.1rem; }
+    .favorite-detail-close { flex:0 0 44px; width:44px; height:44px; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1.1rem; }
     .favorite-detail-body { display:grid; gap:14px; max-height:min(66vh,620px); padding:18px 22px; overflow:auto; }
     .favorite-detail-loading,.favorite-detail-error { margin:0; padding:24px 12px; color:var(--muted); text-align:center; }
     .favorite-detail-error { color:var(--danger); }
@@ -224,7 +224,8 @@
     .data-actions { display:grid; gap:10px; margin:18px 0; }
     .data-actions button { width:100%; }
     .backup-file-label { display:grid; gap:7px; color:var(--muted); font-size:.88rem; }
-    .backup-file-label input { width:100%; text-transform:none; padding:10px; border:1px dashed var(--line); border-radius:10px; }
+    .backup-file-label label { width:max-content; min-height:44px; display:inline-flex; align-items:center; padding:10px 14px; border:1px dashed var(--line); border-radius:10px; cursor:pointer; }
+    .backup-file-label small { color:var(--muted); }
     .restore-mode { display:grid; gap:6px; margin-top:12px; color:var(--muted); font-size:.88rem; }
     .restore-mode select { width:100%; }
     .backup-preview { min-height:44px; margin:12px 0 0; padding:11px 13px; border:1px solid var(--line); border-radius:10px; color:var(--muted); background:#111a2b; font-size:.9rem; white-space:pre-line; }
@@ -328,7 +329,7 @@
     .distribution-summary-label { overflow:hidden; color:var(--text); font-weight:650; text-overflow:ellipsis; white-space:nowrap; }
     .distribution-summary-value { white-space:nowrap; }
     .distribution-summary:not(.expanded) li:nth-child(n+4) { display:none; }
-    .distribution-toggle { width:100%; margin-top:7px; padding:5px 7px; border-color:transparent; color:var(--accent); background:transparent; font-size:.7rem; }
+    .distribution-toggle { width:100%; min-height:44px; margin-top:7px; padding:5px 7px; border-color:transparent; color:var(--accent); background:transparent; font-size:.7rem; }
     .distribution-toggle:hover { border-color:var(--line); background:#182235; }
     .distribution-toggle[hidden] { display:none; }
     .distribution-empty[hidden] { display:none; }
@@ -384,10 +385,10 @@
     .market-summary-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:12px; }
     .market-summary-head h2 { margin:0; font-size:1.05rem; }
     .market-summary-head .favorites-note { margin:2px 0 0; }
-    .market-summary-head button { padding:7px 11px; font-size:.8rem; }
+    .market-summary-head button { min-height:44px; padding:7px 11px; font-size:.8rem; }
     .market-actions { display:flex; gap:7px; align-items:center; }
     .market-summary-head #marketRefresh { color:#062019; background:var(--accent); border:1px solid var(--accent); font-weight:700; }
-    .market-summary-head #marketSettingsButton { width:36px; padding:7px; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1rem; line-height:1; }
+    .market-summary-head #marketSettingsButton { width:44px; padding:7px; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1rem; line-height:1; }
     .market-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
     .market-card { min-width:0; padding:11px; text-align:left; color:var(--text); background:#0d1523; border:1px solid var(--line); }
     .market-card:hover { border-color:var(--accent); transform:translateY(-1px); }
@@ -404,7 +405,7 @@
     .market-settings-row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:#0d1523; }
     .market-settings-row span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .market-settings-row small { color:var(--muted); }
-    .market-settings-remove { width:32px; height:32px; padding:0; color:var(--danger); background:#3b1720; font-size:1rem; }
+    .market-settings-remove { width:44px; height:44px; padding:0; color:var(--danger); background:#3b1720; font-size:1rem; }
     .market-settings-empty { margin:12px 0; color:var(--muted); }
     .market-settings-search { position:relative; display:flex; gap:7px; }
     .market-settings-search input { min-width:0; flex:1; }
@@ -471,6 +472,16 @@
       .app-layout { grid-template-columns:1fr; }
       .favorites-panel { border-left:0; border-top:1px solid var(--line); padding:18px 0 0; }
       .favorites-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+
+    @media (min-width:761px) and (max-width:900px) {
+      body { place-items:start center; padding:16px; }
+      main { width:100%; padding:22px; }
+      main > .app-tabs { margin-bottom:20px; }
+      .app-layout { grid-template-columns:1fr; }
+      .favorites-panel { border-left:0; border-top:1px solid var(--line); padding:18px 0 0; }
+      .favorites-list,.portfolio-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .market-cards { grid-template-columns:repeat(4,minmax(0,1fr)); }
     }
 
     @media (max-width:760px) {
@@ -544,6 +555,10 @@
       .portfolio-page .distribution-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .portfolio-cash-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
+    @media (max-width:360px) {
+      .market-card-label { white-space:normal !important; line-height:1.2; }
+      .market-card-symbol { display:block; margin-top:2px; font-size:.66rem; }
+    }
       @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
     .portfolio-warning { margin:0 0 12px; padding:10px 12px; border:1px solid var(--danger); border-radius:10px; color:var(--danger); }
   </style>
@@ -568,7 +583,7 @@
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
       <div id="marketCards" class="market-cards"></div>
     </section>
-      <aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul><form id="favoriteAddForm" class="favorite-add-search" role="search"><input id="favoriteSearch" type="search" role="combobox" aria-autocomplete="list" aria-controls="favoriteSearchSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Favorilere hisse ekle"><button type="submit" aria-label="Hisseyi favorilere ekle">+</button><ul id="favoriteSearchSuggestions" class="search-suggestions" role="listbox" aria-label="Favorilere eklenecek hisse önerileri"></ul></form></aside>
+      <aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul><form id="favoriteAddForm" class="favorite-add-search" role="search"><label class="sr-only" for="favoriteSearch">Favorilere eklenecek hisseyi ara</label><input id="favoriteSearch" type="search" role="combobox" aria-autocomplete="list" aria-controls="favoriteSearchSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Favorilere hisse ekle"><button type="submit" aria-label="Hisseyi favorilere ekle">+</button><ul id="favoriteSearchSuggestions" class="search-suggestions" role="listbox" aria-label="Favorilere eklenecek hisse önerileri"></ul></form></aside>
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
@@ -596,7 +611,7 @@
         <div id="dateError" class="error" aria-live="polite"></div>
       </div>
     </section>
-    <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt>Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl><div class="period-summary-range"><div class="period-summary-range-track" role="progressbar" aria-label="Güncel fiyatın dönem aralığındaki konumu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="periodRangeFill" class="period-summary-range-fill"></span></div><div class="period-summary-range-labels"><span>Düşük</span><span id="periodRangePosition">Güncel: —</span><span>Yüksek</span></div></div></section>
+    <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt id="periodLastLabel">Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl><div class="period-summary-range"><div class="period-summary-range-track" role="progressbar" aria-label="Güncel fiyatın dönem aralığındaki konumu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="periodRangeFill" class="period-summary-range-fill"></span></div><div class="period-summary-range-labels"><span>Düşük</span><span id="periodRangePosition">Güncel: —</span><span>Yüksek</span></div></div></section>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
@@ -605,7 +620,7 @@
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
       <div id="portfolioList" class="portfolio-list"></div>
-      <div class="portfolio-search"><input id="portfolioSymbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="portfolioSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" role="listbox" aria-label="Portföy hisse önerileri"></ul></div>
+      <div class="portfolio-search"><label class="sr-only" for="portfolioSymbol">Portföye eklenecek hisseyi ara</label><input id="portfolioSymbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="portfolioSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" role="listbox" aria-label="Portföy hisse önerileri"></ul></div>
       <section class="portfolio-cash" aria-labelledby="portfolioCashTitle"><div class="portfolio-cash-head"><h3 id="portfolioCashTitle">Nakit Bakiyeleri</h3><button id="cashAddButton" type="button">+ Nakit Ekle</button></div><div id="portfolioCashList" class="portfolio-cash-list"></div></section>
       <section class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
         <h3 id="portfolioDistributionTitle">Portföy Dağılımı</h3>
@@ -618,7 +633,7 @@
         <div class="portfolio-benchmark-head"><div><h3 id="portfolioBenchmarkTitle">Performans Karşılaştırması</h3><p id="benchmarkStatus" class="benchmark-status">Portföy verisi bekleniyor…</p></div></div>
         <div class="benchmark-controls">
           <div class="benchmark-presets" aria-label="Hazır karşılaştırma ölçütleri"><button type="button" data-benchmark-symbol="^GSPC" data-benchmark-name="S&P 500">S&P 500</button><button type="button" data-benchmark-symbol="^IXIC" data-benchmark-name="Nasdaq">Nasdaq</button><button type="button" data-benchmark-symbol="XU100.IS" data-benchmark-name="BIST 100">BIST 100</button><button type="button" data-benchmark-symbol="GLD" data-benchmark-name="Altın">Altın</button></div>
-          <div class="benchmark-search"><input id="benchmarkSearch" type="search" role="combobox" aria-autocomplete="list" aria-controls="benchmarkSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Başka ölçüt ara"><button id="benchmarkApply" type="button">Karşılaştır</button><ul id="benchmarkSuggestions" class="search-suggestions" role="listbox" aria-label="Karşılaştırma ölçütü önerileri"></ul></div>
+          <div class="benchmark-search"><label class="sr-only" for="benchmarkSearch">Karşılaştırma ölçütü ara</label><input id="benchmarkSearch" type="search" role="combobox" aria-autocomplete="list" aria-controls="benchmarkSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Başka ölçüt ara"><button id="benchmarkApply" type="button">Karşılaştır</button><ul id="benchmarkSuggestions" class="search-suggestions" role="listbox" aria-label="Karşılaştırma ölçütü önerileri"></ul></div>
           <div class="benchmark-ranges" aria-label="Karşılaştırma süresi"><button type="button" data-benchmark-range="5d">1 Hafta</button><button type="button" data-benchmark-range="1mo">1 Ay</button><button type="button" data-benchmark-range="3mo">3 Ay</button><button type="button" data-benchmark-range="6mo">6 Ay</button><button type="button" data-benchmark-range="1y">1 Yıl</button><button type="button" data-benchmark-range="5y">5 Yıl</button><button id="benchmarkCustomRange" type="button" data-benchmark-range="custom">Şu Tarihten İtibaren</button></div><div id="benchmarkDatePicker" class="date-picker"><input id="benchmarkStartDate" type="date" aria-label="Karşılaştırma başlangıç tarihi"><p id="benchmarkDateError" class="error" role="alert"></p></div>
         </div>
         <div class="benchmark-chart-wrap"><canvas id="portfolioBenchmarkChart" role="img" aria-label="Portföy ve karşılaştırma ölçütü performans grafiği"></canvas><p id="benchmarkEmpty" class="benchmark-empty">Karşılaştırma için portföye hisse ekleyin.</p></div>
@@ -652,7 +667,7 @@
           <h3 id="backupTitle">Veri Yedekleme</h3>
           <p>Favoriler, hisse ve nakit portföyü, fiyat alarmları, piyasa özeti ve ayarlarınızı tek bir JSON dosyasında saklayın.</p>
           <div class="data-actions"><button id="backupDownload" type="button">Yedek Dosyasını İndir</button></div>
-          <label class="backup-file-label">Geri yüklenecek JSON dosyası<input id="backupFile" type="file" accept=".json,application/json"></label>
+          <div class="backup-file-label"><span>Geri yüklenecek JSON dosyası</span><label class="dialog-cancel" for="backupFile">Yedek Dosyası Seç</label><input id="backupFile" class="sr-only" type="file" accept=".json,application/json"><small id="backupFileName">Henüz dosya seçilmedi.</small></div>
           <label class="restore-mode">Geri yükleme yöntemi<select id="restoreMode"><option value="merge">Mevcut verilerle birleştir (önerilen)</option><option value="replace">Mevcut verilerin yerine koy</option></select></label>
           <div id="backupPreview" class="backup-preview" aria-live="polite">Henüz bir yedek dosyası seçilmedi.</div>
           <p id="backupError" class="backup-error" role="alert"></p>
@@ -677,6 +692,8 @@
     <form id="portfolioForm" class="portfolio-form" method="dialog">
       <label>Adet<input id="portfolioQuantity" type="number" min="0.000001" step="any" required></label>
       <label>Birim maliyet<input id="portfolioCost" type="number" min="0" step="any" required></label>
+      <label>Maliyet para birimi<select id="portfolioCostCurrency"><option value="AUTO">Ürünün işlem para birimi</option><option value="TRY">TRY · Türk Lirası</option><option value="USD">USD · ABD Doları</option><option value="EUR">EUR · Euro</option><option value="GBP">GBP · İngiliz Sterlini</option></select></label>
+      <label>Alım tarihi <small>(isteğe bağlı)</small><input id="portfolioPurchaseDate" type="date"></label>
       <div class="dialog-actions"><button id="portfolioCancel" class="dialog-cancel" type="button">Vazgeç</button><button type="submit">Kaydet</button></div>
     </form>
   </dialog>
@@ -739,6 +756,7 @@
     let maEnabled = false;
     let lastPrices = [];
     let lastLabels = [];
+    let lastRsiValues = [];
     let currentCurrency = 'TRY';
     let currentChartName = '';
     let primarySymbol = '';
@@ -752,6 +770,7 @@
     const favoriteRefresh = document.getElementById('favoriteRefresh');
     const favoriteUpdated = document.getElementById('favoriteUpdated');
     const periodLast = document.getElementById('periodLast');
+    const periodLastLabel = document.getElementById('periodLastLabel');
     const periodLastDate = document.getElementById('periodLastDate');
     const periodChange = document.getElementById('periodChange');
     const periodLow = document.getElementById('periodLow');
@@ -774,6 +793,7 @@
     const marketSettingsSearch = document.getElementById('marketSettingsSearch');
     const marketSettingsSuggestions = document.getElementById('marketSettingsSuggestions');
     const marketSettingsClose = document.getElementById('marketSettingsClose');
+    const themeColorMeta = document.getElementById('themeColorMeta');
     const defaultMarketItems = [
       {symbol:'TRY=X',label:'USD/TRY'},
       {symbol:'EURTRY=X',label:'EUR/TRY'},
@@ -818,13 +838,14 @@
       const cached=apiCache.get(url);
       if(!force&&cached&&now-cached.time<ttl)return cached.data;
       if(!force&&apiInFlight.has(url))return apiInFlight.get(url);
-      const request=fetch(url,{cache:'no-store'}).then(async response=>{
+      const requestUrl=force?url+(url.includes('?')?'&':'?')+'_reload='+now:url;
+      const request=fetch(requestUrl,{cache:'no-store'}).then(async response=>{
         const payload=await response.json().catch(()=>({}));
         if(!response.ok)throw new Error(payload.error||'Veri sağlayıcısına ulaşılamadı.');
         apiCache.set(url,{time:Date.now(),data:payload});
         return payload;
-      }).finally(()=>apiInFlight.delete(url));
-      apiInFlight.set(url,request);
+      }).finally(()=>{if(!force)apiInFlight.delete(url)});
+      if(!force)apiInFlight.set(url,request);
       return request;
     }
 
@@ -840,6 +861,7 @@
     const alarmPreferenceStatus = document.getElementById('alarmPreferenceStatus');
     const backupDownload = document.getElementById('backupDownload');
     const backupFile = document.getElementById('backupFile');
+    const backupFileName = document.getElementById('backupFileName');
     const restoreMode = document.getElementById('restoreMode');
     const backupPreview = document.getElementById('backupPreview');
     const backupError = document.getElementById('backupError');
@@ -908,6 +930,8 @@
     const portfolioForm = document.getElementById('portfolioForm');
     const portfolioQuantity = document.getElementById('portfolioQuantity');
     const portfolioCost = document.getElementById('portfolioCost');
+    const portfolioCostCurrency = document.getElementById('portfolioCostCurrency');
+    const portfolioPurchaseDate = document.getElementById('portfolioPurchaseDate');
     const portfolioCancel = document.getElementById('portfolioCancel');
     const portfolioCashList = document.getElementById('portfolioCashList');
     const cashAddButton = document.getElementById('cashAddButton');
@@ -942,7 +966,7 @@
     const alarmKey = 'finans-grafigi-alarms';
     let alarms = (() => { try { const saved=JSON.parse(localStorage.getItem(alarmKey)); return Array.isArray(saved) ? saved : []; } catch { return []; } })();
     const portfolioKey = 'finans-grafigi-portfolio';
-    let portfolio = (() => { try { const saved = JSON.parse(localStorage.getItem(portfolioKey)); return Array.isArray(saved) ? saved.filter(item => item && item.symbol && Number(item.quantity) > 0).map(item => ({ symbol:String(item.symbol).toUpperCase(), name:item.name || item.symbol, quantity:Number(item.quantity), unitCost:Number(item.unitCost) || 0 })) : []; } catch { return []; } })();
+    let portfolio = (() => { try { const saved = JSON.parse(localStorage.getItem(portfolioKey)); return Array.isArray(saved) ? saved.map(item=>{const quantity=Number(item?.quantity),unitCost=Number(item?.unitCost),costCurrency=['TRY','USD','EUR','GBP'].includes(String(item?.costCurrency||'').toUpperCase())?String(item.costCurrency).toUpperCase():null,purchaseDate=/^\d{4}-\d{2}-\d{2}$/.test(item?.purchaseDate||'')?item.purchaseDate:null;return{symbol:String(item?.symbol||'').toUpperCase(),name:item?.name||item?.symbol,quantity,unitCost,costCurrency,purchaseDate}}).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0) : []; } catch { return []; } })();
     const cashKey = 'finans-grafigi-cash-balances';
     const supportedCashCurrencies = ['TRY','USD','EUR','GBP'];
     let cashBalances = (()=>{try{const saved=JSON.parse(localStorage.getItem(cashKey));return Array.isArray(saved)?saved.map(item=>({currency:String(item?.currency||'').toUpperCase(),amount:Number(item?.amount)})).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0):[]}catch{return[]}})();
@@ -1034,18 +1058,19 @@
       change.textContent=signed.format(data.delta)+' · '+signed.format(data.change)+'%';priceBlock.append(price,change);
       const time=document.createElement('small');time.className='favorite-detail-time';time.textContent='Fiyat zamanı\n'+formatMarketDataTime(data.marketTimestamp);time.style.whiteSpace='pre-line';hero.append(priceBlock,time);
       const metrics=document.createElement('dl');metrics.className='favorite-detail-metrics';
+      const fundamentalFallback=data.fundamentalsStatus==='provider_error'?'Kaynak erişilemiyor':(data.fundamentalsStatus==='unsupported'?'Desteklenmiyor':'Veri yok');
       addFavoriteDetailMetric(metrics,'Günlük düşük – yüksek',Number.isFinite(data.dayLow)&&Number.isFinite(data.dayHigh)?money(data.dayLow,data.currency)+' – '+money(data.dayHigh,data.currency):'Veri yok');
       addFavoriteDetailMetric(metrics,'52 hafta düşük – yüksek',Number.isFinite(data.yearLow)&&Number.isFinite(data.yearHigh)?money(data.yearLow,data.currency)+' – '+money(data.yearHigh,data.currency):'Veri yok');
-      addFavoriteDetailMetric(metrics,'Piyasa değeri',detailValue(data.marketCap,value=>compactNumber(value)+' '+data.currency,data.marketCapApplicable===false?'Uygulanamaz':'Veri yok'));
-      addFavoriteDetailMetric(metrics,'F/K (TTM)',detailValue(data.pe,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(value),data.peApplicable===false?'Uygulanamaz':'Veri yok'));
-      addFavoriteDetailMetric(metrics,'Temettü verimi',detailValue(data.dividendYieldPercent,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(value)+'%',data.dividendApplicable===false?'Uygulanamaz':'Veri yok'));
+      addFavoriteDetailMetric(metrics,'Piyasa değeri',detailValue(data.marketCap,value=>compactNumber(value)+' '+data.currency,data.marketCapApplicable===false?'Uygulanamaz':fundamentalFallback));
+      addFavoriteDetailMetric(metrics,'F/K (TTM)',detailValue(data.pe,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(value),data.peApplicable===false?'Uygulanamaz':fundamentalFallback));
+      addFavoriteDetailMetric(metrics,'Temettü verimi',detailValue(data.dividendYieldPercent,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(value)+'%',data.dividendApplicable===false?'Uygulanamaz':fundamentalFallback));
       addFavoriteDetailMetric(metrics,'Hacim',detailValue(data.volume,compactNumber));
       addFavoriteDetailMetric(metrics,'RSI (14)',detailValue(data.rsi,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:1}).format(value)));
       favoriteDetailBody.append(hero,metrics);
       if(data.fundamentalsSource){const source=document.createElement('p');source.className='favorite-detail-source';source.textContent='Temel veri kaynağı: '+data.fundamentalsSource;favoriteDetailBody.append(source)}
     }
     async function fetchFavoriteDetail(item) {
-      const fundamentalsPromise=cachedApiJson('/api/fundamentals?symbol='+encodeURIComponent(item.symbol),{ttl:300000}).catch(()=>({available:false}));
+      const fundamentalsPromise=cachedApiJson('/api/fundamentals?symbol='+encodeURIComponent(item.symbol),{ttl:300000}).catch(()=>({available:false,status:'provider_error'}));
       const payload=await cachedApiJson(priceApiUrl(item.symbol,'range=1y&interval=1d'));
       const result=payload.chart?.result?.[0],quote=result?.indicators?.quote?.[0],timestamps=result?.timestamp;
       if(!quote?.close||!timestamps)throw new Error('Detay verisi bulunamadı');
@@ -1061,7 +1086,7 @@
       const pe=fundamentalNumber(fundamentals.pe)??(trailingEps>0?last.close/trailingEps:finiteMeta('trailingPE','forwardPE'));
       const metaYield=finiteMeta('dividendYield','trailingAnnualDividendYield');
       const dividendYieldPercent=fundamentalNumber(fundamentals.dividendYieldPercent)??(Number.isFinite(metaYield)?(Math.abs(metaYield)<=1?metaYield*100:metaYield):null);
-      return {name:meta.longName||meta.shortName||item.name||item.symbol,currency:String(meta.currency||fundamentals.currency||'USD').toUpperCase(),price:last.close,delta:last.close-previous.close,change:(last.close/previous.close-1)*100,dayLow:Number.isFinite(last.low)?last.low:finiteMeta('regularMarketDayLow','dayLow'),dayHigh:Number.isFinite(last.high)?last.high:finiteMeta('regularMarketDayHigh','dayHigh'),yearLow:lows.length?Math.min(...lows):finiteMeta('fiftyTwoWeekLow'),yearHigh:highs.length?Math.max(...highs):finiteMeta('fiftyTwoWeekHigh'),marketCap,pe,dividendYieldPercent,peApplicable:fundamentals.peApplicable,marketCapApplicable:fundamentals.marketCapApplicable,dividendApplicable:fundamentals.dividendApplicable,fundamentalsSource:fundamentals.source||null,volume:Number.isFinite(last.volume)?last.volume:finiteMeta('regularMarketVolume'),rsi:rsiSeries.at(-1),marketTimestamp:finiteMeta('regularMarketTime')||last.time};
+      return {name:meta.longName||meta.shortName||item.name||item.symbol,currency:String(meta.currency||fundamentals.currency||'USD').toUpperCase(),price:last.close,delta:last.close-previous.close,change:(last.close/previous.close-1)*100,dayLow:Number.isFinite(last.low)?last.low:finiteMeta('regularMarketDayLow','dayLow'),dayHigh:Number.isFinite(last.high)?last.high:finiteMeta('regularMarketDayHigh','dayHigh'),yearLow:lows.length?Math.min(...lows):finiteMeta('fiftyTwoWeekLow'),yearHigh:highs.length?Math.max(...highs):finiteMeta('fiftyTwoWeekHigh'),marketCap,pe,dividendYieldPercent,peApplicable:fundamentals.peApplicable,marketCapApplicable:fundamentals.marketCapApplicable,dividendApplicable:fundamentals.dividendApplicable,fundamentalsSource:fundamentals.source||null,fundamentalsStatus:fundamentals.status||'no_data',volume:Number.isFinite(last.volume)?last.volume:finiteMeta('regularMarketVolume'),rsi:rsiSeries.at(-1),marketTimestamp:finiteMeta('regularMarketTime')||last.time};
     }
     async function openFavoriteDetail(item) {
       closeFavoriteMenus();favoriteDetailItem={...item};const requestId=++favoriteDetailRequestId;renderFavoriteDetailIdentity(item);favoriteDetailBody.replaceChildren();
@@ -1269,9 +1294,9 @@
       return results;
     }
 
-    async function fetchFavoriteQuote(item) {
+    async function fetchFavoriteQuote(item,{force=false}={}) {
       const query='range=1mo&interval=1d';
-      const payload=await cachedApiJson(priceApiUrl(item.symbol,query));
+      const payload=await cachedApiJson(priceApiUrl(item.symbol,query),{force});
       const result=payload.chart?.result?.[0];
       const closes=result?.indicators?.quote?.[0]?.close;
       const timestamps=result?.timestamp;
@@ -1286,7 +1311,7 @@
         currency:String(result.meta?.currency||'USD').toUpperCase(),
         price,delta:price-previous,change:(price/previous-1)*100,
         marketTimestamp:Number(result.meta?.regularMarketTime)||points.at(-1).time,
-        updatedAt:Date.now()
+        updatedAt:Date.now(),stale:Boolean(payload._finansTool?.stale),provider:result.meta?.dataProvider||payload._finansTool?.provider||null
       };
     }
 
@@ -1294,8 +1319,8 @@
       favoriteUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
     }
 
-    async function refreshFavoriteQuotes() {
-      if(favoriteRefreshInProgress){favoriteRefreshQueued=true;return}
+    async function refreshFavoriteQuotes({force=false}={}) {
+      if(favoriteRefreshInProgress){favoriteRefreshQueued=force||favoriteRefreshQueued;return}
       if(!favorites.length){
         favoriteQuotes.clear();
         renderFavorites();
@@ -1305,7 +1330,7 @@
       favoriteRefreshInProgress=true;
       const items=favorites.map(item=>({...item}));
       try{
-        const results=await mapWithLimit(items,4,async item=>{try{return{ok:true,data:await fetchFavoriteQuote(item)}}catch{return{ok:false,item}}});
+        const results=await mapWithLimit(items,4,async item=>{try{return{ok:true,data:await fetchFavoriteQuote(item,{force})}}catch{return{ok:false,item}}});
         let namesChanged=false;
         results.forEach(result=>{
           const symbol=result.ok?result.data.symbol:result.item.symbol;
@@ -1324,7 +1349,7 @@
         updateFavoriteRefreshTimestamp();
       }finally{
         favoriteRefreshInProgress=false;
-        if(favoriteRefreshQueued){favoriteRefreshQueued=false;refreshFavoriteQuotes()}
+        if(favoriteRefreshQueued){favoriteRefreshQueued=false;refreshFavoriteQuotes({force:true})}
       }
     }
     let selectedRange = supportedDefaultRanges.includes(localStorage.getItem(defaultRangeKey)) ? localStorage.getItem(defaultRangeKey) : '6mo';
@@ -1436,7 +1461,8 @@
       card.dataset.symbol=item.symbol;
       const label=document.createElement('span');
       label.className='market-card-label';
-      label.textContent=item.label+' · '+item.symbol;
+      label.textContent=item.label+' ';
+      const symbol=document.createElement('small');symbol.className='market-card-symbol';symbol.textContent='· '+item.symbol;label.append(symbol);
       const value=document.createElement('strong');
       value.className='market-card-value';
       value.textContent='Yükleniyor…';
@@ -1453,13 +1479,14 @@
       const value=card.querySelector('.market-card-value');
       const change=card.querySelector('.market-card-change');
       if(!label||!value||!change)return;
-      label.textContent=item.label+' · '+item.symbol;
+      label.textContent=item.label+' ';
+      const symbol=document.createElement('small');symbol.className='market-card-symbol';symbol.textContent='· '+item.symbol;label.append(symbol);
       change.classList.remove('positive','negative');
       if(data?.ok){
         value.textContent=money(data.price,data.currency);
         change.textContent=(data.change>=0?'+':'')+data.change.toFixed(2)+'%';
         change.classList.add(data.change>=0?'positive':'negative');
-        card.title=item.label+' grafiğini aç';
+        card.title=(data.stale?'Önbellekteki son fiyat · ':'Fiyat zamanı '+formatMarketDataTime(data.marketTimestamp)+' · ')+item.label+' grafiğini aç';
         card.disabled=false;
         if(!card.dataset.bound){
           card.addEventListener('click',()=>{chartTab.click();symbolInput.value=item.symbol;updateFavoriteButton();loadPrice(item.symbol)});
@@ -1482,7 +1509,7 @@
       return [...marketCards.children];
     }
 
-    async function loadMarketSummary() {
+    async function loadMarketSummary({force=false}={}) {
       const requestId=++marketSummaryRequest;
       const items=marketItems.map(item=>({...item}));
       if(!items.length){
@@ -1499,16 +1526,17 @@
       const query='range=5d&interval=1d';
       const results=await mapWithLimit(items,4,async item=>{
         try{
-          const payload=await cachedApiJson(priceApiUrl(item.symbol,query));
+          const payload=await cachedApiJson(priceApiUrl(item.symbol,query),{force});
           const result=payload.chart?.result?.[0],prices=result?.indicators?.quote?.[0]?.close?.filter(value=>Number.isFinite(value)&&value>0)||[];
           if(prices.length<2)throw new Error('Yetersiz veri');
           const price=prices.at(-1),previous=prices.at(-2);
-          return{ok:true,price,currency:String(result.meta?.currency||'USD').toUpperCase(),change:(price/previous-1)*100};
+          return{ok:true,price,currency:String(result.meta?.currency||'USD').toUpperCase(),change:(price/previous-1)*100,marketTimestamp:Number(result.meta?.regularMarketTime)||Number(result.timestamp?.at(-1)),stale:Boolean(payload._finansTool?.stale)};
         }catch{return{ok:false}}
       });
       if(requestId!==marketSummaryRequest)return;
       items.forEach((item,index)=>updateMarketCard(cards[index],item,results[index]));
-      marketUpdated.textContent='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
+      const newest=Math.max(...results.filter(item=>item.ok&&Number.isFinite(item.marketTimestamp)).map(item=>item.marketTimestamp));
+      marketUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date())+(Number.isFinite(newest)?' · En yeni fiyat: '+formatMarketDataTime(newest):'');
     }
 
     function formatUpdateTime(date) {
@@ -1521,12 +1549,11 @@
       return new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(milliseconds));
     }
 
-    async function refreshMarketAndFavorites() {
+    async function refreshMarketAndFavorites({force=false}={}) {
       marketRefresh.disabled=true;
       favoriteRefresh.disabled=true;
       try{
-        await Promise.all([loadMarketSummary(),refreshFavoriteQuotes()]);
-        marketUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
+        await Promise.all([loadMarketSummary({force}),refreshFavoriteQuotes({force})]);
         updateFavoriteRefreshTimestamp();
       }finally{
         marketRefresh.disabled=false;
@@ -1538,13 +1565,14 @@
       themePreference=['light','dark','system'].includes(preference)?preference:'system';
       const resolved=themePreference==='system'?(themeMedia.matches?'light':'dark'):themePreference;
       document.documentElement.dataset.theme=resolved;
+      themeColorMeta.content=resolved==='light'?'#f8fafc':'#101827';
       if(persist)localStorage.setItem(themeKey,themePreference);
       themeChoiceButtons.forEach(button=>{
         const active=button.dataset.themeChoice===themePreference;
         button.classList.toggle('active',active);
         button.setAttribute('aria-pressed',String(active));
       });
-      if (lastLabels.length) renderChart(lastLabels,lastPrices,currentChartName,currentCurrency);
+      if (lastLabels.length) renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,lastRsiValues);
       refreshPortfolioDistributionTheme();
       if(portfolioBenchmarkChart){
         const color=distributionLegendColor();
@@ -1602,7 +1630,7 @@
       const sourceArray=value=>Array.isArray(value)?value.slice(0,500):[];
       const cleanText=(value,fallback)=>String(value||fallback||'').trim().slice(0,120);
       const cleanFavorites=sourceArray(raw.favorites).map(item=>{const symbol=normalizeSymbol(item?.symbol);return{symbol,name:cleanText(item?.name,symbol)}}).filter(item=>item.symbol);
-      const cleanPortfolio=sourceArray(raw.portfolio).map(item=>{const symbol=normalizeSymbol(item?.symbol),quantity=Number(item?.quantity),unitCost=Number(item?.unitCost);return{symbol,name:cleanText(item?.name,symbol),quantity,unitCost}}).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0);
+      const cleanPortfolio=sourceArray(raw.portfolio).map(item=>{const symbol=normalizeSymbol(item?.symbol),quantity=Number(item?.quantity),unitCost=Number(item?.unitCost),costCurrency=supportedCashCurrencies.includes(String(item?.costCurrency||'').toUpperCase())?String(item.costCurrency).toUpperCase():null,purchaseDate=/^\d{4}-\d{2}-\d{2}$/.test(item?.purchaseDate||'')?item.purchaseDate:null;return{symbol,name:cleanText(item?.name,symbol),quantity,unitCost,costCurrency,purchaseDate}}).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0);
       const cleanCash=sourceArray(raw.cashBalances).map(item=>({currency:String(item?.currency||'').toUpperCase(),amount:Number(item?.amount)})).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0);
       const cleanAlarms=sourceArray(raw.alarms).map(item=>{const symbol=normalizeSymbol(item?.symbol),target=Number(item?.target),condition=item?.condition==='below'?'below':'above';return{id:cleanText(item?.id,Date.now().toString(36)+Math.random().toString(36).slice(2)),symbol,target,condition,triggered:Boolean(item?.triggered)}}).filter(item=>item.symbol&&Number.isFinite(item.target)&&item.target>0);
       const cleanMarketItems=sourceArray(raw.marketItems).map(item=>{const symbol=normalizeSymbol(item?.symbol);return{symbol,label:cleanText(item?.label||item?.name,symbol)}}).filter(item=>item.symbol);
@@ -1626,7 +1654,7 @@
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
-          portfolio:portfolio.map(({symbol,name,quantity,unitCost})=>({symbol,name,quantity,unitCost})),
+          portfolio:portfolio.map(({symbol,name,quantity,unitCost,costCurrency,purchaseDate})=>({symbol,name,quantity,unitCost,costCurrency:costCurrency||null,purchaseDate:purchaseDate||null})),
           cashBalances:cashBalances.map(({currency,amount})=>({currency,amount})),
           alarms:alarms.map(({id,symbol,target,condition,triggered})=>({id,symbol,target,condition,triggered:Boolean(triggered)})),
           marketItems:marketItems.map(({symbol,label})=>({symbol,label})),
@@ -1696,7 +1724,7 @@
         columns.push({name:'MA100',values:movingAverageData?.ma100||sma(lastPrices,100)});
         columns.push({name:'MA200',values:movingAverageData?.ma200||sma(lastPrices,200)});
       }
-      columns.push({name:'RSI (14)',values:calculateRsi(lastPrices)});
+      columns.push({name:'RSI (14)',values:lastRsiValues.length===lastPrices.length?lastRsiValues:calculateRsi(lastPrices)});
       const quote=value=>'"'+String(value??'').replace(/"/g,'""')+'"';
       const rows=[columns.map(column=>quote(column.name)).join(';')];
       for(let index=0;index<lastLabels.length;index++)rows.push(columns.map(column=>quote(column.values[index])).join(';'));
@@ -1796,6 +1824,22 @@
       return {price:prices.at(-1),currency:String(result.meta?.currency||'USD').toUpperCase()};
     }
 
+    async function historicalUsdRate(currency,date) {
+      const code=String(currency||'USD').toUpperCase();
+      if(code==='USD')return 1;
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date||''))throw new Error('Geçersiz alım tarihi');
+      const start=new Date(date+'T00:00:00Z'),end=new Date(start);
+      start.setUTCDate(start.getUTCDate()-7);end.setUTCDate(end.getUTCDate()+4);
+      const query='period1='+Math.floor(start.getTime()/1000)+'&period2='+Math.floor(end.getTime()/1000)+'&interval=1d';
+      const payload=await cachedApiJson(priceApiUrl(code+'USD=X',query),{ttl:3600000});
+      const result=payload.chart?.result?.[0],values=resultPriceValues(result,{adjusted:true}),timestamps=result?.timestamp;
+      if(!values||!timestamps)throw new Error(code+'/USD tarihsel kuru bulunamadı');
+      const target=new Date(date+'T23:59:59Z').getTime()/1000;
+      const points=timestamps.map((time,index)=>({time,value:values[index]})).filter(point=>Number.isFinite(point.value)&&point.value>0&&point.time<=target);
+      if(!points.length)throw new Error(code+'/USD tarihsel kuru bulunamadı');
+      return points.at(-1).value;
+    }
+
     async function checkAlarms() {
       if(!alarmsEnabled)return;
       const active=alarms.filter(alarm=>!alarm.triggered);
@@ -1887,13 +1931,15 @@
       portfolioDialogSymbol.textContent = portfolioSelection.symbol + (portfolioSelection.name !== portfolioSelection.symbol ? ' · ' + portfolioSelection.name : '');
       portfolioQuantity.value = '';
       portfolioCost.value = '';
+      portfolioCostCurrency.value = 'AUTO';
+      portfolioPurchaseDate.value = '';
       portfolioDialog.showModal();
       portfolioQuantity.focus();
     }
 
     async function fetchPortfolioItem(position) {
       const query='range=1y&interval=1d&events=div';
-      const upcomingPromise=cachedApiJson('/api/dividends?symbol='+encodeURIComponent(position.symbol),{ttl:900000}).catch(()=>({events:[]}));
+      const upcomingPromise=cachedApiJson('/api/dividends?symbol='+encodeURIComponent(position.symbol),{ttl:900000}).catch(error=>({events:[],status:'provider_error',error:error.message}));
       const payload=await cachedApiJson(priceApiUrl(position.symbol,query));
       const result=payload.chart?.result?.[0];
       const rawCloses=result?.indicators?.quote?.[0]?.close;
@@ -1909,8 +1955,9 @@
       const name=result.meta?.longName||result.meta?.shortName||position.name||position.symbol;
       const upcoming=await upcomingPromise;
       const today=new Date().setHours(0,0,0,0);
-      const dividends=(upcoming.events||[]).map(event=>{const exDate=Number(event.exDate),paymentDate=Number(event.paymentDate);return{symbol:position.symbol,name,date:Number.isFinite(exDate)&&exDate>=today?exDate:paymentDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amount:Number(event.amount),currency:String(event.currency||currency).toUpperCase()}}).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
-      return {...position,name,currency,price:points.at(-1).close,previousPrice:(points.length>1?points.at(-2):points.at(-1)).close,weekStartPrice:weekBase.close,dividends,result};
+      const dividends=(upcoming.events||[]).map(event=>{const exDate=Number(event.exDate),paymentDate=Number(event.paymentDate),amountPerShare=Number(event.amount);return{symbol:position.symbol,name,date:Number.isFinite(exDate)&&exDate>=today?exDate:paymentDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*position.quantity,quantity:position.quantity,currency:String(event.currency||currency).toUpperCase()}}).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
+      const previousPoint=points.length>1?points.at(-2):points.at(-1);
+      return {...position,name,currency,price:points.at(-1).close,previousPrice:previousPoint.close,previousTime:previousPoint.time,weekStartPrice:weekBase.close,weekStartTime:weekBase.time,dividends,dividendStatus:upcoming.status||'ok',result};
     }
 
     function addPortfolioStat(parent, label, value, className='') {
@@ -2053,7 +2100,7 @@
       const color=distributionLegendColor();
       [portfolioAllocationChart,portfolioCurrencyChart].forEach(chart=>{
         if(!chart)return;
-        chart.options.plugins.legend.labels.color=color;
+        chart.options.plugins.legend.labels={...(chart.options.plugins.legend.labels||{}),color};
         chart.update('none');
       });
     }
@@ -2087,6 +2134,19 @@
       return values.map(value=>Number.isFinite(value)&&value>0?(value/base-1)*100:null);
     }
 
+    function resultPriceValues(result,options) {
+      const adjusted=Boolean(options&&options.adjusted);
+      const adjustedValues=result?.indicators?.adjclose?.[0]?.adjclose;
+      const closes=result?.indicators?.quote?.[0]?.close;
+      return adjusted&&Array.isArray(adjustedValues)&&adjustedValues.some(Number.isFinite)?adjustedValues:closes;
+    }
+
+    function commonPerformanceWindow(labels,portfolioValues,benchmarkValues) {
+      const start=labels.findIndex((_,index)=>Number.isFinite(portfolioValues[index])&&portfolioValues[index]>0&&Number.isFinite(benchmarkValues[index])&&benchmarkValues[index]>0);
+      if(start<0)return null;
+      return{labels:labels.slice(start),portfolio:normalizePerformance(portfolioValues.slice(start)),benchmark:normalizePerformance(benchmarkValues.slice(start))};
+    }
+
     function benchmarkLastValue(values) {
       for(let index=values.length-1;index>=0;index--)if(Number.isFinite(values[index]))return values[index];
       return null;
@@ -2117,7 +2177,7 @@
     async function fetchBenchmarkResult(symbol,query) {
       const payload=await cachedApiJson(priceApiUrl(symbol,query));
       const result=payload.chart?.result?.[0];
-      if(!result?.timestamp||!result?.indicators?.quote?.[0]?.close)throw new Error('Performans verisi bulunamadı');
+      if(!result?.timestamp||!resultPriceValues(result,{adjusted:true}))throw new Error('Performans verisi bulunamadı');
       return result;
     }
 
@@ -2156,16 +2216,17 @@
         const positionPromises=portfolio.map(async position=>{
           const prefetched=benchmarkSettings.range==='1y'?prefetchedPositions.find(item=>item.symbol===position.symbol&&item.result):null;
           if(prefetched)return{position,result:prefetched.result};
-          try{return{position,result:await fetchBenchmarkResult(position.symbol,query)}}catch{return null}
+          try{return{position,result:await fetchBenchmarkResult(position.symbol,query)}}catch(error){return{position,error}}
         });
         const [benchmarkResult,positionResults]=await Promise.all([benchmarkPromise,Promise.all(positionPromises)]);
         if(requestId!==portfolioBenchmarkRequestId)return;
-        const benchmarkRaw=benchmarkResult.indicators.quote[0].close;
+        const benchmarkRaw=resultPriceValues(benchmarkResult,{adjusted:true});
         const benchmarkPoints=benchmarkResult.timestamp.map((time,index)=>({time,value:benchmarkRaw[index]})).filter(point=>Number.isFinite(point.value)&&point.value>0);
         if(benchmarkPoints.length<2)throw new Error('Karşılaştırma ölçütünde yeterli veri yok');
         const formatter=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
         const labels=benchmarkPoints.map(point=>formatter.format(new Date(point.time*1000)));
-        const validPositions=positionResults.filter(Boolean);
+        const failedAssets=positionResults.filter(item=>item?.error).map(item=>item.position.symbol);
+        const validPositions=positionResults.filter(item=>item?.result);
         const benchmarkCurrency=String(benchmarkResult.meta?.currency||'USD').toUpperCase();
         const positionCurrencies=validPositions.map(item=>String(item.result.meta?.currency||'USD').toUpperCase());
         const useUsd=new Set([...positionCurrencies,...cashBalances.map(item=>item.currency),benchmarkCurrency]).size>1;
@@ -2173,32 +2234,34 @@
         for(const item of validPositions){
           try{
             const currency=String(item.result.meta?.currency||'USD').toUpperCase();
-            let values=fillMissingRates(alignResultToLabels(item.result,labels));
+            let values=fillMissingRates(alignResultToLabels(item.result,labels,{adjusted:true}));
             if(useUsd&&currency!=='USD')values=await convertSeriesToUsd(currency,values,labels,query);
             series.push({values,quantity:item.position.quantity});
-          }catch{}
+          }catch{failedAssets.push(item.position.symbol)}
         }
         for(const balance of cashBalances){
           try{
             let values=labels.map(()=>balance.amount);
             if(useUsd&&balance.currency!=='USD')values=await convertSeriesToUsd(balance.currency,values,labels,query);
             series.push({values,quantity:1});
-          }catch{}
+          }catch{failedAssets.push('Nakit '+balance.currency)}
         }
         if(requestId!==portfolioBenchmarkRequestId)return;
+        if(failedAssets.length)throw new Error('Kısmi sonuç gösterilmedi. Eksik veri: '+[...new Set(failedAssets)].join(', '));
         if(!series.length)throw new Error('Portföy performansı hesaplanamadı');
         const totalValues=labels.map((_,index)=>{
           const values=series.map(item=>Number.isFinite(item.values[index])?item.values[index]*item.quantity:null);
           return values.every(Number.isFinite)?values.reduce((sum,value)=>sum+value,0):null;
         });
-        let benchmarkValues=fillMissingRates(alignResultToLabels(benchmarkResult,labels));
+        let benchmarkValues=fillMissingRates(alignResultToLabels(benchmarkResult,labels,{adjusted:true}));
         if(useUsd&&benchmarkCurrency!=='USD')benchmarkValues=await convertSeriesToUsd(benchmarkCurrency,benchmarkValues,labels,query);
         if(requestId!==portfolioBenchmarkRequestId)return;
-        const portfolioPerformance=normalizePerformance(totalValues);
-        const benchmarkPerformance=normalizePerformance(benchmarkValues);
-        renderPortfolioBenchmarkChart(labels,portfolioPerformance,benchmarkPerformance);
+        const common=commonPerformanceWindow(labels,totalValues,benchmarkValues);
+        if(!common)throw new Error('Portföy ve ölçüt için ortak başlangıç tarihi bulunamadı');
+        const commonLabels=common.labels,portfolioPerformance=common.portfolio,benchmarkPerformance=common.benchmark;
+        renderPortfolioBenchmarkChart(commonLabels,portfolioPerformance,benchmarkPerformance);
         renderBenchmarkStats(portfolioPerformance,benchmarkPerformance);
-        benchmarkStatus.textContent='Son güncelleme: '+formatUpdateTime(new Date())+' · '+series.length+'/'+(portfolio.length+cashBalances.length)+' varlık'+(useUsd?' · USD bazında':'');
+        benchmarkStatus.textContent='Son güncelleme: '+formatUpdateTime(new Date())+' · Ortak başlangıç: '+commonLabels[0]+' · Toplam getiri (temettü/bölünme düzeltilmiş)'+(useUsd?' · USD bazında':'');
       }catch(error){
         if(requestId!==portfolioBenchmarkRequestId)return;
         if(portfolioBenchmarkChart){portfolioBenchmarkChart.destroy();portfolioBenchmarkChart=null}
@@ -2226,6 +2289,10 @@
         li.append(button);benchmarkSuggestions.append(li);
       });
       updateComboboxState(benchmarkSearch,benchmarkSuggestions,items.length>0);
+    }
+
+    function isPortfolioSummaryComplete(failedPositions,missingRates) {
+      return failedPositions.length===0&&missingRates.size===0;
     }
 
     async function renderPortfolio() {
@@ -2258,7 +2325,8 @@
       const results=await Promise.all(portfolio.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
       if(renderId!==portfolioRenderId)return;
       const valid=results.filter(result=>result.ok).map(result=>result.value);
-      const currencies=[...new Set([...valid.map(item=>item.currency),...cashBalances.map(item=>item.currency)])];
+      const failedPositions=results.filter(result=>!result.ok).map(result=>result.position.symbol);
+      const currencies=[...new Set([...valid.flatMap(item=>[item.currency,item.costCurrency||item.currency]),...cashBalances.map(item=>item.currency)])];
       const mixedCurrency=currencies.length>1;
       const summaryCurrency=mixedCurrency?'USD':(currencies[0]||'USD');
       const rates=new Map([['USD',1]]);
@@ -2272,6 +2340,20 @@
           }catch{missingRates.add(code)}
         }));
       }
+      const costRates=new Map();
+      await Promise.all(valid.map(async position=>{
+        const costCurrency=position.costCurrency||position.currency;
+        if(!mixedCurrency){costRates.set(position.symbol,{cost:1,current:1,previous:1,week:1});return}
+        const dateOf=time=>new Date(time*1000).toISOString().slice(0,10);
+        try{
+          const [cost,previous,week]=await Promise.all([
+            position.purchaseDate?historicalUsdRate(costCurrency,position.purchaseDate):Promise.resolve(rates.get(costCurrency)),
+            historicalUsdRate(position.currency,dateOf(position.previousTime)),
+            historicalUsdRate(position.currency,dateOf(position.weekStartTime))
+          ]);
+          costRates.set(position.symbol,{cost,current:rates.get(position.currency),previous,week});
+        }catch{costRates.set(position.symbol,{cost:null,current:rates.get(position.currency),previous:null,week:null})}
+      }));
       if(renderId!==portfolioRenderId)return;
       const scrollBeforeCommit=window.scrollY;
       portfolioList.replaceChildren();
@@ -2279,6 +2361,7 @@
       dividendList.replaceChildren();
       let totalCost=0,totalValue=0,totalPreviousValue=0,totalWeekStartValue=0;
       const allDividends=[];
+      const dividendStatuses=[];
       const allocationValues=[];
       const currencyValues=new Map();
       results.forEach(result=>{
@@ -2299,25 +2382,25 @@
         const details=document.createElement('div');details.className='portfolio-compact-detail';
         const quantityText=new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(position.quantity);
         const cost=position.quantity*position.unitCost;
-        details.textContent=quantityText+' adet · Maliyet '+money(position.unitCost,result.ok?position.currency:'TRY');
-        details.setAttribute('aria-label',quantityText+' adet, birim maliyet '+money(position.unitCost,result.ok?position.currency:'TRY'));
+        const costCurrency=result.ok?(position.costCurrency||position.currency):(position.costCurrency||'TRY');
+        details.textContent=quantityText+' adet · Maliyet '+money(position.unitCost,costCurrency)+(position.purchaseDate?' · '+new Intl.DateTimeFormat('tr-TR').format(new Date(position.purchaseDate+'T00:00:00')):'');
+        details.setAttribute('aria-label',quantityText+' adet, birim maliyet '+money(position.unitCost,costCurrency));
         if(result.ok){
-          const value=position.quantity*position.price,profit=value-cost,percent=cost>0?profit/cost*100:0,tone=profit>=0?'positive':'negative';
+          const value=position.quantity*position.price,positionRates=costRates.get(position.symbol)||{},currentFactor=positionRates.current,costFactor=positionRates.cost,convertedValue=value*currentFactor,convertedCost=cost*costFactor,profit=convertedValue-convertedCost,percent=convertedCost>0?profit/convertedCost*100:0,tone=profit>=0?'positive':'negative';
           currentValue.textContent=money(value,position.currency);
           currentValue.setAttribute('aria-label','Güncel toplam değer '+money(value,position.currency));
-          profitValue.textContent=money(profit,position.currency)+' · '+(percent>=0?'+':'')+percent.toFixed(2)+'%';
-          profitValue.classList.add(tone);
-          profitValue.setAttribute('aria-label','Kâr zarar '+money(profit,position.currency)+', yüzde '+(percent>=0?'+':'')+percent.toFixed(2));
-          const factor=mixedCurrency?rates.get(position.currency):1;
-          if(Number.isFinite(factor)&&factor>0){
-            const convertedValue=value*factor;
-            totalCost+=cost*factor;totalValue+=convertedValue;totalPreviousValue+=position.quantity*position.previousPrice*factor;totalWeekStartValue+=position.quantity*position.weekStartPrice*factor;
+          profitValue.textContent=Number.isFinite(profit)?money(profit,summaryCurrency)+' · '+(percent>=0?'+':'')+percent.toFixed(2)+'%':'Kur verisi eksik';
+          profitValue.classList.add(Number.isFinite(profit)?tone:'negative');
+          profitValue.setAttribute('aria-label',Number.isFinite(profit)?'Kâr zarar '+money(profit,summaryCurrency)+', yüzde '+(percent>=0?'+':'')+percent.toFixed(2):'Kâr zarar kur verisi eksik olduğu için hesaplanamadı');
+          if([currentFactor,costFactor,positionRates.previous,positionRates.week].every(value=>Number.isFinite(value)&&value>0)){
+            totalCost+=convertedCost;totalValue+=convertedValue;totalPreviousValue+=position.quantity*position.previousPrice*positionRates.previous;totalWeekStartValue+=position.quantity*position.weekStartPrice*positionRates.week;
             if(convertedValue>0){
               allocationValues.push({label:position.symbol,value:convertedValue});
               currencyValues.set(position.currency,(currencyValues.get(position.currency)||0)+convertedValue);
             }
-          }else missingRates.add(position.currency);
+          }else missingRates.add(!Number.isFinite(costFactor)?costCurrency+' tarihsel maliyet kuru':position.currency);
           allDividends.push(...position.dividends);
+          dividendStatuses.push({symbol:position.symbol,status:position.dividendStatus});
           const saved=portfolio.find(item=>item.symbol===position.symbol);if(saved)saved.name=position.name;
         }else{
           currentValue.textContent='Veri yok';
@@ -2338,15 +2421,15 @@
         }else missingRates.add(balance.currency);
       });
       savePortfolio();
-      if(missingRates.size){
+      if(!isPortfolioSummaryComplete(failedPositions,missingRates)){
         const codes=[...missingRates].join(', ');
-        portfolioTotalValue.textContent='Kur verisi alınamadı';
-        portfolioDailyChange.textContent=codes+' para birimi toplam hesaba katılmadı; yanıltıcı toplam gösterilmiyor.';
+        portfolioTotalValue.textContent='Eksik veri';
+        portfolioDailyChange.textContent=(failedPositions.length?failedPositions.length+'/'+portfolio.length+' pozisyon fiyatlanamadı. ':'')+(codes?codes+' kuru alınamadı. ':'')+'Yanıltıcı toplam gösterilmiyor.';
         portfolioDailyChange.classList.add('negative');
         const warning=document.createElement('p');
         warning.className='portfolio-warning';
         warning.setAttribute('role','alert');
-        warning.textContent='Portföy özeti hesaplanamadı: '+codes+'/USD kuru alınamadı. Varlık kartlarındaki yerel değerler geçerlidir.';
+        warning.textContent='Portföy özeti hesaplanamadı.'+(failedPositions.length?' Fiyatı alınamayan pozisyonlar: '+failedPositions.join(', ')+'.':'')+(codes?' Eksik kur verileri: '+codes+'.':'')+' Varlık kartlarındaki alınabilen yerel değerler geçerlidir.';
         portfolioSummary.append(warning);
         renderPortfolioDistribution([],new Map(),'USD');
       }else{
@@ -2367,14 +2450,16 @@
         renderPortfolioDistribution(allocationValues,currencyValues,summaryCurrency);
       }
       const dividends=allDividends.sort((a,b)=>a.date-b.date).slice(0,5);
-      if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';empty.textContent=portfolio.length?'Açıklanmış yaklaşan temettü bulunamadı.':'Temettü takvimi için portföyde hisse bulunmuyor.';dividendList.append(empty)}
-      else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency);row.append(date,symbol,amount);dividendList.append(row)});
+      if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';const providerErrors=dividendStatuses.filter(item=>item.status==='provider_error').map(item=>item.symbol),unsupported=dividendStatuses.filter(item=>item.status==='unsupported').map(item=>item.symbol);empty.textContent=providerErrors.length?'Temettü sağlayıcısına erişilemedi: '+providerErrors.join(', '):unsupported.length?'Temettü takvimi desteklenmeyen ürünler: '+unsupported.join(', '):(portfolio.length?'Açıklanmış yaklaşan temettü bulunamadı.':'Temettü takvimi için portföyde hisse bulunmuyor.');dividendList.append(empty)}
+      else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency)+' · '+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(item.quantity)+' adet';amount.title='Hisse başı '+money(item.amountPerShare,item.currency)+' · tahmini brüt toplam';row.append(date,symbol,amount);dividendList.append(row)});
       renderPortfolioBenchmark(valid);
       if(keepExistingPortfolio&&portfolioView.classList.contains('active'))requestAnimationFrame(()=>window.scrollTo({top:scrollBeforeCommit,behavior:'auto'}));
     }
 
     function money(value, currency) {
-      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: currency || 'USD', maximumFractionDigits: 2 }).format(value);
+      const absolute=Math.abs(Number(value));
+      const digits=absolute>0&&absolute<0.01?6:(absolute>0&&absolute<1?4:2);
+      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: currency || 'USD', minimumFractionDigits:Math.min(2,digits), maximumFractionDigits:digits }).format(value);
     }
 
     function sma(values,period) {
@@ -2409,6 +2494,18 @@
       return output;
     }
 
+    async function prepareVisibleRsi(symbol,visiblePoints) {
+      if(!visiblePoints.length)return[];
+      const period1=Math.max(0,visiblePoints[0].time-60*86400),period2=visiblePoints.at(-1).time+2*86400;
+      const payload=await cachedApiJson(priceApiUrl(symbol,'period1='+period1+'&period2='+period2+'&interval=1d'));
+      const result=payload.chart?.result?.[0],closes=result?.indicators?.quote?.[0]?.close,timestamps=result?.timestamp;
+      if(!closes||!timestamps)throw new Error('RSI geçmiş verisi bulunamadı');
+      const history=timestamps.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0&&point.time<=visiblePoints.at(-1).time);
+      const values=calculateRsi(history.map(point=>point.close));
+      const byTime=new Map(history.map((point,index)=>[point.time,values[index]]));
+      return visiblePoints.map(point=>byTime.get(point.time)??null);
+    }
+
     async function prepareMovingAverages(symbol,labels) {
       const query='range=10y&interval=1d';
       const payload=await cachedApiJson(priceApiUrl(symbol,query));
@@ -2436,11 +2533,11 @@
       };
     }
 
-    function renderRsiChart(labels,prices) {
+    function renderRsiChart(labels,prices,preparedValues=null) {
       const wrap=document.getElementById('rsiWrap');
       wrap.classList.add('visible');
       const colors=chartThemeColors();
-      const rsiValues=calculateRsi(prices);
+      const rsiValues=Array.isArray(preparedValues)&&preparedValues.length===prices.length?preparedValues:calculateRsi(prices);
       const datasets=[
         {label:'RSI (14)',data:rsiValues,borderColor:colors.accent,backgroundColor:'rgba(82,213,177,.08)',fill:true,pointRadius:0,pointHoverRadius:4,borderWidth:2,tension:.18},
         {label:'Aşırı alım (70)',data:labels.map(()=>70),borderColor:'#dc2626',borderDash:[5,5],pointRadius:0,borderWidth:1,fill:false},
@@ -2456,9 +2553,9 @@
       document.getElementById('rsiChartSummary').textContent=Number.isFinite(latest)?'Son RSI 14 değeri '+latest.toFixed(2)+'. 70 üzeri aşırı alım, 30 altı aşırı satım bölgesidir.':'RSI için yeterli veri yok.';
     }
 
-    function renderChart(labels,prices,name,currency) {
+    function renderChart(labels,prices,name,currency,rsiValues=null) {
       if(!labels.length||!prices.length)return;
-      lastLabels=[...labels];lastPrices=[...prices];currentChartName=name||currentChartName;currentCurrency=currency||currentCurrency;
+      lastLabels=[...labels];lastPrices=[...prices];lastRsiValues=Array.isArray(rsiValues)&&rsiValues.length===prices.length?[...rsiValues]:calculateRsi(prices);currentChartName=name||currentChartName;currentCurrency=currency||currentCurrency;
       const colors=chartThemeColors();
       const datasets=[{label:currentChartName+' kapanış fiyatı ('+currentCurrency+')',assetSymbol:primarySymbol||currentSymbol(),data:lastPrices,borderColor:colors.accent,backgroundColor:'rgba(82,213,177,.14)',fill:true,pointRadius:0,pointHoverRadius:5,tension:.18,borderWidth:2,yAxisID:'price'}];
       if(maEnabled){
@@ -2475,7 +2572,7 @@
       const first=lastPrices.find(Number.isFinite),last=benchmarkLastValue(lastPrices);
       const change=Number.isFinite(first)&&Number.isFinite(last)&&first!==0?(last/first-1)*100:null;
       document.getElementById('priceChartSummary').textContent=Number.isFinite(change)?currentChartName+' için '+labels[0]+' ile '+labels.at(-1)+' arasında '+(change>=0?'yüzde ':'eksi yüzde ')+Math.abs(change).toFixed(2)+' değişim. Grafikte '+datasets.length+' seri var.':'Grafik için sayısal özet oluşturulamadı.';
-      renderRsiChart(lastLabels,lastPrices);
+      renderRsiChart(lastLabels,lastPrices,lastRsiValues);
     }
 
     function setActivePeriod(button) {
@@ -2505,8 +2602,10 @@
       if(!points.length)return null;
       const first=points[0];
       const last=points.at(-1);
-      const low=points.reduce((best,point)=>point.close<best.close?point:best,points[0]);
-      const high=points.reduce((best,point)=>point.close>best.close?point:best,points[0]);
+      const lowPoint=points.reduce((best,point)=>(Number.isFinite(point.low)?point.low:point.close)<(Number.isFinite(best.low)?best.low:best.close)?point:best,points[0]);
+      const highPoint=points.reduce((best,point)=>(Number.isFinite(point.high)?point.high:point.close)>(Number.isFinite(best.high)?best.high:best.close)?point:best,points[0]);
+      const low={...lowPoint,close:Number.isFinite(lowPoint.low)?lowPoint.low:lowPoint.close};
+      const high={...highPoint,close:Number.isFinite(highPoint.high)?highPoint.high:highPoint.close};
       const spread=high.close-low.close;
       const position=spread>0?Math.max(0,Math.min(100,(last.close-low.close)/spread*100)):50;
       return {last,low,high,position,change:first.close!==0?(last.close/first.close-1)*100:null};
@@ -2578,15 +2677,16 @@
           ? `period1=${Math.floor(new Date(`${selectedStart}T00:00:00Z`).getTime()/1000)}&period2=${Math.floor(Date.now()/1000)}&interval=1d`
           : `range=${encodeURIComponent(selectedRange)}&interval=1d`;
         const url=priceApiUrl(symbol,query);
-        const response=await fetch(url,{cache:'no-store',signal:controller.signal});
+        const requestUrl=silent?url:url+(url.includes('?')?'&':'?')+'_reload='+Date.now();
+        const response=await fetch(requestUrl,{cache:'no-store',signal:controller.signal});
         const payload=await response.json().catch(()=>({}));
         if(!response.ok)throw new Error(payload.error||'Veri sağlayıcısına ulaşılamadı.');
         if(requestId!==priceRequestId)return;
         apiCache.set(url,{time:Date.now(),data:payload});
         const result=payload.chart?.result?.[0];
-        const closes=result?.indicators?.quote?.[0]?.close;
+        const quote=result?.indicators?.quote?.[0],closes=quote?.close;
         if(!result||!closes)throw new Error('Bu finans kodu için fiyat verisi bulunamadı.');
-        const points=result.timestamp.map((time,index)=>({time,close:closes[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0);
+        const points=result.timestamp.map((time,index)=>({time,close:closes[index],low:quote.low?.[index],high:quote.high?.[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0);
         if(!points.length)throw new Error('Bu finans kodu için kullanılabilir fiyat verisi bulunamadı.');
         const labels=points.map(point=>new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(point.time*1000)));
         const prices=points.map(point=>point.close);
@@ -2603,6 +2703,8 @@
         primarySymbol=symbol;
         const last=prices.at(-1);
         const change=((last/prices[0])-1)*100;
+        const isLive=['REGULAR','PRE','POST','PREPRE','POSTPOST'].includes(String(info.marketState||'').toUpperCase());
+        periodLastLabel.textContent=isLive?'Güncel fiyat':'Son kapanış';
         updatePeriodSummary(points,currency);
         meta.replaceChildren();
         const namePart=document.createElement('span');
@@ -2611,7 +2713,7 @@
         namePart.append(nameStrong);
         const pricePart=document.createElement('span');
         pricePart.className='price';
-        pricePart.textContent=`Son kapanış: ${money(last,currency)}`;
+        pricePart.textContent=`${isLive?'Güncel fiyat':'Son kapanış'}: ${money(last,currency)} · ${formatMarketDataTime(Number(info.regularMarketTime)||points.at(-1).time)}`;
         const changePart=document.createElement('span');
         const changeStrong=document.createElement('strong');
         changeStrong.className=change<0?'error':'';
@@ -2624,12 +2726,20 @@
           providerPart.textContent='Kaynak: '+info.dataProvider;
           meta.append(providerPart);
         }
+        if(payload._finansTool?.stale||payload._finansTool?.fallbackLimited){
+          const warning=document.createElement('span');warning.className='error';
+          warning.textContent=payload._finansTool.stale?'Son başarılı önbellek verisi gösteriliyor.':'Yedek kaynak yalnız son iki fiyat noktasını sağladı.';
+          meta.append(warning);
+        }
         movingAverageData=null;
         if(maEnabled){
           try{await prepareMovingAverages(symbol,labels)}catch{}
           if(requestId!==priceRequestId)return;
         }
-        renderChart(labels,prices,name,currency);
+        let rsiValues=null;
+        try{rsiValues=await prepareVisibleRsi(symbol,points)}catch{}
+        if(requestId!==priceRequestId)return;
+        renderChart(labels,prices,name,currency,rsiValues);
         updateFavoriteQuoteCard(symbol);
       }catch(error){
         if(error.name==='AbortError'||requestId!==priceRequestId)return;
@@ -2663,14 +2773,14 @@
         try{await prepareMovingAverages(primarySymbol||currentSymbol(),lastLabels)}catch{movingAverageData=null}
         maToggle.disabled=false;
       }
-      renderChart(lastLabels,lastPrices,currentChartName,currentCurrency);
+      renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,lastRsiValues);
     }
     maToggle.addEventListener('click',toggleMovingAverages);
     chartFavoritesToggle.addEventListener('click',()=>toggleChartAssetPanel('favorites'));
     chartPortfolioToggle.addEventListener('click',()=>toggleChartAssetPanel('portfolio'));
 
-    function alignResultToLabels(result, labels) {
-      const raw = result?.indicators?.quote?.[0]?.close;
+    function alignResultToLabels(result, labels,{adjusted=false}={}) {
+      const raw = resultPriceValues(result,{adjusted});
       const timestamps = result?.timestamp;
       if (!raw || !timestamps) throw new Error('Fiyat verisi bulunamadı');
       const formatter = new Intl.DateTimeFormat('tr-TR', { day:'2-digit', month:'short', year:'numeric' });
@@ -2808,7 +2918,7 @@
       trigger?.focus();
     });
 
-    const manualRefreshMarketAndFavorites=()=>{apiCache.clear();return refreshMarketAndFavorites()};
+    const manualRefreshMarketAndFavorites=()=>{apiCache.clear();return refreshMarketAndFavorites({force:true})};
     marketRefresh.addEventListener('click',manualRefreshMarketAndFavorites);
     favoriteRefresh.addEventListener('click',manualRefreshMarketAndFavorites);
     marketSettingsButton.addEventListener('click',()=>{renderMarketSettings();marketSettingsDialog.showModal();marketSettingsSearch.focus()});
@@ -2869,6 +2979,7 @@
       backupError.textContent='';
       backupPreview.classList.remove('success');
       const file=backupFile.files?.[0];
+      backupFileName.textContent=file?file.name:'Henüz dosya seçilmedi.';
       if(!file){backupPreview.textContent='Henüz bir yedek dosyası seçilmedi.';return}
       if(file.size>1024*1024){backupPreview.textContent='Dosya okunamadı.';backupError.textContent='Yedek dosyası 1 MB sınırını aşıyor.';return}
       try{
@@ -2991,7 +3102,18 @@
       }
     }
     const dialogOpenObserver=new MutationObserver(syncModalScrollLock);
-    document.querySelectorAll('dialog').forEach(dialog=>dialogOpenObserver.observe(dialog,{attributes:true,attributeFilter:['open']}));
+    document.querySelectorAll('dialog').forEach(dialog=>{
+      dialogOpenObserver.observe(dialog,{attributes:true,attributeFilter:['open']});
+      dialog.addEventListener('cancel',event=>{event.preventDefault();dialog.close()});
+      dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close()});
+    });
+    document.addEventListener('keydown',event=>{
+      if(event.key!=='Escape')return;
+      const dialog=[...document.querySelectorAll('dialog[open]')].at(-1);
+      if(!dialog)return;
+      event.preventDefault();
+      dialog.close();
+    });
     const closeFavoriteDetail=()=>{favoriteDetailRequestId++;if(favoriteDetailDialog.open)favoriteDetailDialog.close()};
     favoriteDetailClose.addEventListener('click',closeFavoriteDetail);
     favoriteDetailDialog.addEventListener('click',event=>{if(event.target===favoriteDetailDialog)closeFavoriteDetail()});
@@ -3031,15 +3153,21 @@
       event.preventDefault();
       const quantity = Number(portfolioQuantity.value);
       const unitCost = Number(portfolioCost.value);
+      const costCurrency=portfolioCostCurrency.value==='AUTO'?null:portfolioCostCurrency.value;
+      const purchaseDate=portfolioPurchaseDate.value||null;
       if (!portfolioSelection || !Number.isFinite(quantity) || quantity <= 0 || !Number.isFinite(unitCost) || unitCost < 0) return;
       const existing = portfolio.find(item => item.symbol === portfolioSelection.symbol);
       if (existing) {
+        const incomingCurrency=costCurrency||existing.costCurrency;
+        if(existing.costCurrency&&incomingCurrency&&existing.costCurrency!==incomingCurrency){alert('Aynı pozisyona farklı maliyet para birimi eklemek için önce mevcut pozisyonu düzenleyin.');return}
         const totalQuantity = existing.quantity + quantity;
         existing.unitCost = totalQuantity > 0 ? (existing.quantity * existing.unitCost + quantity * unitCost) / totalQuantity : unitCost;
         existing.quantity = totalQuantity;
         existing.name = portfolioSelection.name || existing.name;
+        existing.costCurrency=incomingCurrency||null;
+        existing.purchaseDate=existing.purchaseDate||purchaseDate;
       } else {
-        portfolio.push({ symbol:portfolioSelection.symbol, name:portfolioSelection.name, quantity, unitCost });
+        portfolio.push({ symbol:portfolioSelection.symbol, name:portfolioSelection.name, quantity, unitCost, costCurrency, purchaseDate });
       }
       savePortfolio();
       portfolioDialog.close();
