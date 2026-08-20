@@ -58,6 +58,7 @@ assert.equal(sandbox.module.exports._test.numberValue('N/A'),null,'N/A sıfır f
 assert.equal(sandbox.module.exports._test.numberValue('-'),null,'Eksik fiyat sıfır olmamalı');
 assert.equal(sandbox.module.exports._test.numberValue('$1,234.56'),1234.56);
 assert.match(priceApi,/TradingView anlık yedek/,'BIST ve FX için bağımsız anlık yedek sağlayıcı bulunmalı');
+assert.match(priceApi,/providerChoice==='tradingview'/,'Yedek sağlayıcı bağımsız olarak doğrulanabilmeli');
 assert.match(priceApi,/s-maxage=10, stale-while-revalidate=5/,'Fiyat önbelleği seçilebilir 15 saniyelik yenilemeyle uyumlu olmalı');
 assert.match(priceApi,/lastKnownGood/,'Sağlayıcı kesintisi için son başarılı veri koruması bulunmalı');
 const fundamentalSandbox={module:{exports:{}},exports:{},AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};

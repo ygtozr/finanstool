@@ -169,7 +169,12 @@ async function fetchTradingViewLatest(symbol,params) {
   return{chart:{result:[{meta:{currency:String(values?.[4]||descriptor.currency||'USD').toUpperCase(),symbol,longName:String(values?.[1]||values?.[0]||symbol),shortName:String(values?.[0]||symbol),regularMarketTime:now,regularMarketPrice:price,chartPreviousClose:previous,priceHint:price<1?6:2,dataGranularity:'1d',dataProvider:'TradingView anlık yedek',fallbackLimited:true},timestamp:[previousTime,now],indicators:{quote:[{open:[previous,price],high:[previous,price],low:[previous,price],close:[previous,price],volume:[null,null]}],adjclose:[{adjclose:[previous,price]}]},events:{}}],error:null}};
 }
 
-async function resolvePrice(symbol,params,forcedFallback) {
+async function resolvePrice(symbol,params,forcedFallback,forcedTradingView=false) {
+  if(forcedTradingView){
+    const result=await fetchTradingViewLatest(symbol,params);
+    if(result)return result;
+    throw new Error('TradingView yedek verisi bulunamadı.');
+  }
   if(!forcedFallback){
     try{return await fetchYahoo('query1.finance.yahoo.com',symbol,params,'Yahoo Finance')}catch{}
   }
@@ -196,12 +201,12 @@ module.exports=async(req,res)=>{
   const symbol=String(req.query.symbol||'').trim().toUpperCase();
   if(!/^[A-Z0-9.^=-]{1,30}$/.test(symbol))return res.status(400).json({error:'Geçersiz hisse kodu.'});
   const params=cleanQuery(req.query.query);
-  const forcedFallback=String(req.query.provider||'')==='fallback';
+  const providerChoice=String(req.query.provider||''),forcedFallback=providerChoice==='fallback',forcedTradingView=providerChoice==='tradingview';
   setCache(res);
-  const key=symbol+'?'+params.toString()+(forcedFallback?'&fallback=1':'');
+  const key=symbol+'?'+params.toString()+(forcedFallback?'&fallback=1':'')+(forcedTradingView?'&tradingview=1':'');
   let request=inFlight.get(key);
   if(!request){
-    request=resolvePrice(symbol,params,forcedFallback).finally(()=>inFlight.delete(key));
+    request=resolvePrice(symbol,params,forcedFallback,forcedTradingView).finally(()=>inFlight.delete(key));
     inFlight.set(key,request);
   }
   try{
