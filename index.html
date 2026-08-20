@@ -15,6 +15,8 @@
     * { box-sizing:border-box; }
     html { min-height:100%; background:var(--bg); }
     body { margin:0; min-height:100vh; min-height:100dvh; display:grid; place-items:center; padding:24px; font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, #263b62 0, var(--bg) 45%); }
+    html.modal-open,body.modal-open { overflow:hidden; overscroll-behavior:none; }
+    body.modal-open { position:fixed; left:0; right:0; width:100%; }
     main { width:min(1120px,100%); min-width:0; background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
     .app-layout { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:24px; align-items:start; }
     .favorites-panel { border-left:1px solid var(--line); padding-left:24px; }
@@ -1612,8 +1614,6 @@
         tab.setAttribute('aria-selected',String(active));
         tab.tabIndex=active?0:-1;
       });
-      const activeView=states.main?mainView:(states.chart?chartView:portfolioView);
-      requestAnimationFrame(()=>activeView.focus({preventScroll:true}));
       if(states.portfolio)renderPortfolio();
       if(states.chart)requestAnimationFrame(()=>{if(chart)chart.resize();if(rsiChart)rsiChart.resize()});
     }
@@ -2611,7 +2611,21 @@
       requestAnimationFrame(()=>tabs[next].focus());
     });
     portfolioAdd.addEventListener('click', openPortfolioDialog);
-    favoriteDetailClose.addEventListener('click',()=>{favoriteDetailRequestId++;favoriteDetailDialog.close()});
+    let modalScrollY=0;
+    function syncModalScrollLock(){
+      const hasOpenDialog=Boolean(document.querySelector('dialog[open]'));
+      if(hasOpenDialog&&!document.body.classList.contains('modal-open')){
+        modalScrollY=window.scrollY;
+        document.documentElement.classList.add('modal-open');document.body.classList.add('modal-open');document.body.style.top='-'+modalScrollY+'px';
+      }else if(!hasOpenDialog&&document.body.classList.contains('modal-open')){
+        document.documentElement.classList.remove('modal-open');document.body.classList.remove('modal-open');document.body.style.top='';window.scrollTo({top:modalScrollY,behavior:'auto'});
+      }
+    }
+    const dialogOpenObserver=new MutationObserver(syncModalScrollLock);
+    document.querySelectorAll('dialog').forEach(dialog=>dialogOpenObserver.observe(dialog,{attributes:true,attributeFilter:['open']}));
+    const closeFavoriteDetail=()=>{favoriteDetailRequestId++;if(favoriteDetailDialog.open)favoriteDetailDialog.close()};
+    favoriteDetailClose.addEventListener('click',closeFavoriteDetail);
+    favoriteDetailDialog.addEventListener('click',event=>{if(event.target===favoriteDetailDialog)closeFavoriteDetail()});
     favoriteDetailDialog.addEventListener('cancel',()=>{favoriteDetailRequestId++});
     favoriteDetailChart.addEventListener('click',()=>{const item=favoriteDetailItem;if(!item)return;favoriteDetailDialog.close();openFavoriteChart(item)});
     favoriteDetailAlarm.addEventListener('click',()=>{const item=favoriteDetailItem;if(!item)return;favoriteDetailDialog.close();openFavoriteAlarm(item)});

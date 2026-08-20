@@ -61,6 +61,9 @@ assert.match(html,/menuAction\('Grafiği Aç'[^]*menuAction\('Fiyat Alarmı Kur'
 assert.match(html,/id="favoriteDetailDialog"[^>]*aria-labelledby="favoriteDetailTitle"/,'Favoriler için erişilebilir hızlı detay paneli bulunmalı');
 assert.match(html,/open\.addEventListener\('click',\(\)=>openFavoriteDetail\(item\)\)/,'Favori kartı hızlı detay panelini açmalı');
 assert.doesNotMatch(html,/closest\('\.favorite-card'\)\)openView\('chart'\)/,'Favori kartı panel açılırken arka planda Grafik sekmesine geçmemeli');
+assert.doesNotMatch(html,/activeView\.focus\(/,'Sekme paneline programatik odak verilerek mavi kenar çizgisi oluşturulmamalı');
+assert.match(html,/body\.modal-open \{ position:fixed; left:0; right:0; width:100%; \}/,'Açık panel arka plan kaydırmasını sabitlemeli');
+assert.match(html,/event\.target===favoriteDetailDialog\)closeFavoriteDetail\(\)/,'Panel dışındaki karartılmış alana dokunmak hızlı detayı kapatmalı');
 assert.match(html,/Günlük düşük – yüksek[\s\S]*52 hafta düşük – yüksek[\s\S]*Piyasa değeri[\s\S]*F\/K[\s\S]*Temettü verimi[\s\S]*Hacim[\s\S]*RSI \(14\)/,'Hızlı detay temel ekonomik ve teknik göstergeleri içermeli');
 assert.match(html,/Number\.isFinite\(value\)\?formatter\(value\):fallback/,'Eksik detay verileri tahmin edilmeden uygun durum metniyle gösterilmeli');
 assert.match(html,/\/api\/fundamentals\?symbol=/,'Hızlı detay ayrı temel veri servisiyle zenginleştirilmeli');
