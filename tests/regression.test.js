@@ -6,6 +6,7 @@ const vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const priceApi=fs.readFileSync(path.join(root,'api','price.js'),'utf8');
+const fundamentalsApi=fs.readFileSync(path.join(root,'api','fundamentals.js'),'utf8');
 
 function extractFunction(source,name){
   const start=source.indexOf('function '+name);
@@ -25,6 +26,7 @@ function extractFunction(source,name){
 const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(match=>match[1]).filter(Boolean);
 scripts.forEach((script,index)=>assert.doesNotThrow(()=>new Function(script),'İstemci betiği '+(index+1)+' sözdizimi'));
 assert.doesNotThrow(()=>new Function('module','exports','require',priceApi),'Fiyat API sözdizimi');
+assert.doesNotThrow(()=>new Function('module','exports','require',fundamentalsApi),'Temel veri API sözdizimi');
 
 const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary'].map(name=>extractFunction(scripts[0],name)).join('\n');
 const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary};')();
@@ -43,6 +45,11 @@ vm.runInNewContext(priceApi+'\nmodule.exports._test={numberValue,cleanQuery};',s
 assert.equal(sandbox.module.exports._test.numberValue('N/A'),null,'N/A sıfır fiyat olmamalı');
 assert.equal(sandbox.module.exports._test.numberValue('-'),null,'Eksik fiyat sıfır olmamalı');
 assert.equal(sandbox.module.exports._test.numberValue('$1,234.56'),1234.56);
+const fundamentalSandbox={module:{exports:{}},exports:{},AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
+vm.runInNewContext(fundamentalsApi+'\nmodule.exports._test={numberValue,trailingEps};',fundamentalSandbox);
+assert.equal(fundamentalSandbox.module.exports._test.numberValue('0.35%'),0.35,'Temettü yüzdesi doğru ayrıştırılmalı');
+assert.equal(fundamentalSandbox.module.exports._test.numberValue('4,623,874,049,400'),4623874049400,'Piyasa değeri doğru ayrıştırılmalı');
+assert.equal(fundamentalSandbox.module.exports._test.trailingEps({data:{earningsPerShare:[{type:'PreviousQuarter',earnings:1},{type:'PreviousQuarter',earnings:2},{type:'PreviousQuarter',earnings:3},{type:'PreviousQuarter',earnings:4}]}}),10,'TTM EPS son dört gerçekleşmiş çeyrekten hesaplanmalı');
 
 assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh parametresi kalmamalı');
 assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunmalı');
@@ -53,8 +60,12 @@ assert.match(html,/className='favorite-menu-trigger'/,'Favorilerde hızlı işle
 assert.match(html,/menuAction\('Grafiği Aç'[^]*menuAction\('Fiyat Alarmı Kur'[^]*menuAction\('Portföye Ekle'[^]*menuAction\('Favorilerden Çıkar'/,'Hızlı işlem menüsü dört temel eylemi içermeli');
 assert.match(html,/id="favoriteDetailDialog"[^>]*aria-labelledby="favoriteDetailTitle"/,'Favoriler için erişilebilir hızlı detay paneli bulunmalı');
 assert.match(html,/open\.addEventListener\('click',\(\)=>openFavoriteDetail\(item\)\)/,'Favori kartı hızlı detay panelini açmalı');
+assert.doesNotMatch(html,/closest\('\.favorite-card'\)\)openView\('chart'\)/,'Favori kartı panel açılırken arka planda Grafik sekmesine geçmemeli');
 assert.match(html,/Günlük düşük – yüksek[\s\S]*52 hafta düşük – yüksek[\s\S]*Piyasa değeri[\s\S]*F\/K[\s\S]*Temettü verimi[\s\S]*Hacim[\s\S]*RSI \(14\)/,'Hızlı detay temel ekonomik ve teknik göstergeleri içermeli');
-assert.match(html,/Number\.isFinite\(value\)\?formatter\(value\):'Veri yok'/,'Eksik detay verileri tahmin edilmeden Veri yok olarak gösterilmeli');
+assert.match(html,/Number\.isFinite\(value\)\?formatter\(value\):fallback/,'Eksik detay verileri tahmin edilmeden uygun durum metniyle gösterilmeli');
+assert.match(html,/\/api\/fundamentals\?symbol=/,'Hızlı detay ayrı temel veri servisiyle zenginleştirilmeli');
+assert.match(html,/F\/K \(TTM\)/,'F/K değeri gerçekleşmiş son dört çeyrek bazında etiketlenmeli');
+assert.match(html,/Temel veri kaynağı:/,'Temel veri kaynağı panelde açıklanmalı');
 assert.match(html,/id="favoriteDetailChart"[^>]*>Grafiği Aç<[\s\S]*id="favoriteDetailAlarm"[^>]*>Alarm Kur<[\s\S]*id="favoriteDetailPortfolio"[^>]*>Portföye Ekle</,'Hızlı detay alt eylemleri bulunmalı');
 assert.match(html,/role="listbox"/,'Arama önerileri listbox olmalı');
 assert.match(html,/marketTimestamp:Number\(result\.meta\?\.regularMarketTime\)\|\|points\.at\(-1\)\.time/,'Favori zamanı gerçek piyasa verisinden gelmeli');

@@ -173,6 +173,7 @@
     .favorite-detail-metric { min-width:0; display:grid; gap:5px; padding:11px 12px; border:1px solid var(--line); border-radius:11px; background:#111a2b; }
     .favorite-detail-metric dt { color:var(--muted); font-size:.72rem; }
     .favorite-detail-metric dd { margin:0; font-size:.9rem; font-weight:750; overflow-wrap:anywhere; }
+    .favorite-detail-source { margin:0; color:var(--muted); font-size:.68rem; text-align:right; }
     .favorite-detail-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; padding:16px 22px calc(16px + env(safe-area-inset-bottom,0px)); border-top:1px solid var(--line); }
     .favorite-detail-actions button { min-width:0; padding:10px 8px; font-size:.78rem; }
     html[data-theme="light"] .favorite-detail-hero,html[data-theme="light"] .favorite-detail-metric { background:#f1f5f9; }
@@ -842,7 +843,7 @@
       portfolioSymbol.value=item.symbol;
       openPortfolioDialog();
     }
-    function detailValue(value,formatter=value=>String(value)) { return Number.isFinite(value)?formatter(value):'Veri yok'; }
+    function detailValue(value,formatter=value=>String(value),fallback='Veri yok') { return Number.isFinite(value)?formatter(value):fallback; }
     function compactNumber(value) { return new Intl.NumberFormat('tr-TR',{notation:'compact',maximumFractionDigits:2}).format(value); }
     function renderFavoriteDetailIdentity(item,name=item.name||item.symbol) {
       favoriteDetailIdentity.replaceChildren();
@@ -872,14 +873,16 @@
       const metrics=document.createElement('dl');metrics.className='favorite-detail-metrics';
       addFavoriteDetailMetric(metrics,'Günlük düşük – yüksek',Number.isFinite(data.dayLow)&&Number.isFinite(data.dayHigh)?money(data.dayLow,data.currency)+' – '+money(data.dayHigh,data.currency):'Veri yok');
       addFavoriteDetailMetric(metrics,'52 hafta düşük – yüksek',Number.isFinite(data.yearLow)&&Number.isFinite(data.yearHigh)?money(data.yearLow,data.currency)+' – '+money(data.yearHigh,data.currency):'Veri yok');
-      addFavoriteDetailMetric(metrics,'Piyasa değeri',detailValue(data.marketCap,value=>compactNumber(value)+' '+data.currency));
-      addFavoriteDetailMetric(metrics,'F/K',detailValue(data.pe,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(value)));
-      addFavoriteDetailMetric(metrics,'Temettü verimi',detailValue(data.dividendYield,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(Math.abs(value)<=1?value*100:value)+'%'));
+      addFavoriteDetailMetric(metrics,'Piyasa değeri',detailValue(data.marketCap,value=>compactNumber(value)+' '+data.currency,data.marketCapApplicable===false?'Uygulanamaz':'Veri yok'));
+      addFavoriteDetailMetric(metrics,'F/K (TTM)',detailValue(data.pe,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(value),data.peApplicable===false?'Uygulanamaz':'Veri yok'));
+      addFavoriteDetailMetric(metrics,'Temettü verimi',detailValue(data.dividendYieldPercent,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(value)+'%',data.dividendApplicable===false?'Uygulanamaz':'Veri yok'));
       addFavoriteDetailMetric(metrics,'Hacim',detailValue(data.volume,compactNumber));
       addFavoriteDetailMetric(metrics,'RSI (14)',detailValue(data.rsi,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:1}).format(value)));
       favoriteDetailBody.append(hero,metrics);
+      if(data.fundamentalsSource){const source=document.createElement('p');source.className='favorite-detail-source';source.textContent='Temel veri kaynağı: '+data.fundamentalsSource;favoriteDetailBody.append(source)}
     }
     async function fetchFavoriteDetail(item) {
+      const fundamentalsPromise=cachedApiJson('/api/fundamentals?symbol='+encodeURIComponent(item.symbol),{ttl:300000}).catch(()=>({available:false}));
       const payload=await cachedApiJson(priceApiUrl(item.symbol,'range=1y&interval=1d'));
       const result=payload.chart?.result?.[0],quote=result?.indicators?.quote?.[0],timestamps=result?.timestamp;
       if(!quote?.close||!timestamps)throw new Error('Detay verisi bulunamadı');
@@ -888,7 +891,14 @@
       const last=points.at(-1),previous=points.at(-2),lows=points.map(point=>point.low).filter(value=>Number.isFinite(value)&&value>0),highs=points.map(point=>point.high).filter(value=>Number.isFinite(value)&&value>0),meta=result.meta||{};
       const finiteMeta=(...keys)=>{for(const key of keys){const raw=meta[key];if(raw===null||raw===undefined||raw==='')continue;const value=Number(raw);if(Number.isFinite(value))return value}return null};
       const rsiSeries=calculateRsi(points.map(point=>point.close));
-      return {name:meta.longName||meta.shortName||item.name||item.symbol,currency:String(meta.currency||'USD').toUpperCase(),price:last.close,delta:last.close-previous.close,change:(last.close/previous.close-1)*100,dayLow:Number.isFinite(last.low)?last.low:finiteMeta('regularMarketDayLow','dayLow'),dayHigh:Number.isFinite(last.high)?last.high:finiteMeta('regularMarketDayHigh','dayHigh'),yearLow:lows.length?Math.min(...lows):finiteMeta('fiftyTwoWeekLow'),yearHigh:highs.length?Math.max(...highs):finiteMeta('fiftyTwoWeekHigh'),marketCap:finiteMeta('marketCap'),pe:finiteMeta('trailingPE','forwardPE'),dividendYield:finiteMeta('dividendYield','trailingAnnualDividendYield'),volume:Number.isFinite(last.volume)?last.volume:finiteMeta('regularMarketVolume'),rsi:rsiSeries.at(-1),marketTimestamp:finiteMeta('regularMarketTime')||last.time};
+      const fundamentals=await fundamentalsPromise;
+      const fundamentalNumber=value=>typeof value==='number'&&Number.isFinite(value)?value:null;
+      const marketCap=fundamentalNumber(fundamentals.marketCap)??finiteMeta('marketCap');
+      const trailingEps=fundamentalNumber(fundamentals.trailingEps);
+      const pe=fundamentalNumber(fundamentals.pe)??(trailingEps>0?last.close/trailingEps:finiteMeta('trailingPE','forwardPE'));
+      const metaYield=finiteMeta('dividendYield','trailingAnnualDividendYield');
+      const dividendYieldPercent=fundamentalNumber(fundamentals.dividendYieldPercent)??(Number.isFinite(metaYield)?(Math.abs(metaYield)<=1?metaYield*100:metaYield):null);
+      return {name:meta.longName||meta.shortName||item.name||item.symbol,currency:String(meta.currency||fundamentals.currency||'USD').toUpperCase(),price:last.close,delta:last.close-previous.close,change:(last.close/previous.close-1)*100,dayLow:Number.isFinite(last.low)?last.low:finiteMeta('regularMarketDayLow','dayLow'),dayHigh:Number.isFinite(last.high)?last.high:finiteMeta('regularMarketDayHigh','dayHigh'),yearLow:lows.length?Math.min(...lows):finiteMeta('fiftyTwoWeekLow'),yearHigh:highs.length?Math.max(...highs):finiteMeta('fiftyTwoWeekHigh'),marketCap,pe,dividendYieldPercent,peApplicable:fundamentals.peApplicable,marketCapApplicable:fundamentals.marketCapApplicable,dividendApplicable:fundamentals.dividendApplicable,fundamentalsSource:fundamentals.source||null,volume:Number.isFinite(last.volume)?last.volume:finiteMeta('regularMarketVolume'),rsi:rsiSeries.at(-1),marketTimestamp:finiteMeta('regularMarketTime')||last.time};
     }
     async function openFavoriteDetail(item) {
       closeFavoriteMenus();favoriteDetailItem={...item};const requestId=++favoriteDetailRequestId;renderFavoriteDetailIdentity(item);favoriteDetailBody.replaceChildren();
@@ -2701,7 +2711,6 @@
       document.getElementById('desktopAlarmNav').addEventListener('click',function(){openView('chart');document.getElementById('alarmButton').click()});
       document.getElementById('desktopDataNav').addEventListener('click',function(){document.getElementById('dataButton').click()});
       document.getElementById('mobileMoreNav').addEventListener('click',function(){document.getElementById('dataButton').click()});
-      document.getElementById('favoritesList').addEventListener('click',function(event){if(event.target.closest('.favorite-card'))openView('chart')});
       document.getElementById('symbolForm').addEventListener('submit',function(){setTimeout(resizeVisibleCharts,40)});
     })();
   </script>
