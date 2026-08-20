@@ -103,7 +103,12 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/FinansTool v5/,'Kalıcı sürüm adı v5 olmalı');
+assert.match(html,/FinansTool v5\.1/,'Aday sürüm adı v5.1 olmalı');
+assert.match(html,/\.favorite-row \{[^}]*grid-template-columns:minmax\(0,1fr\) 36px;/,'Favori satırı kompakt işlem sütunu kullanmalı');
+assert.match(html,/\.favorite-menu-trigger,\.favorite-remove \{[^}]*width:36px; height:36px;/,'Favori işlem düğmeleri görsel olarak kompakt olmalı');
+assert.match(html,/\.favorite-menu-trigger::before,\.favorite-remove::before \{[^}]*inset:-4px;/,'Kompakt favori düğmelerinin dokunma alanı 44 piksel kalmalı');
+assert.match(html,/\.market-card \{[^}]*min-height:60px; padding:7px 10px;/,'Piyasa kartları dikeyde kompakt olmalı');
+assert.match(html,/\.market-card-label \.market-card-symbol \{ display:inline;/,'Piyasa adı ve kodu gereksiz ek satır oluşturmamalı');
 assert.match(html,/viewport-fit=cover/,'iOS güvenli alanı için viewport-fit=cover bulunmalı');
 assert.match(html,/apple-mobile-web-app-capable/,'iOS bağımsız web uygulaması meta bilgisi bulunmalı');
 assert.match(html,/\.mobile-bottom-nav \{ position:fixed !important;[^}]*bottom:0;/,'Mobil alt menü ekranın fiziksel altına sabitlenmeli');
@@ -176,4 +181,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('FinansTool v5 regresyon testleri başarılı.');
+console.log('FinansTool v5.1 regresyon testleri başarılı.');
