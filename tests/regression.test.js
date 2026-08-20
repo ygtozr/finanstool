@@ -108,6 +108,10 @@ assert.match(html,/\.favorite-row \{[^}]*grid-template-columns:minmax\(0,1fr\) 3
 assert.match(html,/\.favorite-menu-trigger,\.favorite-remove \{[^}]*width:36px; height:36px;/,'Favori işlem düğmeleri görsel olarak kompakt olmalı');
 assert.match(html,/\.favorite-menu-trigger::before,\.favorite-remove::before \{[^}]*inset:-4px;/,'Kompakt favori düğmelerinin dokunma alanı 44 piksel kalmalı');
 assert.match(html,/\.market-card \{[^}]*min-height:60px; padding:7px 10px;/,'Piyasa kartları dikeyde kompakt olmalı');
+assert.match(html,/\.market-card \{[^}]*grid-template-columns:minmax\(0,1fr\) auto;[^}]*grid-template-rows:auto auto;/,'Piyasa fiyatı ile yüzde değişim aynı satırda yer almalı');
+assert.match(html,/\.market-card-label \{ grid-column:1\/-1; \}/,'Piyasa ürün adı fiyat satırının üzerinde kalmalı');
+assert.match(html,/\.market-card strong \{[^}]*font-size:\.96rem; \}/,'Piyasa fiyat puntosu hafifçe büyütülmeli');
+assert.match(html,/\.market-card small \{[^}]*font-size:\.74rem; \}/,'Piyasa değişim puntosu hafifçe büyütülmeli');
 assert.match(html,/\.market-card-label \.market-card-symbol \{ display:inline;/,'Piyasa adı ve kodu gereksiz ek satır oluşturmamalı');
 assert.match(html,/viewport-fit=cover/,'iOS güvenli alanı için viewport-fit=cover bulunmalı');
 assert.match(html,/apple-mobile-web-app-capable/,'iOS bağımsız web uygulaması meta bilgisi bulunmalı');
