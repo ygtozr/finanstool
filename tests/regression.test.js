@@ -62,6 +62,8 @@ assert.match(html,/id="favoriteDetailDialog"[^>]*aria-labelledby="favoriteDetail
 assert.match(html,/open\.addEventListener\('click',\(\)=>openFavoriteDetail\(item\)\)/,'Favori kartı hızlı detay panelini açmalı');
 assert.doesNotMatch(html,/closest\('\.favorite-card'\)\)openView\('chart'\)/,'Favori kartı panel açılırken arka planda Grafik sekmesine geçmemeli');
 assert.doesNotMatch(html,/activeView\.focus\(/,'Sekme paneline programatik odak verilerek mavi kenar çizgisi oluşturulmamalı');
+assert.doesNotMatch(html,/class="app-view[^>]*tabindex="-1"/,'Sekme kapsayıcıları Safari tarafından yeniden odaklanabilir olmamalı');
+assert.match(html,/\.app-view:focus,\.app-view:focus-visible \{ outline:none !important; \}/,'Safari sekme kapsayıcısı odak çerçevesi bastırılmalı');
 assert.match(html,/body\.modal-open \{ position:fixed; left:0; right:0; width:100%; \}/,'Açık panel arka plan kaydırmasını sabitlemeli');
 assert.match(html,/event\.target===favoriteDetailDialog\)closeFavoriteDetail\(\)/,'Panel dışındaki karartılmış alana dokunmak hızlı detayı kapatmalı');
 assert.match(html,/Günlük düşük – yüksek[\s\S]*52 hafta düşük – yüksek[\s\S]*Piyasa değeri[\s\S]*F\/K[\s\S]*Temettü verimi[\s\S]*Hacim[\s\S]*RSI \(14\)/,'Hızlı detay temel ekonomik ve teknik göstergeleri içermeli');

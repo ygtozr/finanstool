@@ -240,6 +240,7 @@
     .app-tabs button.active { color:#062019; background:var(--accent); }
     .app-view { display:none; }
     .app-view.active { display:block; }
+    .app-view:focus,.app-view:focus-visible { outline:none !important; }
     .portfolio-page { min-height:620px; overflow-anchor:none; }
     .portfolio-page .portfolio-head { margin-bottom:16px; }
     .portfolio-head-metrics { display:grid; gap:2px; }
@@ -478,7 +479,7 @@
       <small>v4.3</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
-    <section id="mainView" class="app-view active overview-page" role="tabpanel" tabindex="-1" aria-labelledby="mainTab">
+    <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
       <h1>FinansTool <span class="version-badge">v4.3</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
@@ -488,7 +489,7 @@
       <aside class="favorites-panel" aria-label="Favori hisseler"><div class="favorites-panel-head"><div><h2>Favoriler</h2><p id="favoriteUpdated" class="favorites-note">Veriler yükleniyor…</p></div><button id="favoriteRefresh" type="button">Yenile</button></div><p id="favoritesEmpty" class="favorites-note">Henüz favori hisse yok.</p><ul id="favoritesList" class="favorites-list"></ul></aside>
       </section></div>
     </section>
-    <section id="chartView" class="app-view chart-page" role="tabpanel" tabindex="-1" aria-labelledby="chartTab" hidden>
+    <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -516,7 +517,7 @@
     <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt>Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl><div class="period-summary-range"><div class="period-summary-range-track" role="progressbar" aria-label="Güncel fiyatın dönem aralığındaki konumu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="periodRangeFill" class="period-summary-range-fill"></span></div><div class="period-summary-range-labels"><span>Düşük</span><span id="periodRangePosition">Güncel: —</span><span>Yüksek</span></div></div></section>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
     </section>
-    <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" tabindex="-1" aria-labelledby="portfolioTab" hidden>
+    <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div></div>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
