@@ -51,6 +51,11 @@ assert.doesNotMatch(html,/let compareData\s*=/,'Ana grafik karşılaştırma dur
 assert.doesNotMatch(html,/data-action=['"]compare['"]/,'Favorilerde karşılaştırma düğmesi kalmamalı');
 assert.match(html,/className='favorite-menu-trigger'/,'Favorilerde hızlı işlem düğmesi bulunmalı');
 assert.match(html,/menuAction\('Grafiği Aç'[^]*menuAction\('Fiyat Alarmı Kur'[^]*menuAction\('Portföye Ekle'[^]*menuAction\('Favorilerden Çıkar'/,'Hızlı işlem menüsü dört temel eylemi içermeli');
+assert.match(html,/id="favoriteDetailDialog"[^>]*aria-labelledby="favoriteDetailTitle"/,'Favoriler için erişilebilir hızlı detay paneli bulunmalı');
+assert.match(html,/open\.addEventListener\('click',\(\)=>openFavoriteDetail\(item\)\)/,'Favori kartı hızlı detay panelini açmalı');
+assert.match(html,/Günlük düşük – yüksek[\s\S]*52 hafta düşük – yüksek[\s\S]*Piyasa değeri[\s\S]*F\/K[\s\S]*Temettü verimi[\s\S]*Hacim[\s\S]*RSI \(14\)/,'Hızlı detay temel ekonomik ve teknik göstergeleri içermeli');
+assert.match(html,/Number\.isFinite\(value\)\?formatter\(value\):'Veri yok'/,'Eksik detay verileri tahmin edilmeden Veri yok olarak gösterilmeli');
+assert.match(html,/id="favoriteDetailChart"[^>]*>Grafiği Aç<[\s\S]*id="favoriteDetailAlarm"[^>]*>Alarm Kur<[\s\S]*id="favoriteDetailPortfolio"[^>]*>Portföye Ekle</,'Hızlı detay alt eylemleri bulunmalı');
 assert.match(html,/role="listbox"/,'Arama önerileri listbox olmalı');
 assert.match(html,/marketTimestamp:Number\(result\.meta\?\.regularMarketTime\)\|\|points\.at\(-1\)\.time/,'Favori zamanı gerçek piyasa verisinden gelmeli');
 assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler başlığında yenileme zamanı gösterilmeli');
