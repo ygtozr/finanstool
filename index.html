@@ -149,17 +149,20 @@
     .summary-card strong { display:block; margin-top:3px; }
     .portfolio-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
     .portfolio-empty { grid-column:1/-1; padding:18px; text-align:center; color:var(--muted); border:1px dashed #40516e; border-radius:12px; }
-    .portfolio-row { min-width:0; padding:10px; border:1px solid var(--line); border-radius:10px; background:#0d1523; }
-    .portfolio-row-head { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
-    .portfolio-row-title { display:flex; flex:1; min-width:0; align-items:baseline; gap:6px; }
-    .portfolio-row-title strong { flex:0 0 auto; }
+    .portfolio-row { min-width:0; padding:8px 9px; border:1px solid var(--line); border-radius:10px; background:#0d1523; }
+    .portfolio-row-head { display:grid; grid-template-columns:34px minmax(0,1fr) auto 28px; align-items:center; gap:7px; margin-bottom:5px; }
+    .portfolio-row-logo { width:34px; height:34px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.58rem; font-weight:800; }
+    .portfolio-row-logo > * { grid-area:1/1; }
+    .portfolio-row-logo img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    .portfolio-row-title { min-width:0; display:grid; gap:0; line-height:1.15; }
     .portfolio-row-title strong, .portfolio-row-title small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .portfolio-row-title small { min-width:0; color:var(--muted); }
+    .portfolio-row-title strong { font-size:.86rem; }
+    .portfolio-row-title small { min-width:0; color:var(--muted); font-size:.68rem; }
     .portfolio-delete { flex:0 0 28px; width:28px; height:28px; padding:0; color:var(--danger); background:#3b1720; }
-    .portfolio-compact-value { display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:4px; }
-    .portfolio-compact-value strong { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .portfolio-compact-profit { flex:0 0 auto; font-size:.86rem; white-space:nowrap; }
-    .portfolio-compact-detail { overflow:hidden; color:var(--muted); font-size:.8rem; text-overflow:ellipsis; white-space:nowrap; }
+    .portfolio-current-value { max-width:100px; overflow:hidden; font-size:.84rem; text-overflow:ellipsis; white-space:nowrap; }
+    .portfolio-compact-line { min-width:0; display:flex; align-items:center; justify-content:space-between; gap:7px; padding-left:41px; }
+    .portfolio-compact-profit { flex:0 0 auto; font-size:.72rem; font-weight:750; white-space:nowrap; }
+    .portfolio-compact-detail { min-width:0; overflow:hidden; color:var(--muted); font-size:.68rem; text-overflow:ellipsis; white-space:nowrap; }
     .portfolio-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
     .portfolio-stat { padding:8px; border-radius:8px; background:#162238; }
     .portfolio-stat span, .portfolio-stat strong { display:block; }
@@ -2135,13 +2138,16 @@
         const position=result.ok?result.value:result.position;
         const row=document.createElement('article');row.className='portfolio-row';
         const head=document.createElement('div');head.className='portfolio-row-head';
+        const badge=document.createElement('span');badge.className='portfolio-row-logo';
+        const initials=document.createElement('span');initials.textContent=position.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';badge.append(initials);
+        const logoUrl=favoriteLogoUrl(position.symbol);if(logoUrl){const logo=document.createElement('img');logo.src=logoUrl;logo.alt='';logo.referrerPolicy='no-referrer';logo.addEventListener('error',()=>logo.remove(),{once:true});badge.append(logo)}
         const title=document.createElement('div');title.className='portfolio-row-title';
         const symbol=document.createElement('strong');symbol.textContent=position.symbol;
-        const name=document.createElement('small');name.textContent=result.ok?position.name:result.error.message;title.append(symbol,name);
-        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.title=position.symbol+' pozisyonunu sil';remove.textContent='×';remove.addEventListener('click',()=>{portfolio=portfolio.filter(item=>item.symbol!==position.symbol);savePortfolio();renderPortfolio()});
-        head.append(title,remove);
-        const valueLine=document.createElement('div');valueLine.className='portfolio-compact-value';
-        const currentValue=document.createElement('strong');
+        const name=document.createElement('small');name.textContent=result.ok?position.name:result.error.message;name.title=name.textContent;title.append(symbol,name);
+        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.title=position.symbol+' pozisyonunu sil';remove.setAttribute('aria-label',position.symbol+' pozisyonunu sil');remove.textContent='×';remove.addEventListener('click',()=>{portfolio=portfolio.filter(item=>item.symbol!==position.symbol);savePortfolio();renderPortfolio()});
+        const currentValue=document.createElement('strong');currentValue.className='portfolio-current-value';
+        head.append(badge,title,currentValue,remove);
+        const compactLine=document.createElement('div');compactLine.className='portfolio-compact-line';
         const profitValue=document.createElement('span');profitValue.className='portfolio-compact-profit';
         const details=document.createElement('div');details.className='portfolio-compact-detail';
         const quantityText=new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(position.quantity);
@@ -2171,8 +2177,8 @@
           profitValue.textContent='Hesaplanamadı';
           profitValue.classList.add('negative');
         }
-        valueLine.append(currentValue,profitValue);
-        row.append(head,valueLine,details);portfolioList.append(row);
+        compactLine.append(details,profitValue);
+        row.append(head,compactLine);portfolioList.append(row);
       });
       if(!portfolio.length){const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Henüz hisse pozisyonu yok.';portfolioList.append(empty)}
       cashBalances.forEach(balance=>{
@@ -2307,13 +2313,13 @@
       if(!labels.length||!prices.length)return;
       lastLabels=[...labels];lastPrices=[...prices];currentChartName=name||currentChartName;currentCurrency=currency||currentCurrency;
       const colors=chartThemeColors();
-      const datasets=[{label:currentChartName+' kapanış fiyatı ('+currentCurrency+')',data:lastPrices,borderColor:colors.accent,backgroundColor:'rgba(82,213,177,.14)',fill:true,pointRadius:0,pointHoverRadius:5,tension:.18,borderWidth:2,yAxisID:'price'}];
+      const datasets=[{label:currentChartName+' kapanış fiyatı ('+currentCurrency+')',assetSymbol:primarySymbol||currentSymbol(),data:lastPrices,borderColor:colors.accent,backgroundColor:'rgba(82,213,177,.14)',fill:true,pointRadius:0,pointHoverRadius:5,tension:.18,borderWidth:2,yAxisID:'price'}];
       if(maEnabled){
         datasets.push({label:'MA50',data:movingAverageData?.ma50||sma(lastPrices,50),borderColor:'#16a34a',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
         datasets.push({label:'MA100',data:movingAverageData?.ma100||sma(lastPrices,100),borderColor:'#ca8a04',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
         datasets.push({label:'MA200',data:movingAverageData?.ma200||sma(lastPrices,200),borderColor:'#dc2626',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
       }
-      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:{color:colors.text}},tooltip:{callbacks:{label:context=>context.dataset.label+': '+money(context.parsed.y,currentCurrency)}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},price:{position:'left',grid:{color:colors.grid},ticks:{color:colors.text,callback:value=>money(value,currentCurrency)}}}};
+      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:{color:colors.text}},tooltip:{callbacks:{label:context=>(context.dataset.assetSymbol||context.dataset.label)+': '+money(context.parsed.y,currentCurrency)}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},price:{position:'left',grid:{color:colors.grid},ticks:{color:colors.text,callback:value=>money(value,currentCurrency)}}}};
       if(chart){
         chart.data={labels:lastLabels,datasets};
         chart.options=options;

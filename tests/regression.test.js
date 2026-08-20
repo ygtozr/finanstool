@@ -122,5 +122,9 @@ assert.match(html,/function benchmarkQuery\(\)[\s\S]*period1=[\s\S]*period2=/,'�
 assert.match(html,/\/api\/dividends\?symbol=/,'Portföy yaklaşan temettü uç noktasını kullanmalı');
 assert.match(dividendsApi,/exOrEffDate[\s\S]*paymentDate[\s\S]*sort\(\(a,b\)=>\(a\.exDate\|\|a\.paymentDate\)-\(b\.exDate\|\|b\.paymentDate\)\)/,'Temettü API hak kullanım ve ödeme tarihlerini yakından uzağa sıralamalı');
 assert.match(html,/allDividends\.sort\(\(a,b\)=>a\.date-b\.date\)\.slice\(0,5\)/,'Takvim yalnız yaklaşan en yakın beş temettüyü göstermeli');
+assert.match(html,/\.portfolio-row-head \{ display:grid; grid-template-columns:34px minmax\(0,1fr\) auto 28px;/,'Portföy kartı logo, kimlik, değer ve silme düğmesini tek kompakt satıra yerleştirmeli');
+assert.match(html,/className='portfolio-compact-line'[\s\S]*compactLine\.append\(details,profitValue\)/,'Adet, maliyet ve kâr zarar ikinci kompakt satırda bilgi kaybı olmadan gösterilmeli');
+assert.match(html,/assetSymbol:primarySymbol\|\|currentSymbol\(\)/,'Ana grafik veri serisi sade balon için hisse kodunu taşımalı');
+assert.match(html,/context\.dataset\.assetSymbol\|\|context\.dataset\.label/,'Grafik veri balonu şirketin uzun adı yerine hisse kodunu kullanmalı');
 
 console.log('FinansTool v4.3 regresyon testleri başarılı.');
