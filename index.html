@@ -234,12 +234,34 @@
     @media (max-width:760px) { .app-layout { grid-template-columns:1fr; } .favorites-panel { border-left:0; border-top:1px solid var(--line); padding:20px 0 0; } }
     @media (max-width:500px) { form { flex-wrap:wrap; } .search-field { flex-basis:100%; } #submitButton { width:100%; } .portfolio-drawer { width:100%; padding:18px; } .portfolio-stats { grid-template-columns:1fr; } .portfolio-open { top:auto; bottom:18px; transform:none; writing-mode:horizontal-tb; border-radius:0 12px 12px 0; } }
 
-    .theme-toggle { position:fixed; z-index:45; top:16px; right:16px; width:44px; height:44px; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); box-shadow:0 8px 22px #0006; }
+    .other-page { max-width:920px; }
+    .other-page > h2 { margin-top:0; }
+    .settings-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .settings-card { min-width:0; padding:15px; border:1px solid var(--line); border-radius:13px; background:#0d1523; }
+    .settings-card h3 { margin:0 0 5px; font-size:1rem; }
+    .settings-card > p { margin:0 0 13px; color:var(--muted); font-size:.8rem; line-height:1.45; }
+    .settings-wide { grid-column:1/-1; }
+    .settings-options { display:grid; gap:10px; }
+    .settings-options label { display:grid; gap:6px; color:var(--muted); font-size:.8rem; }
+    .settings-options select { width:100%; }
+    .theme-choices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+    .theme-choice { min-width:0; padding:9px 5px; color:var(--text); background:#182235; font-size:.76rem; }
+    .theme-choice.active { color:#07120f; border-color:var(--accent); background:var(--accent); }
+    .setting-switch { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px; border:1px solid var(--line); border-radius:10px; }
+    .setting-switch span { min-width:0; }
+    .setting-switch strong,.setting-switch small { display:block; }
+    .setting-switch small { margin-top:2px; color:var(--muted); font-size:.72rem; }
+    .setting-switch input { flex:0 0 auto; width:20px; height:20px; }
+    .settings-help { display:grid; gap:8px; margin:0; padding-left:18px; color:var(--muted); font-size:.82rem; line-height:1.45; }
+    .settings-version { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line); color:var(--muted); font-size:.78rem; }
+    .other-backup .data-actions { margin-bottom:11px; }
     html[data-theme="light"] { color-scheme:light; --bg:#eef3f8; --panel:#ffffff; --line:#cbd5e1; --text:#172033; --muted:#5f6f86; --accent:#0f9f7f; --danger:#c9344f; }
     html[data-theme="light"] body { background:radial-gradient(circle at top,#dbeafe 0,#eef3f8 48%); }
     html[data-theme="light"] main { background:rgba(255,255,255,.97); box-shadow:0 22px 60px #64748b33; }
     html[data-theme="light"] input, html[data-theme="light"] select, html[data-theme="light"] .favorite-card, html[data-theme="light"] .search-suggestions, html[data-theme="light"] .portfolio-drawer, html[data-theme="light"] .portfolio-dialog, html[data-theme="light"] .portfolio-row, html[data-theme="light"] .portfolio-cash, html[data-theme="light"] .portfolio-cash-item, html[data-theme="light"] .summary-card, html[data-theme="light"] .portfolio-stat, html[data-theme="light"] .dividend-row, html[data-theme="light"] .advanced-result, html[data-theme="light"] .alarm-row { color:var(--text); background:#f8fafc; }
-    html[data-theme="light"] .toolbar button, html[data-theme="light"] .periods button, html[data-theme="light"] .portfolio-close, html[data-theme="light"] .dialog-cancel, html[data-theme="light"] .theme-toggle { color:var(--text); background:#e2e8f0; }
+    html[data-theme="light"] .toolbar button, html[data-theme="light"] .periods button, html[data-theme="light"] .portfolio-close, html[data-theme="light"] .dialog-cancel { color:var(--text); background:#e2e8f0; }
+    html[data-theme="light"] .settings-card,html[data-theme="light"] .theme-choice { color:var(--text); background:#f8fafc; }
+    html[data-theme="light"] .theme-choice.active { color:#fff; background:#0f766e; }
     html[data-theme="light"] .periods button.active { color:#fff; background:#0f766e; box-shadow:0 0 0 2px #99f6e4; }
     html[data-theme="light"] .search-suggestions { box-shadow:0 12px 25px #64748b44; }
     html[data-theme="light"] .suggestion:hover { background:#e2e8f0; }
@@ -267,12 +289,12 @@
       .period-summary-list { grid-template-columns:1fr; }
       .rsi-wrap { height:175px; }
       .periods button { flex-basis:calc(50% - 8px); }
-      .theme-toggle { top:10px; right:10px; }
+      .settings-grid { grid-template-columns:1fr; }
+      .settings-wide { grid-column:auto; }
     }
 
     .app-tabs { display:flex; gap:8px; margin:0 0 24px; padding-bottom:14px; border-bottom:1px solid var(--line); }
     .app-tabs button { flex:0 1 180px; color:var(--text); background:#26344d; }
-    .app-tabs .data-button { flex:0 0 auto; margin-left:auto; padding-inline:18px; }
     .app-tabs button.active { color:#062019; background:var(--accent); }
     .app-view { display:none; }
     .app-view.active { display:block; }
@@ -352,7 +374,7 @@
     html[data-theme="light"] .app-tabs button { color:var(--text); background:#e2e8f0; }
     html[data-theme="light"] .app-tabs button.active { color:#fff; background:var(--accent); }
     html[data-theme="light"] .analysis-table { background:#f8fafc; }
-    @media (max-width:500px) { .app-tabs { flex-wrap:wrap; } .app-tabs button { flex:1; } .app-tabs .data-button { flex-basis:100%; margin-left:0; } .analysis-table th, .analysis-table td { padding:9px 8px; font-size:.86rem; } }
+    @media (max-width:500px) { .app-tabs { flex-wrap:wrap; } .app-tabs button { flex:1; } .analysis-table th, .analysis-table td { padding:9px 8px; font-size:.86rem; } }
 
     .market-summary { margin:0 0 22px; padding:16px; border:1px solid var(--line); border-radius:14px; background:#111a2b; }
     .market-summary-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:12px; }
@@ -523,7 +545,6 @@
   </style>
 </head>
 <body>
-  <button id="themeToggle" class="theme-toggle" type="button" aria-label="Açık temaya geç" title="Tema değiştir">☀️</button>
   <main>
     <aside class="desktop-sidebar" aria-label="Masaüstü gezinme">
       <div class="desktop-brand"><span class="desktop-brand-mark">₺</span><span>FinansTool</span></div>
@@ -532,10 +553,10 @@
       <button id="desktopPortfolioNav" type="button">▤ <span>Portföy</span></button>
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
-      <button id="desktopDataNav" type="button">⇩ <span>Veri Yedekleme</span></button>
+      <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
       <small>v4.3</small>
     </aside>
-    <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="dataButton" class="data-button" type="button" title="Verileri yedekle veya geri yükle">💾 Veri</button></nav>
+    <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
       <h1>FinansTool <span class="version-badge">v4.3</span></h1>
       <div class="app-layout"><section class="chart-panel">
@@ -600,6 +621,49 @@
         <div id="benchmarkStats" class="benchmark-stats"></div>
       </section>
       <section class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
+    </section>
+    <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
+      <h2>Diğer</h2>
+      <div class="settings-grid">
+        <section class="settings-card" aria-labelledby="appearanceTitle">
+          <h3 id="appearanceTitle">Görünüm</h3>
+          <p>Uygulamanın görünümünü seçin veya cihazınızın temasını otomatik takip edin.</p>
+          <div class="theme-choices" role="group" aria-label="Tema seçimi">
+            <button class="theme-choice" type="button" data-theme-choice="light" aria-pressed="false">☀ Açık</button>
+            <button class="theme-choice" type="button" data-theme-choice="dark" aria-pressed="false">☾ Koyu</button>
+            <button class="theme-choice" type="button" data-theme-choice="system" aria-pressed="false">◐ Sistem</button>
+          </div>
+        </section>
+        <section class="settings-card" aria-labelledby="dataPreferencesTitle">
+          <h3 id="dataPreferencesTitle">Yenileme Ve Veri Tercihleri</h3>
+          <p>Otomatik veri yenileme sıklığını ve grafiklerin başlangıç dönemini belirleyin.</p>
+          <div class="settings-options">
+            <label>Otomatik yenileme<select id="refreshIntervalSelect"><option value="5000">5 saniye</option><option value="15000">15 saniye</option><option value="30000">30 saniye</option><option value="60000">1 dakika</option><option value="0">Kapalı</option></select></label>
+            <label>Varsayılan grafik dönemi<select id="defaultRangeSelect"><option value="5d">1 hafta</option><option value="1mo">1 ay</option><option value="3mo">3 ay</option><option value="6mo">6 ay</option><option value="1y">1 yıl</option><option value="5y">5 yıl</option></select></label>
+          </div>
+        </section>
+        <section class="settings-card" aria-labelledby="notificationsTitle">
+          <h3 id="notificationsTitle">Bildirimler</h3>
+          <p>Kaydettiğiniz fiyat alarmlarının uygulama açıkken kontrol edilmesini yönetin.</p>
+          <label class="setting-switch"><span><strong>Fiyat Alarmı Denetimi</strong><small id="alarmPreferenceStatus">Alarmlar düzenli olarak kontrol edilir.</small></span><input id="alarmNotificationsToggle" type="checkbox" role="switch"></label>
+        </section>
+        <section class="settings-card" aria-labelledby="helpTitle">
+          <h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3>
+          <p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p>
+          <ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul>
+          <div class="settings-version"><span>FinansTool</span><strong>v4.3 Aday</strong></div>
+        </section>
+        <section class="settings-card settings-wide other-backup" aria-labelledby="backupTitle">
+          <h3 id="backupTitle">Veri Yedekleme</h3>
+          <p>Favoriler, hisse ve nakit portföyü, fiyat alarmları, piyasa özeti ve ayarlarınızı tek bir JSON dosyasında saklayın.</p>
+          <div class="data-actions"><button id="backupDownload" type="button">Yedek Dosyasını İndir</button></div>
+          <label class="backup-file-label">Geri yüklenecek JSON dosyası<input id="backupFile" type="file" accept=".json,application/json"></label>
+          <label class="restore-mode">Geri yükleme yöntemi<select id="restoreMode"><option value="merge">Mevcut verilerle birleştir (önerilen)</option><option value="replace">Mevcut verilerin yerine koy</option></select></label>
+          <div id="backupPreview" class="backup-preview" aria-live="polite">Henüz bir yedek dosyası seçilmedi.</div>
+          <p id="backupError" class="backup-error" role="alert"></p>
+          <div class="data-actions"><button id="restoreBackup" type="button" disabled>Geri Yükle</button></div>
+        </section>
+      </div>
     </section>
   </main>
   <nav class="mobile-bottom-nav" aria-label="Mobil gezinme">
@@ -669,21 +733,6 @@
     </form>
     <div class="dialog-actions"><button id="marketSettingsClose" class="dialog-cancel" type="button">Kapat</button></div>
   </dialog>
-  <dialog id="dataDialog" class="portfolio-dialog data-dialog">
-    <h3>Veri Yedekleme</h3>
-    <p class="portfolio-dialog-symbol">Favoriler, hisse ve nakit portföyü, fiyat alarmları, piyasa özeti ve tema ayarınızı tek bir JSON dosyasında saklayın.</p>
-    <div class="data-actions"><button id="backupDownload" type="button">Yedek dosyasını indir</button></div>
-    <label class="backup-file-label">Geri yüklenecek JSON dosyası
-      <input id="backupFile" type="file" accept=".json,application/json">
-    </label>
-    <label class="restore-mode">Geri yükleme yöntemi
-      <select id="restoreMode"><option value="merge">Mevcut verilerle birleştir (önerilen)</option><option value="replace">Mevcut verilerin yerine koy</option></select>
-    </label>
-    <div id="backupPreview" class="backup-preview" aria-live="polite">Henüz bir yedek dosyası seçilmedi.</div>
-    <p id="backupError" class="backup-error" role="alert"></p>
-    <div class="dialog-actions"><button id="dataClose" class="dialog-cancel" type="button">Kapat</button><button id="restoreBackup" type="button" disabled>Geri yükle</button></div>
-  </dialog>
-
   <script>
     let chart;
     let rsiChart;
@@ -785,20 +834,35 @@
     }
 
     const saveMarketItems = () => localStorage.setItem(marketItemsKey,JSON.stringify(marketItems));
-    const themeToggle = document.getElementById('themeToggle');
-    const dataButton = document.getElementById('dataButton');
-    const dataDialog = document.getElementById('dataDialog');
+    const themeChoiceButtons = [...document.querySelectorAll('[data-theme-choice]')];
+    const refreshIntervalSelect = document.getElementById('refreshIntervalSelect');
+    const defaultRangeSelect = document.getElementById('defaultRangeSelect');
+    const alarmNotificationsToggle = document.getElementById('alarmNotificationsToggle');
+    const alarmPreferenceStatus = document.getElementById('alarmPreferenceStatus');
     const backupDownload = document.getElementById('backupDownload');
     const backupFile = document.getElementById('backupFile');
     const restoreMode = document.getElementById('restoreMode');
     const backupPreview = document.getElementById('backupPreview');
     const backupError = document.getElementById('backupError');
     const restoreBackup = document.getElementById('restoreBackup');
-    const dataClose = document.getElementById('dataClose');
     let pendingRestoreData = null;
     const exportCsv = document.getElementById('exportCsv');
     const exportPng = document.getElementById('exportPng');
     const themeKey = 'finans-grafigi-theme';
+    const refreshIntervalKey = 'finans-grafigi-refresh-interval';
+    const defaultRangeKey = 'finans-grafigi-default-range';
+    const alarmPreferenceKey = 'finans-grafigi-alarm-checks';
+    const supportedRefreshIntervals = [0,5000,15000,30000,60000];
+    const supportedDefaultRanges = ['5d','1mo','3mo','6mo','1y','5y'];
+    const themeMedia = matchMedia('(prefers-color-scheme: light)');
+    let themePreference = ['light','dark','system'].includes(localStorage.getItem(themeKey)) ? localStorage.getItem(themeKey) : 'system';
+    const savedRefreshInterval=localStorage.getItem(refreshIntervalKey);
+    let refreshInterval = savedRefreshInterval===null?15000:Number(savedRefreshInterval);
+    if(!supportedRefreshIntervals.includes(refreshInterval))refreshInterval=15000;
+    let alarmsEnabled = localStorage.getItem(alarmPreferenceKey)!=='false';
+    let marketRefreshTimerId = null;
+    let chartRefreshTimerId = null;
+    let portfolioRefreshTimerId = null;
     const periodButtons = [...document.querySelectorAll('[data-range]')];
     const customPeriod = document.getElementById('customPeriod');
     const datePicker = document.getElementById('datePicker');
@@ -817,9 +881,11 @@
     const mainTab = document.getElementById('mainTab');
     const chartTab = document.getElementById('chartTab');
     const portfolioTab = document.getElementById('portfolioTab');
+    const otherTab = document.getElementById('otherTab');
     const mainView = document.getElementById('mainView');
     const chartView = document.getElementById('chartView');
     const portfolioView = document.getElementById('portfolioView');
+    const otherView = document.getElementById('otherView');
     const portfolioSymbol = document.getElementById('portfolioSymbol');
     const portfolioAdd = document.getElementById('portfolioAdd');
     const portfolioSuggestions = document.getElementById('portfolioSuggestions');
@@ -1262,7 +1328,7 @@
         if(favoriteRefreshQueued){favoriteRefreshQueued=false;refreshFavoriteQuotes()}
       }
     }
-    let selectedRange = '6mo';
+    let selectedRange = supportedDefaultRanges.includes(localStorage.getItem(defaultRangeKey)) ? localStorage.getItem(defaultRangeKey) : '6mo';
     let selectedStart = '';
 
 
@@ -1469,12 +1535,16 @@
       }
     }
 
-    function applyTheme(theme) {
-      const next = theme === 'light' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = next;
-      localStorage.setItem(themeKey,next);
-      themeToggle.textContent = next === 'light' ? '🌙' : '☀️';
-      themeToggle.setAttribute('aria-label', next === 'light' ? 'Koyu temaya geç' : 'Açık temaya geç');
+    function applyTheme(preference,{persist=true}={}) {
+      themePreference=['light','dark','system'].includes(preference)?preference:'system';
+      const resolved=themePreference==='system'?(themeMedia.matches?'light':'dark'):themePreference;
+      document.documentElement.dataset.theme=resolved;
+      if(persist)localStorage.setItem(themeKey,themePreference);
+      themeChoiceButtons.forEach(button=>{
+        const active=button.dataset.themeChoice===themePreference;
+        button.classList.toggle('active',active);
+        button.setAttribute('aria-pressed',String(active));
+      });
       if (lastLabels.length) renderChart(lastLabels,lastPrices,currentChartName,currentCurrency);
       refreshPortfolioDistributionTheme();
       if(portfolioBenchmarkChart){
@@ -1482,6 +1552,23 @@
         portfolioBenchmarkChart.options.plugins.legend.labels.color=color;
         portfolioBenchmarkChart.update('none');
       }
+    }
+
+    function syncSettingsControls() {
+      refreshIntervalSelect.value=String(refreshInterval);
+      defaultRangeSelect.value=selectedRange;
+      alarmNotificationsToggle.checked=alarmsEnabled;
+      alarmPreferenceStatus.textContent=alarmsEnabled?'Alarmlar düzenli olarak kontrol edilir.':'Alarm denetimleri duraklatıldı.';
+      periodButtons.forEach(button=>button.classList.toggle('active',button.dataset.range===selectedRange));
+    }
+
+    function startRefreshTimers() {
+      [marketRefreshTimerId,chartRefreshTimerId,portfolioRefreshTimerId].forEach(timer=>{if(timer)clearInterval(timer)});
+      marketRefreshTimerId=chartRefreshTimerId=portfolioRefreshTimerId=null;
+      if(refreshInterval<=0)return;
+      marketRefreshTimerId=setInterval(()=>{if(!document.hidden)refreshMarketAndFavorites()},refreshInterval);
+      chartRefreshTimerId=setInterval(refreshCurrentChart,refreshInterval);
+      portfolioRefreshTimerId=setInterval(()=>{if(!document.hidden&&portfolioView.classList.contains('active'))renderPortfolio()},refreshInterval);
     }
 
     function safeFileName(value) {
@@ -1526,14 +1613,17 @@
         cashBalances:uniqueBy(cleanCash,item=>item.currency),
         alarms:uniqueBy(cleanAlarms,item=>item.id||item.symbol+'|'+item.condition+'|'+item.target),
         marketItems:uniqueBy(cleanMarketItems,item=>item.symbol),
-        theme:raw.theme==='light'?'light':'dark'
+        theme:['light','dark','system'].includes(raw.theme)?raw.theme:'system',
+        refreshInterval:supportedRefreshIntervals.includes(Number(raw.refreshInterval))?Number(raw.refreshInterval):15000,
+        defaultRange:supportedDefaultRanges.includes(raw.defaultRange)?raw.defaultRange:'6mo',
+        alarmsEnabled:raw.alarmsEnabled!==false
       };
     }
 
     function createBackup() {
       return {
         schemaVersion:1,
-        appVersion:'4.1',
+        appVersion:'4.3',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
@@ -1541,13 +1631,17 @@
           cashBalances:cashBalances.map(({currency,amount})=>({currency,amount})),
           alarms:alarms.map(({id,symbol,target,condition,triggered})=>({id,symbol,target,condition,triggered:Boolean(triggered)})),
           marketItems:marketItems.map(({symbol,label})=>({symbol,label})),
-          theme:document.documentElement.dataset.theme==='light'?'light':'dark'
+          theme:themePreference,
+          refreshInterval,
+          defaultRange:selectedRange,
+          alarmsEnabled
         }
       };
     }
 
     function backupSummary(data) {
-      return 'Favoriler: '+data.favorites.length+'\nPortföy pozisyonları: '+data.portfolio.length+'\nNakit bakiyeleri: '+data.cashBalances.length+'\nFiyat alarmları: '+data.alarms.length+'\nPiyasa özeti öğeleri: '+data.marketItems.length+'\nTema: '+(data.theme==='light'?'Açık':'Koyu');
+      const themeLabel={light:'Açık',dark:'Koyu',system:'Sistem'}[data.theme]||'Sistem';
+      return 'Favoriler: '+data.favorites.length+'\nPortföy pozisyonları: '+data.portfolio.length+'\nNakit bakiyeleri: '+data.cashBalances.length+'\nFiyat alarmları: '+data.alarms.length+'\nPiyasa özeti öğeleri: '+data.marketItems.length+'\nTema: '+themeLabel;
     }
 
     function mergeUnique(current,incoming,key) {
@@ -1563,6 +1657,14 @@
         alarms=data.alarms;
         marketItems=data.marketItems;
         applyTheme(data.theme);
+        refreshInterval=data.refreshInterval;
+        selectedRange=data.defaultRange;
+        alarmsEnabled=data.alarmsEnabled;
+        localStorage.setItem(refreshIntervalKey,String(refreshInterval));
+        localStorage.setItem(defaultRangeKey,selectedRange);
+        localStorage.setItem(alarmPreferenceKey,String(alarmsEnabled));
+        syncSettingsControls();
+        startRefreshTimers();
       }else{
         favorites=mergeUnique(favorites,data.favorites,item=>item.symbol);
         portfolio=mergeUnique(portfolio,data.portfolio,item=>item.symbol);
@@ -1696,6 +1798,7 @@
     }
 
     async function checkAlarms() {
+      if(!alarmsEnabled)return;
       const active=alarms.filter(alarm=>!alarm.triggered);
       await Promise.all(active.map(async alarm=>{
         try{
@@ -1748,8 +1851,8 @@
     }
 
     function setActiveView(view) {
-      const states={main:view==='main',chart:view==='chart',portfolio:view==='portfolio'};
-      [[mainView,mainTab,states.main],[chartView,chartTab,states.chart],[portfolioView,portfolioTab,states.portfolio]].forEach(([panel,tab,active])=>{
+      const states={main:view==='main',chart:view==='chart',portfolio:view==='portfolio',other:view==='other'};
+      [[mainView,mainTab,states.main],[chartView,chartTab,states.chart],[portfolioView,portfolioTab,states.portfolio],[otherView,otherTab,states.other]].forEach(([panel,tab,active])=>{
         panel.classList.toggle('active',active);
         panel.hidden=!active;
         tab.classList.toggle('active',active);
@@ -2730,16 +2833,32 @@
       const symbol=marketSettingsSearch.value.trim().toUpperCase();
       if(symbol)addMarketItem({symbol,name:symbol});
     });
-    dataButton.addEventListener('click',()=>{
-      pendingRestoreData=null;
-      backupFile.value='';
-      backupError.textContent='';
-      backupPreview.textContent='Henüz bir yedek dosyası seçilmedi.';
-      backupPreview.classList.remove('success');
-      restoreBackup.disabled=true;
-      dataDialog.showModal();
+    themeChoiceButtons.forEach(button=>button.addEventListener('click',()=>applyTheme(button.dataset.themeChoice)));
+    themeMedia.addEventListener('change',()=>{if(themePreference==='system')applyTheme('system',{persist:false})});
+    refreshIntervalSelect.addEventListener('change',()=>{
+      const next=Number(refreshIntervalSelect.value);
+      refreshInterval=supportedRefreshIntervals.includes(next)?next:15000;
+      localStorage.setItem(refreshIntervalKey,String(refreshInterval));
+      startRefreshTimers();
+      syncSettingsControls();
     });
-    dataClose.addEventListener('click',()=>dataDialog.close());
+    defaultRangeSelect.addEventListener('change',()=>{
+      selectedRange=supportedDefaultRanges.includes(defaultRangeSelect.value)?defaultRangeSelect.value:'6mo';
+      selectedStart='';
+      localStorage.setItem(defaultRangeKey,selectedRange);
+      setActivePeriod(periodButtons.find(button=>button.dataset.range===selectedRange));
+      syncSettingsControls();
+      if(chartView.classList.contains('active'))loadPrice(currentSymbol());
+    });
+    alarmNotificationsToggle.addEventListener('change',()=>{
+      alarmsEnabled=alarmNotificationsToggle.checked;
+      localStorage.setItem(alarmPreferenceKey,String(alarmsEnabled));
+      syncSettingsControls();
+      if(alarmsEnabled){
+        if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
+        checkAlarms();
+      }
+    });
     backupDownload.addEventListener('click',()=>{
       const backup=createBackup();
       const day=new Date().toISOString().slice(0,10);
@@ -2771,7 +2890,6 @@
       restoreBackup.disabled=true;
       pendingRestoreData=null;
     });
-    themeToggle.addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light'));
     exportCsv.addEventListener('click',exportChartCsv);
     exportPng.addEventListener('click',exportChartPng);
     advancedSearchButton.addEventListener('click',()=>{advancedQuery.value=symbolInput.value;advancedResults.replaceChildren();advancedSearchDialog.showModal();advancedQuery.focus()});
@@ -2850,9 +2968,10 @@
     mainTab.addEventListener('click',()=>setActiveView('main'));
     chartTab.addEventListener('click',()=>setActiveView('chart'));
     portfolioTab.addEventListener('click',()=>setActiveView('portfolio'));
+    otherTab.addEventListener('click',()=>setActiveView('other'));
     document.querySelector('.app-tabs').addEventListener('keydown',event=>{
       if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
-      const tabs=[mainTab,chartTab,portfolioTab];
+      const tabs=[mainTab,chartTab,portfolioTab,otherTab];
       const current=tabs.indexOf(document.activeElement);
       if(current<0)return;
       event.preventDefault();
@@ -2930,16 +3049,15 @@
       showPortfolioSuggestions([]);
       renderPortfolio();
     });
-    applyTheme(localStorage.getItem(themeKey) || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
+    applyTheme(themePreference,{persist:false});
+    syncSettingsControls();
     renderFavorites();
     updateFavoriteButton();
     loadPrice('AAPL');
     refreshMarketAndFavorites();
     renderAlarms();
     setInterval(checkAlarms,60000);
-    setInterval(()=>{if(!document.hidden)refreshMarketAndFavorites()},15000);
-    setInterval(refreshCurrentChart,15000);
-    setInterval(()=>{if(!document.hidden&&portfolioView.classList.contains('active'))renderPortfolio()},15000);
+    startRefreshTimers();
     document.addEventListener('visibilitychange',()=>{
       if(document.hidden)return;
       if(mainView.classList.contains('active'))refreshMarketAndFavorites();
@@ -2953,10 +3071,12 @@
       const mainTab=document.getElementById('mainTab');
       const chartTab=document.getElementById('chartTab');
       const portfolioTab=document.getElementById('portfolioTab');
+      const otherTab=document.getElementById('otherTab');
       const navGroups={
         main:['desktopOverviewNav','mobileOverviewNav'],
         chart:['desktopChartNav','mobileChartNav'],
-        portfolio:['desktopPortfolioNav','mobilePortfolioNav']
+        portfolio:['desktopPortfolioNav','mobilePortfolioNav'],
+        other:['desktopMoreNav','mobileMoreNav']
       };
       function resizeVisibleCharts(){
         requestAnimationFrame(function(){
@@ -2969,7 +3089,7 @@
         });
       }
       function openView(view){
-        ({main:mainTab,chart:chartTab,portfolio:portfolioTab})[view].click();
+        ({main:mainTab,chart:chartTab,portfolio:portfolioTab,other:otherTab})[view].click();
         markNavigation(view);
         window.scrollTo({top:0,behavior:'smooth'});
         if(view!=='main')setTimeout(resizeVisibleCharts,60);
@@ -2980,12 +3100,13 @@
       document.getElementById('mobileOverviewNav').addEventListener('click',function(){openView('main')});
       document.getElementById('mobileChartNav').addEventListener('click',function(){openView('chart')});
       document.getElementById('mobilePortfolioNav').addEventListener('click',function(){openView('portfolio')});
+      document.getElementById('desktopMoreNav').addEventListener('click',function(){openView('other')});
+      document.getElementById('mobileMoreNav').addEventListener('click',function(){openView('other')});
       mainTab.addEventListener('click',function(){markNavigation('main')});
       chartTab.addEventListener('click',function(){markNavigation('chart');setTimeout(resizeVisibleCharts,40)});
       portfolioTab.addEventListener('click',function(){markNavigation('portfolio');setTimeout(resizeVisibleCharts,40)});
+      otherTab.addEventListener('click',function(){markNavigation('other')});
       document.getElementById('desktopAlarmNav').addEventListener('click',function(){openView('chart');document.getElementById('alarmButton').click()});
-      document.getElementById('desktopDataNav').addEventListener('click',function(){document.getElementById('dataButton').click()});
-      document.getElementById('mobileMoreNav').addEventListener('click',function(){document.getElementById('dataButton').click()});
       document.getElementById('symbolForm').addEventListener('submit',function(){setTimeout(resizeVisibleCharts,40)});
     })();
   </script>

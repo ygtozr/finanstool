@@ -132,5 +132,12 @@ assert.match(html,/\.distribution-summary:not\(\.expanded\) li:nth-child\(n\+4\)
 assert.match(html,/toggle\.textContent=expanded\?'Daralt':'Tümünü Göster'/,'Dağılım ayrıntıları açılıp daraltılabilmeli');
 assert.match(html,/renderDistributionCenter\(allocationCenter,sortedAllocations\)/,'Halka grafiğinin merkezinde en büyük pay gösterilmeli');
 assert.match(html,/label\.textContent=items\[0\]\.label/,'Halka grafiğinin merkezinde en büyük paya sahip ürünün adı gösterilmeli');
+assert.doesNotMatch(html,/id="themeToggle"/,'Tema düğmesi ekranın üzerinde sabit kalmamalı');
+assert.match(html,/id="otherView"[\s\S]*data-theme-choice="light"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="system"/,'Diğer ekranı Açık, Koyu ve Sistem tema seçeneklerini içermeli');
+assert.match(html,/id="otherView"[\s\S]*id="backupDownload"[\s\S]*id="restoreBackup"/,'Veri yedekleme araçları Diğer ekranında korunmalı');
+assert.match(html,/function startRefreshTimers\(\)[\s\S]*refreshInterval/,'Otomatik yenileme süresi kullanıcı tercihine göre yeniden başlatılmalı');
+assert.match(html,/savedRefreshInterval===null\?15000:Number\(savedRefreshInterval\)/,'Yeni kullanıcılar için otomatik yenileme varsayılan olarak 15 saniye olmalı');
+assert.match(html,/themeMedia\.addEventListener\('change'[\s\S]*themePreference==='system'/,'Sistem teması cihaz görünümü değiştiğinde otomatik uygulanmalı');
+assert.match(html,/mobileMoreNav'\)\.addEventListener\('click',[\s\S]*openView\('other'\)/,'Mobil Diğer düğmesi sabit ayarlar ekranını açmalı');
 
 console.log('FinansTool v4.3 regresyon testleri başarılı.');
