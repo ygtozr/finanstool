@@ -8,6 +8,7 @@ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const priceApi=fs.readFileSync(path.join(root,'api','price.js'),'utf8');
 const fundamentalsApi=fs.readFileSync(path.join(root,'api','fundamentals.js'),'utf8');
 const dividendsApi=fs.readFileSync(path.join(root,'api','dividends.js'),'utf8');
+const logoSvg=fs.readFileSync(path.join(root,'assets','ozer-finans-mark.svg'),'utf8');
 
 function extractFunction(source,name){
   const start=source.indexOf('function '+name);
@@ -106,6 +107,10 @@ assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğ
 assert.match(html,/<title>Özer Finans v5\.3<\/title>/,'Tarayıcı başlığı yeni marka ve aday sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
+assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
+assert.match(html,/\.page-brand \{[^}]*justify-content:center;/,'Sayfa marka kilidi yatay olarak ortalanmalı');
+assert.match(html,/\.version-badge \{[^}]*border:0;[^}]*opacity:\.62;/,'Sürüm bilgisi rozetsiz, küçük ve silik gösterilmeli');
+assert.match(logoSvg,/<rect x="1" y="1" width="62" height="62" rx="16" fill="#fff"/,'Özer Finans logosu beyaz zeminli uygulama ikonu olmalı');
 assert.match(html,/@media \(max-width:760px\) \{[\s\S]*body \{[^}]*padding:max\(4px,env\(safe-area-inset-top,0px\)\)/,'Mobil üst boşluk sabit marj yerine güvenli alan kadar olmalı');
 assert.match(html,/main \{[^}]*margin:0 auto; padding:10px 6px 20px;/,'Mobil ana çerçeve üst ve yan boşlukları azaltılmalı');
 assert.match(html,/\.market-summary \{ order:1; margin-bottom:14px; padding:10px;/,'Mobil piyasa özeti yan dolgusu azaltılmalı');

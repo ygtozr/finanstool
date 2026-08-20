@@ -61,10 +61,11 @@
     html[data-theme="light"] .favorite-quick-menu button:hover,html[data-theme="light"] .favorite-quick-menu button:focus-visible { background:#e2e8f0; }
     h1 { margin:0; font-size:clamp(1.5rem,4vw,2.15rem); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .brand-lockup { display:flex; align-items:center; gap:10px; min-width:0; }
-    .brand-lockup-mark { width:42px; height:42px; flex:0 0 42px; display:block; }
+    .brand-lockup-mark { width:46px; height:46px; flex:0 0 46px; display:block; }
     .brand-lockup-name { color:var(--text); font-weight:800; letter-spacing:-.025em; white-space:nowrap; }
-    .page-brand { margin-bottom:2px; }
-    .version-badge { display:inline-flex; align-items:center; padding:3px 8px; border:1px solid var(--line); border-radius:999px; color:var(--accent); font-size:.72rem; font-weight:700; letter-spacing:.04em; }
+    .page-brand { width:100%; justify-content:center; margin:0 0 14px; text-align:center; }
+    .page-brand .brand-lockup-mark { width:50px; height:50px; flex-basis:50px; }
+    .version-badge { align-self:flex-end; margin:0 0 5px -3px; padding:0; border:0; border-radius:0; color:var(--muted); font-size:.61rem; font-weight:500; letter-spacing:.03em; opacity:.62; }
     .intro { margin:6px 0 25px; color:var(--muted); }
     form { display:flex; gap:10px; margin-bottom:22px; }
     .search-field { display:flex; flex:1; min-width:0; gap:8px; }
@@ -461,7 +462,7 @@
       main { width:min(1440px,100%); min-height:100vh; display:grid; grid-template-columns:216px minmax(0,1fr); column-gap:24px; align-content:start; border-radius:0; padding:0 30px 38px 0; }
       .desktop-sidebar { grid-column:1; grid-row:1 / span 3; position:sticky; top:0; min-height:100vh; display:flex; flex-direction:column; gap:8px; padding:28px 18px; background:#0d1523; border-right:1px solid var(--line); }
       .desktop-brand { margin:0 0 22px; display:flex; align-items:center; gap:9px; font-size:1.08rem; font-weight:800; }
-      .desktop-brand .brand-lockup-mark { width:36px; height:36px; flex-basis:36px; }
+      .desktop-brand .brand-lockup-mark { width:40px; height:40px; flex-basis:40px; }
       .desktop-sidebar button { width:100%; display:flex; align-items:center; gap:10px; padding:10px 12px; color:var(--muted); background:transparent; border:1px solid transparent; text-align:left; font-size:.9rem; }
       .desktop-sidebar button:hover,.desktop-sidebar button.is-active { color:var(--text); background:#192337; border-color:var(--line); }
       .desktop-sidebar-spacer { flex:1; }
@@ -593,6 +594,7 @@
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.3</span></h1>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -622,6 +624,7 @@
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.3</span></h1>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div></div>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
@@ -648,6 +651,7 @@
       <section class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.3</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
         <section class="settings-card settings-horizontal" aria-labelledby="appearanceTitle">
@@ -681,7 +685,7 @@
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>FinansTool</span><strong>v5.2</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v5.3</strong></div></div>
         </section>
       </div>
     </section>
