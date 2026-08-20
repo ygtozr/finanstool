@@ -120,6 +120,7 @@ assert.match(html,/portfolioSummaryCurrencyNote\.textContent=showTry\?'Portföy 
 assert.match(html,/\.market-summary-head #marketRefresh,\.favorites-panel-head #favoriteRefresh \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
 assert.ok((html.match(/labels:solidLegendLabels\(colors\.text\)/g)||[]).length>=2,'Fiyat ve RSI grafiklerinin lejant örnekleri dolu renk kullanmalı');
 assert.match(html,/function solidLegendLabels\(color\)[\s\S]*fillStyle:fill,strokeStyle:fill,lineWidth:0/,'Lejant renk kutularının içi seri rengiyle tamamen doldurulmalı');
+assert.match(html,/\.market-summary-head h2,\.favorites-panel h2,\.chart-page > h2,\.portfolio-head h2 \{ font-size:1\.17rem; \}/,'Dört ana bölüm başlığı Portföy Özet Analizi ile aynı puntoda olmalı');
 assert.match(html,/@media \(max-width:760px\) \{[\s\S]*body \{[^}]*padding:max\(4px,env\(safe-area-inset-top,0px\)\)/,'Mobil üst boşluk sabit marj yerine güvenli alan kadar olmalı');
 assert.match(html,/main \{[^}]*margin:0 auto; padding:10px 6px 20px;/,'Mobil ana çerçeve üst ve yan boşlukları azaltılmalı');
 assert.match(html,/\.market-summary \{ order:1; margin-bottom:14px; padding:10px;/,'Mobil piyasa özeti yan dolgusu azaltılmalı');
