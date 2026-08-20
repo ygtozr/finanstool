@@ -139,5 +139,9 @@ assert.match(html,/function startRefreshTimers\(\)[\s\S]*refreshInterval/,'Otoma
 assert.match(html,/savedRefreshInterval===null\?15000:Number\(savedRefreshInterval\)/,'Yeni kullanıcılar için otomatik yenileme varsayılan olarak 15 saniye olmalı');
 assert.match(html,/themeMedia\.addEventListener\('change'[\s\S]*themePreference==='system'/,'Sistem teması cihaz görünümü değiştiğinde otomatik uygulanmalı');
 assert.match(html,/mobileMoreNav'\)\.addEventListener\('click',[\s\S]*openView\('other'\)/,'Mobil Diğer düğmesi sabit ayarlar ekranını açmalı');
+assert.match(html,/\.settings-grid \{ display:grid; grid-template-columns:1fr;/,'Diğer ekranındaki ayar kartları yatay satırlar halinde sıralanmalı');
+assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:minmax\(210px,\.8fr\) minmax\(320px,1\.2fr\)/,'İlk dört ayar kartının içeriği masaüstünde yatay yerleşmeli');
+assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
+assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
 console.log('FinansTool v4.3 regresyon testleri başarılı.');

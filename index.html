@@ -236,18 +236,21 @@
 
     .other-page { max-width:920px; }
     .other-page > h2 { margin-top:0; }
-    .settings-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .settings-grid { display:grid; grid-template-columns:1fr; gap:12px; }
     .settings-card { min-width:0; padding:15px; border:1px solid var(--line); border-radius:13px; background:#0d1523; }
     .settings-card h3 { margin:0 0 5px; font-size:1rem; }
     .settings-card > p { margin:0 0 13px; color:var(--muted); font-size:.8rem; line-height:1.45; }
-    .settings-wide { grid-column:1/-1; }
+    .settings-horizontal { display:grid; grid-template-columns:minmax(210px,.8fr) minmax(320px,1.2fr); gap:20px; align-items:center; }
+    .settings-card-copy > p { margin:0; color:var(--muted); font-size:.8rem; line-height:1.45; }
+    .settings-card-controls { min-width:0; }
+    .settings-wide { grid-column:auto; }
     .settings-options { display:grid; gap:10px; }
     .settings-options label { display:grid; gap:6px; color:var(--muted); font-size:.8rem; }
     .settings-options select { width:100%; }
     .theme-choices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
     .theme-choice { min-width:0; padding:9px 5px; color:var(--text); background:#182235; font-size:.76rem; }
     .theme-choice.active { color:#07120f; border-color:var(--accent); background:var(--accent); }
-    .setting-switch { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px; border:1px solid var(--line); border-radius:10px; }
+    .setting-switch { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0; border:0; border-radius:0; }
     .setting-switch span { min-width:0; }
     .setting-switch strong,.setting-switch small { display:block; }
     .setting-switch small { margin-top:2px; color:var(--muted); font-size:.72rem; }
@@ -278,6 +281,7 @@
       .period-summary-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .rsi-wrap { height:190px; }
       .periods button { flex:1 1 calc(33.333% - 8px); }
+      .settings-horizontal { grid-template-columns:1fr; gap:13px; align-items:stretch; }
     }
     @media (max-width:420px) {
       body { padding:8px; }
@@ -625,33 +629,24 @@
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
       <h2>Diğer</h2>
       <div class="settings-grid">
-        <section class="settings-card" aria-labelledby="appearanceTitle">
-          <h3 id="appearanceTitle">Görünüm</h3>
-          <p>Uygulamanın görünümünü seçin veya cihazınızın temasını otomatik takip edin.</p>
-          <div class="theme-choices" role="group" aria-label="Tema seçimi">
+        <section class="settings-card settings-horizontal" aria-labelledby="appearanceTitle">
+          <div class="settings-card-copy"><h3 id="appearanceTitle">Görünüm</h3><p>Uygulamanın görünümünü seçin veya cihazınızın temasını otomatik takip edin.</p></div>
+          <div class="theme-choices settings-card-controls" role="group" aria-label="Tema seçimi">
             <button class="theme-choice" type="button" data-theme-choice="light" aria-pressed="false">☀ Açık</button>
             <button class="theme-choice" type="button" data-theme-choice="dark" aria-pressed="false">☾ Koyu</button>
             <button class="theme-choice" type="button" data-theme-choice="system" aria-pressed="false">◐ Sistem</button>
           </div>
         </section>
-        <section class="settings-card" aria-labelledby="dataPreferencesTitle">
-          <h3 id="dataPreferencesTitle">Yenileme Ve Veri Tercihleri</h3>
-          <p>Otomatik veri yenileme sıklığını ve grafiklerin başlangıç dönemini belirleyin.</p>
-          <div class="settings-options">
+        <section class="settings-card settings-horizontal" aria-labelledby="dataPreferencesTitle">
+          <div class="settings-card-copy"><h3 id="dataPreferencesTitle">Yenileme Ve Veri Tercihleri</h3><p>Otomatik veri yenileme sıklığını ve grafiklerin başlangıç dönemini belirleyin.</p></div>
+          <div class="settings-options settings-card-controls">
             <label>Otomatik yenileme<select id="refreshIntervalSelect"><option value="5000">5 saniye</option><option value="15000">15 saniye</option><option value="30000">30 saniye</option><option value="60000">1 dakika</option><option value="0">Kapalı</option></select></label>
             <label>Varsayılan grafik dönemi<select id="defaultRangeSelect"><option value="5d">1 hafta</option><option value="1mo">1 ay</option><option value="3mo">3 ay</option><option value="6mo">6 ay</option><option value="1y">1 yıl</option><option value="5y">5 yıl</option></select></label>
           </div>
         </section>
-        <section class="settings-card" aria-labelledby="notificationsTitle">
-          <h3 id="notificationsTitle">Bildirimler</h3>
-          <p>Kaydettiğiniz fiyat alarmlarının uygulama açıkken kontrol edilmesini yönetin.</p>
-          <label class="setting-switch"><span><strong>Fiyat Alarmı Denetimi</strong><small id="alarmPreferenceStatus">Alarmlar düzenli olarak kontrol edilir.</small></span><input id="alarmNotificationsToggle" type="checkbox" role="switch"></label>
-        </section>
-        <section class="settings-card" aria-labelledby="helpTitle">
-          <h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3>
-          <p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p>
-          <ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul>
-          <div class="settings-version"><span>FinansTool</span><strong>v4.3 Aday</strong></div>
+        <section class="settings-card settings-horizontal" aria-labelledby="notificationsTitle">
+          <div class="settings-card-copy"><h3 id="notificationsTitle">Bildirimler</h3><p>Kaydettiğiniz fiyat alarmlarının uygulama açıkken kontrol edilmesini yönetin.</p></div>
+          <label class="setting-switch settings-card-controls"><span><strong>Fiyat Alarmı Denetimi</strong><small id="alarmPreferenceStatus">Alarmlar düzenli olarak kontrol edilir.</small></span><input id="alarmNotificationsToggle" type="checkbox" role="switch"></label>
         </section>
         <section class="settings-card settings-wide other-backup" aria-labelledby="backupTitle">
           <h3 id="backupTitle">Veri Yedekleme</h3>
@@ -662,6 +657,10 @@
           <div id="backupPreview" class="backup-preview" aria-live="polite">Henüz bir yedek dosyası seçilmedi.</div>
           <p id="backupError" class="backup-error" role="alert"></p>
           <div class="data-actions"><button id="restoreBackup" type="button" disabled>Geri Yükle</button></div>
+        </section>
+        <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
+          <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>FinansTool</span><strong>v4.3 Aday</strong></div></div>
         </section>
       </div>
     </section>
