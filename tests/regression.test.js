@@ -74,6 +74,7 @@ assert.equal(dividendSandbox.module.exports._test.parseAmount('$0.27'),0.27,'Tem
 assert.equal(new Date(dividendSandbox.module.exports._test.parseDate('09/15/2026')).toISOString().slice(0,10),'2026-09-15','Temettü tarihi doğru ayrıştırılmalı');
 assert.match(dividendsApi,/status:'unsupported'/,'Desteklenmeyen temettü ürünleri ayrılmalı');
 assert.match(dividendsApi,/status:'provider_error'/,'Temettü sağlayıcı hatası ayrı durum olmalı');
+assert.match(dividendsApi,/function fetchBist[\s\S]*dividend_amount_upcoming[\s\S]*dividend_ex_date_upcoming/,'BIST yaklaşan temettüleri TradingView kaynağından alınmalı');
 
 assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh parametresi kalmamalı');
 assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunmalı');

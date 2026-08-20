@@ -6,6 +6,7 @@ const HEADERS={
 };
 
 const inFlight=new Map();
+const TRADINGVIEW_HEADERS={'User-Agent':HEADERS['User-Agent'],'Accept':'application/json','Content-Type':'application/json','Origin':'https://www.tradingview.com'};
 
 function cache(res){
   res.setHeader('Cache-Control','public, max-age=0, s-maxage=3600, stale-while-revalidate=21600');
@@ -40,7 +41,19 @@ async function fetchClass(symbol,assetClass){
   }).filter(item=>item.amount!==null&&((item.exDate&&item.exDate>=today.getTime())||(item.paymentDate&&item.paymentDate>=today.getTime())));
 }
 
+async function fetchBist(symbol){
+  const ticker=symbol.replace(/\.IS$/,''),body={symbols:{tickers:['BIST:'+ticker],query:{types:[]}},columns:['dividend_amount_upcoming','dividend_ex_date_upcoming','dividend_payment_date_upcoming','currency']};
+  const response=await fetch('https://scanner.tradingview.com/turkey/scan',{method:'POST',headers:TRADINGVIEW_HEADERS,body:JSON.stringify(body),signal:AbortSignal.timeout(4500)});
+  if(!response.ok)throw new Error('TradingView '+response.status);
+  const values=(await response.json())?.data?.[0]?.d,amount=Number(values?.[0]),exSeconds=Number(values?.[1]),paymentSeconds=Number(values?.[2]);
+  if(!Number.isFinite(amount)||amount<0||(!Number.isFinite(exSeconds)&&!Number.isFinite(paymentSeconds)))return[];
+  const event={exDate:Number.isFinite(exSeconds)?exSeconds*1000:null,paymentDate:Number.isFinite(paymentSeconds)?paymentSeconds*1000:null,amount,currency:String(values?.[3]||'TRY').toUpperCase(),type:'Cash'};
+  const today=new Date();today.setUTCHours(0,0,0,0);
+  return((event.exDate&&event.exDate>=today.getTime())||(event.paymentDate&&event.paymentDate>=today.getTime()))?[event]:[];
+}
+
 async function resolve(symbol){
+  if(/^[A-Z][A-Z0-9-]{0,14}\.IS$/.test(symbol)){const events=await fetchBist(symbol);return{symbol,events,provider:'TradingView',supported:true,status:events.length?'ok':'no_events'}}
   if(symbol.includes('.'))return{symbol,events:[],provider:null,supported:false,status:'unsupported'};
   const attempts=await Promise.allSettled(['stocks','etf'].map(assetClass=>fetchClass(symbol,assetClass)));
   if(!attempts.some(result=>result.status==='fulfilled'))throw new Error('Temettü sağlayıcısına ulaşılamadı.');
@@ -59,5 +72,5 @@ module.exports=async(req,res)=>{
   let request=inFlight.get(symbol);
   if(!request){request=resolve(symbol).finally(()=>inFlight.delete(symbol));inFlight.set(symbol,request)}
   try{return res.status(200).json(await request)}
-  catch(error){res.setHeader('Cache-Control','no-store');res.setHeader('Vercel-CDN-Cache-Control','no-store');return res.status(503).json({symbol,events:[],provider:'Nasdaq',supported:true,status:'provider_error',error:error.message||'Temettü sağlayıcısına ulaşılamadı.'})}
+  catch(error){res.setHeader('Cache-Control','no-store');res.setHeader('Vercel-CDN-Cache-Control','no-store');return res.status(503).json({symbol,events:[],provider:'Nasdaq / TradingView',supported:true,status:'provider_error',error:error.message||'Temettü sağlayıcısına ulaşılamadı.'})}
 };
