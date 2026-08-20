@@ -154,6 +154,10 @@ assert.match(html,/\.portfolio-row-head \{ display:grid; grid-template-columns:3
 assert.match(html,/\.portfolio-delete \{[^}]*width:32px; height:32px;[^}]*font-size:\.85rem;/,'Portföy silme düğmesi görsel olarak küçük olmalı');
 assert.match(html,/\.portfolio-delete::before \{[^}]*inset:-6px;/,'Küçük portföy silme düğmesinin dokunma alanı 44 piksel kalmalı');
 assert.match(html,/className='portfolio-compact-line'[\s\S]*compactLine\.append\(details,profitValue\)/,'Adet, maliyet ve kâr zarar ikinci kompakt satırda bilgi kaybı olmadan gösterilmeli');
+assert.match(html,/\.portfolio-row-title strong \{ font-size:1rem; \}/,'Portföy hisse kodu favorilerle aynı puntoda olmalı');
+assert.match(html,/\.portfolio-row-title small \{[^}]*font-size:\.75rem; \}/,'Portföy hisse adı favorilerle aynı puntoda olmalı');
+assert.match(html,/\.portfolio-current-value \{[^}]*font-size:1\.02rem;/,'Portföy güncel değeri favorilerle aynı puntoda olmalı');
+assert.match(html,/\.portfolio-compact-profit \{[^}]*font-size:\.76rem;/,'Portföy kâr zarar değeri favorilerle aynı puntoda olmalı');
 assert.match(html,/assetSymbol:primarySymbol\|\|currentSymbol\(\)/,'Ana grafik veri serisi sade balon için hisse kodunu taşımalı');
 assert.match(html,/context\.dataset\.assetSymbol\|\|context\.dataset\.label/,'Grafik veri balonu şirketin uzun adı yerine hisse kodunu kullanmalı');
 assert.match(html,/\.distribution-chart-wrap \{ position:relative; height:150px;/,'Portföy dağılım halkaları kompakt yükseklikte olmalı');
