@@ -111,6 +111,15 @@ assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans mark
 assert.match(html,/\.page-brand \{[^}]*justify-content:center;/,'Sayfa marka kilidi yatay olarak ortalanmalı');
 assert.match(html,/\.version-badge \{[^}]*border:0;[^}]*opacity:\.62;/,'Sürüm bilgisi rozetsiz, küçük ve silik gösterilmeli');
 assert.match(logoSvg,/<rect x="1" y="1" width="62" height="62" rx="16" fill="#fff"/,'Özer Finans logosu beyaz zeminli uygulama ikonu olmalı');
+assert.match(html,/\.portfolio-head \{[^}]*padding:16px;[^}]*border:1px solid var\(--line\);[^}]*border-radius:14px;/,'Portföy üst özeti tüm ekranlarda çerçeveli kart olmalı');
+assert.match(html,/\.portfolio-head-value \{[^}]*font-size:1\.5rem;/,'Portföy toplam değeri hafifçe büyütülmeli');
+assert.match(html,/id="portfolioCurrencyToggle"[^>]*aria-pressed="false"[^>]*>⇄<\/button>/,'Portföy üst özetinde dönüşüm düğmesi bulunmalı');
+assert.match(html,/let portfolioDisplayCurrency = 'AUTO';[\s\S]*presentationFactor=summaryToUsd\/tryToUsd;/,'Portföy özeti TL dönüşümünü çapraz kurla hesaplamalı');
+assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*portfolioDisplayCurrency==='TRY'\?'AUTO':'TRY'[\s\S]*renderPortfolio\(\)/,'Dönüşüm düğmesi TL ve asıl para birimi arasında geçiş yapmalı');
+assert.match(html,/portfolioSummaryCurrencyNote\.textContent=showTry\?'Portföy özeti ve dağılım değerleri TL bazında gösteriliyor\.'/,'TL görünümünde özet açıklaması seçili para birimini doğru anlatmalı');
+assert.match(html,/\.market-summary-head #marketRefresh,\.favorites-panel-head #favoriteRefresh \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
+assert.ok((html.match(/labels:solidLegendLabels\(colors\.text\)/g)||[]).length>=2,'Fiyat ve RSI grafiklerinin lejant örnekleri dolu renk kullanmalı');
+assert.match(html,/function solidLegendLabels\(color\)[\s\S]*fillStyle:fill,strokeStyle:fill,lineWidth:0/,'Lejant renk kutularının içi seri rengiyle tamamen doldurulmalı');
 assert.match(html,/@media \(max-width:760px\) \{[\s\S]*body \{[^}]*padding:max\(4px,env\(safe-area-inset-top,0px\)\)/,'Mobil üst boşluk sabit marj yerine güvenli alan kadar olmalı');
 assert.match(html,/main \{[^}]*margin:0 auto; padding:10px 6px 20px;/,'Mobil ana çerçeve üst ve yan boşlukları azaltılmalı');
 assert.match(html,/\.market-summary \{ order:1; margin-bottom:14px; padding:10px;/,'Mobil piyasa özeti yan dolgusu azaltılmalı');
