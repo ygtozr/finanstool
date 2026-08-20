@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="FinansTool">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>FinansTool v5.1</title>
+  <title>FinansTool v5.2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -491,14 +491,14 @@
     }
 
     @media (max-width:760px) {
-      body { min-height:100svh; min-height:100dvh; display:block; padding:8px 8px calc(92px + env(safe-area-inset-bottom,0px)); overflow-x:hidden; }
-      main { width:100%; max-width:100%; margin:48px auto 0; padding:14px 12px 24px; overflow-x:hidden; border-radius:16px; }
+      body { min-height:100svh; min-height:100dvh; display:block; padding:max(4px,env(safe-area-inset-top,0px)) max(4px,env(safe-area-inset-right,0px)) calc(92px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px)); overflow-x:hidden; }
+      main { width:100%; max-width:100%; margin:0 auto; padding:10px 6px 20px; overflow-x:hidden; border-radius:12px; }
       .app-layout,.chart-panel,.market-summary,.market-cards { min-width:0; width:100%; max-width:100%; }
       main > .app-tabs { display:none; }
       .chart-panel h1 { font-size:1.24rem; }
       .portfolio-glance { order:0; padding:15px; border-radius:18px; }
       .portfolio-glance-value { font-size:1.55rem; }
-      .market-summary { order:1; margin-bottom:16px; overflow:hidden; }
+      .market-summary { order:1; margin-bottom:14px; padding:10px; overflow:hidden; }
       .market-cards { display:grid; grid-auto-flow:column; grid-auto-columns:clamp(112px,34vw,138px); grid-template-columns:none; gap:8px; overflow-x:auto; padding-bottom:5px; scroll-snap-type:x proximity; }
       .market-card { scroll-snap-align:start; min-height:60px; }
       #symbolForm { order:2; }
@@ -575,11 +575,11 @@
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small>v5.1</small>
+      <small>v5.2</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1>FinansTool <span class="version-badge">v5.1</span></h1>
+      <h1>FinansTool <span class="version-badge">v5.2</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -677,7 +677,7 @@
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>FinansTool</span><strong>v5.1</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>FinansTool</span><strong>v5.2</strong></div></div>
         </section>
       </div>
     </section>
@@ -1652,7 +1652,7 @@
     function createBackup() {
       return {
         schemaVersion:1,
-        appVersion:'5.1',
+        appVersion:'5.2',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),

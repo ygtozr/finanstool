@@ -103,7 +103,10 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/FinansTool v5\.1/,'Kalıcı sürüm adı v5.1 olmalı');
+assert.match(html,/FinansTool v5\.2/,'Aday sürüm adı v5.2 olmalı');
+assert.match(html,/@media \(max-width:760px\) \{[\s\S]*body \{[^}]*padding:max\(4px,env\(safe-area-inset-top,0px\)\)/,'Mobil üst boşluk sabit marj yerine güvenli alan kadar olmalı');
+assert.match(html,/main \{[^}]*margin:0 auto; padding:10px 6px 20px;/,'Mobil ana çerçeve üst ve yan boşlukları azaltılmalı');
+assert.match(html,/\.market-summary \{ order:1; margin-bottom:14px; padding:10px;/,'Mobil piyasa özeti yan dolgusu azaltılmalı');
 assert.match(html,/\.favorite-row \{[^}]*grid-template-columns:minmax\(0,1fr\) 36px;/,'Favori satırı kompakt işlem sütunu kullanmalı');
 assert.match(html,/\.favorite-menu-trigger,\.favorite-remove \{[^}]*width:36px; height:36px;/,'Favori işlem düğmeleri görsel olarak kompakt olmalı');
 assert.match(html,/\.favorite-menu-trigger::before,\.favorite-remove::before \{[^}]*inset:-4px;/,'Kompakt favori düğmelerinin dokunma alanı 44 piksel kalmalı');
@@ -141,7 +144,7 @@ assert.match(html,/id="chartFavoritesToggle"[^>]*>Favoriler<[\s\S]*id="chartPort
 assert.match(html,/className='chart-asset-item'[\s\S]*loadPrice\(item\.symbol\)/,'Kayıtlı hisse seçimi ana grafiği güncellemeli');
 assert.match(html,/id="favoriteAddForm"[^>]*[\s\S]*id="favoriteSearch"[^>]*placeholder="Favorilere hisse ekle"/,'Özet favorilerinin altında ekleme araması bulunmalı');
 assert.match(html,/function addOverviewFavorite\(item\)[\s\S]*favorites\.push\(\{symbol,name\}\)[\s\S]*refreshFavoriteQuotes\(\)/,'Özet aramasından seçilen hisse favorilere eklenip fiyatı yenilenmeli');
-assert.match(html,/main \{ width:100%; max-width:100%; margin:48px auto 0; padding:14px 12px 24px;/,'Mobil sayfanın altındaki gereksiz iç boşluk azaltılmalı');
+assert.doesNotMatch(html,/margin:48px auto 0/,'Mobil sayfanın üstünde sabit 48 piksel boşluk kalmamalı');
 assert.match(html,/id="cashAddButton"[^>]*>\+ Nakit Ekle<[\s\S]*id="cashCurrency"[\s\S]*TRY · Türk Lirası[\s\S]*USD · ABD Doları[\s\S]*EUR · Euro[\s\S]*GBP · İngiliz Sterlini/,'Portföye dört para biriminde nakit ekleme akışı bulunmalı');
 assert.match(html,/const cashKey = 'finans-grafigi-cash-balances'/,'Nakit bakiyeleri kalıcı olarak saklanmalı');
 assert.match(html,/cashBalances\.forEach\(balance=>\{[\s\S]*totalValue\+=convertedValue[\s\S]*allocationValues\.push\(\{label:'Nakit '/,'Nakit bakiyeleri portföy toplamı ve dağılımına katılmalı');
@@ -191,4 +194,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('FinansTool v5.1 regresyon testleri başarılı.');
+console.log('FinansTool v5.2 regresyon testleri başarılı.');
