@@ -131,5 +131,6 @@ assert.match(html,/@media \(max-width:700px\)[\s\S]*\.distribution-grid \{ grid-
 assert.match(html,/\.distribution-summary:not\(\.expanded\) li:nth-child\(n\+4\)/,'Dağılım özetinde ilk üç kalem dışındakiler başlangıçta gizlenmeli');
 assert.match(html,/toggle\.textContent=expanded\?'Daralt':'Tümünü Göster'/,'Dağılım ayrıntıları açılıp daraltılabilmeli');
 assert.match(html,/renderDistributionCenter\(allocationCenter,sortedAllocations\)/,'Halka grafiğinin merkezinde en büyük pay gösterilmeli');
+assert.match(html,/label\.textContent=items\[0\]\.label/,'Halka grafiğinin merkezinde en büyük paya sahip ürünün adı gösterilmeli');
 
 console.log('FinansTool v4.3 regresyon testleri başarılı.');
