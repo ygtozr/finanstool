@@ -68,11 +68,29 @@
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     button { border:0; border-radius:10px; padding:12px 20px; background:var(--accent); color:#062019; font:600 16px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif; cursor:pointer; }
     button:disabled { opacity:.65; cursor:wait; }
-    .toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}.toolbar label,.toolbar button{width:100%;min-height:42px;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:#26344d;font-size:.85rem;font-weight:650;line-height:1.2;text-align:center}.toolbar label{cursor:pointer}.toolbar label input{flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0;padding:0;accent-color:var(--accent)}.rsi-wrap{height:150px;display:none;margin-top:14px}.rsi-wrap.visible{display:block}
+    .toolbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 12px}.toolbar button{width:100%;min-height:42px;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:#26344d;font-size:.85rem;font-weight:650;line-height:1.2;text-align:center}.rsi-wrap{height:150px;display:block;margin-top:0}
     .meta { display:flex; flex-wrap:wrap; gap:10px 22px; min-height:28px; margin:0 0 14px; color:var(--muted); }
     .price { color:var(--text); font-weight:700; }
     .error { color:var(--danger); }
     .chart-wrap { position:relative; height:clamp(290px,55vw,460px); }
+    .chart-ma-toggle { position:absolute; z-index:3; top:8px; left:8px; min-height:28px; padding:5px 8px; color:var(--text); background:#192337dd; border:1px solid var(--line); border-radius:7px; font-size:.66rem; font-weight:700; box-shadow:0 4px 12px #0005; }
+    .chart-ma-toggle[aria-pressed="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
+    .chart-asset-switcher { margin-top:22px; padding-top:16px; border-top:1px solid var(--line); }
+    .chart-asset-switcher-buttons { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .chart-asset-switcher-buttons button { width:100%; padding:9px 12px; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:.82rem; }
+    .chart-asset-switcher-buttons button[aria-expanded="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
+    .chart-asset-panel { margin-top:8px; padding:8px; border:1px solid var(--line); border-radius:11px; background:#111a2b; }
+    .chart-asset-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin:0; padding:0; list-style:none; }
+    .chart-asset-item { width:100%; min-width:0; display:grid; grid-template-columns:34px minmax(0,1fr); align-items:center; gap:8px; padding:7px 8px; color:var(--text); background:#192337; border:1px solid var(--line); text-align:left; }
+    .chart-asset-logo { width:34px; height:34px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#0d1523; font-size:.58rem; font-weight:800; }
+    .chart-asset-logo > * { grid-area:1/1; }
+    .chart-asset-logo img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    .chart-asset-name { min-width:0; display:grid; gap:1px; }
+    .chart-asset-name strong,.chart-asset-name small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .chart-asset-name strong { font-size:.76rem; }
+    .chart-asset-name small { color:var(--muted); font-size:.64rem; }
+    .chart-asset-empty { margin:0; padding:8px; color:var(--muted); font-size:.76rem; text-align:center; }
+    html[data-theme="light"] .chart-ma-toggle,html[data-theme="light"] .chart-asset-panel,html[data-theme="light"] .chart-asset-item { color:var(--text); background:#f1f5f9; }
     .period-summary { margin-top:14px; padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
     .period-summary h3 { margin:0 0 10px; font-size:.9rem; }
     .period-summary-list { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:0; }
@@ -203,7 +221,7 @@
     html[data-theme="light"] body { background:radial-gradient(circle at top,#dbeafe 0,#eef3f8 48%); }
     html[data-theme="light"] main { background:rgba(255,255,255,.97); box-shadow:0 22px 60px #64748b33; }
     html[data-theme="light"] input, html[data-theme="light"] select, html[data-theme="light"] .favorite-card, html[data-theme="light"] .search-suggestions, html[data-theme="light"] .portfolio-drawer, html[data-theme="light"] .portfolio-dialog, html[data-theme="light"] .portfolio-row, html[data-theme="light"] .summary-card, html[data-theme="light"] .portfolio-stat, html[data-theme="light"] .dividend-row, html[data-theme="light"] .advanced-result, html[data-theme="light"] .alarm-row { color:var(--text); background:#f8fafc; }
-    html[data-theme="light"] .toolbar button, html[data-theme="light"] .toolbar label, html[data-theme="light"] .periods button, html[data-theme="light"] .portfolio-close, html[data-theme="light"] .dialog-cancel, html[data-theme="light"] .theme-toggle { color:var(--text); background:#e2e8f0; }
+    html[data-theme="light"] .toolbar button, html[data-theme="light"] .periods button, html[data-theme="light"] .portfolio-close, html[data-theme="light"] .dialog-cancel, html[data-theme="light"] .theme-toggle { color:var(--text); background:#e2e8f0; }
     html[data-theme="light"] .periods button.active { color:#fff; background:#0f766e; box-shadow:0 0 0 2px #99f6e4; }
     html[data-theme="light"] .search-suggestions { box-shadow:0 12px 25px #64748b44; }
     html[data-theme="light"] .suggestion:hover { background:#e2e8f0; }
@@ -496,8 +514,8 @@
       <div class="search-field"><input id="symbol" name="symbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="suggestions" aria-expanded="false" value="AAPL" maxlength="20" autocomplete="off" placeholder="Hisse ara: AAPL veya THYAO.IS" required><button id="favoriteButton" class="favorite-toggle" type="button" aria-label="Hisseyi favorilere ekle" aria-pressed="false" title="Favorilere ekle">☆</button><ul id="suggestions" class="search-suggestions" role="listbox" aria-label="Hisse önerileri"></ul></div>
       <button id="submitButton" type="submit">Grafiği getir</button>
     </form>
-    <div class="toolbar"><button id="advancedSearchButton" type="button">Gelişmiş Arama</button><button id="alarmButton" type="button">Fiyat Alarmı</button><label><input id="maToggle" type="checkbox"> MA50/100/200</label><label><input id="rsiToggle" type="checkbox"> RSI</label><button id="exportCsv" type="button">CSV İndir</button><button id="exportPng" type="button">PNG İndir</button></div><div id="meta" class="meta" aria-live="polite"></div>
-    <div class="chart-wrap"><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img" aria-describedby="priceChartSummary"></canvas><p id="priceChartSummary" class="sr-only" aria-live="polite"></p></div>
+    <div class="toolbar"><button id="advancedSearchButton" type="button">Gelişmiş Arama</button><button id="alarmButton" type="button">Fiyat Alarmı</button><button id="exportCsv" type="button">CSV İndir</button><button id="exportPng" type="button">PNG İndir</button></div><div id="meta" class="meta" aria-live="polite"></div>
+    <div class="chart-wrap"><button id="maToggle" class="chart-ma-toggle" type="button" aria-pressed="false">MA50/100/200</button><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img" aria-describedby="priceChartSummary"></canvas><p id="priceChartSummary" class="sr-only" aria-live="polite"></p></div>
     <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
     <section class="periods" aria-label="Grafik süresi">
       <button type="button" data-range="5d">1 hafta</button>
@@ -516,6 +534,7 @@
     </section>
     <section class="period-summary" aria-labelledby="periodSummaryTitle"><h3 id="periodSummaryTitle">Dönem Özeti</h3><dl class="period-summary-list"><div class="period-summary-item"><dt>Son kapanış</dt><dd><span id="periodLast">—</span><small id="periodLastDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem değişimi</dt><dd><span id="periodChange">—</span></dd></div><div class="period-summary-item"><dt>Dönem düşük</dt><dd><span id="periodLow">—</span><small id="periodLowDate" class="period-summary-date">—</small></dd></div><div class="period-summary-item"><dt>Dönem yüksek</dt><dd><span id="periodHigh">—</span><small id="periodHighDate" class="period-summary-date">—</small></dd></div></dl><div class="period-summary-range"><div class="period-summary-range-track" role="progressbar" aria-label="Güncel fiyatın dönem aralığındaki konumu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="periodRangeFill" class="period-summary-range-fill"></span></div><div class="period-summary-range-labels"><span>Düşük</span><span id="periodRangePosition">Güncel: —</span><span>Yüksek</span></div></div></section>
     <p class="hint">BIST hisseleri için koda <code>.IS</code> ekleyin: <code>THYAO.IS</code>, <code>ASELS.IS</code>.</p>
+    <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div></div>
@@ -621,6 +640,7 @@
     let chart;
     let rsiChart;
     let movingAverageData = null;
+    let maEnabled = false;
     let lastPrices = [];
     let lastLabels = [];
     let currentCurrency = 'TRY';
@@ -644,6 +664,13 @@
     const periodHighDate = document.getElementById('periodHighDate');
     const periodRangeFill = document.getElementById('periodRangeFill');
     const periodRangePosition = document.getElementById('periodRangePosition');
+    const maToggle = document.getElementById('maToggle');
+    const chartFavoritesToggle = document.getElementById('chartFavoritesToggle');
+    const chartPortfolioToggle = document.getElementById('chartPortfolioToggle');
+    const chartFavoritesPanel = document.getElementById('chartFavoritesPanel');
+    const chartPortfolioPanel = document.getElementById('chartPortfolioPanel');
+    const chartFavoritesList = document.getElementById('chartFavoritesList');
+    const chartPortfolioList = document.getElementById('chartPortfolioList');
     const marketSettingsButton = document.getElementById('marketSettingsButton');
     const marketSettingsDialog = document.getElementById('marketSettingsDialog');
     const marketSettingsList = document.getElementById('marketSettingsList');
@@ -915,6 +942,32 @@
       return /^[A-Z0-9.^=-]{1,20}$/.test(safe)
         ? 'https://financialmodelingprep.com/image-stock/'+encodeURIComponent(safe)+'.png'
         : '';
+    }
+    function renderChartAssetList(list,items,emptyText) {
+      list.replaceChildren();
+      if(!items.length){const empty=document.createElement('li');empty.className='chart-asset-empty';empty.textContent=emptyText;list.append(empty);return}
+      items.forEach(item=>{
+        const row=document.createElement('li'),select=document.createElement('button');select.type='button';select.className='chart-asset-item';select.title=item.symbol+' grafiğini aç';
+        const logo=document.createElement('span');logo.className='chart-asset-logo';
+        const initials=document.createElement('span');initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';logo.appendChild(initials);
+        const logoUrl=favoriteLogoUrl(item.symbol);
+        if(logoUrl){const image=document.createElement('img');image.src=logoUrl;image.alt='';image.referrerPolicy='no-referrer';image.addEventListener('error',()=>image.remove(),{once:true});logo.append(image)}
+        const name=document.createElement('span');name.className='chart-asset-name';const symbol=document.createElement('strong');symbol.textContent=item.symbol;const company=document.createElement('small');company.textContent=item.name||item.symbol;name.append(symbol,company);select.append(logo,name);
+        select.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();closeChartAssetPanels();chartView.scrollIntoView({behavior:'smooth',block:'start'});loadPrice(item.symbol)});
+        row.append(select);list.append(row);
+      });
+    }
+    function renderChartAssetPanels() {
+      renderChartAssetList(chartFavoritesList,favorites,'Henüz favori hisse yok.');
+      renderChartAssetList(chartPortfolioList,portfolio,'Portföyünüzde hisse yok.');
+    }
+    function closeChartAssetPanels() {
+      chartFavoritesPanel.hidden=true;chartPortfolioPanel.hidden=true;chartFavoritesToggle.setAttribute('aria-expanded','false');chartPortfolioToggle.setAttribute('aria-expanded','false');
+    }
+    function toggleChartAssetPanel(kind) {
+      const favoritesPanel=kind==='favorites',target=favoritesPanel?chartFavoritesPanel:chartPortfolioPanel,opening=target.hidden;
+      renderChartAssetPanels();closeChartAssetPanels();
+      if(opening){target.hidden=false;(favoritesPanel?chartFavoritesToggle:chartPortfolioToggle).setAttribute('aria-expanded','true')}
     }
 
     function renderFavorites() {
@@ -1458,8 +1511,7 @@
 
     function exportChartCsv() {
       if (!lastLabels.length) return;
-      const includeMa=document.getElementById('maToggle').checked;
-      const includeRsi=document.getElementById('rsiToggle').checked;
+      const includeMa=maEnabled;
       const columns=[
         {name:'Tarih',values:lastLabels},
         {name:currentChartName+' ('+currentCurrency+')',values:lastPrices}
@@ -1469,7 +1521,7 @@
         columns.push({name:'MA100',values:movingAverageData?.ma100||sma(lastPrices,100)});
         columns.push({name:'MA200',values:movingAverageData?.ma200||sma(lastPrices,200)});
       }
-      if(includeRsi)columns.push({name:'RSI (14)',values:calculateRsi(lastPrices)});
+      columns.push({name:'RSI (14)',values:calculateRsi(lastPrices)});
       const quote=value=>'"'+String(value??'').replace(/"/g,'""')+'"';
       const rows=[columns.map(column=>quote(column.name)).join(';')];
       for(let index=0;index<lastLabels.length;index++)rows.push(columns.map(column=>quote(column.values[index])).join(';'));
@@ -1483,7 +1535,7 @@
       exportPng.textContent='PNG hazırlanıyor…';
       try {
         const canvases=[document.getElementById('priceChart')];
-        if(document.getElementById('rsiWrap').classList.contains('visible'))canvases.push(document.getElementById('rsiChart'));
+        canvases.push(document.getElementById('rsiChart'));
         const width=Math.max(...canvases.map(canvas=>canvas.width));
         const gap=24;
         const height=canvases.reduce((sum,canvas)=>sum+canvas.height,0)+gap*(canvases.length-1);
@@ -2134,13 +2186,7 @@
 
     function renderRsiChart(labels,prices) {
       const wrap=document.getElementById('rsiWrap');
-      const enabled=document.getElementById('rsiToggle').checked;
-      wrap.classList.toggle('visible',enabled);
-      if(!enabled){
-        if(rsiChart){rsiChart.destroy();rsiChart=null}
-        document.getElementById('rsiChartSummary').textContent='';
-        return;
-      }
+      wrap.classList.add('visible');
       const colors=chartThemeColors();
       const rsiValues=calculateRsi(prices);
       const datasets=[
@@ -2163,7 +2209,7 @@
       lastLabels=[...labels];lastPrices=[...prices];currentChartName=name||currentChartName;currentCurrency=currency||currentCurrency;
       const colors=chartThemeColors();
       const datasets=[{label:currentChartName+' kapanış fiyatı ('+currentCurrency+')',data:lastPrices,borderColor:colors.accent,backgroundColor:'rgba(82,213,177,.14)',fill:true,pointRadius:0,pointHoverRadius:5,tension:.18,borderWidth:2,yAxisID:'price'}];
-      if(document.getElementById('maToggle').checked){
+      if(maEnabled){
         datasets.push({label:'MA50',data:movingAverageData?.ma50||sma(lastPrices,50),borderColor:'#16a34a',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
         datasets.push({label:'MA100',data:movingAverageData?.ma100||sma(lastPrices,100),borderColor:'#ca8a04',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
         datasets.push({label:'MA200',data:movingAverageData?.ma200||sma(lastPrices,200),borderColor:'#dc2626',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
@@ -2327,7 +2373,7 @@
           meta.append(providerPart);
         }
         movingAverageData=null;
-        if(document.getElementById('maToggle').checked){
+        if(maEnabled){
           try{await prepareMovingAverages(symbol,labels)}catch{}
           if(requestId!==priceRequestId)return;
         }
@@ -2357,16 +2403,19 @@
       finally{chartRefreshInProgress=false}
     }
 
-    async function redrawIndicators(event) {
-      const control = event?.target;
-      if(control?.id==='maToggle'&&control.checked){
-        control.disabled=true;
+    async function toggleMovingAverages() {
+      maEnabled=!maEnabled;
+      maToggle.setAttribute('aria-pressed',String(maEnabled));
+      if(maEnabled){
+        maToggle.disabled=true;
         try{await prepareMovingAverages(primarySymbol||currentSymbol(),lastLabels)}catch{movingAverageData=null}
-        control.disabled=false;
+        maToggle.disabled=false;
       }
       renderChart(lastLabels,lastPrices,currentChartName,currentCurrency);
     }
-    document.querySelectorAll('#maToggle,#rsiToggle').forEach(control => control.addEventListener('change', redrawIndicators));
+    maToggle.addEventListener('click',toggleMovingAverages);
+    chartFavoritesToggle.addEventListener('click',()=>toggleChartAssetPanel('favorites'));
+    chartPortfolioToggle.addEventListener('click',()=>toggleChartAssetPanel('portfolio'));
 
     function alignResultToLabels(result, labels) {
       const raw = result?.indicators?.quote?.[0]?.close;

@@ -96,8 +96,13 @@ assert.match(html,/portfolioAllocationChart\?updateDistributionChart\(portfolioA
 assert.match(html,/portfolioCurrencyChart\?updateDistributionChart\(portfolioCurrencyChart/,'Para birimi pasta grafiği yeniden oluşturulmadan güncellenmeli');
 assert.match(html,/chart\.update\('none'\)/,'Pasta grafik güncellemesi animasyonsuz olmalı');
 const toolbarMarkup=html.match(/<div class="toolbar">([\s\S]*?)<\/div><div id="meta"/)?.[1]||'';
-assert.ok(toolbarMarkup.indexOf('advancedSearchButton')<toolbarMarkup.indexOf('alarmButton')&&toolbarMarkup.indexOf('alarmButton')<toolbarMarkup.indexOf('maToggle')&&toolbarMarkup.indexOf('maToggle')<toolbarMarkup.indexOf('rsiToggle'),'Grafik araçları istenen sırada olmalı');
-assert.match(html,/\.toolbar label,\.toolbar button\{[^}]*justify-content:center[^}]*text-align:center/,'Altı grafik aracı ortalı ve ortak biçimde olmalı');
-assert.match(toolbarMarkup,/Gelişmiş Arama[\s\S]*Fiyat Alarmı[\s\S]*MA50\/100\/200[\s\S]*> RSI<[\s\S]*CSV İndir[\s\S]*PNG İndir/,'Grafik aracı metinleri ortak biçimde olmalı');
+assert.match(toolbarMarkup,/Gelişmiş Arama[\s\S]*Fiyat Alarmı[\s\S]*CSV İndir[\s\S]*PNG İndir/,'Grafik araç çubuğu dört temel işlemi içermeli');
+assert.doesNotMatch(toolbarMarkup,/maToggle|rsiToggle/,'MA ve RSI kontrolleri üst araç çubuğunda kalmamalı');
+assert.match(html,/class="chart-wrap"><button id="maToggle" class="chart-ma-toggle"[^>]*aria-pressed="false">MA50\/100\/200<\/button><canvas id="priceChart"/,'MA düğmesi ana grafiğin sol üstüne gömülmeli');
+assert.doesNotMatch(html,/id="rsiToggle"/,'RSI açma kapama düğmesi kaldırılmalı');
+assert.match(html,/\.rsi-wrap\{height:150px;display:block;margin-top:0\}/,'RSI grafiği daima görünür ve ana grafiğe bitişik olmalı');
+assert.match(html,/columns\.push\(\{name:'RSI \(14\)'/,'RSI verisi dışa aktarmada daima yer almalı');
+assert.match(html,/id="chartFavoritesToggle"[^>]*>Favoriler<[\s\S]*id="chartPortfolioToggle"[^>]*>Portföy</,'Grafik sayfasının altında Favoriler ve Portföy seçicileri bulunmalı');
+assert.match(html,/className='chart-asset-item'[\s\S]*loadPrice\(item\.symbol\)/,'Kayıtlı hisse seçimi ana grafiği güncellemeli');
 
 console.log('FinansTool v4.3 regresyon testleri başarılı.');
