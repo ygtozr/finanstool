@@ -7,6 +7,7 @@ const root=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const priceApi=fs.readFileSync(path.join(root,'api','price.js'),'utf8');
 const fundamentalsApi=fs.readFileSync(path.join(root,'api','fundamentals.js'),'utf8');
+const dividendsApi=fs.readFileSync(path.join(root,'api','dividends.js'),'utf8');
 
 function extractFunction(source,name){
   const start=source.indexOf('function '+name);
@@ -27,6 +28,7 @@ const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].ma
 scripts.forEach((script,index)=>assert.doesNotThrow(()=>new Function(script),'İstemci betiği '+(index+1)+' sözdizimi'));
 assert.doesNotThrow(()=>new Function('module','exports','require',priceApi),'Fiyat API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',fundamentalsApi),'Temel veri API sözdizimi');
+assert.doesNotThrow(()=>new Function('module','exports','require',dividendsApi),'Temettü API sözdizimi');
 
 const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary'].map(name=>extractFunction(scripts[0],name)).join('\n');
 const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary};')();
@@ -50,6 +52,10 @@ vm.runInNewContext(fundamentalsApi+'\nmodule.exports._test={numberValue,trailing
 assert.equal(fundamentalSandbox.module.exports._test.numberValue('0.35%'),0.35,'Temettü yüzdesi doğru ayrıştırılmalı');
 assert.equal(fundamentalSandbox.module.exports._test.numberValue('4,623,874,049,400'),4623874049400,'Piyasa değeri doğru ayrıştırılmalı');
 assert.equal(fundamentalSandbox.module.exports._test.trailingEps({data:{earningsPerShare:[{type:'PreviousQuarter',earnings:1},{type:'PreviousQuarter',earnings:2},{type:'PreviousQuarter',earnings:3},{type:'PreviousQuarter',earnings:4}]}}),10,'TTM EPS son dört gerçekleşmiş çeyrekten hesaplanmalı');
+const dividendSandbox={module:{exports:{}},exports:{},AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
+vm.runInNewContext(dividendsApi+'\nmodule.exports._test={parseDate,parseAmount};',dividendSandbox);
+assert.equal(dividendSandbox.module.exports._test.parseAmount('$0.27'),0.27,'Temettü tutarı doğru ayrıştırılmalı');
+assert.equal(new Date(dividendSandbox.module.exports._test.parseDate('09/15/2026')).toISOString().slice(0,10),'2026-09-15','Temettü tarihi doğru ayrıştırılmalı');
 
 assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh parametresi kalmamalı');
 assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunmalı');
@@ -108,5 +114,13 @@ assert.match(html,/className='chart-asset-item'[\s\S]*loadPrice\(item\.symbol\)/
 assert.match(html,/id="favoriteAddForm"[^>]*[\s\S]*id="favoriteSearch"[^>]*placeholder="Favorilere hisse ekle"/,'Özet favorilerinin altında ekleme araması bulunmalı');
 assert.match(html,/function addOverviewFavorite\(item\)[\s\S]*favorites\.push\(\{symbol,name\}\)[\s\S]*refreshFavoriteQuotes\(\)/,'Özet aramasından seçilen hisse favorilere eklenip fiyatı yenilenmeli');
 assert.match(html,/main \{ width:100%; max-width:100%; margin:48px auto 0; padding:14px 12px 24px;/,'Mobil sayfanın altındaki gereksiz iç boşluk azaltılmalı');
+assert.match(html,/id="cashAddButton"[^>]*>\+ Nakit Ekle<[\s\S]*id="cashCurrency"[\s\S]*TRY · Türk Lirası[\s\S]*USD · ABD Doları[\s\S]*EUR · Euro[\s\S]*GBP · İngiliz Sterlini/,'Portföye dört para biriminde nakit ekleme akışı bulunmalı');
+assert.match(html,/const cashKey = 'finans-grafigi-cash-balances'/,'Nakit bakiyeleri kalıcı olarak saklanmalı');
+assert.match(html,/cashBalances\.forEach\(balance=>\{[\s\S]*totalValue\+=convertedValue[\s\S]*allocationValues\.push\(\{label:'Nakit '/,'Nakit bakiyeleri portföy toplamı ve dağılımına katılmalı');
+assert.match(html,/data-benchmark-range="5d">1 Hafta<[\s\S]*data-benchmark-range="5y">5 Yıl<[\s\S]*data-benchmark-range="custom">Şu Tarihten İtibaren/,'Performans karşılaştırması grafik ekranındaki tüm süre seçeneklerini içermeli');
+assert.match(html,/function benchmarkQuery\(\)[\s\S]*period1=[\s\S]*period2=/,'Özel başlangıç tarihi karşılaştırma sorgusuna dönüştürülmeli');
+assert.match(html,/\/api\/dividends\?symbol=/,'Portföy yaklaşan temettü uç noktasını kullanmalı');
+assert.match(dividendsApi,/exOrEffDate[\s\S]*paymentDate[\s\S]*sort\(\(a,b\)=>\(a\.exDate\|\|a\.paymentDate\)-\(b\.exDate\|\|b\.paymentDate\)\)/,'Temettü API hak kullanım ve ödeme tarihlerini yakından uzağa sıralamalı');
+assert.match(html,/allDividends\.sort\(\(a,b\)=>a\.date-b\.date\)\.slice\(0,5\)/,'Takvim yalnız yaklaşan en yakın beş temettüyü göstermeli');
 
 console.log('FinansTool v4.3 regresyon testleri başarılı.');

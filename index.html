@@ -132,6 +132,17 @@
     .portfolio-search input { width:100%; }
     .portfolio-add { flex:0 0 48px; padding:0; font-size:1.5rem; }
     .portfolio-suggestions { left:0; right:56px; top:calc(100% + 4px); }
+    .portfolio-cash { margin:18px 0 0; padding:14px; border:1px solid var(--line); border-radius:12px; background:#111a2b; }
+    .portfolio-cash-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+    .portfolio-cash-head h3 { margin:0; font-size:1rem; }
+    .portfolio-cash-head button { padding:7px 10px; font-size:.78rem; }
+    .portfolio-cash-list { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+    .portfolio-cash-item { min-width:0; display:grid; grid-template-columns:minmax(0,1fr) 28px; align-items:center; gap:6px; padding:9px 10px; border:1px solid var(--line); border-radius:9px; background:#0d1523; }
+    .portfolio-cash-value { min-width:0; display:grid; gap:1px; }
+    .portfolio-cash-value small { color:var(--muted); font-size:.68rem; }
+    .portfolio-cash-value strong { overflow:hidden; font-size:.88rem; text-overflow:ellipsis; white-space:nowrap; }
+    .portfolio-cash-delete { width:28px; height:28px; padding:0; color:var(--danger); background:#3b1720; }
+    .portfolio-cash-empty { margin:0; color:var(--muted); font-size:.78rem; }
     .portfolio-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
     .summary-card { padding:12px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
     .summary-card small { display:block; color:var(--muted); }
@@ -224,7 +235,7 @@
     html[data-theme="light"] { color-scheme:light; --bg:#eef3f8; --panel:#ffffff; --line:#cbd5e1; --text:#172033; --muted:#5f6f86; --accent:#0f9f7f; --danger:#c9344f; }
     html[data-theme="light"] body { background:radial-gradient(circle at top,#dbeafe 0,#eef3f8 48%); }
     html[data-theme="light"] main { background:rgba(255,255,255,.97); box-shadow:0 22px 60px #64748b33; }
-    html[data-theme="light"] input, html[data-theme="light"] select, html[data-theme="light"] .favorite-card, html[data-theme="light"] .search-suggestions, html[data-theme="light"] .portfolio-drawer, html[data-theme="light"] .portfolio-dialog, html[data-theme="light"] .portfolio-row, html[data-theme="light"] .summary-card, html[data-theme="light"] .portfolio-stat, html[data-theme="light"] .dividend-row, html[data-theme="light"] .advanced-result, html[data-theme="light"] .alarm-row { color:var(--text); background:#f8fafc; }
+    html[data-theme="light"] input, html[data-theme="light"] select, html[data-theme="light"] .favorite-card, html[data-theme="light"] .search-suggestions, html[data-theme="light"] .portfolio-drawer, html[data-theme="light"] .portfolio-dialog, html[data-theme="light"] .portfolio-row, html[data-theme="light"] .portfolio-cash, html[data-theme="light"] .portfolio-cash-item, html[data-theme="light"] .summary-card, html[data-theme="light"] .portfolio-stat, html[data-theme="light"] .dividend-row, html[data-theme="light"] .advanced-result, html[data-theme="light"] .alarm-row { color:var(--text); background:#f8fafc; }
     html[data-theme="light"] .toolbar button, html[data-theme="light"] .periods button, html[data-theme="light"] .portfolio-close, html[data-theme="light"] .dialog-cancel, html[data-theme="light"] .theme-toggle { color:var(--text); background:#e2e8f0; }
     html[data-theme="light"] .periods button.active { color:#fff; background:#0f766e; box-shadow:0 0 0 2px #99f6e4; }
     html[data-theme="light"] .search-suggestions { box-shadow:0 12px 25px #64748b44; }
@@ -401,6 +412,7 @@
       .app-layout { grid-template-columns:minmax(0,1fr) 320px; gap:18px; }
       .market-cards { grid-template-columns:repeat(4,minmax(0,1fr)); }
       .portfolio-list { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .portfolio-cash-list { grid-template-columns:repeat(3,minmax(0,1fr)); }
       .portfolio-glance { max-width:760px; }
       .portfolio-page .portfolio-head { padding:18px; border:1px solid var(--line); border-radius:16px; background:#111a2b; }
       html[data-theme="light"] .desktop-sidebar { background:#f8fafc; }
@@ -482,6 +494,7 @@
       .chart-page .chart-wrap { height:340px; }
       .portfolio-page .portfolio-analysis { margin-top:14px; padding-top:0; border-top:0; }
       .portfolio-page .distribution-grid { grid-template-columns:1fr; }
+      .portfolio-cash-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
       @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
     .portfolio-warning { margin:0 0 12px; padding:10px 12px; border:1px solid var(--danger); border-radius:10px; color:var(--danger); }
@@ -546,6 +559,7 @@
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
       <div id="portfolioList" class="portfolio-list"></div>
       <div class="portfolio-search"><input id="portfolioSymbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="portfolioSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" role="listbox" aria-label="Portföy hisse önerileri"></ul></div>
+      <section class="portfolio-cash" aria-labelledby="portfolioCashTitle"><div class="portfolio-cash-head"><h3 id="portfolioCashTitle">Nakit Bakiyeleri</h3><button id="cashAddButton" type="button">+ Nakit Ekle</button></div><div id="portfolioCashList" class="portfolio-cash-list"></div></section>
       <section class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
         <h3 id="portfolioDistributionTitle">Portföy Dağılımı</h3>
         <div class="distribution-grid">
@@ -558,12 +572,12 @@
         <div class="benchmark-controls">
           <div class="benchmark-presets" aria-label="Hazır karşılaştırma ölçütleri"><button type="button" data-benchmark-symbol="^GSPC" data-benchmark-name="S&P 500">S&P 500</button><button type="button" data-benchmark-symbol="^IXIC" data-benchmark-name="Nasdaq">Nasdaq</button><button type="button" data-benchmark-symbol="XU100.IS" data-benchmark-name="BIST 100">BIST 100</button><button type="button" data-benchmark-symbol="GLD" data-benchmark-name="Altın">Altın</button></div>
           <div class="benchmark-search"><input id="benchmarkSearch" type="search" role="combobox" aria-autocomplete="list" aria-controls="benchmarkSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Başka ölçüt ara"><button id="benchmarkApply" type="button">Karşılaştır</button><ul id="benchmarkSuggestions" class="search-suggestions" role="listbox" aria-label="Karşılaştırma ölçütü önerileri"></ul></div>
-          <div class="benchmark-ranges" aria-label="Karşılaştırma süresi"><button type="button" data-benchmark-range="1mo">1 Ay</button><button type="button" data-benchmark-range="3mo">3 Ay</button><button type="button" data-benchmark-range="6mo">6 Ay</button><button type="button" data-benchmark-range="1y">1 Yıl</button></div>
+          <div class="benchmark-ranges" aria-label="Karşılaştırma süresi"><button type="button" data-benchmark-range="5d">1 Hafta</button><button type="button" data-benchmark-range="1mo">1 Ay</button><button type="button" data-benchmark-range="3mo">3 Ay</button><button type="button" data-benchmark-range="6mo">6 Ay</button><button type="button" data-benchmark-range="1y">1 Yıl</button><button type="button" data-benchmark-range="5y">5 Yıl</button><button id="benchmarkCustomRange" type="button" data-benchmark-range="custom">Şu Tarihten İtibaren</button></div><div id="benchmarkDatePicker" class="date-picker"><input id="benchmarkStartDate" type="date" aria-label="Karşılaştırma başlangıç tarihi"><p id="benchmarkDateError" class="error" role="alert"></p></div>
         </div>
         <div class="benchmark-chart-wrap"><canvas id="portfolioBenchmarkChart" role="img" aria-label="Portföy ve karşılaştırma ölçütü performans grafiği"></canvas><p id="benchmarkEmpty" class="benchmark-empty">Karşılaştırma için portföye hisse ekleyin.</p></div>
         <div id="benchmarkStats" class="benchmark-stats"></div>
       </section>
-      <section class="dividend-section"><h3>Temettü Takvimi</h3><ul id="dividendList" class="dividend-list"></ul></section>
+      <section class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
   </main>
   <nav class="mobile-bottom-nav" aria-label="Mobil gezinme">
@@ -579,6 +593,14 @@
       <label>Adet<input id="portfolioQuantity" type="number" min="0.000001" step="any" required></label>
       <label>Birim maliyet<input id="portfolioCost" type="number" min="0" step="any" required></label>
       <div class="dialog-actions"><button id="portfolioCancel" class="dialog-cancel" type="button">Vazgeç</button><button type="submit">Kaydet</button></div>
+    </form>
+  </dialog>
+  <dialog id="cashDialog" class="portfolio-dialog" aria-labelledby="cashDialogTitle">
+    <h3 id="cashDialogTitle">Nakit Ekle</h3><p class="portfolio-dialog-symbol">Aynı para birimi yeniden eklenirse mevcut bakiyeye eklenir.</p>
+    <form id="cashForm" class="portfolio-form">
+      <label>Para birimi<select id="cashCurrency" required><option value="TRY">TRY · Türk Lirası</option><option value="USD">USD · ABD Doları</option><option value="EUR">EUR · Euro</option><option value="GBP">GBP · İngiliz Sterlini</option></select></label>
+      <label>Tutar<input id="cashAmount" type="number" min="0.01" step="any" inputmode="decimal" required></label>
+      <div class="dialog-actions"><button id="cashCancel" class="dialog-cancel" type="button">Vazgeç</button><button type="submit">Bakiyeye Ekle</button></div>
     </form>
   </dialog>
 
@@ -627,7 +649,7 @@
   </dialog>
   <dialog id="dataDialog" class="portfolio-dialog data-dialog">
     <h3>Veri Yedekleme</h3>
-    <p class="portfolio-dialog-symbol">Favoriler, portföy, fiyat alarmları, piyasa özeti ve tema ayarınızı tek bir JSON dosyasında saklayın.</p>
+    <p class="portfolio-dialog-symbol">Favoriler, hisse ve nakit portföyü, fiyat alarmları, piyasa özeti ve tema ayarınızı tek bir JSON dosyasında saklayın.</p>
     <div class="data-actions"><button id="backupDownload" type="button">Yedek dosyasını indir</button></div>
     <label class="backup-file-label">Geri yüklenecek JSON dosyası
       <input id="backupFile" type="file" accept=".json,application/json">
@@ -790,12 +812,23 @@
     const benchmarkStats = document.getElementById('benchmarkStats');
     const benchmarkPresetButtons = [...document.querySelectorAll('[data-benchmark-symbol]')];
     const benchmarkRangeButtons = [...document.querySelectorAll('[data-benchmark-range]')];
+    const benchmarkCustomRange = document.getElementById('benchmarkCustomRange');
+    const benchmarkDatePicker = document.getElementById('benchmarkDatePicker');
+    const benchmarkStartDate = document.getElementById('benchmarkStartDate');
+    const benchmarkDateError = document.getElementById('benchmarkDateError');
     const portfolioDialog = document.getElementById('portfolioDialog');
     const portfolioDialogSymbol = document.getElementById('portfolioDialogSymbol');
     const portfolioForm = document.getElementById('portfolioForm');
     const portfolioQuantity = document.getElementById('portfolioQuantity');
     const portfolioCost = document.getElementById('portfolioCost');
     const portfolioCancel = document.getElementById('portfolioCancel');
+    const portfolioCashList = document.getElementById('portfolioCashList');
+    const cashAddButton = document.getElementById('cashAddButton');
+    const cashDialog = document.getElementById('cashDialog');
+    const cashForm = document.getElementById('cashForm');
+    const cashCurrency = document.getElementById('cashCurrency');
+    const cashAmount = document.getElementById('cashAmount');
+    const cashCancel = document.getElementById('cashCancel');
     const favoriteDetailDialog = document.getElementById('favoriteDetailDialog');
     const favoriteDetailIdentity = document.getElementById('favoriteDetailIdentity');
     const favoriteDetailBody = document.getElementById('favoriteDetailBody');
@@ -823,6 +856,9 @@
     let alarms = (() => { try { const saved=JSON.parse(localStorage.getItem(alarmKey)); return Array.isArray(saved) ? saved : []; } catch { return []; } })();
     const portfolioKey = 'finans-grafigi-portfolio';
     let portfolio = (() => { try { const saved = JSON.parse(localStorage.getItem(portfolioKey)); return Array.isArray(saved) ? saved.filter(item => item && item.symbol && Number(item.quantity) > 0).map(item => ({ symbol:String(item.symbol).toUpperCase(), name:item.name || item.symbol, quantity:Number(item.quantity), unitCost:Number(item.unitCost) || 0 })) : []; } catch { return []; } })();
+    const cashKey = 'finans-grafigi-cash-balances';
+    const supportedCashCurrencies = ['TRY','USD','EUR','GBP'];
+    let cashBalances = (()=>{try{const saved=JSON.parse(localStorage.getItem(cashKey));return Array.isArray(saved)?saved.map(item=>({currency:String(item?.currency||'').toUpperCase(),amount:Number(item?.amount)})).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0):[]}catch{return[]}})();
     let portfolioSearchTimer;
     let portfolioSelection = null;
     let portfolioRenderId = 0;
@@ -833,7 +869,8 @@
     let benchmarkSearchTimer;
     let benchmarkSelection = null;
     const benchmarkKey = 'finans-grafigi-portfolio-benchmark';
-    let benchmarkSettings = (()=>{try{const saved=JSON.parse(localStorage.getItem(benchmarkKey));return saved&&saved.symbol?{symbol:String(saved.symbol).toUpperCase(),name:saved.name||saved.symbol,range:['1mo','3mo','6mo','1y'].includes(saved.range)?saved.range:'6mo'}:{symbol:'^GSPC',name:'S&P 500',range:'6mo'}}catch{return{symbol:'^GSPC',name:'S&P 500',range:'6mo'}}})();
+    const benchmarkRanges=['5d','1mo','3mo','6mo','1y','5y','custom'];
+    let benchmarkSettings = (()=>{try{const saved=JSON.parse(localStorage.getItem(benchmarkKey));const range=benchmarkRanges.includes(saved?.range)?saved.range:'6mo';return saved&&saved.symbol?{symbol:String(saved.symbol).toUpperCase(),name:saved.name||saved.symbol,range,startDate:/^\d{4}-\d{2}-\d{2}$/.test(saved.startDate||'')?saved.startDate:''}:{symbol:'^GSPC',name:'S&P 500',range:'6mo',startDate:''}}catch{return{symbol:'^GSPC',name:'S&P 500',range:'6mo',startDate:''}}})();
     let currentName = '';
     const favoriteQuotes = new Map();
     let favoriteRefreshInProgress = false;
@@ -1458,11 +1495,13 @@
       const cleanText=(value,fallback)=>String(value||fallback||'').trim().slice(0,120);
       const cleanFavorites=sourceArray(raw.favorites).map(item=>{const symbol=normalizeSymbol(item?.symbol);return{symbol,name:cleanText(item?.name,symbol)}}).filter(item=>item.symbol);
       const cleanPortfolio=sourceArray(raw.portfolio).map(item=>{const symbol=normalizeSymbol(item?.symbol),quantity=Number(item?.quantity),unitCost=Number(item?.unitCost);return{symbol,name:cleanText(item?.name,symbol),quantity,unitCost}}).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0);
+      const cleanCash=sourceArray(raw.cashBalances).map(item=>({currency:String(item?.currency||'').toUpperCase(),amount:Number(item?.amount)})).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0);
       const cleanAlarms=sourceArray(raw.alarms).map(item=>{const symbol=normalizeSymbol(item?.symbol),target=Number(item?.target),condition=item?.condition==='below'?'below':'above';return{id:cleanText(item?.id,Date.now().toString(36)+Math.random().toString(36).slice(2)),symbol,target,condition,triggered:Boolean(item?.triggered)}}).filter(item=>item.symbol&&Number.isFinite(item.target)&&item.target>0);
       const cleanMarketItems=sourceArray(raw.marketItems).map(item=>{const symbol=normalizeSymbol(item?.symbol);return{symbol,label:cleanText(item?.label||item?.name,symbol)}}).filter(item=>item.symbol);
       return {
         favorites:uniqueBy(cleanFavorites,item=>item.symbol),
         portfolio:uniqueBy(cleanPortfolio,item=>item.symbol),
+        cashBalances:uniqueBy(cleanCash,item=>item.currency),
         alarms:uniqueBy(cleanAlarms,item=>item.id||item.symbol+'|'+item.condition+'|'+item.target),
         marketItems:uniqueBy(cleanMarketItems,item=>item.symbol),
         theme:raw.theme==='light'?'light':'dark'
@@ -1477,6 +1516,7 @@
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
           portfolio:portfolio.map(({symbol,name,quantity,unitCost})=>({symbol,name,quantity,unitCost})),
+          cashBalances:cashBalances.map(({currency,amount})=>({currency,amount})),
           alarms:alarms.map(({id,symbol,target,condition,triggered})=>({id,symbol,target,condition,triggered:Boolean(triggered)})),
           marketItems:marketItems.map(({symbol,label})=>({symbol,label})),
           theme:document.documentElement.dataset.theme==='light'?'light':'dark'
@@ -1485,7 +1525,7 @@
     }
 
     function backupSummary(data) {
-      return 'Favoriler: '+data.favorites.length+'\nPortföy pozisyonları: '+data.portfolio.length+'\nFiyat alarmları: '+data.alarms.length+'\nPiyasa özeti öğeleri: '+data.marketItems.length+'\nTema: '+(data.theme==='light'?'Açık':'Koyu');
+      return 'Favoriler: '+data.favorites.length+'\nPortföy pozisyonları: '+data.portfolio.length+'\nNakit bakiyeleri: '+data.cashBalances.length+'\nFiyat alarmları: '+data.alarms.length+'\nPiyasa özeti öğeleri: '+data.marketItems.length+'\nTema: '+(data.theme==='light'?'Açık':'Koyu');
     }
 
     function mergeUnique(current,incoming,key) {
@@ -1497,17 +1537,20 @@
       if(mode==='replace'){
         favorites=data.favorites;
         portfolio=data.portfolio;
+        cashBalances=data.cashBalances;
         alarms=data.alarms;
         marketItems=data.marketItems;
         applyTheme(data.theme);
       }else{
         favorites=mergeUnique(favorites,data.favorites,item=>item.symbol);
         portfolio=mergeUnique(portfolio,data.portfolio,item=>item.symbol);
+        data.cashBalances.forEach(incoming=>{const existing=cashBalances.find(item=>item.currency===incoming.currency);if(existing)existing.amount+=incoming.amount;else cashBalances.push({...incoming})});
         alarms=mergeUnique(alarms,data.alarms,item=>item.id||item.symbol+'|'+item.condition+'|'+item.target);
         marketItems=mergeUnique(marketItems,data.marketItems,item=>item.symbol);
       }
       saveFavorites();
       savePortfolio();
+      saveCashBalances();
       saveAlarms();
       saveMarketItems();
       renderFavorites();
@@ -1666,6 +1709,21 @@
     }
 
     const savePortfolio = () => localStorage.setItem(portfolioKey, JSON.stringify(portfolio));
+    const saveCashBalances = () => localStorage.setItem(cashKey,JSON.stringify(cashBalances));
+
+    function renderCashBalances(){
+      portfolioCashList.replaceChildren();
+      if(!cashBalances.length){const empty=document.createElement('p');empty.className='portfolio-cash-empty';empty.textContent='Henüz nakit bakiye eklenmedi.';portfolioCashList.append(empty);return}
+      cashBalances.slice().sort((a,b)=>supportedCashCurrencies.indexOf(a.currency)-supportedCashCurrencies.indexOf(b.currency)).forEach(balance=>{
+        const item=document.createElement('article');item.className='portfolio-cash-item';
+        const value=document.createElement('div');value.className='portfolio-cash-value';
+        const label=document.createElement('small');label.textContent=balance.currency+' Nakit';
+        const amount=document.createElement('strong');amount.textContent=money(balance.amount,balance.currency);value.append(label,amount);
+        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-cash-delete';remove.textContent='×';remove.setAttribute('aria-label',balance.currency+' nakit bakiyesini sil');
+        remove.addEventListener('click',()=>{cashBalances=cashBalances.filter(item=>item.currency!==balance.currency);saveCashBalances();renderPortfolio()});
+        item.append(value,remove);portfolioCashList.append(item);
+      });
+    }
 
     function setActiveView(view) {
       const states={main:view==='main',chart:view==='chart',portfolio:view==='portfolio'};
@@ -1711,6 +1769,7 @@
 
     async function fetchPortfolioItem(position) {
       const query='range=1y&interval=1d&events=div';
+      const upcomingPromise=cachedApiJson('/api/dividends?symbol='+encodeURIComponent(position.symbol),{ttl:900000}).catch(()=>({events:[]}));
       const payload=await cachedApiJson(priceApiUrl(position.symbol,query));
       const result=payload.chart?.result?.[0];
       const rawCloses=result?.indicators?.quote?.[0]?.close;
@@ -1724,7 +1783,9 @@
       const weekBase=[...points].reverse().find(point=>point.time*1000<monday.getTime())||points[0];
       const currency=String(result.meta?.currency||'USD').toUpperCase();
       const name=result.meta?.longName||result.meta?.shortName||position.name||position.symbol;
-      const dividends=Object.values(result.events?.dividends||{}).map(event=>({symbol:position.symbol,name,date:Number(event.date)*1000,amount:Number(event.amount),currency})).filter(item=>Number.isFinite(item.date)&&Number.isFinite(item.amount));
+      const upcoming=await upcomingPromise;
+      const today=new Date().setHours(0,0,0,0);
+      const dividends=(upcoming.events||[]).map(event=>{const exDate=Number(event.exDate),paymentDate=Number(event.paymentDate);return{symbol:position.symbol,name,date:Number.isFinite(exDate)&&exDate>=today?exDate:paymentDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amount:Number(event.amount),currency:String(event.currency||currency).toUpperCase()}}).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
       return {...position,name,currency,price:points.at(-1).close,previousPrice:(points.length>1?points.at(-2):points.at(-1)).close,weekStartPrice:weekBase.close,dividends,result};
     }
 
@@ -1855,6 +1916,19 @@
       benchmarkPresetButtons.forEach(button=>button.classList.toggle('active',button.dataset.benchmarkSymbol===benchmarkSettings.symbol));
       benchmarkRangeButtons.forEach(button=>button.classList.toggle('active',button.dataset.benchmarkRange===benchmarkSettings.range));
       benchmarkSearch.value=benchmarkSettings.symbol;
+      const custom=benchmarkSettings.range==='custom';
+      benchmarkDatePicker.classList.toggle('visible',custom);
+      benchmarkStartDate.value=benchmarkSettings.startDate||'';
+      benchmarkCustomRange.textContent=custom&&benchmarkSettings.startDate?new Intl.DateTimeFormat('tr-TR').format(new Date(benchmarkSettings.startDate+'T00:00:00'))+' Tarihinden İtibaren':'Şu Tarihten İtibaren';
+    }
+
+    function benchmarkQuery(){
+      if(benchmarkSettings.range!=='custom')return'range='+benchmarkSettings.range+'&interval=1d';
+      const start=new Date((benchmarkSettings.startDate||'')+'T00:00:00');
+      if(!Number.isFinite(start.getTime()))throw new Error('Karşılaştırma başlangıç tarihi seçin');
+      const period1=Math.floor(start.getTime()/1000),period2=Math.floor(Date.now()/1000);
+      if(period1>=period2)throw new Error('Başlangıç tarihi bugünden önce olmalı');
+      return'period1='+period1+'&period2='+period2+'&interval=1d';
     }
 
     function normalizePerformance(values) {
@@ -1915,7 +1989,7 @@
       const requestId=++portfolioBenchmarkRequestId;
       updateBenchmarkControls();
       benchmarkStats.replaceChildren();
-      if(!portfolio.length){
+      if(!portfolio.length&&!cashBalances.length){
         if(portfolioBenchmarkChart){portfolioBenchmarkChart.destroy();portfolioBenchmarkChart=null}
         document.getElementById('portfolioBenchmarkChart').hidden=true;
         benchmarkEmpty.hidden=false;
@@ -1927,10 +2001,10 @@
       const canvas=document.getElementById('portfolioBenchmarkChart');
       canvas.hidden=false;
       try{
-        const query='range='+benchmarkSettings.range+'&interval=1d';
+        const query=benchmarkQuery();
         const benchmarkPromise=fetchBenchmarkResult(benchmarkSettings.symbol,query);
         const positionPromises=portfolio.map(async position=>{
-          const prefetched=prefetchedPositions.find(item=>item.symbol===position.symbol&&item.result);
+          const prefetched=benchmarkSettings.range==='1y'?prefetchedPositions.find(item=>item.symbol===position.symbol&&item.result):null;
           if(prefetched)return{position,result:prefetched.result};
           try{return{position,result:await fetchBenchmarkResult(position.symbol,query)}}catch{return null}
         });
@@ -1942,10 +2016,9 @@
         const formatter=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
         const labels=benchmarkPoints.map(point=>formatter.format(new Date(point.time*1000)));
         const validPositions=positionResults.filter(Boolean);
-        if(!validPositions.length)throw new Error('Portföy hisselerinin performans verisi alınamadı');
         const benchmarkCurrency=String(benchmarkResult.meta?.currency||'USD').toUpperCase();
         const positionCurrencies=validPositions.map(item=>String(item.result.meta?.currency||'USD').toUpperCase());
-        const useUsd=new Set([...positionCurrencies,benchmarkCurrency]).size>1;
+        const useUsd=new Set([...positionCurrencies,...cashBalances.map(item=>item.currency),benchmarkCurrency]).size>1;
         const series=[];
         for(const item of validPositions){
           try{
@@ -1953,6 +2026,13 @@
             let values=fillMissingRates(alignResultToLabels(item.result,labels));
             if(useUsd&&currency!=='USD')values=await convertSeriesToUsd(currency,values,labels,query);
             series.push({values,quantity:item.position.quantity});
+          }catch{}
+        }
+        for(const balance of cashBalances){
+          try{
+            let values=labels.map(()=>balance.amount);
+            if(useUsd&&balance.currency!=='USD')values=await convertSeriesToUsd(balance.currency,values,labels,query);
+            series.push({values,quantity:1});
           }catch{}
         }
         if(requestId!==portfolioBenchmarkRequestId)return;
@@ -1968,7 +2048,7 @@
         const benchmarkPerformance=normalizePerformance(benchmarkValues);
         renderPortfolioBenchmarkChart(labels,portfolioPerformance,benchmarkPerformance);
         renderBenchmarkStats(portfolioPerformance,benchmarkPerformance);
-        benchmarkStatus.textContent='Son güncelleme: '+formatUpdateTime(new Date())+' · '+series.length+'/'+portfolio.length+' pozisyon'+(useUsd?' · USD bazında':'');
+        benchmarkStatus.textContent='Son güncelleme: '+formatUpdateTime(new Date())+' · '+series.length+'/'+(portfolio.length+cashBalances.length)+' varlık'+(useUsd?' · USD bazında':'');
       }catch(error){
         if(requestId!==portfolioBenchmarkRequestId)return;
         if(portfolioBenchmarkChart){portfolioBenchmarkChart.destroy();portfolioBenchmarkChart=null}
@@ -2003,14 +2083,15 @@
       const keepExistingPortfolio=Boolean(portfolioList.querySelector('.portfolio-row'));
       const portfolioTotalValue=document.getElementById('portfolioTotalValue');
       const portfolioDailyChange=document.getElementById('portfolioDailyChange');
-      if(!portfolio.length){
+      portfolioDailyChange.className='portfolio-daily-change';
+      renderCashBalances();
+      if(!portfolio.length&&!cashBalances.length){
         portfolioList.replaceChildren();
         portfolioSummary.replaceChildren();
         dividendList.replaceChildren();
         portfolioTotalValue.textContent=money(0,'USD');
         portfolioDailyChange.textContent='Bugün —';
-        portfolioDailyChange.className='portfolio-daily-change';
-        const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Portföyünüz boş. Hisse arayıp + düğmesine basın.';portfolioList.append(empty);
+        const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Portföyünüz boş. Hisse veya nakit ekleyin.';portfolioList.append(empty);
         const dividendEmpty=document.createElement('li');dividendEmpty.className='favorites-note';dividendEmpty.textContent='Temettü verisi için portföye hisse ekleyin.';dividendList.append(dividendEmpty);
         renderPortfolioDistribution([],new Map(),'USD');
         renderPortfolioBenchmark();
@@ -2022,13 +2103,12 @@
         dividendList.replaceChildren();
         portfolioTotalValue.textContent='Hesaplanıyor…';
         portfolioDailyChange.textContent='Bugün hesaplanıyor…';
-        portfolioDailyChange.className='portfolio-daily-change';
-        const loading=document.createElement('div');loading.className='portfolio-empty';loading.textContent='Portföy fiyatları güncelleniyor…';portfolioList.append(loading);
+        const loading=document.createElement('div');loading.className='portfolio-empty';loading.textContent=portfolio.length?'Portföy fiyatları güncelleniyor…':'Henüz hisse pozisyonu yok.';portfolioList.append(loading);
       }
       const results=await Promise.all(portfolio.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
       if(renderId!==portfolioRenderId)return;
       const valid=results.filter(result=>result.ok).map(result=>result.value);
-      const currencies=[...new Set(valid.map(item=>item.currency))];
+      const currencies=[...new Set([...valid.map(item=>item.currency),...cashBalances.map(item=>item.currency)])];
       const mixedCurrency=currencies.length>1;
       const summaryCurrency=mixedCurrency?'USD':(currencies[0]||'USD');
       const rates=new Map([['USD',1]]);
@@ -2094,6 +2174,16 @@
         valueLine.append(currentValue,profitValue);
         row.append(head,valueLine,details);portfolioList.append(row);
       });
+      if(!portfolio.length){const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Henüz hisse pozisyonu yok.';portfolioList.append(empty)}
+      cashBalances.forEach(balance=>{
+        const factor=mixedCurrency?rates.get(balance.currency):1;
+        if(Number.isFinite(factor)&&factor>0){
+          const convertedValue=balance.amount*factor;
+          totalCost+=convertedValue;totalValue+=convertedValue;totalPreviousValue+=convertedValue;totalWeekStartValue+=convertedValue;
+          allocationValues.push({label:'Nakit '+balance.currency,value:convertedValue});
+          currencyValues.set(balance.currency,(currencyValues.get(balance.currency)||0)+convertedValue);
+        }else missingRates.add(balance.currency);
+      });
       savePortfolio();
       if(missingRates.size){
         const codes=[...missingRates].join(', ');
@@ -2123,9 +2213,9 @@
         portfolioSummary.append(table);
         renderPortfolioDistribution(allocationValues,currencyValues,summaryCurrency);
       }
-      const dividends=allDividends.sort((a,b)=>b.date-a.date).slice(0,5);
-      if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';empty.textContent='Temettü kaydı bulunamadı.';dividendList.append(empty)}
-      else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol;const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency);row.append(date,symbol,amount);dividendList.append(row)});
+      const dividends=allDividends.sort((a,b)=>a.date-b.date).slice(0,5);
+      if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';empty.textContent=portfolio.length?'Açıklanmış yaklaşan temettü bulunamadı.':'Temettü takvimi için portföyde hisse bulunmuyor.';dividendList.append(empty)}
+      else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency);row.append(date,symbol,amount);dividendList.append(row)});
       renderPortfolioBenchmark(valid);
       if(keepExistingPortfolio&&portfolioView.classList.contains('active'))requestAnimationFrame(()=>window.scrollTo({top:scrollBeforeCommit,behavior:'auto'}));
     }
@@ -2668,10 +2758,21 @@
       renderPortfolioBenchmark();
     }));
     benchmarkRangeButtons.forEach(button=>button.addEventListener('click',()=>{
-      benchmarkSettings={...benchmarkSettings,range:button.dataset.benchmarkRange};
+      const range=button.dataset.benchmarkRange;
+      benchmarkSettings={...benchmarkSettings,range,startDate:range==='custom'?benchmarkSettings.startDate:''};
       saveBenchmarkSettings();
+      updateBenchmarkControls();
+      if(range==='custom'&&!benchmarkSettings.startDate){benchmarkStartDate.focus();return}
       renderPortfolioBenchmark();
     }));
+    benchmarkStartDate.addEventListener('change',()=>{
+      const value=benchmarkStartDate.value;
+      const date=new Date(value+'T00:00:00');
+      if(!value||!Number.isFinite(date.getTime())||date.getTime()>=Date.now()){benchmarkDateError.textContent='Bugünden önce geçerli bir tarih seçin.';return}
+      benchmarkDateError.textContent='';
+      benchmarkSettings={...benchmarkSettings,range:'custom',startDate:value};
+      saveBenchmarkSettings();updateBenchmarkControls();renderPortfolioBenchmark();
+    });
     benchmarkSearch.addEventListener('input',()=>{
       const requestId=++benchmarkSearchRequestId;
       benchmarkSelection=null;
@@ -2730,6 +2831,16 @@
     favoriteDetailAlarm.addEventListener('click',()=>{const item=favoriteDetailItem;if(!item)return;favoriteDetailDialog.close();openFavoriteAlarm(item)});
     favoriteDetailPortfolio.addEventListener('click',()=>{const item=favoriteDetailItem;if(!item)return;favoriteDetailDialog.close();openFavoritePortfolio(item)});
     portfolioCancel.addEventListener('click', () => portfolioDialog.close());
+    cashAddButton.addEventListener('click',()=>{cashAmount.value='';cashDialog.showModal();cashAmount.focus()});
+    cashCancel.addEventListener('click',()=>cashDialog.close());
+    cashForm.addEventListener('submit',event=>{
+      event.preventDefault();
+      const currency=String(cashCurrency.value).toUpperCase(),amount=Number(cashAmount.value);
+      if(!supportedCashCurrencies.includes(currency)||!Number.isFinite(amount)||amount<=0)return;
+      const existing=cashBalances.find(item=>item.currency===currency);
+      if(existing)existing.amount+=amount;else cashBalances.push({currency,amount});
+      saveCashBalances();cashDialog.close();renderPortfolio();
+    });
     portfolioSymbol.addEventListener('input',()=>{
       const requestId=++portfolioSearchRequestId;
       portfolioSelection=null;
