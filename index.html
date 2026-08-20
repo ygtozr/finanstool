@@ -6,9 +6,9 @@
   <meta id="themeColorMeta" name="theme-color" content="#101827">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="FinansTool">
+  <meta name="apple-mobile-web-app-title" content="Özer Finans">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>FinansTool v5.2</title>
+  <title>Özer Finans v5.3</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -60,6 +60,10 @@
     html[data-theme="light"] .favorite-quick-menu { background:#fff; box-shadow:0 14px 34px #33415533; }
     html[data-theme="light"] .favorite-quick-menu button:hover,html[data-theme="light"] .favorite-quick-menu button:focus-visible { background:#e2e8f0; }
     h1 { margin:0; font-size:clamp(1.5rem,4vw,2.15rem); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .brand-lockup { display:flex; align-items:center; gap:10px; min-width:0; }
+    .brand-lockup-mark { width:42px; height:42px; flex:0 0 42px; display:block; }
+    .brand-lockup-name { color:var(--text); font-weight:800; letter-spacing:-.025em; white-space:nowrap; }
+    .page-brand { margin-bottom:2px; }
     .version-badge { display:inline-flex; align-items:center; padding:3px 8px; border:1px solid var(--line); border-radius:999px; color:var(--accent); font-size:.72rem; font-weight:700; letter-spacing:.04em; }
     .intro { margin:6px 0 25px; color:var(--muted); }
     form { display:flex; gap:10px; margin-bottom:22px; }
@@ -456,8 +460,8 @@
       body { place-items:start center; padding:0; }
       main { width:min(1440px,100%); min-height:100vh; display:grid; grid-template-columns:216px minmax(0,1fr); column-gap:24px; align-content:start; border-radius:0; padding:0 30px 38px 0; }
       .desktop-sidebar { grid-column:1; grid-row:1 / span 3; position:sticky; top:0; min-height:100vh; display:flex; flex-direction:column; gap:8px; padding:28px 18px; background:#0d1523; border-right:1px solid var(--line); }
-      .desktop-brand { margin:0 0 22px; display:flex; align-items:center; gap:10px; font-size:1.08rem; font-weight:800; }
-      .desktop-brand-mark { width:34px; height:34px; display:grid; place-items:center; border-radius:10px; color:#062019; background:var(--accent); }
+      .desktop-brand { margin:0 0 22px; display:flex; align-items:center; gap:9px; font-size:1.08rem; font-weight:800; }
+      .desktop-brand .brand-lockup-mark { width:36px; height:36px; flex-basis:36px; }
       .desktop-sidebar button { width:100%; display:flex; align-items:center; gap:10px; padding:10px 12px; color:var(--muted); background:transparent; border:1px solid transparent; text-align:left; font-size:.9rem; }
       .desktop-sidebar button:hover,.desktop-sidebar button.is-active { color:var(--text); background:#192337; border-color:var(--line); }
       .desktop-sidebar-spacer { flex:1; }
@@ -568,18 +572,18 @@
 <body>
   <main>
     <aside class="desktop-sidebar" aria-label="Masaüstü gezinme">
-      <div class="desktop-brand"><span class="desktop-brand-mark">₺</span><span>FinansTool</span></div>
+      <div class="desktop-brand brand-lockup"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span></div>
       <button id="desktopOverviewNav" class="is-active" type="button" aria-current="page">⌂ <span>Özet</span></button>
       <button id="desktopChartNav" type="button">⌁ <span>Grafik Ve Analiz</span></button>
       <button id="desktopPortfolioNav" type="button">▤ <span>Portföy</span></button>
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small>v5.2</small>
+      <small>v5.3</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1>FinansTool <span class="version-badge">v5.2</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.3</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>

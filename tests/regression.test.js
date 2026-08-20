@@ -103,7 +103,9 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/FinansTool v5\.2/,'Kalıcı sürüm adı v5.2 olmalı');
+assert.match(html,/<title>Özer Finans v5\.3<\/title>/,'Tarayıcı başlığı yeni marka ve aday sürüm adını kullanmalı');
+assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
+assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.match(html,/@media \(max-width:760px\) \{[\s\S]*body \{[^}]*padding:max\(4px,env\(safe-area-inset-top,0px\)\)/,'Mobil üst boşluk sabit marj yerine güvenli alan kadar olmalı');
 assert.match(html,/main \{[^}]*margin:0 auto; padding:10px 6px 20px;/,'Mobil ana çerçeve üst ve yan boşlukları azaltılmalı');
 assert.match(html,/\.market-summary \{ order:1; margin-bottom:14px; padding:10px;/,'Mobil piyasa özeti yan dolgusu azaltılmalı');
@@ -194,4 +196,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('FinansTool v5.2 regresyon testleri başarılı.');
+console.log('Özer Finans v5.3 regresyon testleri başarılı.');
