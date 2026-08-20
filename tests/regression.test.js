@@ -126,5 +126,10 @@ assert.match(html,/\.portfolio-row-head \{ display:grid; grid-template-columns:3
 assert.match(html,/className='portfolio-compact-line'[\s\S]*compactLine\.append\(details,profitValue\)/,'Adet, maliyet ve kâr zarar ikinci kompakt satırda bilgi kaybı olmadan gösterilmeli');
 assert.match(html,/assetSymbol:primarySymbol\|\|currentSymbol\(\)/,'Ana grafik veri serisi sade balon için hisse kodunu taşımalı');
 assert.match(html,/context\.dataset\.assetSymbol\|\|context\.dataset\.label/,'Grafik veri balonu şirketin uzun adı yerine hisse kodunu kullanmalı');
+assert.match(html,/\.distribution-chart-wrap \{ position:relative; height:150px;/,'Portföy dağılım halkaları kompakt yükseklikte olmalı');
+assert.match(html,/@media \(max-width:700px\)[\s\S]*\.distribution-grid \{ grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/,'İki dağılım grafiği mobilde de yan yana kalmalı');
+assert.match(html,/\.distribution-summary:not\(\.expanded\) li:nth-child\(n\+4\)/,'Dağılım özetinde ilk üç kalem dışındakiler başlangıçta gizlenmeli');
+assert.match(html,/toggle\.textContent=expanded\?'Daralt':'Tümünü Göster'/,'Dağılım ayrıntıları açılıp daraltılabilmeli');
+assert.match(html,/renderDistributionCenter\(allocationCenter,sortedAllocations\)/,'Halka grafiğinin merkezinde en büyük pay gösterilmeli');
 
 console.log('FinansTool v4.3 regresyon testleri başarılı.');

@@ -287,10 +287,13 @@
     .portfolio-page .portfolio-search { max-width:720px; }
     .portfolio-distribution { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
     .portfolio-distribution > h3 { margin:0 0 14px; }
-    .distribution-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-    .distribution-card { min-width:0; padding:14px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
-    .distribution-card h4 { margin:0 0 8px; font-size:.92rem; }
-    .distribution-chart-wrap { position:relative; height:310px; }
+    .distribution-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .distribution-card { min-width:0; padding:10px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
+    .distribution-card h4 { margin:0 0 6px; font-size:.84rem; }
+    .distribution-chart-wrap { position:relative; height:150px; }
+    .distribution-center { position:absolute; inset:50% auto auto 50%; z-index:1; display:grid; place-items:center; width:64px; pointer-events:none; text-align:center; transform:translate(-50%,-50%); }
+    .distribution-center strong { font-size:.86rem; line-height:1.05; }
+    .distribution-center small { margin-top:2px; color:var(--muted); font-size:.57rem; line-height:1.05; }
     .distribution-empty { margin:0; height:100%; display:grid; place-items:center; color:var(--muted); text-align:center; }
     .distribution-summary { list-style:none; display:grid; gap:6px; margin:10px 0 0; padding:0; }
     .distribution-summary:empty { display:none; }
@@ -298,9 +301,25 @@
     .distribution-summary-dot { width:9px; height:9px; border-radius:50%; }
     .distribution-summary-label { overflow:hidden; color:var(--text); font-weight:650; text-overflow:ellipsis; white-space:nowrap; }
     .distribution-summary-value { white-space:nowrap; }
+    .distribution-summary:not(.expanded) li:nth-child(n+4) { display:none; }
+    .distribution-toggle { width:100%; margin-top:7px; padding:5px 7px; border-color:transparent; color:var(--accent); background:transparent; font-size:.7rem; }
+    .distribution-toggle:hover { border-color:var(--line); background:#182235; }
+    .distribution-toggle[hidden] { display:none; }
     .distribution-empty[hidden] { display:none; }
     html[data-theme="light"] .distribution-card { background:#f8fafc; }
-    @media (max-width:700px) { .distribution-grid { grid-template-columns:1fr; } .distribution-chart-wrap { height:290px; } }
+    html[data-theme="light"] .distribution-toggle:hover { background:#e2e8f0; }
+    @media (max-width:700px) {
+      .distribution-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+      .distribution-card { padding:8px 7px; }
+      .distribution-card h4 { font-size:.74rem; }
+      .distribution-chart-wrap { height:120px; }
+      .distribution-center { width:52px; }
+      .distribution-center strong { font-size:.72rem; }
+      .distribution-summary { gap:4px; margin-top:7px; }
+      .distribution-summary li { grid-template-columns:7px minmax(0,1fr); gap:5px; font-size:.65rem; }
+      .distribution-summary-dot { width:7px; height:7px; }
+      .distribution-summary-value { grid-column:2; color:var(--muted); font-size:.61rem; }
+    }
     .portfolio-benchmark { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
     .portfolio-benchmark-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px; }
     .portfolio-benchmark-head h3 { margin:0; }
@@ -496,7 +515,7 @@
       .chart-page .toolbar { display:grid; }
       .chart-page .chart-wrap { height:340px; }
       .portfolio-page .portfolio-analysis { margin-top:14px; padding-top:0; border-top:0; }
-      .portfolio-page .distribution-grid { grid-template-columns:1fr; }
+      .portfolio-page .distribution-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .portfolio-cash-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
       @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
@@ -566,8 +585,8 @@
       <section class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
         <h3 id="portfolioDistributionTitle">Portföy Dağılımı</h3>
         <div class="distribution-grid">
-          <article class="distribution-card"><h4>Varlık Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioAllocationChart" role="img" aria-label="Portföyün hisselere göre güncel değer dağılımı"></canvas><p id="portfolioAllocationEmpty" class="distribution-empty" hidden>Dağılım için portföye hisse ekleyin.</p></div><ul id="portfolioAllocationSummary" class="distribution-summary" aria-label="Varlık dağılımı özeti"></ul></article>
-          <article class="distribution-card"><h4>Para Birimi Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioCurrencyChart" role="img" aria-label="Portföyün para birimlerine göre güncel değer dağılımı"></canvas><p id="portfolioCurrencyEmpty" class="distribution-empty" hidden>Para birimi dağılımı bulunamadı.</p></div><ul id="portfolioCurrencySummary" class="distribution-summary" aria-label="Para birimi dağılımı özeti"></ul></article>
+          <article class="distribution-card"><h4>Varlık Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioAllocationChart" role="img" aria-label="Portföyün hisselere göre güncel değer dağılımı"></canvas><div id="portfolioAllocationCenter" class="distribution-center" aria-hidden="true"></div><p id="portfolioAllocationEmpty" class="distribution-empty" hidden>Dağılım için portföye hisse ekleyin.</p></div><ul id="portfolioAllocationSummary" class="distribution-summary" aria-label="Varlık dağılımı özeti"></ul><button id="portfolioAllocationSummaryToggle" class="distribution-toggle" type="button" aria-controls="portfolioAllocationSummary" hidden>Tümünü Göster</button></article>
+          <article class="distribution-card"><h4>Para Birimi Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioCurrencyChart" role="img" aria-label="Portföyün para birimlerine göre güncel değer dağılımı"></canvas><div id="portfolioCurrencyCenter" class="distribution-center" aria-hidden="true"></div><p id="portfolioCurrencyEmpty" class="distribution-empty" hidden>Para birimi dağılımı bulunamadı.</p></div><ul id="portfolioCurrencySummary" class="distribution-summary" aria-label="Para birimi dağılımı özeti"></ul><button id="portfolioCurrencySummaryToggle" class="distribution-toggle" type="button" aria-controls="portfolioCurrencySummary" hidden>Tümünü Göster</button></article>
         </div>
       </section>
       <section class="portfolio-benchmark" aria-labelledby="portfolioBenchmarkTitle">
@@ -1834,7 +1853,7 @@
         options:{
           responsive:true,
           maintainAspectRatio:false,
-          cutout:'62%',
+          cutout:'70%',
           animation:{duration:450},
           plugins:{
             legend:{display:false},
@@ -1875,6 +1894,27 @@
         value.textContent=money(item.value,currency)+' · '+percent.toFixed(1)+'%';
         row.append(dot,name,value);element.append(row);
       });
+      const toggle=document.getElementById(element.id+'Toggle');
+      const hasMore=items.length>3;
+      if(!hasMore)element.classList.remove('expanded');
+      toggle.hidden=!hasMore;
+      const syncToggle=()=>{
+        const expanded=element.classList.contains('expanded');
+        toggle.textContent=expanded?'Daralt':'Tümünü Göster';
+        toggle.setAttribute('aria-expanded',String(expanded));
+      };
+      toggle.onclick=()=>{element.classList.toggle('expanded');syncToggle()};
+      syncToggle();
+    }
+
+    function renderDistributionCenter(element,items) {
+      element.replaceChildren();
+      if(!items.length){element.hidden=true;return}
+      const total=items.reduce((sum,item)=>sum+Number(item.value||0),0);
+      const largest=total>0?Number(items[0].value||0)/total*100:0;
+      const value=document.createElement('strong');value.textContent='%'+largest.toFixed(0);
+      const label=document.createElement('small');label.textContent='En Büyük Pay';
+      element.append(value,label);element.hidden=false;
     }
 
     function renderPortfolioDistribution(allocations,currencyTotals,summaryCurrency) {
@@ -1884,6 +1924,8 @@
       const currencyCanvas=document.getElementById('portfolioCurrencyChart');
       const allocationSummary=document.getElementById('portfolioAllocationSummary');
       const currencySummary=document.getElementById('portfolioCurrencySummary');
+      const allocationCenter=document.getElementById('portfolioAllocationCenter');
+      const currencyCenter=document.getElementById('portfolioCurrencyCenter');
       const sortedAllocations=allocations.filter(item=>item.value>0).sort((a,b)=>b.value-a.value);
       const currencies=[...currencyTotals.entries()].filter(([,value])=>value>0).sort((a,b)=>b[1]-a[1]);
       allocationEmpty.hidden=sortedAllocations.length>0;
@@ -1891,7 +1933,10 @@
       currencyEmpty.hidden=currencies.length>0;
       currencyCanvas.hidden=!currencies.length;
       renderDistributionSummary(allocationSummary,sortedAllocations,summaryCurrency);
-      renderDistributionSummary(currencySummary,currencies.map(([label,value])=>({label,value})),summaryCurrency);
+      const currencyItems=currencies.map(([label,value])=>({label,value}));
+      renderDistributionSummary(currencySummary,currencyItems,summaryCurrency);
+      renderDistributionCenter(allocationCenter,sortedAllocations);
+      renderDistributionCenter(currencyCenter,currencyItems);
       if(sortedAllocations.length){
         const labels=sortedAllocations.map(item=>item.label),values=sortedAllocations.map(item=>item.value);
         portfolioAllocationChart=portfolioAllocationChart?updateDistributionChart(portfolioAllocationChart,labels,values,summaryCurrency,'Güncel değer'):createDistributionChart('portfolioAllocationChart',labels,values,summaryCurrency,'Güncel değer');
