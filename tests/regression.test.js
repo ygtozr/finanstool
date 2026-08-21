@@ -104,7 +104,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v5\.3<\/title>/,'Tarayıcı başlığı yeni marka ve aday sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v5\.4<\/title>/,'Tarayıcı başlığı yeni marka ve aday sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -115,7 +115,7 @@ assert.match(html,/\.portfolio-head \{[^}]*padding:16px;[^}]*border:1px solid va
 assert.match(html,/\.portfolio-head-value \{[^}]*font-size:1\.5rem;/,'Portföy toplam değeri hafifçe büyütülmeli');
 assert.match(html,/id="portfolioCurrencyToggle"[^>]*aria-pressed="false"[^>]*>⇄<\/button>/,'Portföy üst özetinde dönüşüm düğmesi bulunmalı');
 assert.match(html,/let portfolioDisplayCurrency = 'AUTO';[\s\S]*presentationFactor=summaryToUsd\/tryToUsd;/,'Portföy özeti TL dönüşümünü çapraz kurla hesaplamalı');
-assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*portfolioDisplayCurrency==='TRY'\?'AUTO':'TRY'[\s\S]*renderPortfolio\(\)/,'Dönüşüm düğmesi TL ve asıl para birimi arasında geçiş yapmalı');
+assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*portfolioDisplayCurrency==='TRY'\?'AUTO':'TRY'[\s\S]*renderPortfolio\(\{refreshBenchmark:false,refreshDividends:false\}\)/,'Dönüşüm düğmesi yalnız fiyat özetini yeniden hesaplamalı');
 assert.match(html,/portfolioSummaryCurrencyNote\.textContent=showTry\?'Portföy özeti ve dağılım değerleri TL bazında gösteriliyor\.'/,'TL görünümünde özet açıklaması seçili para birimini doğru anlatmalı');
 assert.match(html,/\.market-summary-head #marketRefresh,\.favorites-panel-head #favoriteRefresh \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
 assert.ok((html.match(/labels:solidLegendLabels\(colors\.text\)/g)||[]).length>=2,'Fiyat ve RSI grafiklerinin lejant örnekleri dolu renk kullanmalı');
@@ -169,7 +169,13 @@ assert.match(html,/data-benchmark-range="5d">1 Hafta<[\s\S]*data-benchmark-range
 assert.match(html,/function benchmarkQuery\(\)[\s\S]*period1=[\s\S]*period2=/,'Özel başlangıç tarihi karşılaştırma sorgusuna dönüştürülmeli');
 assert.match(html,/\/api\/dividends\?symbol=/,'Portföy yaklaşan temettü uç noktasını kullanmalı');
 assert.match(dividendsApi,/exOrEffDate[\s\S]*paymentDate[\s\S]*sort\(\(a,b\)=>\(a\.exDate\|\|a\.paymentDate\)-\(b\.exDate\|\|b\.paymentDate\)\)/,'Temettü API hak kullanım ve ödeme tarihlerini yakından uzağa sıralamalı');
-assert.match(html,/allDividends\.sort\(\(a,b\)=>a\.date-b\.date\)\.slice\(0,5\)/,'Takvim yalnız yaklaşan en yakın beş temettüyü göstermeli');
+assert.match(html,/results\.flatMap\(item=>item\.events\)\.sort\(\(a,b\)=>a\.date-b\.date\)\.slice\(0,5\)/,'Takvim yalnız yaklaşan en yakın beş temettüyü göstermeli');
+const portfolioPriceLoader=extractFunction(scripts[0],'fetchPortfolioItem');
+assert.match(portfolioPriceLoader,/range=1mo&interval=1d/,'Portföy özeti için yalnız gerekli kısa fiyat geçmişi alınmalı');
+assert.doesNotMatch(portfolioPriceLoader,/\/api\/dividends/,'Yavaş temettü isteği portföy fiyat özetini engellememeli');
+assert.match(html,/async function renderPortfolioDividends\(positions\)/,'Temettü takvimi fiyat özetinden bağımsız yüklenmeli');
+assert.match(html,/if\(refreshDividends\)renderPortfolioDividends\(valid\);[\s\S]*if\(refreshBenchmark\)renderPortfolioBenchmark\(valid\);/,'Ağır alt bölümler yalnız istendiğinde arka planda yenilenmeli');
+assert.match(html,/portfolioRefreshTimerId=setInterval\(\(\)=>\{if\(!document\.hidden&&portfolioView\.classList\.contains\('active'\)\)renderPortfolio\(\{refreshBenchmark:false,refreshDividends:false\}\)\}/,'Otomatik portföy yenilemesi ağır temettü ve kıyas sorgularını tekrarlamamalı');
 assert.match(html,/\.portfolio-row-head \{ display:grid; grid-template-columns:34px minmax\(0,1fr\) auto 32px;/,'Portföy kartı kompakt silme sütunu kullanmalı');
 assert.match(html,/\.portfolio-delete \{[^}]*width:32px; height:32px;[^}]*font-size:\.85rem;/,'Portföy silme düğmesi görsel olarak küçük olmalı');
 assert.match(html,/\.portfolio-delete::before \{[^}]*inset:-6px;/,'Küçük portföy silme düğmesinin dokunma alanı 44 piksel kalmalı');
@@ -211,4 +217,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v5.3 regresyon testleri başarılı.');
+console.log('Özer Finans v5.4 regresyon testleri başarılı.');

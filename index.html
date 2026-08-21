@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Özer Finans">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>Özer Finans v5.3</title>
+  <title>Özer Finans v5.4</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -588,11 +588,11 @@
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small>v5.3</small>
+      <small>v5.4</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.3</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.4</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -602,7 +602,7 @@
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.3</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.4</span></h1>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -632,7 +632,7 @@
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.3</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.4</span></h1>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
@@ -659,7 +659,7 @@
       <section class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.3</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.4</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
         <section class="settings-card settings-horizontal" aria-labelledby="appearanceTitle">
@@ -693,7 +693,7 @@
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v5.3</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v5.4</strong></div></div>
         </section>
       </div>
     </section>
@@ -993,6 +993,7 @@
     let portfolioSearchTimer;
     let portfolioSelection = null;
     let portfolioRenderId = 0;
+    let portfolioDividendRequestId = 0;
     let portfolioDisplayCurrency = 'AUTO';
     let portfolioAllocationChart = null;
     let portfolioCurrencyChart = null;
@@ -1616,7 +1617,7 @@
       if(refreshInterval<=0)return;
       marketRefreshTimerId=setInterval(()=>{if(!document.hidden)refreshMarketAndFavorites()},refreshInterval);
       chartRefreshTimerId=setInterval(refreshCurrentChart,refreshInterval);
-      portfolioRefreshTimerId=setInterval(()=>{if(!document.hidden&&portfolioView.classList.contains('active'))renderPortfolio()},refreshInterval);
+      portfolioRefreshTimerId=setInterval(()=>{if(!document.hidden&&portfolioView.classList.contains('active'))renderPortfolio({refreshBenchmark:false,refreshDividends:false})},refreshInterval);
     }
 
     function safeFileName(value) {
@@ -1959,8 +1960,7 @@
     }
 
     async function fetchPortfolioItem(position) {
-      const query='range=1y&interval=1d&events=div';
-      const upcomingPromise=cachedApiJson('/api/dividends?symbol='+encodeURIComponent(position.symbol),{ttl:900000}).catch(error=>({events:[],status:'provider_error',error:error.message}));
+      const query='range=1mo&interval=1d';
       const payload=await cachedApiJson(priceApiUrl(position.symbol,query));
       const result=payload.chart?.result?.[0];
       const rawCloses=result?.indicators?.quote?.[0]?.close;
@@ -1974,11 +1974,46 @@
       const weekBase=[...points].reverse().find(point=>point.time*1000<monday.getTime())||points[0];
       const currency=String(result.meta?.currency||'USD').toUpperCase();
       const name=result.meta?.longName||result.meta?.shortName||position.name||position.symbol;
-      const upcoming=await upcomingPromise;
-      const today=new Date().setHours(0,0,0,0);
-      const dividends=(upcoming.events||[]).map(event=>{const exDate=Number(event.exDate),paymentDate=Number(event.paymentDate),amountPerShare=Number(event.amount);return{symbol:position.symbol,name,date:Number.isFinite(exDate)&&exDate>=today?exDate:paymentDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*position.quantity,quantity:position.quantity,currency:String(event.currency||currency).toUpperCase()}}).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
       const previousPoint=points.length>1?points.at(-2):points.at(-1);
-      return {...position,name,currency,price:points.at(-1).close,previousPrice:previousPoint.close,previousTime:previousPoint.time,weekStartPrice:weekBase.close,weekStartTime:weekBase.time,dividends,dividendStatus:upcoming.status||'ok',result};
+      return {...position,name,currency,price:points.at(-1).close,previousPrice:previousPoint.close,previousTime:previousPoint.time,weekStartPrice:weekBase.close,weekStartTime:weekBase.time,result};
+    }
+
+    async function fetchPortfolioDividends(position) {
+      try{
+        const upcoming=await cachedApiJson('/api/dividends?symbol='+encodeURIComponent(position.symbol),{ttl:900000});
+        const today=new Date().setHours(0,0,0,0);
+        const events=(upcoming.events||[]).map(event=>{
+          const exDate=Number(event.exDate),paymentDate=Number(event.paymentDate),amountPerShare=Number(event.amount);
+          return{symbol:position.symbol,name:position.name,date:Number.isFinite(exDate)&&exDate>=today?exDate:paymentDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*position.quantity,quantity:position.quantity,currency:String(event.currency||position.currency||'USD').toUpperCase()};
+        }).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
+        return{symbol:position.symbol,status:upcoming.status||'ok',events};
+      }catch{return{symbol:position.symbol,status:'provider_error',events:[]}}
+    }
+
+    async function renderPortfolioDividends(positions) {
+      const requestId=++portfolioDividendRequestId;
+      dividendList.replaceChildren();
+      if(!positions.length){
+        const empty=document.createElement('li');empty.className='favorites-note';empty.textContent='Temettü takvimi için portföyde hisse bulunmuyor.';dividendList.append(empty);return;
+      }
+      const loading=document.createElement('li');loading.className='favorites-note';loading.textContent='Temettü takvimi güncelleniyor…';dividendList.append(loading);
+      const results=await Promise.all(positions.map(fetchPortfolioDividends));
+      if(requestId!==portfolioDividendRequestId)return;
+      dividendList.replaceChildren();
+      const dividends=results.flatMap(item=>item.events).sort((a,b)=>a.date-b.date).slice(0,5);
+      if(!dividends.length){
+        const empty=document.createElement('li');empty.className='favorites-note';
+        const providerErrors=results.filter(item=>item.status==='provider_error').map(item=>item.symbol),unsupported=results.filter(item=>item.status==='unsupported').map(item=>item.symbol);
+        empty.textContent=providerErrors.length?'Temettü sağlayıcısına erişilemedi: '+providerErrors.join(', '):unsupported.length?'Temettü takvimi desteklenmeyen ürünler: '+unsupported.join(', '):'Açıklanmış yaklaşan temettü bulunamadı.';
+        dividendList.append(empty);return;
+      }
+      dividends.forEach(item=>{
+        const row=document.createElement('li');row.className='dividend-row';
+        const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));
+        const symbol=document.createElement('span');symbol.textContent=item.symbol+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');
+        const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency)+' · '+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(item.quantity)+' adet';amount.title='Hisse başı '+money(item.amountPerShare,item.currency)+' · tahmini brüt toplam';
+        row.append(date,symbol,amount);dividendList.append(row);
+      });
     }
 
     function addPortfolioStat(parent, label, value, className='') {
@@ -2316,8 +2351,9 @@
       return failedPositions.length===0&&missingRates.size===0;
     }
 
-    async function renderPortfolio() {
+    async function renderPortfolio({refreshBenchmark=true,refreshDividends=true}={}) {
       const renderId=++portfolioRenderId;
+      if(refreshDividends)portfolioDividendRequestId++;
       const keepExistingPortfolio=Boolean(portfolioList.querySelector('.portfolio-row'));
       const portfolioTotalValue=document.getElementById('portfolioTotalValue');
       const portfolioDailyChange=document.getElementById('portfolioDailyChange');
@@ -2337,13 +2373,12 @@
         const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Portföyünüz boş. Hisse veya nakit ekleyin.';portfolioList.append(empty);
         const dividendEmpty=document.createElement('li');dividendEmpty.className='favorites-note';dividendEmpty.textContent='Temettü verisi için portföye hisse ekleyin.';dividendList.append(dividendEmpty);
         renderPortfolioDistribution([],new Map(),'USD');
-        renderPortfolioBenchmark();
+        if(refreshBenchmark)renderPortfolioBenchmark();
         return;
       }
       if(!keepExistingPortfolio){
         portfolioList.replaceChildren();
         portfolioSummary.replaceChildren();
-        dividendList.replaceChildren();
         portfolioTotalValue.textContent='Hesaplanıyor…';
         portfolioDailyChange.textContent='Bugün hesaplanıyor…';
         const loading=document.createElement('div');loading.className='portfolio-empty';loading.textContent=portfolio.length?'Portföy fiyatları güncelleniyor…':'Henüz hisse pozisyonu yok.';portfolioList.append(loading);
@@ -2396,10 +2431,7 @@
       const scrollBeforeCommit=window.scrollY;
       portfolioList.replaceChildren();
       portfolioSummary.replaceChildren();
-      dividendList.replaceChildren();
       let totalCost=0,totalValue=0,totalPreviousValue=0,totalWeekStartValue=0;
-      const allDividends=[];
-      const dividendStatuses=[];
       const allocationValues=[];
       const currencyValues=new Map();
       results.forEach(result=>{
@@ -2437,8 +2469,6 @@
               currencyValues.set(position.currency,(currencyValues.get(position.currency)||0)+convertedValue);
             }
           }else missingRates.add(!Number.isFinite(costFactor)?costCurrency+' tarihsel maliyet kuru':position.currency);
-          allDividends.push(...position.dividends);
-          dividendStatuses.push({symbol:position.symbol,status:position.dividendStatus});
           const saved=portfolio.find(item=>item.symbol===position.symbol);if(saved)saved.name=position.name;
         }else{
           currentValue.textContent='Veri yok';
@@ -2487,10 +2517,8 @@
         portfolioSummary.append(table);
         renderPortfolioDistribution(allocationValues.map(item=>({...item,value:item.value*presentationFactor})),new Map([...currencyValues].map(([code,value])=>[code,value*presentationFactor])),presentationCurrency);
       }
-      const dividends=allDividends.sort((a,b)=>a.date-b.date).slice(0,5);
-      if(!dividends.length){const empty=document.createElement('li');empty.className='favorites-note';const providerErrors=dividendStatuses.filter(item=>item.status==='provider_error').map(item=>item.symbol),unsupported=dividendStatuses.filter(item=>item.status==='unsupported').map(item=>item.symbol);empty.textContent=providerErrors.length?'Temettü sağlayıcısına erişilemedi: '+providerErrors.join(', '):unsupported.length?'Temettü takvimi desteklenmeyen ürünler: '+unsupported.join(', '):(portfolio.length?'Açıklanmış yaklaşan temettü bulunamadı.':'Temettü takvimi için portföyde hisse bulunmuyor.');dividendList.append(empty)}
-      else dividends.forEach(item=>{const row=document.createElement('li');row.className='dividend-row';const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));const symbol=document.createElement('span');symbol.textContent=item.symbol+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency)+' · '+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(item.quantity)+' adet';amount.title='Hisse başı '+money(item.amountPerShare,item.currency)+' · tahmini brüt toplam';row.append(date,symbol,amount);dividendList.append(row)});
-      renderPortfolioBenchmark(valid);
+      if(refreshDividends)renderPortfolioDividends(valid);
+      if(refreshBenchmark)renderPortfolioBenchmark(valid);
       if(keepExistingPortfolio&&portfolioView.classList.contains('active'))requestAnimationFrame(()=>window.scrollTo({top:scrollBeforeCommit,behavior:'auto'}));
     }
 
@@ -3144,7 +3172,7 @@
     portfolioAdd.addEventListener('click', openPortfolioDialog);
     portfolioCurrencyToggle.addEventListener('click',()=>{
       portfolioDisplayCurrency=portfolioDisplayCurrency==='TRY'?'AUTO':'TRY';
-      renderPortfolio();
+      renderPortfolio({refreshBenchmark:false,refreshDividends:false});
     });
     let modalScrollY=0;
     function syncModalScrollLock(){
