@@ -7,14 +7,19 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Özer Finans">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>Özer Finans v5.4</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com https://eodhd.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
+  <title>Özer Finans v5.5</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
     * { box-sizing:border-box; }
     html { min-height:100%; background:var(--bg); }
     body { margin:0; min-height:100vh; min-height:100dvh; display:grid; place-items:center; padding:24px; font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, #263b62 0, var(--bg) 45%); }
+    .pull-refresh-indicator { position:fixed; z-index:80; top:max(8px,env(safe-area-inset-top,0px)); left:50%; display:flex; align-items:center; gap:7px; min-height:34px; padding:6px 12px; opacity:0; pointer-events:none; color:var(--text); background:#0d1523ee; border:1px solid var(--line); border-radius:999px; box-shadow:0 8px 24px #0005; font-size:.75rem; font-weight:750; transform:translate(-50%,-150%); transition:opacity .16s ease,transform .16s ease; }
+    .pull-refresh-indicator.visible,.pull-refresh-indicator.refreshing { opacity:1; }
+    .pull-refresh-indicator.ready { color:#062019; background:var(--accent); border-color:var(--accent); }
+    .pull-refresh-indicator.refreshing .pull-refresh-icon { animation:pull-refresh-spin .8s linear infinite; }
+    @keyframes pull-refresh-spin { to { transform:rotate(360deg); } }
     html.modal-open,body.modal-open { overflow:hidden; overscroll-behavior:none; }
     body.modal-open { position:fixed; left:0; right:0; width:100%; }
     main { width:min(1120px,100%); min-width:0; background:rgba(25,35,55,.95); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,38px); box-shadow:0 22px 60px #05091499; }
@@ -579,6 +584,7 @@
   </style>
 </head>
 <body>
+  <div id="pullRefreshIndicator" class="pull-refresh-indicator" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true">↓</span><span class="pull-refresh-label">Yenilemek için çekin</span></div>
   <main>
     <aside class="desktop-sidebar" aria-label="Masaüstü gezinme">
       <div class="desktop-brand brand-lockup"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span></div>
@@ -588,11 +594,11 @@
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small>v5.4</small>
+      <small>v5.5</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.4</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.5</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -602,7 +608,7 @@
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.4</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.5</span></h1>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -632,7 +638,7 @@
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.4</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.5</span></h1>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
@@ -659,7 +665,7 @@
       <section class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.4</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.5</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
         <section class="settings-card settings-horizontal" aria-labelledby="appearanceTitle">
@@ -693,7 +699,7 @@
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v5.4</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v5.5</strong></div></div>
         </section>
       </div>
     </section>
@@ -925,6 +931,9 @@
     const chartView = document.getElementById('chartView');
     const portfolioView = document.getElementById('portfolioView');
     const otherView = document.getElementById('otherView');
+    const pullRefreshIndicator = document.getElementById('pullRefreshIndicator');
+    const pullRefreshIcon = pullRefreshIndicator.querySelector('.pull-refresh-icon');
+    const pullRefreshLabel = pullRefreshIndicator.querySelector('.pull-refresh-label');
     const portfolioSymbol = document.getElementById('portfolioSymbol');
     const portfolioAdd = document.getElementById('portfolioAdd');
     const portfolioSuggestions = document.getElementById('portfolioSuggestions');
@@ -1058,8 +1067,7 @@
       favoriteDetailIdentity.replaceChildren();
       const badge=document.createElement('span');badge.className='favorite-card-badge';
       const initials=document.createElement('span');initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';badge.append(initials);
-      const logoUrl=favoriteLogoUrl(item.symbol);
-      if(logoUrl){const logo=document.createElement('img');logo.className='favorite-card-logo';logo.src=logoUrl;logo.alt='';logo.referrerPolicy='no-referrer';logo.addEventListener('error',()=>logo.remove(),{once:true});badge.append(logo)}
+      appendSymbolLogo(badge,'favorite-card-logo',item.symbol);
       const title=document.createElement('h3');title.id='favoriteDetailTitle';title.textContent=item.symbol;
       const subtitle=document.createElement('p');subtitle.textContent=name!==item.symbol?name:'Hisse';
       favoriteDetailIdentity.append(badge,title,subtitle);
@@ -1117,11 +1125,26 @@
       try{const data=await fetchFavoriteDetail(item);if(requestId!==favoriteDetailRequestId||!favoriteDetailDialog.open)return;renderFavoriteDetailIdentity(item,data.name);renderFavoriteDetail(data)}
       catch{if(requestId!==favoriteDetailRequestId||!favoriteDetailDialog.open)return;favoriteDetailBody.replaceChildren();const error=document.createElement('p');error.className='favorite-detail-error';error.textContent='Detay verileri alınamadı. Daha sonra tekrar deneyin.';favoriteDetailBody.append(error)}
     }
-    function favoriteLogoUrl(symbol) {
+    function favoriteLogoUrls(symbol) {
       const safe=normalizeSymbol(symbol);
-      return /^[A-Z0-9.^=-]{1,20}$/.test(safe)
-        ? 'https://financialmodelingprep.com/image-stock/'+encodeURIComponent(safe)+'.png'
-        : '';
+      if(!/^[A-Z0-9.^=-]{1,30}(?:\.[A-Z]{1,6})?$/.test(safe)||safe.startsWith('^')||safe.includes('=')||safe.endsWith('-USD'))return[];
+      const suffix=safe.match(/\.([A-Z]{1,6})$/)?.[1]||'';
+      const exchange=suffix==='IS'?'IS':'US';
+      const ticker=suffix?safe.slice(0,-suffix.length-1):safe;
+      return uniqueBy([
+        'https://financialmodelingprep.com/image-stock/'+encodeURIComponent(safe)+'.png',
+        'https://eodhd.com/img/logos/'+exchange+'/'+encodeURIComponent(ticker)+'.png'
+      ],value=>value);
+    }
+    function appendSymbolLogo(container,className,symbol) {
+      const sources=favoriteLogoUrls(symbol);
+      if(!sources.length)return null;
+      const image=document.createElement('img');
+      image.className=className||'';image.alt='';image.loading='eager';image.referrerPolicy='no-referrer';
+      let sourceIndex=0;
+      const loadNext=()=>{if(sourceIndex>=sources.length){image.remove();return}image.src=sources[sourceIndex++]};
+      image.addEventListener('error',loadNext);
+      container.append(image);loadNext();return image;
     }
     function renderChartAssetList(list,items,emptyText) {
       list.replaceChildren();
@@ -1130,8 +1153,7 @@
         const row=document.createElement('li'),select=document.createElement('button');select.type='button';select.className='chart-asset-item';select.title=item.symbol+' grafiğini aç';
         const logo=document.createElement('span');logo.className='chart-asset-logo';
         const initials=document.createElement('span');initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';logo.appendChild(initials);
-        const logoUrl=favoriteLogoUrl(item.symbol);
-        if(logoUrl){const image=document.createElement('img');image.src=logoUrl;image.alt='';image.referrerPolicy='no-referrer';image.addEventListener('error',()=>image.remove(),{once:true});logo.append(image)}
+        appendSymbolLogo(logo,'',item.symbol);
         const name=document.createElement('span');name.className='chart-asset-name';const symbol=document.createElement('strong');symbol.textContent=item.symbol;const company=document.createElement('small');company.textContent=item.name||item.symbol;name.append(symbol,company);select.append(logo,name);
         select.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();closeChartAssetPanels();chartView.scrollIntoView({behavior:'smooth',block:'start'});loadPrice(item.symbol)});
         row.append(select);list.append(row);
@@ -1166,17 +1188,7 @@
         const initials=document.createElement('span');
         initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';
         badge.append(initials);
-        const logoUrl=favoriteLogoUrl(item.symbol);
-        if(logoUrl){
-          const logo=document.createElement('img');
-          logo.className='favorite-card-logo';
-          logo.src=logoUrl;
-          logo.alt='';
-          logo.loading='lazy';
-          logo.referrerPolicy='no-referrer';
-          logo.addEventListener('error',()=>logo.remove(),{once:true});
-          badge.append(logo);
-        }
+        appendSymbolLogo(badge,'favorite-card-logo',item.symbol);
         const head=document.createElement('span');
         head.className='favorite-card-head';
         const symbol=document.createElement('strong');
@@ -2440,7 +2452,7 @@
         const head=document.createElement('div');head.className='portfolio-row-head';
         const badge=document.createElement('span');badge.className='portfolio-row-logo';
         const initials=document.createElement('span');initials.textContent=position.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';badge.append(initials);
-        const logoUrl=favoriteLogoUrl(position.symbol);if(logoUrl){const logo=document.createElement('img');logo.src=logoUrl;logo.alt='';logo.referrerPolicy='no-referrer';logo.addEventListener('error',()=>logo.remove(),{once:true});badge.append(logo)}
+        appendSymbolLogo(badge,'',position.symbol);
         const title=document.createElement('div');title.className='portfolio-row-title';
         const symbol=document.createElement('strong');symbol.textContent=position.symbol;
         const name=document.createElement('small');name.textContent=result.ok?position.name:result.error.message;name.title=name.textContent;title.append(symbol,name);
@@ -2998,6 +3010,47 @@
     });
 
     const manualRefreshMarketAndFavorites=()=>{apiCache.clear();return refreshMarketAndFavorites({force:true})};
+    const pullRefreshThreshold=72;
+    let pullRefreshStartY=null,pullRefreshDistance=0,pullRefreshRunning=false,pullRefreshHideTimer=null;
+    function resetPullRefreshIndicator({immediate=false}={}) {
+      pullRefreshStartY=null;pullRefreshDistance=0;
+      pullRefreshIndicator.classList.remove('visible','ready');
+      pullRefreshIndicator.style.transform='translate(-50%,-150%)';
+      if(immediate){pullRefreshIndicator.classList.remove('refreshing');pullRefreshIcon.textContent='↓';pullRefreshLabel.textContent='Yenilemek için çekin'}
+    }
+    async function refreshActiveViewFromPull() {
+      apiCache.clear();
+      if(mainView.classList.contains('active'))return refreshMarketAndFavorites({force:true});
+      if(chartView.classList.contains('active'))return loadPrice(currentSymbol()||'AAPL',{silent:true});
+      if(portfolioView.classList.contains('active'))return renderPortfolio();
+      return refreshMarketAndFavorites({force:true});
+    }
+    async function runPullRefresh() {
+      if(pullRefreshRunning)return;
+      pullRefreshRunning=true;clearTimeout(pullRefreshHideTimer);
+      pullRefreshIndicator.classList.remove('ready');pullRefreshIndicator.classList.add('visible','refreshing');
+      pullRefreshIndicator.style.transform='translate(-50%,0)';pullRefreshIcon.textContent='↻';pullRefreshLabel.textContent='Yenileniyor…';
+      try{await refreshActiveViewFromPull();pullRefreshIcon.textContent='✓';pullRefreshLabel.textContent='Güncellendi'}
+      catch{pullRefreshIcon.textContent='!';pullRefreshLabel.textContent='Yenileme tamamlanamadı'}
+      finally{pullRefreshRunning=false;pullRefreshHideTimer=setTimeout(()=>resetPullRefreshIndicator({immediate:true}),850)}
+    }
+    document.addEventListener('touchstart',event=>{
+      if(pullRefreshRunning||document.querySelector('dialog[open]')||window.scrollY>0||event.touches.length!==1)return;
+      clearTimeout(pullRefreshHideTimer);pullRefreshStartY=event.touches[0].clientY;pullRefreshDistance=0;
+    },{passive:true});
+    document.addEventListener('touchmove',event=>{
+      if(pullRefreshStartY===null||event.touches.length!==1)return;
+      if(window.scrollY>0){resetPullRefreshIndicator({immediate:true});return}
+      const delta=event.touches[0].clientY-pullRefreshStartY;
+      if(delta<=0)return;
+      event.preventDefault();
+      pullRefreshDistance=Math.min(104,delta*.55);
+      pullRefreshIndicator.classList.add('visible');pullRefreshIndicator.classList.toggle('ready',pullRefreshDistance>=pullRefreshThreshold);
+      pullRefreshIndicator.style.transform='translate(-50%,'+(Math.min(12,pullRefreshDistance-42))+'px)';
+      pullRefreshIcon.textContent=pullRefreshDistance>=pullRefreshThreshold?'↻':'↓';pullRefreshLabel.textContent=pullRefreshDistance>=pullRefreshThreshold?'Yenilemek için bırakın':'Yenilemek için çekin';
+    },{passive:false});
+    document.addEventListener('touchend',()=>{if(pullRefreshStartY===null)return;const reachedThreshold=pullRefreshDistance>=pullRefreshThreshold;resetPullRefreshIndicator();if(reachedThreshold)runPullRefresh()},{passive:true});
+    document.addEventListener('touchcancel',()=>resetPullRefreshIndicator({immediate:true}),{passive:true});
     marketRefresh.addEventListener('click',manualRefreshMarketAndFavorites);
     favoriteRefresh.addEventListener('click',manualRefreshMarketAndFavorites);
     marketSettingsButton.addEventListener('click',()=>{renderMarketSettings();marketSettingsDialog.showModal();marketSettingsSearch.focus()});

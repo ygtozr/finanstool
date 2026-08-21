@@ -104,7 +104,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v5\.4<\/title>/,'Tarayıcı başlığı yeni marka ve aday sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v5\.5<\/title>/,'Tarayıcı başlığı yeni marka ve aday sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -138,8 +138,17 @@ assert.match(html,/apple-mobile-web-app-capable/,'iOS bağımsız web uygulamas�
 assert.match(html,/\.mobile-bottom-nav \{ position:fixed !important;[^}]*bottom:0;/,'Mobil alt menü ekranın fiziksel altına sabitlenmeli');
 assert.match(html,/padding:6px 6px calc\(6px \+ env\(safe-area-inset-bottom,0px\)\)/,'Güvenli alan menüyü yukarı taşımak yerine iç dolgu olarak uygulanmalı');
 assert.doesNotMatch(html,/bottom:max\(8px,env\(safe-area-inset-bottom\)\)/,'Güvenli alan menünün tamamını yukarı taşımamalı');
+assert.match(html,/id="pullRefreshIndicator"[^>]*role="status"/,'Üstten çekerek yenileme için erişilebilir durum göstergesi bulunmalı');
+assert.match(html,/document\.addEventListener\('touchmove',[\s\S]*event\.preventDefault\(\)[\s\S]*\{passive:false\}\)/,'Üstten çekme hareketi mobil tarayıcının doğal sıçramasıyla çakışmamalı');
+assert.match(html,/async function refreshActiveViewFromPull\(\)[\s\S]*mainView\.classList\.contains\('active'\)[\s\S]*chartView\.classList\.contains\('active'\)[\s\S]*portfolioView\.classList\.contains\('active'\)/,'Çekerek yenileme Özet, Grafik ve Portföy ekranlarını kendi verileriyle güncellemeli');
+assert.match(html,/pullRefreshDistance>=pullRefreshThreshold[\s\S]*runPullRefresh\(\)/,'Yenileme yalnız çekme eşiği aşılıp parmak bırakıldığında başlamalı');
 assert.match(html,/id="periodRangeFill"/,'Dönem içi fiyat konum barı bulunmalı');
 assert.match(html,/className='favorite-market-time'/,'Her favoride fiyat zamanı alanı bulunmalı');
+assert.match(html,/function favoriteLogoUrls\(symbol\)[\s\S]*financialmodelingprep\.com\/image-stock\/[\s\S]*eodhd\.com\/img\/logos\//,'Favori logoları iki bağımsız kaynağı sırayla kullanmalı');
+assert.match(html,/const exchange=suffix==='IS'\?'IS':'US'/,'BIST sembolleri yedek logo kaynağında doğru borsaya çevrilmeli');
+assert.match(html,/function appendSymbolLogo\(container,className,symbol\)[\s\S]*image\.addEventListener\('error',loadNext\)/,'Logo yükleme hatasında sonraki kaynak otomatik denenmeli');
+assert.match(html,/image\.loading='eager'/,'Favori logoları Safari görünürlük tahminine bırakılmadan yüklenmeli');
+assert.match(html,/img-src 'self' data: https:\/\/financialmodelingprep\.com https:\/\/eodhd\.com/,'İki logo kaynağı içerik güvenlik politikasında izinli olmalı');
 assert.ok(html.indexOf('class="periods"')<html.indexOf('id="periodSummaryTitle"'),'Süre seçimi dönem özetinden önce gelmeli');
 assert.ok(html.indexOf('id="portfolioList"')<html.indexOf('id="portfolioSymbol"'),'Portföy araması hisse listesinden sonra gelmeli');
 assert.match(html,/\.benchmark-stats \{ grid-template-columns:repeat\(3,minmax\(0,1fr\)\); gap:6px; \}/,'Mobil getiri kıyası üç sütun olmalı');
@@ -217,4 +226,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v5.4 regresyon testleri başarılı.');
+console.log('Özer Finans v5.5 regresyon testleri başarılı.');
