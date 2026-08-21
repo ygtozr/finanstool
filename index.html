@@ -1133,7 +1133,8 @@
       const ticker=suffix?safe.slice(0,-suffix.length-1):safe;
       return uniqueBy([
         'https://financialmodelingprep.com/image-stock/'+encodeURIComponent(safe)+'.png',
-        'https://eodhd.com/img/logos/'+exchange+'/'+encodeURIComponent(ticker)+'.png'
+        'https://eodhd.com/img/logos/'+exchange+'/'+encodeURIComponent(ticker)+'.png',
+        suffix==='IS'?'/api/logo?symbol='+encodeURIComponent(safe):''
       ],value=>value);
     }
     function appendSymbolLogo(container,className,symbol) {

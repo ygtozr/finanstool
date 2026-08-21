@@ -8,6 +8,7 @@ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const priceApi=fs.readFileSync(path.join(root,'api','price.js'),'utf8');
 const fundamentalsApi=fs.readFileSync(path.join(root,'api','fundamentals.js'),'utf8');
 const dividendsApi=fs.readFileSync(path.join(root,'api','dividends.js'),'utf8');
+const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
 const logoSvg=fs.readFileSync(path.join(root,'assets','ozer-finans-mark.svg'),'utf8');
 
 function extractFunction(source,name){
@@ -30,6 +31,7 @@ scripts.forEach((script,index)=>assert.doesNotThrow(()=>new Function(script),'İ
 assert.doesNotThrow(()=>new Function('module','exports','require',priceApi),'Fiyat API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',fundamentalsApi),'Temel veri API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',dividendsApi),'Temettü API sözdizimi');
+assert.doesNotThrow(()=>new Function('module','exports','require','Buffer',logoApi),'Logo API sözdizimi');
 
 const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary','normalizePerformance','resultPriceValues','commonPerformanceWindow','isPortfolioSummaryComplete'].map(name=>extractFunction(scripts[0],name)).join('\n');
 const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete};')();
@@ -145,9 +147,13 @@ assert.match(html,/pullRefreshDistance>=pullRefreshThreshold[\s\S]*runPullRefres
 assert.match(html,/id="periodRangeFill"/,'Dönem içi fiyat konum barı bulunmalı');
 assert.match(html,/className='favorite-market-time'/,'Her favoride fiyat zamanı alanı bulunmalı');
 assert.match(html,/function favoriteLogoUrls\(symbol\)[\s\S]*financialmodelingprep\.com\/image-stock\/[\s\S]*eodhd\.com\/img\/logos\//,'Favori logoları iki bağımsız kaynağı sırayla kullanmalı');
+assert.match(html,/suffix==='IS'\?'\/api\/logo\?symbol='/,'BIST logoları için aynı kaynaklı üçüncü yedek bulunmalı');
 assert.match(html,/const exchange=suffix==='IS'\?'IS':'US'/,'BIST sembolleri yedek logo kaynağında doğru borsaya çevrilmeli');
 assert.match(html,/function appendSymbolLogo\(container,className,symbol\)[\s\S]*image\.addEventListener\('error',loadNext\)/,'Logo yükleme hatasında sonraki kaynak otomatik denenmeli');
 assert.match(html,/image\.loading='eager'/,'Favori logoları Safari görünürlük tahminine bırakılmadan yüklenmeli');
+assert.match(logoApi,/scanner\.tradingview\.com\/turkey\/scan[\s\S]*columns:\['name','description','logoid'\]/,'BIST logo yedeği TradingView logo kimliğini kullanmalı');
+assert.match(logoApi,/s3-symbol-logo\.tradingview\.com\/[\s\S]*--big\.svg/,'Doğrulanan TradingView logosu sunucu üzerinden aktarılmalı');
+assert.match(logoApi,/\^\[A-Z0-9\]\{1,12\}\\\.IS\$/,'Logo uç noktası yalnız doğrulanmış BIST sembollerini kabul etmeli');
 assert.match(html,/img-src 'self' data: https:\/\/financialmodelingprep\.com https:\/\/eodhd\.com/,'İki logo kaynağı içerik güvenlik politikasında izinli olmalı');
 assert.ok(html.indexOf('class="periods"')<html.indexOf('id="periodSummaryTitle"'),'Süre seçimi dönem özetinden önce gelmeli');
 assert.ok(html.indexOf('id="portfolioList"')<html.indexOf('id="portfolioSymbol"'),'Portföy araması hisse listesinden sonra gelmeli');
