@@ -8,6 +8,9 @@ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const priceApi=fs.readFileSync(path.join(root,'api','price.js'),'utf8');
 const fundamentalsApi=fs.readFileSync(path.join(root,'api','fundamentals.js'),'utf8');
 const dividendsApi=fs.readFileSync(path.join(root,'api','dividends.js'),'utf8');
+const dividendHistoryApi=fs.readFileSync(path.join(root,'api','dividend-history.js'),'utf8');
+const goldApi=fs.readFileSync(path.join(root,'api','gold.js'),'utf8');
+const searchApi=fs.readFileSync(path.join(root,'api','search.js'),'utf8');
 const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
 const logoSvg=fs.readFileSync(path.join(root,'assets','ozer-finans-mark.svg'),'utf8');
 
@@ -31,10 +34,13 @@ scripts.forEach((script,index)=>assert.doesNotThrow(()=>new Function(script),'İ
 assert.doesNotThrow(()=>new Function('module','exports','require',priceApi),'Fiyat API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',fundamentalsApi),'Temel veri API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',dividendsApi),'Temettü API sözdizimi');
+assert.doesNotThrow(()=>new Function('module','exports','require',dividendHistoryApi),'Temettü geçmişi API sözdizimi');
+assert.doesNotThrow(()=>new Function('module','exports','require','URLSearchParams',goldApi),'Altın API sözdizimi');
+assert.doesNotThrow(()=>new Function('module','exports','require',searchApi),'Arama API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require','Buffer',logoApi),'Logo API sözdizimi');
 
-const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary','normalizePerformance','resultPriceValues','commonPerformanceWindow','isPortfolioSummaryComplete'].map(name=>extractFunction(scripts[0],name)).join('\n');
-const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete};')();
+const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary','normalizePerformance','resultPriceValues','commonPerformanceWindow','isPortfolioSummaryComplete','calculateDrip'].map(name=>extractFunction(scripts[0],name)).join('\n');
+const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete,calculateDrip}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete,calculateDrip};')();
 
 assert.deepEqual(fillMissingRates([null,null,2,null,3,null]),[null,null,2,2,3,3],'Gelecekteki kur geçmişe taşınmamalı');
 assert.deepEqual(sma([null,1,2,3],3),[null,null,null,2],'Eksik değer içeren MA penceresi hesaplanmamalı');
@@ -54,6 +60,9 @@ assert.deepEqual(common.labels,['b','c'],'Portföy ve ölçüt aynı ilk ortak t
 assert.ok(Math.abs(common.portfolio[0])<1e-9&&Math.abs(common.benchmark[0])<1e-9&&Math.abs(common.portfolio[1]-10)<1e-9&&Math.abs(common.benchmark[1]-10)<1e-9,'Ortak başlangıçta her iki seri yüzde sıfıra bazlanmalı');
 assert.equal(isPortfolioSummaryComplete([],new Set()),true,'Eksiksiz portföy özeti yayınlanabilmeli');
 assert.equal(isPortfolioSummaryComplete(['AAPL'],new Set()),false,'Fiyatı eksik pozisyon varken toplam yayınlanmamalı');
+const drip=calculateDrip(10,{prices:[{time:100,close:20},{time:200,close:25}],events:[{paymentDate:100,amount:2},{paymentDate:200,amount:1}],splits:[{date:150,numerator:2,denominator:1}],source:'fixture'},10,true);
+assert.ok(Math.abs(drip.quantity-22.5848)<1e-9,'DRIP vergi, ödeme fiyatı ve bölünmeyi kronolojik uygulamalı');
+assert.equal(drip.dividendCount,2,'DRIP işlenen temettü sayısını raporlamalı');
 
 const sandbox={module:{exports:{}},exports:{},require,URLSearchParams,URL,AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
 vm.runInNewContext(priceApi+'\nmodule.exports._test={numberValue,cleanQuery};',sandbox);
@@ -78,6 +87,15 @@ assert.equal(new Date(dividendSandbox.module.exports._test.parseDate('09/15/2026
 assert.match(dividendsApi,/status:'unsupported'/,'Desteklenmeyen temettü ürünleri ayrılmalı');
 assert.match(dividendsApi,/status:'provider_error'/,'Temettü sağlayıcı hatası ayrı durum olmalı');
 assert.match(dividendsApi,/function fetchBist[\s\S]*dividend_amount_upcoming[\s\S]*dividend_ex_date_upcoming/,'BIST yaklaşan temettüleri TradingView kaynağından alınmalı');
+assert.match(dividendHistoryApi,/paymentDate:parseDate\(row\.paymentDate\)\|\|parseDate\(row\.exOrEffDate\)/,'DRIP ödeme tarihi yoksa hak kullanım tarihine dönmeli');
+assert.match(dividendHistoryApi,/price\.events\?\.splits/,'DRIP hesaplaması için bölünmeler servisten dönmeli');
+const goldSandbox={module:{exports:{}},exports:{},AbortSignal,URLSearchParams,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
+vm.runInNewContext(goldApi,goldSandbox);
+const goldTest=goldSandbox.module.exports._test;
+assert.ok(Math.abs(3100*40/goldTest.TROY_OUNCE_GRAMS-3986.695)<0.01,'Gram altın ons × USDTRY ÷ troy ons gramı formülüyle hesaplanmalı');
+const aligned=goldTest.alignCalculated({timestamp:[1],indicators:{quote:[{close:[3100]}]}},{timestamp:[1],indicators:{quote:[{close:[40]}]}});
+assert.ok(Math.abs(aligned[0].close-3100*40/goldTest.TROY_OUNCE_GRAMS)<1e-9,'Gram altın serisi ons ve kuru aynı tarihte birleştirmeli');
+assert.match(searchApi,/ALTIN-GRAM[\s\S]*ALTIN-CEYREK[\s\S]*ALTIN-YARIM[\s\S]*ALTIN-TAM[\s\S]*ALTIN-CUMHURIYET[\s\S]*ALTIN-ATA/,'Altın ürünleri arama kataloğunda bulunmalı');
 
 assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh parametresi kalmamalı');
 assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunmalı');
@@ -106,7 +124,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v5\.5<\/title>/,'Tarayıcı başlığı yeni marka ve aday sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v5\.6 Önizleme<\/title>/,'Tarayıcı başlığı yeni marka ve aday sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -232,4 +250,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v5.5 regresyon testleri başarılı.');
+console.log('Özer Finans v5.6 önizleme regresyon testleri başarılı.');

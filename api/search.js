@@ -3,6 +3,22 @@ const HEADERS={
   'Accept':'application/json, text/plain, */*'
 };
 
+const GOLD_QUOTES=[
+  {symbol:'ALTIN-GRAM',name:'Gram Altın (Spot)',exchange:'Türkiye',type:'COMMODITY'},
+  {symbol:'ALTIN-CEYREK',name:'Çeyrek Altın',exchange:'Serbest Piyasa',type:'COMMODITY'},
+  {symbol:'ALTIN-YARIM',name:'Yarım Altın',exchange:'Serbest Piyasa',type:'COMMODITY'},
+  {symbol:'ALTIN-TAM',name:'Tam Altın',exchange:'Serbest Piyasa',type:'COMMODITY'},
+  {symbol:'ALTIN-CUMHURIYET',name:'Cumhuriyet Altını',exchange:'Serbest Piyasa',type:'COMMODITY'},
+  {symbol:'ALTIN-ATA',name:'Ata Altın',exchange:'Serbest Piyasa',type:'COMMODITY'},
+  {symbol:'ALTIN-IKIBUCUK',name:'2,5’luk Altın',exchange:'Serbest Piyasa',type:'COMMODITY'},
+  {symbol:'ALTIN-BESLI',name:'Beşli Altın',exchange:'Serbest Piyasa',type:'COMMODITY'}
+];
+
+function goldQuotes(query,limit){
+  const normalized=String(query||'').toLocaleLowerCase('tr-TR').replace(/[’']/g,'');
+  return GOLD_QUOTES.filter(item=>(item.symbol+' '+item.name).toLocaleLowerCase('tr-TR').replace(/[’']/g,'').includes(normalized)).slice(0,limit);
+}
+
 async function fetchJson(url,headers=HEADERS){
   const response=await fetch(url,{headers,signal:AbortSignal.timeout(4500)});
   if(!response.ok)throw new Error('Sağlayıcı hatası');
@@ -52,6 +68,8 @@ module.exports=async(req,res)=>{
   const limit=advanced?20:5;
   res.setHeader('Cache-Control','s-maxage=300, stale-while-revalidate=600');
   if(!q)return res.status(200).json({quotes:[]});
+  const gold=goldQuotes(q,limit);
+  if(gold.length)return res.status(200).json({quotes:gold,provider:'Özer Finans altın ürünleri'});
   if(!forcedFallback){
     try{
       const data=await fetchJson('https://query1.finance.yahoo.com/v1/finance/search?q='+encodeURIComponent(q));
