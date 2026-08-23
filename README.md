@@ -155,7 +155,7 @@ Yahoo Finance birincil veri kaynağıdır. Desteklenen ABD hisse ve ETF'lerinde 
 
 ## Yerel veri ve yedekleme
 
-Favoriler, hisse/nakit portföyü, fiyat alarmları, Piyasa Özeti, tema, yenileme ve grafik dönemi tercihleri tarayıcının `localStorage` alanında saklanır. Veriler JSON dosyası olarak dışa aktarılabilir; geri yüklerken birleştirme veya değiştirme seçilebilir.
+Favoriler, hisse/nakit portföyü, pozisyonların alım tarihleri ve temettü yeniden yatırım ayarları, fiyat alarmları, Piyasa Özeti, tema, yenileme ve grafik dönemi tercihleri tarayıcının `localStorage` alanında saklanır. Bu alanların tamamı JSON dosyası olarak dışa aktarılır; geri yüklerken birleştirme veya değiştirme seçilebilir. Birleştirmede aynı sembol yedekte de bulunuyorsa pozisyon ve temettü ayarları yedekteki kayıtla geri yüklenir.
 
 ## Teknik yapı
 

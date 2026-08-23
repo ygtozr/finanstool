@@ -385,7 +385,7 @@ Kullanıcı verileri JSON dosyası olarak dışa aktarılabilir ve daha sonra ge
 Yedek kapsamı:
 
 - Favoriler,
-- Hisse ve çoklu para birimli nakit portföyü,
+- Hisse ve çoklu para birimli nakit portföyü; pozisyonların alım tarihi, maliyet para birimi, temel adedi ve temettü yeniden yatırım ayarları,
 - Fiyat alarmları,
 - Piyasa Özeti öğeleri,
 - Açık/Koyu/Sistem tema tercihi,
@@ -398,7 +398,7 @@ Yedek kapsamı:
 ```json
 {
   "schemaVersion": 1,
-  "appVersion": "5",
+  "appVersion": "5.6",
   "exportedAt": "2026-08-08T00:00:00.000Z",
   "data": {
     "favorites": [
@@ -409,7 +409,13 @@ Yedek kapsamı:
         "symbol": "AAPL",
         "name": "Apple Inc.",
         "quantity": 1,
-        "unitCost": 100
+        "baseQuantity": 1,
+        "unitCost": 100,
+        "costCurrency": "USD",
+        "purchaseDate": "2026-01-15",
+        "dripEnabled": true,
+        "dripTaxRate": 15,
+        "dripFractional": true
       }
     ],
     "cashBalances": [
@@ -437,7 +443,7 @@ Yedek kapsamı:
 
 Geri yükleme seçenekleri:
 
-- **Birleştir:** Mevcut kayıtları korur, yedekteki kayıtları ekler/günceller.
+- **Birleştir:** Mevcut kayıtları korur, yedekteki kayıtları ekler. Aynı portföy sembolü iki tarafta da varsa yedekteki adet, maliyet, alım tarihi ve temettü yeniden yatırım ayarları geri yüklenir.
 - **Değiştir:** Mevcut yerel veriyi yedek içeriğiyle değiştirir.
 
 Yüklenen dosya JSON olarak doğrulanır, beklenmeyen alanlar ayıklanır ve yaklaşık 1 MB dosya sınırı uygulanır.
