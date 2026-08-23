@@ -241,6 +241,10 @@ assert.match(html,/dialog\.addEventListener\('cancel',event=>\{event\.preventDef
 assert.match(html,/document\.addEventListener\('keydown',event=>\{[\s\S]*event\.key!=='Escape'[\s\S]*dialog\.close\(\)/,'Native cancel üretmeyen tarayıcılarda Escape yedeği bulunmalı');
 assert.match(html,/id="backupFileName"/,'Özel Türkçe dosya seçici seçilen dosya adını göstermeli');
 assert.match(html,/id="portfolioCostCurrency"[\s\S]*id="portfolioPurchaseDate"/,'Portföy maliyet para birimi ve alım tarihi kaydedilebilmeli');
+assert.match(html,/function openPortfolioDialog\(position=null\)[\s\S]*portfolioQuantity\.value = editing\?String\(position\.baseQuantity\?\?position\.quantity\)[\s\S]*portfolioCost\.value = editing\?String\(position\.unitCost\)[\s\S]*portfolioPurchaseDate\.value = editing\?\(position\.purchaseDate\|\|''\)/,'Pozisyon düzenleme penceresi mevcut adet, maliyet ve alış tarihini doldurmalı');
+assert.match(html,/row\.setAttribute\('aria-label',position\.symbol\+' pozisyonunu düzenle'\)[\s\S]*const editPosition=\(\)=>\{const saved=portfolio\.find[\s\S]*openPortfolioDialog\(saved\)[\s\S]*row\.addEventListener\('click'/,'Portföy kartına tıklamak erişilebilir düzenleme akışını açmalı');
+assert.match(html,/if\(edited\)\{[\s\S]*edited\.quantity=quantity;edited\.baseQuantity=quantity;edited\.unitCost=unitCost;edited\.costCurrency=costCurrency;edited\.purchaseDate=purchaseDate;/,'Düzenleme kaydı yeni adet eklemek yerine mevcut pozisyonu güncellemeli');
+assert.match(html,/event\.stopPropagation\(\);portfolio=portfolio\.filter/,'Silme düğmesi kart düzenleme olayını tetiklememeli');
 assert.match(html,/historicalUsdRate\(costCurrency,position\.purchaseDate\)/,'Maliyet, alım tarihindeki kurla özet para birimine çevrilmeli');
 assert.match(html,/Kısmi sonuç gösterilmedi\. Eksik veri/,'Eksik varlıkla performans kıyası sessizce yayınlanmamalı');
 assert.match(html,/prepareVisibleRsi\(symbol,points\)/,'Kısa dönem RSI için görünür dönem öncesi veri kullanılmalı');

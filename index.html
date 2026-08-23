@@ -163,7 +163,9 @@
     .summary-card strong { display:block; margin-top:3px; }
     .portfolio-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
     .portfolio-empty { grid-column:1/-1; padding:18px; text-align:center; color:var(--muted); border:1px dashed #40516e; border-radius:12px; }
-    .portfolio-row { min-width:0; padding:8px 9px; border:1px solid var(--line); border-radius:10px; background:#0d1523; }
+    .portfolio-row { min-width:0; padding:8px 9px; border:1px solid var(--line); border-radius:10px; background:#0d1523; cursor:pointer; }
+    .portfolio-row:hover,.portfolio-row:focus-visible { border-color:var(--accent); }
+    .portfolio-row:focus-visible { outline:3px solid #52d5b166; outline-offset:2px; }
     .portfolio-row-head { display:grid; grid-template-columns:34px minmax(0,1fr) auto 32px; align-items:center; gap:7px; margin-bottom:5px; }
     .portfolio-row-logo { width:34px; height:34px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.58rem; font-weight:800; }
     .portfolio-row-logo > * { grid-area:1/1; }
@@ -720,7 +722,7 @@
   </nav>
 
   <dialog id="portfolioDialog" class="portfolio-dialog">
-    <h3>Portföye Ekle</h3><p id="portfolioDialogSymbol" class="portfolio-dialog-symbol"></p>
+    <h3 id="portfolioDialogTitle">Portföye Ekle</h3><p id="portfolioDialogSymbol" class="portfolio-dialog-symbol"></p>
     <form id="portfolioForm" class="portfolio-form" method="dialog">
       <label>Adet<input id="portfolioQuantity" type="number" min="0.000001" step="any" required></label>
       <label>Birim maliyet<input id="portfolioCost" type="number" min="0" step="any" required></label>
@@ -734,7 +736,7 @@
         </div>
         <p class="portfolio-drip-note">Net temettü, ödeme günü veya sonraki işlem günü kapanışından yeniden yatırıma dönüşür. Altın ürünlerinde uygulanmaz.</p>
       </section>
-      <div class="dialog-actions"><button id="portfolioCancel" class="dialog-cancel" type="button">Vazgeç</button><button type="submit">Kaydet</button></div>
+      <div class="dialog-actions"><button id="portfolioCancel" class="dialog-cancel" type="button">Vazgeç</button><button id="portfolioSave" type="submit">Kaydet</button></div>
     </form>
   </dialog>
   <dialog id="cashDialog" class="portfolio-dialog" aria-labelledby="cashDialogTitle">
@@ -978,6 +980,8 @@
     const portfolioCost = document.getElementById('portfolioCost');
     const portfolioCostCurrency = document.getElementById('portfolioCostCurrency');
     const portfolioPurchaseDate = document.getElementById('portfolioPurchaseDate');
+    const portfolioDialogTitle = document.getElementById('portfolioDialogTitle');
+    const portfolioSave = document.getElementById('portfolioSave');
     const portfolioDrip = document.getElementById('portfolioDrip');
     const portfolioDripEnabled = document.getElementById('portfolioDripEnabled');
     const portfolioDripTax = document.getElementById('portfolioDripTax');
@@ -1027,6 +1031,7 @@
     let cashBalances = (()=>{try{const saved=JSON.parse(localStorage.getItem(cashKey));return Array.isArray(saved)?saved.map(item=>({currency:String(item?.currency||'').toUpperCase(),amount:Number(item?.amount)})).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0):[]}catch{return[]}})();
     let portfolioSearchTimer;
     let portfolioSelection = null;
+    let portfolioEditSymbol = null;
     let portfolioRenderId = 0;
     let portfolioDividendRequestId = 0;
     let portfolioDisplayCurrency = 'AUTO';
@@ -1985,20 +1990,24 @@
       updateComboboxState(portfolioSymbol,portfolioSuggestions,items.length>0);
     }
 
-    function openPortfolioDialog() {
-      const symbol = String(portfolioSelection?.symbol || portfolioSymbol.value).trim().toUpperCase();
+    function openPortfolioDialog(position=null) {
+      const editing=position&&position.symbol;
+      const symbol = String(editing?position.symbol:(portfolioSelection?.symbol || portfolioSymbol.value)).trim().toUpperCase();
       if (!symbol) return portfolioSymbol.focus();
-      portfolioSelection = { symbol, name:portfolioSelection?.name || symbol };
+      portfolioEditSymbol=editing?symbol:null;
+      portfolioSelection = { symbol, name:editing?(position.name||symbol):(portfolioSelection?.name || symbol) };
+      portfolioDialogTitle.textContent=editing?'Pozisyonu Düzenle':'Portföye Ekle';
+      portfolioSave.textContent=editing?'Değişiklikleri Kaydet':'Kaydet';
       portfolioDialogSymbol.textContent = portfolioSelection.symbol + (portfolioSelection.name !== portfolioSelection.symbol ? ' · ' + portfolioSelection.name : '');
-      portfolioQuantity.value = '';
-      portfolioCost.value = '';
-      portfolioCostCurrency.value = 'AUTO';
-      portfolioPurchaseDate.value = '';
-      portfolioDripEnabled.checked = false;
-      portfolioDripTax.value = '0';
-      portfolioDripFractional.value = 'fractional';
+      portfolioQuantity.value = editing?String(position.baseQuantity??position.quantity):'';
+      portfolioCost.value = editing?String(position.unitCost):'';
+      portfolioCostCurrency.value = editing?(position.costCurrency||'AUTO'):'AUTO';
+      portfolioPurchaseDate.value = editing?(position.purchaseDate||''):'';
+      portfolioDripEnabled.checked = editing?Boolean(position.dripEnabled):false;
+      portfolioDripTax.value = editing?String(position.dripTaxRate||0):'0';
+      portfolioDripFractional.value = editing&&position.dripFractional===false?'whole':'fractional';
       portfolioDripEnabled.disabled = symbol.startsWith('ALTIN-');
-      portfolioDrip.classList.remove('enabled');
+      portfolioDrip.classList.toggle('enabled',portfolioDripEnabled.checked);
       portfolioDialog.showModal();
       portfolioQuantity.focus();
     }
@@ -2511,7 +2520,7 @@
       const currencyValues=new Map();
       results.forEach(result=>{
         const position=result.ok?result.value:result.position;
-        const row=document.createElement('article');row.className='portfolio-row';
+        const row=document.createElement('article');row.className='portfolio-row';row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label',position.symbol+' pozisyonunu düzenle');
         const head=document.createElement('div');head.className='portfolio-row-head';
         const badge=document.createElement('span');badge.className='portfolio-row-logo';
         const initials=document.createElement('span');initials.textContent=position.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';badge.append(initials);
@@ -2520,7 +2529,7 @@
         const symbol=document.createElement('strong');symbol.textContent=position.symbol;
         if(position.drip){const chip=document.createElement('span');chip.className='drip-chip';chip.textContent='DRIP';symbol.append(chip)}
         const name=document.createElement('small');name.textContent=result.ok?position.name:result.error.message;name.title=name.textContent;title.append(symbol,name);
-        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.title=position.symbol+' pozisyonunu sil';remove.setAttribute('aria-label',position.symbol+' pozisyonunu sil');remove.textContent='×';remove.addEventListener('click',()=>{portfolio=portfolio.filter(item=>item.symbol!==position.symbol);savePortfolio();renderPortfolio()});
+        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.title=position.symbol+' pozisyonunu sil';remove.setAttribute('aria-label',position.symbol+' pozisyonunu sil');remove.textContent='×';remove.addEventListener('click',event=>{event.stopPropagation();portfolio=portfolio.filter(item=>item.symbol!==position.symbol);savePortfolio();renderPortfolio()});
         const currentValue=document.createElement('strong');currentValue.className='portfolio-current-value';
         head.append(badge,title,currentValue,remove);
         const compactLine=document.createElement('div');compactLine.className='portfolio-compact-line';
@@ -2554,6 +2563,9 @@
           profitValue.textContent='Hesaplanamadı';
           profitValue.classList.add('negative');
         }
+        const editPosition=()=>{const saved=portfolio.find(item=>item.symbol===position.symbol);if(saved)openPortfolioDialog(saved)};
+        row.addEventListener('click',event=>{if(!event.target.closest('button'))editPosition()});
+        row.addEventListener('keydown',event=>{if(event.target!==row||!['Enter',' '].includes(event.key))return;event.preventDefault();editPosition()});
         compactLine.append(details,profitValue);
         row.append(head,compactLine);portfolioList.append(row);
       });
@@ -3325,6 +3337,7 @@
     favoriteDetailAlarm.addEventListener('click',()=>{const item=favoriteDetailItem;if(!item)return;favoriteDetailDialog.close();openFavoriteAlarm(item)});
     favoriteDetailPortfolio.addEventListener('click',()=>{const item=favoriteDetailItem;if(!item)return;favoriteDetailDialog.close();openFavoritePortfolio(item)});
     portfolioCancel.addEventListener('click', () => portfolioDialog.close());
+    portfolioDialog.addEventListener('close',()=>{portfolioEditSymbol=null;portfolioDialogTitle.textContent='Portföye Ekle';portfolioSave.textContent='Kaydet';portfolioPurchaseDate.setCustomValidity('')});
     cashAddButton.addEventListener('click',()=>{cashAmount.value='';cashDialog.showModal();cashAmount.focus()});
     cashCancel.addEventListener('click',()=>cashDialog.close());
     cashForm.addEventListener('submit',event=>{
@@ -3364,8 +3377,12 @@
       const dripFractional=portfolioDripFractional.value!=='whole';
       if(dripEnabled&&!purchaseDate){portfolioPurchaseDate.setCustomValidity('Otomatik temettü geri yatırımı için alım tarihi gereklidir.');portfolioPurchaseDate.reportValidity();return}
       portfolioPurchaseDate.setCustomValidity('');
+      const edited = portfolioEditSymbol?portfolio.find(item=>item.symbol===portfolioEditSymbol):null;
       const existing = portfolio.find(item => item.symbol === portfolioSelection.symbol);
-      if (existing) {
+      if(edited){
+        edited.quantity=quantity;edited.baseQuantity=quantity;edited.unitCost=unitCost;edited.costCurrency=costCurrency;edited.purchaseDate=purchaseDate;
+        edited.name=portfolioSelection.name||edited.name;edited.dripEnabled=dripEnabled;edited.dripTaxRate=dripTaxRate;edited.dripFractional=dripFractional;
+      } else if (existing) {
         if((existing.dripEnabled||dripEnabled)&&existing.purchaseDate&&purchaseDate&&existing.purchaseDate!==purchaseDate){alert('Otomatik temettü hesabında farklı alım tarihleri tek pozisyonda birleştirilemez. Bu kayıt için aynı başlangıç tarihini kullanın. Çoklu alım lotları sonraki portföy paketinde eklenecek.');return}
         const incomingCurrency=costCurrency||existing.costCurrency;
         if(existing.costCurrency&&incomingCurrency&&existing.costCurrency!==incomingCurrency){alert('Aynı pozisyona farklı maliyet para birimi eklemek için önce mevcut pozisyonu düzenleyin.');return}
@@ -3383,6 +3400,7 @@
       portfolioDialog.close();
       portfolioSymbol.value = '';
       portfolioSelection = null;
+      portfolioEditSymbol = null;
       showPortfolioSuggestions([]);
       renderPortfolio();
     });
