@@ -151,11 +151,12 @@
     .portfolio-cash-head h3 { margin:0; font-size:1rem; }
     .portfolio-cash-head button { padding:7px 10px; font-size:.78rem; }
     .portfolio-cash-list { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
-    .portfolio-cash-item { min-width:0; display:grid; grid-template-columns:minmax(0,1fr) 28px; align-items:center; gap:6px; padding:9px 10px; border:1px solid var(--line); border-radius:9px; background:#0d1523; }
+    .portfolio-cash-item { min-width:0; display:grid; grid-template-columns:minmax(0,1fr) 24px; align-items:center; gap:5px; padding:9px 8px 9px 10px; border:1px solid var(--line); border-radius:9px; background:#0d1523; cursor:pointer; }
+    .portfolio-cash-item:hover { border-color:#526786; }
     .portfolio-cash-value { min-width:0; display:grid; gap:1px; }
     .portfolio-cash-value small { color:var(--muted); font-size:.68rem; }
     .portfolio-cash-value strong { overflow:hidden; font-size:.88rem; text-overflow:ellipsis; white-space:nowrap; }
-    .portfolio-cash-delete { width:44px; height:44px; padding:0; color:var(--danger); background:#3b1720; }
+    .portfolio-cash-delete { width:24px; height:24px; min-height:24px; padding:0; border-radius:7px; color:var(--danger); background:#3b1720; font-size:.9rem; line-height:1; }
     .portfolio-cash-empty { margin:0; color:var(--muted); font-size:.78rem; }
     .portfolio-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
     .summary-card { padding:12px; border:1px solid var(--line); border-radius:12px; background:#0d1523; }
@@ -742,11 +743,11 @@
     </form>
   </dialog>
   <dialog id="cashDialog" class="portfolio-dialog" aria-labelledby="cashDialogTitle">
-    <h3 id="cashDialogTitle">Nakit Ekle</h3><p class="portfolio-dialog-symbol">Aynı para birimi yeniden eklenirse mevcut bakiyeye eklenir.</p>
+    <h3 id="cashDialogTitle">Nakit Ekle</h3><p id="cashDialogNote" class="portfolio-dialog-symbol">Aynı para birimi yeniden eklenirse mevcut bakiyeye eklenir.</p>
     <form id="cashForm" class="portfolio-form">
       <label>Para birimi<select id="cashCurrency" required><option value="TRY">TRY · Türk Lirası</option><option value="USD">USD · ABD Doları</option><option value="EUR">EUR · Euro</option><option value="GBP">GBP · İngiliz Sterlini</option></select></label>
       <label>Tutar<input id="cashAmount" type="number" min="0.01" step="any" inputmode="decimal" required></label>
-      <div class="dialog-actions"><button id="cashCancel" class="dialog-cancel" type="button">Vazgeç</button><button type="submit">Bakiyeye Ekle</button></div>
+      <div class="dialog-actions"><button id="cashCancel" class="dialog-cancel" type="button">Vazgeç</button><button id="cashSave" type="submit">Bakiyeye Ekle</button></div>
     </form>
   </dialog>
 
@@ -996,6 +997,9 @@
     const cashCurrency = document.getElementById('cashCurrency');
     const cashAmount = document.getElementById('cashAmount');
     const cashCancel = document.getElementById('cashCancel');
+    const cashDialogTitle = document.getElementById('cashDialogTitle');
+    const cashDialogNote = document.getElementById('cashDialogNote');
+    const cashSave = document.getElementById('cashSave');
     const favoriteDetailDialog = document.getElementById('favoriteDetailDialog');
     const favoriteDetailIdentity = document.getElementById('favoriteDetailIdentity');
     const favoriteDetailBody = document.getElementById('favoriteDetailBody');
@@ -1034,6 +1038,7 @@
     let portfolioSearchTimer;
     let portfolioSelection = null;
     let portfolioEditSymbol = null;
+    let cashEditCurrency = null;
     let portfolioRenderId = 0;
     let portfolioDividendRequestId = 0;
     let portfolioDisplayCurrency = 'AUTO';
@@ -1947,16 +1952,31 @@
     const savePortfolio = () => localStorage.setItem(portfolioKey, JSON.stringify(portfolio));
     const saveCashBalances = () => localStorage.setItem(cashKey,JSON.stringify(cashBalances));
 
+    function openCashDialog(balance=null){
+      cashEditCurrency=balance?.currency||null;
+      cashDialogTitle.textContent=balance?'Nakit Bakiyeyi Düzenle':'Nakit Ekle';
+      cashDialogNote.textContent=balance?'Para birimini veya mevcut bakiye tutarını değiştirebilirsiniz.':'Aynı para birimi yeniden eklenirse mevcut bakiyeye eklenir.';
+      cashSave.textContent=balance?'Değişiklikleri Kaydet':'Bakiyeye Ekle';
+      cashCurrency.value=balance?.currency||'TRY';
+      cashAmount.value=balance?.amount??'';
+      cashCurrency.setCustomValidity('');
+      cashDialog.showModal();
+      cashAmount.focus();
+    }
+
     function renderCashBalances(){
       portfolioCashList.replaceChildren();
       if(!cashBalances.length){const empty=document.createElement('p');empty.className='portfolio-cash-empty';empty.textContent='Henüz nakit bakiye eklenmedi.';portfolioCashList.append(empty);return}
       cashBalances.slice().sort((a,b)=>supportedCashCurrencies.indexOf(a.currency)-supportedCashCurrencies.indexOf(b.currency)).forEach(balance=>{
-        const item=document.createElement('article');item.className='portfolio-cash-item';
+        const item=document.createElement('article');item.className='portfolio-cash-item';item.tabIndex=0;item.setAttribute('role','button');item.setAttribute('aria-label',balance.currency+' nakit bakiyesini düzenle');
         const value=document.createElement('div');value.className='portfolio-cash-value';
         const label=document.createElement('small');label.textContent=balance.currency+' Nakit';
         const amount=document.createElement('strong');amount.textContent=money(balance.amount,balance.currency);value.append(label,amount);
         const remove=document.createElement('button');remove.type='button';remove.className='portfolio-cash-delete';remove.textContent='×';remove.setAttribute('aria-label',balance.currency+' nakit bakiyesini sil');
-        remove.addEventListener('click',()=>{cashBalances=cashBalances.filter(item=>item.currency!==balance.currency);saveCashBalances();renderPortfolio()});
+        const edit=()=>openCashDialog(balance);
+        item.addEventListener('click',edit);
+        item.addEventListener('keydown',event=>{if(event.target===item&&(event.key==='Enter'||event.key===' ')){event.preventDefault();edit()}});
+        remove.addEventListener('click',event=>{event.stopPropagation();cashBalances=cashBalances.filter(item=>item.currency!==balance.currency);saveCashBalances();renderPortfolio()});
         item.append(value,remove);portfolioCashList.append(item);
       });
     }
@@ -3342,14 +3362,23 @@
     favoriteDetailPortfolio.addEventListener('click',()=>{const item=favoriteDetailItem;if(!item)return;favoriteDetailDialog.close();openFavoritePortfolio(item)});
     portfolioCancel.addEventListener('click', () => portfolioDialog.close());
     portfolioDialog.addEventListener('close',()=>{portfolioEditSymbol=null;portfolioDialogTitle.textContent='Portföye Ekle';portfolioSave.textContent='Kaydet';portfolioPurchaseDate.setCustomValidity('')});
-    cashAddButton.addEventListener('click',()=>{cashAmount.value='';cashDialog.showModal();cashAmount.focus()});
+    cashAddButton.addEventListener('click',()=>openCashDialog());
     cashCancel.addEventListener('click',()=>cashDialog.close());
+    cashDialog.addEventListener('close',()=>{cashEditCurrency=null;cashCurrency.setCustomValidity('')});
+    cashCurrency.addEventListener('change',()=>cashCurrency.setCustomValidity(''));
     cashForm.addEventListener('submit',event=>{
       event.preventDefault();
       const currency=String(cashCurrency.value).toUpperCase(),amount=Number(cashAmount.value);
       if(!supportedCashCurrencies.includes(currency)||!Number.isFinite(amount)||amount<=0)return;
-      const existing=cashBalances.find(item=>item.currency===currency);
-      if(existing)existing.amount+=amount;else cashBalances.push({currency,amount});
+      if(cashEditCurrency){
+        const duplicate=cashBalances.find(item=>item.currency===currency&&item.currency!==cashEditCurrency);
+        if(duplicate){cashCurrency.setCustomValidity('Bu para birimi için zaten bir nakit bakiyesi var.');cashCurrency.reportValidity();return}
+        const edited=cashBalances.find(item=>item.currency===cashEditCurrency);
+        if(edited){edited.currency=currency;edited.amount=amount}
+      }else{
+        const existing=cashBalances.find(item=>item.currency===currency);
+        if(existing)existing.amount+=amount;else cashBalances.push({currency,amount});
+      }
       saveCashBalances();cashDialog.close();renderPortfolio();
     });
     portfolioSymbol.addEventListener('input',()=>{

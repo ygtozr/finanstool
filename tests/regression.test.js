@@ -202,6 +202,9 @@ assert.doesNotMatch(html,/margin:48px auto 0/,'Mobil sayfanın üstünde sabit 4
 assert.match(html,/id="cashAddButton"[^>]*>\+ Nakit Ekle<[\s\S]*id="cashCurrency"[\s\S]*TRY · Türk Lirası[\s\S]*USD · ABD Doları[\s\S]*EUR · Euro[\s\S]*GBP · İngiliz Sterlini/,'Portföye dört para biriminde nakit ekleme akışı bulunmalı');
 assert.match(html,/const cashKey = 'finans-grafigi-cash-balances'/,'Nakit bakiyeleri kalıcı olarak saklanmalı');
 assert.match(html,/cashBalances\.forEach\(balance=>\{[\s\S]*totalValue\+=convertedValue[\s\S]*allocationValues\.push\(\{label:'Nakit '/,'Nakit bakiyeleri portföy toplamı ve dağılımına katılmalı');
+assert.match(html,/function openCashDialog\(balance=null\)[\s\S]*Nakit Bakiyeyi Düzenle[\s\S]*cashAmount\.value=balance\?\.amount/,'Nakit kartına tıklanınca mevcut bakiye düzenleme formuna yüklenmeli');
+assert.match(html,/item\.addEventListener\('click',edit\)[\s\S]*cashEditCurrency[\s\S]*edited\.currency=currency;edited\.amount=amount/,'Nakit kartı tıklama ve düzenleme akışı bulunmalı');
+assert.match(html,/\.portfolio-cash-delete \{ width:24px; height:24px; min-height:24px;/,'Nakit silme düğmesi kart sınırlarında kompakt kalmalı');
 assert.match(html,/data-benchmark-range="5d">1 Hafta<[\s\S]*data-benchmark-range="5y">5 Yıl<[\s\S]*data-benchmark-range="custom">Şu Tarihten İtibaren/,'Performans karşılaştırması grafik ekranındaki tüm süre seçeneklerini içermeli');
 assert.match(html,/function benchmarkQuery\(\)[\s\S]*period1=[\s\S]*period2=/,'Özel başlangıç tarihi karşılaştırma sorgusuna dönüştürülmeli');
 assert.match(html,/\/api\/dividends\?symbol=/,'Portföy yaklaşan temettü uç noktasını kullanmalı');
