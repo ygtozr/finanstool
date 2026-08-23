@@ -2,13 +2,13 @@ const HEADERS={'User-Agent':'Mozilla/5.0 (compatible; OzerFinans/5.6)','Accept':
 const TROY_OUNCE_GRAMS=31.1034768;
 const PRODUCTS={
   'ALTIN-GRAM':{name:'Gram Altın (Spot)',providerCode:null},
-  'ALTIN-CEYREK':{name:'Çeyrek Altın',providerCode:'C'},
-  'ALTIN-YARIM':{name:'Yarım Altın',providerCode:'Y'},
-  'ALTIN-TAM':{name:'Tam Altın',providerCode:'T'},
-  'ALTIN-CUMHURIYET':{name:'Cumhuriyet Altını',providerCode:'CMR'},
-  'ALTIN-ATA':{name:'Ata Altın',providerCode:'ATA'},
-  'ALTIN-IKIBUCUK':{name:"2,5'lik Altın",providerCode:'IKB'},
-  'ALTIN-BESLI':{name:'Beşli Altın',providerCode:'BSL'}
+  'ALTIN-CEYREK':{name:'Çeyrek Altın',providerCode:'C',providerKey:'ceyrek-altin'},
+  'ALTIN-YARIM':{name:'Yarım Altın',providerCode:'Y',providerKey:'yarim-altin'},
+  'ALTIN-TAM':{name:'Tam Altın',providerCode:'T',providerKey:'tam-altin'},
+  'ALTIN-CUMHURIYET':{name:'Cumhuriyet Altını',providerCode:'CMR',providerKey:'cumhuriyet-altini'},
+  'ALTIN-ATA':{name:'Ata Altın',providerCode:'ATA',providerKey:'ata-altin'},
+  'ALTIN-IKIBUCUK':{name:"2,5'lik Altın",providerCode:'IKB',providerKey:'ikibucuk-altin'},
+  'ALTIN-BESLI':{name:'Beşli Altın',providerCode:'BSL',providerKey:'besli-altin'}
 };
 const inFlight=new Map(),lastGood=new Map();
 let physicalCache={time:0,data:null,promise:null};
@@ -79,15 +79,30 @@ async function physicalQuotes(){
   if(physicalCache.data&&Date.now()-physicalCache.time<60000)return physicalCache.data;
   if(physicalCache.promise)return physicalCache.promise;
   const codes=[...new Set(Object.values(PRODUCTS).map(item=>item.providerCode).filter(Boolean))].join(',');
-  physicalCache.promise=json('https://api.genelpara.com/json/?list=altin&sembol='+codes).then(data=>{physicalCache={time:Date.now(),data:data?.data||{},promise:null};return physicalCache.data}).finally(()=>{physicalCache.promise=null});
+  physicalCache.promise=(async()=>{
+    try{
+      const data=await json('https://finans.truncgil.com/today.json');
+      return{source:'Truncgil serbest piyasa alış',updated:data?.Update_Date||null,data:Object.fromEntries(Object.values(PRODUCTS).filter(item=>item.providerCode).map(item=>[item.providerCode,data?.[item.providerKey]]))};
+    }catch{
+      const data=await json('https://api.genelpara.com/json/?list=altin&sembol='+codes);
+      return{source:'GenelPara serbest piyasa alış',updated:null,data:data?.data||{}};
+    }
+  })().then(value=>{physicalCache={time:Date.now(),data:value,promise:null};return value}).finally(()=>{physicalCache.promise=null});
   return physicalCache.promise;
 }
 
+function turkishNumber(value){
+  if(typeof value==='number')return value;
+  const normalized=String(value??'').replace(/[$₺%\s]/g,'').replace(/\./g,'').replace(',','.');
+  const parsed=Number(normalized);return Number.isFinite(parsed)?parsed:null;
+}
+
 async function physical(symbol,product){
-  const quotes=await physicalQuotes(),quote=quotes?.[product.providerCode],buy=Number(quote?.alis),sell=Number(quote?.satis);
+  const quotes=await physicalQuotes(),quote=quotes?.data?.[product.providerCode],buy=turkishNumber(quote?.Alış??quote?.alis),sell=turkishNumber(quote?.Satış??quote?.satis);
   if(!Number.isFinite(buy)||buy<=0)throw new Error('Fiziki altın alış fiyatı bulunamadı.');
-  const change=Number(quote?.degisim),previous=Number.isFinite(change)&&buy-change>0?buy-change:buy,now=Math.floor(Date.now()/1000);
-  return yahooShape(symbol,product,[{time:now-86400,close:previous},{time:now,close:buy}],'GenelPara serbest piyasa alış',{buy,sell:Number.isFinite(sell)?sell:null});
+  const changePercent=turkishNumber(quote?.Değişim??quote?.oran),previous=Number.isFinite(changePercent)&&changePercent>-99?buy/(1+changePercent/100):buy;
+  const parsedTime=quotes.updated?Math.floor(new Date(String(quotes.updated).replace(' ','T')+'+03:00').getTime()/1000):null,now=Number.isFinite(parsedTime)?parsedTime:Math.floor(Date.now()/1000);
+  return yahooShape(symbol,product,[{time:now-86400,close:previous},{time:now,close:buy}],quotes.source,{buy,sell:Number.isFinite(sell)?sell:null});
 }
 
 async function resolve(symbol,params){
@@ -109,4 +124,4 @@ module.exports=async(req,res)=>{
   catch(error){const saved=lastGood.get(key);if(saved&&Date.now()-saved.time<86400000){saved.data._finansTool={...saved.data._finansTool,stale:true,servedAt:Date.now()};return res.status(200).json(saved.data)}return res.status(502).json({error:error.message||'Altın verisi alınamadı.'})}
 };
 
-module.exports._test={PRODUCTS,TROY_OUNCE_GRAMS,alignCalculated};
+module.exports._test={PRODUCTS,TROY_OUNCE_GRAMS,alignCalculated,turkishNumber};

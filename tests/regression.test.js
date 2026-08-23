@@ -95,6 +95,8 @@ const goldTest=goldSandbox.module.exports._test;
 assert.ok(Math.abs(3100*40/goldTest.TROY_OUNCE_GRAMS-3986.695)<0.01,'Gram altın ons × USDTRY ÷ troy ons gramı formülüyle hesaplanmalı');
 const aligned=goldTest.alignCalculated({timestamp:[1],indicators:{quote:[{close:[3100]}]}},{timestamp:[1],indicators:{quote:[{close:[40]}]}});
 assert.ok(Math.abs(aligned[0].close-3100*40/goldTest.TROY_OUNCE_GRAMS)<1e-9,'Gram altın serisi ons ve kuru aynı tarihte birleştirmeli');
+assert.equal(goldTest.turkishNumber('11.253,14'),11253.14,'Fiziki altın alış fiyatı Türkçe sayı biçiminden doğru ayrıştırılmalı');
+assert.match(goldApi,/Truncgil serbest piyasa alış[\s\S]*GenelPara serbest piyasa alış/,'Fiziki altın için Vercel uyumlu birincil ve yedek sağlayıcı bulunmalı');
 assert.match(searchApi,/ALTIN-GRAM[\s\S]*ALTIN-CEYREK[\s\S]*ALTIN-YARIM[\s\S]*ALTIN-TAM[\s\S]*ALTIN-CUMHURIYET[\s\S]*ALTIN-ATA/,'Altın ürünleri arama kataloğunda bulunmalı');
 
 assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh parametresi kalmamalı');
