@@ -252,6 +252,9 @@ assert.match(html,/Kısmi sonuç gösterilmedi\. Eksik veri/,'Eksik varlıkla pe
 assert.match(html,/prepareVisibleRsi\(symbol,points\)/,'Kısa dönem RSI için görünür dönem öncesi veri kullanılmalı');
 assert.match(html,/En yeni fiyat:/,'Piyasa özetinde istek zamanından ayrı gerçek fiyat zamanı gösterilmeli');
 assert.match(html,/@media \(min-width:761px\) and \(max-width:900px\)/,'Tablet geçişi için ayrı düzen bulunmalı');
+assert.match(html,/name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/,'Uygulama görünümünde sayfa ölçeği sabitlenmeli');
+assert.match(html,/@media \(max-width:760px\)[\s\S]*input,select,textarea \{ font-size:16px !important; \}/,'iOS odak yakınlaştırmasını önlemek için mobil girişler en az 16 px olmalı');
+assert.match(html,/\['gesturestart','gesturechange','gestureend'\][\s\S]*event=>event\.preventDefault\(\)[\s\S]*event\.touches\.length>1/,'iOS pinch ve gesture yakınlaştırması engellenmeli');
 assert.match(html,/mobileMoreNav'\)\.addEventListener\('click',[\s\S]*openView\('other'\)/,'Mobil Diğer düğmesi sabit ayarlar ekranını açmalı');
 assert.match(html,/\.settings-grid \{ display:grid; grid-template-columns:1fr;/,'Diğer ekranındaki ayar kartları yatay satırlar halinde sıralanmalı');
 assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:minmax\(210px,\.8fr\) minmax\(320px,1\.2fr\)/,'İlk dört ayar kartının içeriği masaüstünde yatay yerleşmeli');
