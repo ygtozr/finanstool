@@ -18,10 +18,14 @@ module.exports=async(req,res)=>{
   res.setHeader('Cache-Control','public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
   try{
     const [rows,price]=await Promise.all([nasdaqRows(symbol),priceHistory(symbol,from)]),fromTime=Math.floor(new Date(from+'T00:00:00Z').getTime()/1000);
-    const events=rows.map(row=>({id:[row.exOrEffDate,row.paymentDate,row.amount].join('|'),exDate:parseDate(row.exOrEffDate),paymentDate:parseDate(row.paymentDate)||parseDate(row.exOrEffDate),amount:parseAmount(row.amount),currency:String(row.currency||price.meta?.currency||'USD').toUpperCase()})).filter(event=>event.paymentDate>=fromTime&&event.paymentDate<=Date.now()/1000&&Number.isFinite(event.amount)&&event.amount>0).sort((a,b)=>a.paymentDate-b.paymentDate);
+    const nasdaqEvents=rows.map(row=>({id:[row.exOrEffDate,row.paymentDate,row.amount].join('|'),exDate:parseDate(row.exOrEffDate),paymentDate:parseDate(row.paymentDate)||parseDate(row.exOrEffDate),amount:parseAmount(row.amount),currency:String(row.currency||price.meta?.currency||'USD').toUpperCase(),dateBasis:parseDate(row.paymentDate)?'payment_date':'ex_date_fallback'}));
+    const yahooEvents=Object.values(price.events?.dividends||{}).map(item=>({id:String(item.date)+'|'+String(item.amount),exDate:Number(item.date),paymentDate:Number(item.date),amount:Number(item.amount),currency:String(price.meta?.currency||'USD').toUpperCase(),dateBasis:'ex_date_fallback'}));
+    const providerEvents=nasdaqEvents.length?nasdaqEvents:yahooEvents;
+    const events=providerEvents.filter(event=>event.paymentDate>=fromTime&&event.paymentDate<=Date.now()/1000&&Number.isFinite(event.amount)&&event.amount>0).sort((a,b)=>a.paymentDate-b.paymentDate);
     const closes=(price.timestamp||[]).map((time,index)=>({time,close:price.indicators?.quote?.[0]?.close?.[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0);
     const splits=Object.values(price.events?.splits||{}).map(item=>({id:String(item.date)+'|'+String(item.splitRatio||''),date:Number(item.date),numerator:Number(item.numerator),denominator:Number(item.denominator)})).filter(item=>Number.isFinite(item.date)&&Number.isFinite(item.numerator)&&Number.isFinite(item.denominator)&&item.denominator>0&&item.date>=fromTime).sort((a,b)=>a.date-b.date);
-    return res.status(200).json({status:events.length?'ok':'no_events',symbol,currency:String(price.meta?.currency||'USD').toUpperCase(),events,splits,prices:closes,source:'Nasdaq temettü takvimi + Yahoo Finance kapanış/split'});
+    const source=nasdaqEvents.length?'Nasdaq ödeme tarihleri + Yahoo Finance kapanış/split':'Yahoo Finance dağıtım tarihleri ve kapanış/split (ödeme tarihi bulunmadığında hak kullanım tarihi)';
+    return res.status(200).json({status:events.length?'ok':'no_events',symbol,currency:String(price.meta?.currency||'USD').toUpperCase(),events,splits,prices:closes,source});
   }catch(error){return res.status(502).json({status:'provider_error',events:[],error:error.message||'Temettü geçmişi alınamadı.'})}
 };
 module.exports._test={parseDate,parseAmount};

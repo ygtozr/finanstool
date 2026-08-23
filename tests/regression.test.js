@@ -89,6 +89,8 @@ assert.match(dividendsApi,/status:'provider_error'/,'Temettü sağlayıcı hatas
 assert.match(dividendsApi,/function fetchBist[\s\S]*dividend_amount_upcoming[\s\S]*dividend_ex_date_upcoming/,'BIST yaklaşan temettüleri TradingView kaynağından alınmalı');
 assert.match(dividendHistoryApi,/paymentDate:parseDate\(row\.paymentDate\)\|\|parseDate\(row\.exOrEffDate\)/,'DRIP ödeme tarihi yoksa hak kullanım tarihine dönmeli');
 assert.match(dividendHistoryApi,/price\.events\?\.splits/,'DRIP hesaplaması için bölünmeler servisten dönmeli');
+assert.match(dividendHistoryApi,/Object\.values\(price\.events\?\.dividends\|\|\{\}\)[\s\S]*dateBasis:'ex_date_fallback'/,'Nasdaq geçmişi olmayan MINT benzeri ETF’lerde Yahoo dağıtımları yedek olmalı');
+assert.match(dividendHistoryApi,/nasdaqEvents\.length\?nasdaqEvents:yahooEvents/,'Nasdaq ödeme tarihleri varsa öncelikli, yoksa Yahoo olayları kullanılmalı');
 const goldSandbox={module:{exports:{}},exports:{},AbortSignal,URLSearchParams,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
 vm.runInNewContext(goldApi,goldSandbox);
 const goldTest=goldSandbox.module.exports._test;
