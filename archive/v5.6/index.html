@@ -1741,12 +1741,22 @@
 
     function backupSummary(data) {
       const themeLabel={light:'Açık',dark:'Koyu',system:'Sistem'}[data.theme]||'Sistem';
-      return 'Favoriler: '+data.favorites.length+'\nPortföy pozisyonları: '+data.portfolio.length+'\nNakit bakiyeleri: '+data.cashBalances.length+'\nFiyat alarmları: '+data.alarms.length+'\nPiyasa özeti öğeleri: '+data.marketItems.length+'\nTema: '+themeLabel;
+      const datedPositions=data.portfolio.filter(item=>item.purchaseDate).length;
+      const dripPositions=data.portfolio.filter(item=>item.dripEnabled).length;
+      return 'Favoriler: '+data.favorites.length+'\nPortföy pozisyonları: '+data.portfolio.length+'\nAlım tarihi kayıtlı pozisyonlar: '+datedPositions+'\nTemettü yeniden yatırımı açık pozisyonlar: '+dripPositions+'\nNakit bakiyeleri: '+data.cashBalances.length+'\nFiyat alarmları: '+data.alarms.length+'\nPiyasa özeti öğeleri: '+data.marketItems.length+'\nTema: '+themeLabel;
     }
 
     function mergeUnique(current,incoming,key) {
       const known=new Set(current.map(key));
       return current.concat(incoming.filter(item=>{const value=key(item);if(known.has(value))return false;known.add(value);return true}));
+    }
+
+    function mergePortfolioBackup(current,incoming) {
+      const restored=new Map(incoming.map(item=>[item.symbol,{...item}]));
+      const merged=current.map(item=>restored.has(item.symbol)?restored.get(item.symbol):item);
+      const known=new Set(current.map(item=>item.symbol));
+      incoming.forEach(item=>{if(!known.has(item.symbol))merged.push({...item})});
+      return merged;
     }
 
     function applyBackup(data,mode) {
@@ -1767,7 +1777,7 @@
         startRefreshTimers();
       }else{
         favorites=mergeUnique(favorites,data.favorites,item=>item.symbol);
-        portfolio=mergeUnique(portfolio,data.portfolio,item=>item.symbol);
+        portfolio=mergePortfolioBackup(portfolio,data.portfolio);
         data.cashBalances.forEach(incoming=>{const existing=cashBalances.find(item=>item.currency===incoming.currency);if(existing)existing.amount+=incoming.amount;else cashBalances.push({...incoming})});
         alarms=mergeUnique(alarms,data.alarms,item=>item.id||item.symbol+'|'+item.condition+'|'+item.target);
         marketItems=mergeUnique(marketItems,data.marketItems,item=>item.symbol);
