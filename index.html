@@ -2458,13 +2458,22 @@
         return tokens.every(token=>searchable.includes(token));
       }).map(({symbol,name})=>({symbol,name,exchange:'TEFAS',type:'MUTUALFUND',provider:'TEFAS'}));
     }
+    function rankSearchResults(items,query){
+      const foldedQuery=foldSearchText(query),queryTokens=foldedQuery.split(/\s+/).filter(Boolean);
+      return items.map((item,index)=>{
+        const symbol=foldSearchText(item.symbol),baseSymbol=symbol.replace(/^TEFAS-/,'');
+        const name=foldSearchText(item.name),isTefas=item.provider==='TEFAS'||symbol.startsWith('TEFAS-');
+        const rank=baseSymbol===foldedQuery?0:baseSymbol.startsWith(foldedQuery)?1:name.startsWith(foldedQuery)?2:queryTokens.every(token=>(symbol+' '+name).includes(token))?3:4;
+        return{item,index,rank,isTefas};
+      }).sort((a,b)=>a.rank-b.rank||(a.rank<=1?Number(b.isTefas)-Number(a.isTefas):0)||a.index-b.index).map(entry=>entry.item);
+    }
     function startUnifiedAssetSearch(query,isCurrent,render,seed=[]){
       const merged=new Map(seed.map(item=>[item.symbol,item]));
       let settled=0,failed=0;
       const finish=()=>{
         settled++;
         if(settled!==2||!isCurrent())return;
-        const items=[...merged.values()];
+        const items=rankSearchResults([...merged.values()],query);
         render(items,items.length?'':failed===2?'Arama servisine ulaşılamadı.':'Eşleşen ürün bulunamadı.');
       };
       [
@@ -2472,7 +2481,7 @@
         cachedApiJson('/api/tefas?action=search&q='+encodeURIComponent(query),{ttl:600000})
       ].forEach(request=>request.then(payload=>{
         (payload.quotes||[]).forEach(item=>merged.set(item.symbol,item));
-        if(isCurrent()&&merged.size)render([...merged.values()]);
+        if(isCurrent()&&merged.size)render(rankSearchResults([...merged.values()],query));
       }).catch(()=>{failed++}).finally(finish));
     }
 

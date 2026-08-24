@@ -272,6 +272,7 @@ assert.match(html,/label\.textContent=items\[0\]\.label/,'Halka grafiğinin merk
 assert.doesNotMatch(html,/id="themeToggle"/,'Tema düğmesi ekranın üzerinde sabit kalmamalı');
 assert.match(html,/priceApiUrl\(symbol,query\)[\s\S]*startsWith\('TEFAS-'\)[\s\S]*\/api\/tefas\?action=price/,'TEFAS fon fiyatları ayrı sağlayıcı işlevine yönlenmeli');
 assert.match(html,/function startUnifiedAssetSearch\([\s\S]*\/api\/search\?q=[\s\S]*\/api\/tefas\?action=search/,'Bütün varlık aramaları piyasa ve TEFAS sonuçlarını aşamalı olarak birleştirmeli');
+assert.match(html,/function rankSearchResults\(items,query\)[\s\S]*baseSymbol===foldedQuery[\s\S]*Number\(b\.isTefas\)-Number\(a\.isTefas\)/,'Tam TEFAS fon kodu eşleşmesi ilk beş piyasa sonucunun arkasında kaybolmamalı');
 assert.match(html,/dripUnsupported=symbol\.startsWith\('ALTIN-'\)\|\|symbol\.startsWith\('TEFAS-'\)/,'TEFAS fonlarında otomatik temettü seçimi kapalı olmalı');
 assert.match(tefasApi,/\/api\/funds\/fonFiyatBilgiGetir/,'TEFAS fiyat işlevi yeni resmî fiyat geçmişi uç noktasını kullanmalı');
 assert.match(tefasApi,/\/api\/funds\/fonUnvanAra/,'TEFAS araması yeni resmî fon arama uç noktasını kullanmalı');
