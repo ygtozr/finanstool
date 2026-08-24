@@ -72,7 +72,7 @@
 ## v5 ürün ve ayar merkezi sürümü
 
 - Favori kartlarına hızlı işlem menüsü ve sade ekonomik gösterge paneli eklendi; ana grafik karşılaştırma akışı kaldırıldı.
-- Favori kartları ayrı bir tutamaç olmadan yaklaşık 0,4 saniye basılı tutulup sürüklenerek sıralanabilir; yeni sıra otomatik olarak cihazda saklanır. Kısa dokunma hızlı detay panelini, normal dikey hareket sayfa kaydırmasını açmaya devam eder.
+- Favori kartları ayrı bir tutamaç olmadan yaklaşık 0,4 saniye basılı tutulup sürüklenerek sıralanabilir; seçilen kart parmağı canlı takip eder, komşu kartlar akıcı biçimde yer açar ve bırakılan kart hedefe oturur. Yeni sıra otomatik olarak cihazda saklanır. Kısa dokunma hızlı detay panelini, normal dikey hareket sayfa kaydırmasını açmaya devam eder.
 - RSI ana grafiğin altında sürekli görünür; MA50/100/200 kontrolü grafik içine, Favoriler ve Portföy varlık seçicileri grafik sayfasının altına yerleştirildi.
 - Portföye TRY, USD, EUR ve GBP nakit ekleme; bütün grafik dönemleriyle performans karşılaştırması ve yaklaşan temettü listesi eklendi.
 - Portföy varlık kartları iki satırlı kompakt düzene, dağılım grafikleri yan yana mini halka görünümüne geçirildi. İlk üç kalem doğrudan, diğerleri açılır özetle gösterilir.

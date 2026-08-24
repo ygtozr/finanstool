@@ -35,13 +35,13 @@
     .favorite-add-search input { min-height:42px; padding:9px 11px; font-size:.84rem; }
     .favorite-add-search > button { flex:0 0 44px; width:44px; min-height:44px; padding:0; font-size:1.15rem; }
     .favorite-add-search .search-suggestions { right:50px; }
-    .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 36px; gap:6px; align-items:stretch; }
+    .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 36px; gap:6px; align-items:stretch; will-change:transform; }
     .favorite-card { min-width:0; min-height:76px; padding:9px 11px; display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:10px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; cursor:grab; touch-action:none; -webkit-user-select:none; user-select:none; }
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
-    .favorite-row.favorite-drag-placeholder { opacity:.28; }
+    .favorite-row.favorite-drag-placeholder { opacity:.24; transition:opacity .14s ease; }
     .favorite-row.favorite-drag-placeholder .favorite-card { border-color:var(--accent); }
-    .favorite-row.favorite-drag-ghost { position:fixed; z-index:120; margin:0; pointer-events:none; opacity:.98; filter:drop-shadow(0 16px 24px #02061788); }
-    .favorite-row.favorite-drag-ghost .favorite-card { border-color:var(--accent); cursor:grabbing; transform:scale(1.015); }
+    .favorite-row.favorite-drag-ghost { position:fixed; z-index:120; margin:0; pointer-events:none; opacity:.99; filter:drop-shadow(0 18px 28px #020617aa); will-change:transform; }
+    .favorite-row.favorite-drag-ghost .favorite-card { border-color:var(--accent); cursor:grabbing; transform:scale(1.035) rotate(.35deg); box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent); }
     body.favorite-reordering { overflow:hidden; overscroll-behavior:none; }
     .favorite-card-badge { width:44px; height:44px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.74rem; font-weight:800; letter-spacing:.02em; }
     .favorite-card-badge > * { grid-area:1/1; }
@@ -1299,6 +1299,26 @@
       saveFavorites();
       renderChartAssetPanels();
     }
+    function playFavoriteMotion(element,keyframes,{duration,easing},onFinish) {
+      if(typeof element.animate==='function'){
+        const animation=element.animate(keyframes,{duration,easing,fill:onFinish?'forwards':'none'});
+        if(onFinish)animation.finished.then(onFinish,onFinish);
+        return;
+      }
+      const first=keyframes[0],last=keyframes[keyframes.length-1];
+      element.style.transition='none';
+      Object.assign(element.style,first);
+      requestAnimationFrame(()=>{
+        const properties=Object.keys(last).map(property=>property.replace(/[A-Z]/g,letter=>'-'+letter.toLowerCase())).join(',');
+        element.style.transition=properties.split(',').map(property=>`${property} ${duration}ms ${easing}`).join(',');
+        Object.assign(element.style,last);
+        setTimeout(()=>{
+          element.style.transition='';
+          if(!onFinish){element.style.transform='';element.style.opacity=''}
+          onFinish?.();
+        },duration+30);
+      });
+    }
     function attachFavoriteReorder(open,row,item) {
       let pending=null;
       const clearPending=()=>{
@@ -1324,13 +1344,29 @@
         document.body.classList.add('favorite-reordering');
         pending.active=true;
         pending.ghost=ghost;
+        pending.ghostTop=rect.top;
+        pending.ghostY=rect.top;
         pending.offsetY=pending.lastY-rect.top;
         navigator.vibrate?.(18);
       };
       const movePlaceholder=clientY=>{
         const siblings=[...favoritesList.querySelectorAll(':scope > .favorite-row:not(.favorite-drag-placeholder)')];
         const before=siblings.find(candidate=>clientY<candidate.getBoundingClientRect().top+candidate.getBoundingClientRect().height/2);
+        if(before===row.nextElementSibling||(!before&&!row.nextElementSibling))return;
+        const previousPositions=new Map(siblings.map(candidate=>[candidate,candidate.getBoundingClientRect().top]));
         if(before)favoritesList.insertBefore(row,before);else favoritesList.append(row);
+        siblings.forEach(candidate=>{
+          const previousTop=previousPositions.get(candidate);
+          candidate.getAnimations?.().forEach(animation=>animation.cancel());
+          candidate.style.transition='none';
+          candidate.style.transform='';
+          const delta=previousTop-candidate.getBoundingClientRect().top;
+          if(Math.abs(delta)<.5)return;
+          playFavoriteMotion(candidate,[
+            {transform:`translate3d(0,${delta}px,0)`},
+            {transform:'translate3d(0,0,0)'}
+          ],{duration:180,easing:'cubic-bezier(.22,.8,.25,1)'});
+        });
       };
       const onMove=event=>{
         if(!pending||event.pointerId!==pending.pointerId)return;
@@ -1353,7 +1389,8 @@
           return;
         }
         event.preventDefault();
-        pending.ghost.style.top=(event.clientY-pending.offsetY)+'px';
+        pending.ghostY=event.clientY-pending.offsetY;
+        pending.ghost.style.transform=`translate3d(0,${pending.ghostY-pending.ghostTop}px,0)`;
         movePlaceholder(event.clientY);
         const edge=72;
         if(event.clientY<edge)window.scrollBy(0,-Math.min(14,(edge-event.clientY)/3));
@@ -1366,11 +1403,21 @@
         const scrolling=pending.scrolling;
         if(active){
           event.preventDefault();
-          row.classList.remove('favorite-drag-placeholder');
-          ghost?.remove();
-          document.body.classList.remove('favorite-reordering');
           favoriteDragSuppressUntil=Date.now()+500;
           persistFavoriteOrderFromDom();
+          const targetRect=row.getBoundingClientRect();
+          const ghostRect=ghost.getBoundingClientRect();
+          const currentY=pending.ghostY-pending.ghostTop;
+          const targetY=currentY+(targetRect.top-ghostRect.top);
+          const finishSettle=()=>{
+            row.classList.remove('favorite-drag-placeholder');
+            ghost.remove();
+            document.body.classList.remove('favorite-reordering');
+          };
+          playFavoriteMotion(ghost,[
+            {transform:`translate3d(0,${currentY}px,0)`,opacity:.99},
+            {transform:`translate3d(0,${targetY}px,0)`,opacity:.9}
+          ],{duration:190,easing:'cubic-bezier(.2,.85,.25,1)'},finishSettle);
         }else if(scrolling){
           event.preventDefault();
           favoriteDragSuppressUntil=Date.now()+350;
@@ -1390,7 +1437,7 @@
         cancelAnimationFrame(favoriteScrollMomentum);
         favoriteScrollMomentum=0;
         clearPending();
-        pending={pointerId:event.pointerId,pointerType:event.pointerType,startX:event.clientX,startY:event.clientY,lastY:event.clientY,lastMoveAt:performance.now(),velocity:0,scrolling:false,active:false,ghost:null,offsetY:0,timer:0};
+        pending={pointerId:event.pointerId,pointerType:event.pointerType,startX:event.clientX,startY:event.clientY,lastY:event.clientY,lastMoveAt:performance.now(),velocity:0,scrolling:false,active:false,ghost:null,ghostTop:0,ghostY:0,offsetY:0,timer:0};
         pending.timer=setTimeout(activate,400);
         window.addEventListener('pointermove',onMove,{passive:false});
         window.addEventListener('pointerup',onEnd,{passive:false});
