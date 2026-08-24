@@ -2,6 +2,7 @@ import json
 import re
 import threading
 import time
+import unicodedata
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
 
@@ -85,6 +86,14 @@ def _clean_code(value):
     return code if FUND_CODE.fullmatch(code) else ""
 
 
+def _search_text(value):
+    text = str(value or "").strip().replace("ı", "i").replace("İ", "I")
+    return "".join(
+        character for character in unicodedata.normalize("NFKD", text)
+        if unicodedata.category(character) != "Mn"
+    ).upper()
+
+
 def _period(query):
     params = parse_qs(query or "")
     value = (params.get("range") or ["6mo"])[0]
@@ -124,7 +133,7 @@ def _number(value):
 def _search(query):
     payload = _post("/api/funds/fonUnvanAra", {"aramaMetni": query})
     rows = payload.get("resultList") or []
-    normalized_query = str(query or "").strip().upper()
+    normalized_query = _search_text(query)
 
     # TEFAS'in hizli ad aramasi, alim-satimi sinirli veya dagitimi kapali
     # bazi yatirim fonlarini (ornegin YLB/ENR) her zaman dondurmuyor.
@@ -143,8 +152,8 @@ def _search(query):
             code = _clean_code(row.get("fonKod") or row.get("fonKodu") or row.get("kod"))
             name = str(row.get("unvan") or row.get("fonUnvan") or row.get("fonAdi") or "").strip()
             if normalized_query and (
-                normalized_query in code.upper()
-                or normalized_query in name.upper()
+                normalized_query in _search_text(code)
+                or normalized_query in _search_text(name)
             ):
                 rows.append(row)
     except Exception:
@@ -169,7 +178,7 @@ def _search(query):
     quotes.sort(key=lambda item: (
         0 if item["symbol"] == "TEFAS-" + normalized_query else
         1 if item["symbol"].replace("TEFAS-", "").startswith(normalized_query) else
-        2 if item["name"].upper().startswith(normalized_query) else 3
+        2 if _search_text(item["name"]).startswith(normalized_query) else 3
     ))
     return {"quotes": quotes[:5], "provider": "TEFAS"}
 
