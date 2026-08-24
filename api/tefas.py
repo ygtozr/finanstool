@@ -18,6 +18,22 @@ KNOWN_FUND_NAMES = {
     "YLB": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
     "ENR": "QNB PORTFÖY ENPARA PARA PİYASASI (TL) FONU",
 }
+SEARCH_SYNONYMS = {
+    "PARA": ("MONEY",),
+    "PIYASASI": ("MARKET",),
+    "PORTFOY": ("ASSET", "MANAGEMENT"),
+    "HISSE": ("EQUITY", "STOCK"),
+    "SENEDI": ("EQUITY", "STOCK"),
+    "ALTIN": ("GOLD",),
+    "GUMUS": ("SILVER",),
+    "KATILIM": ("PARTICIPATION",),
+    "DEGISKEN": ("VARIABLE",),
+    "BORCLANMA": ("DEBT", "BOND"),
+    "ARACLARI": ("INSTRUMENTS",),
+    "BIRINCI": ("FIRST",),
+    "IKINCI": ("SECOND",),
+    "UCUNCU": ("THIRD",),
+}
 
 _lock = threading.Lock()
 _session = None
@@ -98,6 +114,17 @@ def _search_text(value):
     ).upper()
 
 
+def _matches_search(query, code, name):
+    searchable = _search_text(code + " " + name)
+    if query in searchable:
+        return True
+    for token in query.split():
+        alternatives = (token,) + SEARCH_SYNONYMS.get(token, ())
+        if not any(alternative in searchable for alternative in alternatives):
+            return False
+    return True
+
+
 def _period(query):
     params = parse_qs(query or "")
     value = (params.get("range") or ["6mo"])[0]
@@ -164,10 +191,7 @@ def _search(query):
         for row in full_rows:
             code = _clean_code(row.get("fonKod") or row.get("fonKodu") or row.get("kod"))
             name = str(row.get("unvan") or row.get("fonUnvan") or row.get("fonAdi") or "").strip()
-            if normalized_query and (
-                normalized_query in _search_text(code)
-                or normalized_query in _search_text(name)
-            ):
+            if normalized_query and _matches_search(normalized_query, code, name):
                 rows.append(row)
     except Exception:
         # Hizli arama calisiyorsa tam liste kesintisi sonuclari engellememeli.
@@ -178,7 +202,7 @@ def _search(query):
     for row in rows:
         code = _clean_code(row.get("fonKod") or row.get("fonKodu") or row.get("kod"))
         name = str(row.get("unvan") or row.get("fonUnvan") or row.get("fonAdi") or "").strip()
-        if not code or not name or code in seen:
+        if not code or not name or code in seen or not _matches_search(normalized_query, code, name):
             continue
         seen.add(code)
         quotes.append({
@@ -191,7 +215,8 @@ def _search(query):
     quotes.sort(key=lambda item: (
         0 if item["symbol"] == "TEFAS-" + normalized_query else
         1 if item["symbol"].replace("TEFAS-", "").startswith(normalized_query) else
-        2 if _search_text(item["name"]).startswith(normalized_query) else 3
+        2 if _search_text(item["name"]).startswith(normalized_query) else
+        3 if _matches_search(normalized_query, item["symbol"], item["name"]) else 4
     ))
     return {"quotes": quotes[:5], "provider": "TEFAS"}
 

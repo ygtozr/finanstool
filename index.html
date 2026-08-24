@@ -2463,7 +2463,7 @@
       return items.map((item,index)=>{
         const symbol=foldSearchText(item.symbol),baseSymbol=symbol.replace(/^TEFAS-/,'');
         const name=foldSearchText(item.name),isTefas=item.provider==='TEFAS'||symbol.startsWith('TEFAS-');
-        const rank=baseSymbol===foldedQuery?0:baseSymbol.startsWith(foldedQuery)?1:name.startsWith(foldedQuery)?2:queryTokens.every(token=>(symbol+' '+name).includes(token))?3:4;
+        const rank=baseSymbol===foldedQuery?0:baseSymbol.startsWith(foldedQuery)?1:name.startsWith(foldedQuery)?2:queryTokens.every(token=>(symbol+' '+name).includes(token))||isTefas?3:4;
         return{item,index,rank,isTefas};
       }).sort((a,b)=>a.rank-b.rank||(a.rank<=1?Number(b.isTefas)-Number(a.isTefas):0)||a.index-b.index).map(entry=>entry.item);
     }

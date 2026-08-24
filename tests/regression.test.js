@@ -279,6 +279,8 @@ assert.match(tefasApi,/\/api\/funds\/fonUnvanAra/,'TEFAS araması yeni resmî fo
 assert.match(tefasApi,/\/api\/statistics\/tefas\/getFplFonList/,'TEFAS araması hızlı aramada görünmeyen yatırım fonları için tam fon listesini kullanmalı');
 assert.match(tefasApi,/FUND_LIST_TTL\s*=\s*6\s*\*\s*60\s*\*\s*60/,'TEFAS tam fon listesi sağlayıcı sınırını korumak için uzun süre önbelleklenmeli');
 assert.match(tefasApi,/def _search_text\(value\):[\s\S]*unicodedata\.normalize\("NFKD", text\)/,'TEFAS fon araması Türkçe karakter ve aksan farklarından etkilenmemeli');
+assert.match(tefasApi,/SEARCH_SYNONYMS\s*=\s*\{[\s\S]*"PARA": \("MONEY",\)[\s\S]*"PIYASASI": \("MARKET",\)/,'TEFAS fon araması Türkçe para piyasası terimlerini İngilizce unvanlarla eşleştirmeli');
+assert.match(tefasApi,/def _matches_search\(query, code, name\):[\s\S]*for token in query\.split\(\)/,'TEFAS fon araması kelime sırasından bağımsız bütün sorgu terimlerini eşleştirmeli');
 assert.match(tefasApi,/"YLB": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU"[\s\S]*"ENR": "QNB PORTFÖY ENPARA PARA PİYASASI \(TL\) FONU"/,'YLB ve ENR resmî Türkçe adlarıyla banka adı aramasında bulunmalı');
 assert.match(tefasApi,/Session\(impersonate="chrome131"\)/,'TEFAS bot koruması için Chrome uyumlu TLS oturumu kullanılmalı');
 assert.match(html,/Eşleşen ürün bulunamadı\./,'Boş arama sonuçları kullanıcıya görünür şekilde bildirilmeli');
