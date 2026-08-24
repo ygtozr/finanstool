@@ -12,6 +12,7 @@ BASE_URL = "https://www.tefas.gov.tr"
 FUND_CODE = re.compile(r"^[A-Z0-9]{2,8}$")
 SESSION_TTL = 9 * 60
 CACHE_TTL = 10 * 60
+FUND_LIST_TTL = 6 * 60 * 60
 
 _lock = threading.Lock()
 _session = None
@@ -46,10 +47,10 @@ def _get_session():
         return _session
 
 
-def _post(path, body):
+def _post(path, body, cache_ttl=CACHE_TTL):
     key = path + "|" + json.dumps(body, sort_keys=True, ensure_ascii=False)
     cached = _cache.get(key)
-    if cached and time.time() - cached[0] < CACHE_TTL:
+    if cached and time.time() - cached[0] < cache_ttl:
         return cached[1]
 
     last_error = None
@@ -123,12 +124,41 @@ def _number(value):
 def _search(query):
     payload = _post("/api/funds/fonUnvanAra", {"aramaMetni": query})
     rows = payload.get("resultList") or []
+    normalized_query = str(query or "").strip().upper()
+
+    # TEFAS'in hizli ad aramasi, alim-satimi sinirli veya dagitimi kapali
+    # bazi yatirim fonlarini (ornegin YLB/ENR) her zaman dondurmuyor.
+    # Tam YAT fon listesini uzun sureli onbellekten okuyup yerelde aramak,
+    # bu fonlari da izlenebilir tutarken TEFAS istek sayisini sinirlar.
+    try:
+        full_payload = _post(
+            "/api/statistics/tefas/getFplFonList",
+            {"fonTipi": "YAT"},
+            cache_ttl=FUND_LIST_TTL,
+        )
+        full_rows = full_payload.get("data") or full_payload.get("resultList") or []
+        if isinstance(full_rows, dict):
+            full_rows = full_rows.get("data") or full_rows.get("resultList") or []
+        for row in full_rows:
+            code = _clean_code(row.get("fonKod") or row.get("fonKodu") or row.get("kod"))
+            name = str(row.get("unvan") or row.get("fonUnvan") or row.get("fonAdi") or "").strip()
+            if normalized_query and (
+                normalized_query in code.upper()
+                or normalized_query in name.upper()
+            ):
+                rows.append(row)
+    except Exception:
+        # Hizli arama calisiyorsa tam liste kesintisi sonuclari engellememeli.
+        pass
+
     quotes = []
+    seen = set()
     for row in rows:
         code = _clean_code(row.get("fonKod") or row.get("fonKodu") or row.get("kod"))
         name = str(row.get("unvan") or row.get("fonUnvan") or row.get("fonAdi") or "").strip()
-        if not code or not name:
+        if not code or not name or code in seen:
             continue
+        seen.add(code)
         quotes.append({
             "symbol": "TEFAS-" + code,
             "name": name,
@@ -136,9 +166,12 @@ def _search(query):
             "type": "MUTUALFUND",
             "provider": "TEFAS",
         })
-        if len(quotes) >= 5:
-            break
-    return {"quotes": quotes, "provider": "TEFAS"}
+    quotes.sort(key=lambda item: (
+        0 if item["symbol"] == "TEFAS-" + normalized_query else
+        1 if item["symbol"].replace("TEFAS-", "").startswith(normalized_query) else
+        2 if item["name"].upper().startswith(normalized_query) else 3
+    ))
+    return {"quotes": quotes[:5], "provider": "TEFAS"}
 
 
 def _price(symbol, query):
@@ -252,4 +285,3 @@ class handler(BaseHTTPRequestHandler):
             return self._json(404, {"error": str(error)}, "no-store")
         except Exception:
             return self._json(503, {"error": "TEFAS veri sağlayıcısına geçici olarak ulaşılamadı."}, "no-store")
-

@@ -275,7 +275,11 @@ assert.match(html,/Promise\.allSettled\(\[[\s\S]*\/api\/search\?q=[\s\S]*\/api\/
 assert.match(html,/dripUnsupported=symbol\.startsWith\('ALTIN-'\)\|\|symbol\.startsWith\('TEFAS-'\)/,'TEFAS fonlarında otomatik temettü seçimi kapalı olmalı');
 assert.match(tefasApi,/\/api\/funds\/fonFiyatBilgiGetir/,'TEFAS fiyat işlevi yeni resmî fiyat geçmişi uç noktasını kullanmalı');
 assert.match(tefasApi,/\/api\/funds\/fonUnvanAra/,'TEFAS araması yeni resmî fon arama uç noktasını kullanmalı');
+assert.match(tefasApi,/\/api\/statistics\/tefas\/getFplFonList/,'TEFAS araması hızlı aramada görünmeyen yatırım fonları için tam fon listesini kullanmalı');
+assert.match(tefasApi,/FUND_LIST_TTL\s*=\s*6\s*\*\s*60\s*\*\s*60/,'TEFAS tam fon listesi sağlayıcı sınırını korumak için uzun süre önbelleklenmeli');
 assert.match(tefasApi,/Session\(impersonate="chrome131"\)/,'TEFAS bot koruması için Chrome uyumlu TLS oturumu kullanılmalı');
+assert.match(html,/Eşleşen ürün bulunamadı\./,'Boş arama sonuçları kullanıcıya görünür şekilde bildirilmeli');
+assert.match(html,/Arama servisine ulaşılamadı\./,'Arama kesintisi ürün bulunamamasından ayrılmalı');
 assert.match(html,/id="otherView"[\s\S]*data-theme-choice="light"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="system"/,'Diğer ekranı Açık, Koyu ve Sistem tema seçeneklerini içermeli');
 assert.match(html,/id="otherView"[\s\S]*id="backupDownload"[\s\S]*id="restoreBackup"/,'Veri yedekleme araçları Diğer ekranında korunmalı');
 assert.match(html,/function startRefreshTimers\(\)[\s\S]*refreshInterval/,'Otomatik yenileme süresi kullanıcı tercihine göre yeniden başlatılmalı');

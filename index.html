@@ -87,7 +87,7 @@
     .favorite-toggle { color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.55rem; }
     .favorite-toggle.is-favorite { background:#5b4817; border-color:#d7aa38; }
     .search-field { position:relative; }
-    .search-suggestions {display:none;position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:54px;margin:0;padding:5px;list-style:none;border:1px solid var(--line);border-radius:10px;background:#101827;box-shadow:0 12px 25px #0008}.search-suggestions.visible{display:grid;gap:3px}.suggestion{width:100%;padding:8px 10px;text-align:left;color:var(--text);background:transparent;border-radius:7px;font-size:.88rem}.suggestion:hover{background:#26344d}
+    .search-suggestions {display:none;position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:54px;margin:0;padding:5px;list-style:none;border:1px solid var(--line);border-radius:10px;background:#101827;box-shadow:0 12px 25px #0008}.search-suggestions.visible{display:grid;gap:3px}.suggestion{width:100%;padding:8px 10px;text-align:left;color:var(--text);background:transparent;border-radius:7px;font-size:.88rem}.suggestion:hover{background:#26344d}.suggestion-empty{padding:10px;color:var(--muted);font-size:.84rem;text-align:left}
     input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:uppercase; }
     input:focus { outline:3px solid #52d5b166; border-color:var(--accent); }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
@@ -1829,7 +1829,14 @@
       });
     }
 
-    function showMarketSuggestions(items) {
+    function showEmptySuggestion(list,message) {
+      if(!message)return false;
+      const empty=document.createElement('li');
+      empty.className='suggestion-empty';empty.setAttribute('role','status');empty.textContent=message;
+      list.append(empty);return true;
+    }
+
+    function showMarketSuggestions(items,message='') {
       marketSearchResults=items.slice(0,5);
       marketSettingsSuggestions.replaceChildren();
       marketSearchResults.forEach((item,index)=>{
@@ -1840,7 +1847,8 @@
         button.addEventListener('click',()=>addMarketItem(item));
         li.append(button);marketSettingsSuggestions.append(li);
       });
-      updateComboboxState(marketSettingsSearch,marketSettingsSuggestions,marketSearchResults.length>0);
+      const hasMessage=!marketSearchResults.length&&showEmptySuggestion(marketSettingsSuggestions,message);
+      updateComboboxState(marketSettingsSearch,marketSettingsSuggestions,marketSearchResults.length>0||hasMessage);
     }
 
     function addMarketItem(item) {
@@ -2416,7 +2424,7 @@
       if(states.chart)requestAnimationFrame(()=>{if(chart)chart.resize();if(rsiChart)rsiChart.resize()});
     }
 
-    function showPortfolioSuggestions(items) {
+    function showPortfolioSuggestions(items,message='') {
       portfolioSuggestions.replaceChildren();
       items.slice(0,5).forEach((item,index)=>{
         const li=document.createElement('li');
@@ -2431,7 +2439,8 @@
         });
         li.append(option);portfolioSuggestions.append(li);
       });
-      updateComboboxState(portfolioSymbol,portfolioSuggestions,items.length>0);
+      const hasMessage=!items.length&&showEmptySuggestion(portfolioSuggestions,message);
+      updateComboboxState(portfolioSymbol,portfolioSuggestions,items.length>0||hasMessage);
     }
 
     function openPortfolioDialog(position=null) {
@@ -2859,7 +2868,7 @@
       }
     }
 
-    function showBenchmarkSuggestions(items) {
+    function showBenchmarkSuggestions(items,message='') {
       benchmarkSuggestions.replaceChildren();
       items.slice(0,5).forEach((item,index)=>{
         const li=document.createElement('li');
@@ -2875,7 +2884,8 @@
         });
         li.append(button);benchmarkSuggestions.append(li);
       });
-      updateComboboxState(benchmarkSearch,benchmarkSuggestions,items.length>0);
+      const hasMessage=!items.length&&showEmptySuggestion(benchmarkSuggestions,message);
+      updateComboboxState(benchmarkSearch,benchmarkSuggestions,items.length>0||hasMessage);
     }
 
     async function renderAllPortfoliosSummary() {
@@ -3494,7 +3504,7 @@
       event.preventDefault();
       loadPrice(symbolInput.value.trim().toUpperCase());
     });
-    function showSuggestions(items){
+    function showSuggestions(items,message=''){
       suggestions.replaceChildren();
       items.slice(0,5).forEach((item,index)=>{
         const li=document.createElement('li'),button=document.createElement('button');
@@ -3503,7 +3513,8 @@
         button.addEventListener('click',()=>{symbolInput.value=item.symbol;updateComboboxState(symbolInput,suggestions,false);updateFavoriteButton();loadPrice(item.symbol)});
         li.append(button);suggestions.append(li);
       });
-      updateComboboxState(symbolInput,suggestions,items.length>0);
+      const hasMessage=!items.length&&showEmptySuggestion(suggestions,message);
+      updateComboboxState(symbolInput,suggestions,items.length>0||hasMessage);
     }
     function addOverviewFavorite(item){
       const symbol=normalizeSymbol(item?.symbol||favoriteSearch.value);
@@ -3519,7 +3530,7 @@
       favoriteSearch.value='';
       updateComboboxState(favoriteSearch,favoriteSearchSuggestions,false);
     }
-    function showFavoriteSearchSuggestions(items){
+    function showFavoriteSearchSuggestions(items,message=''){
       favoriteSearchSuggestions.replaceChildren();
       items.slice(0,5).forEach((item,index)=>{
         const li=document.createElement('li'),option=document.createElement('button');
@@ -3528,7 +3539,8 @@
         option.addEventListener('click',()=>addOverviewFavorite(item));
         li.append(option);favoriteSearchSuggestions.append(li);
       });
-      updateComboboxState(favoriteSearch,favoriteSearchSuggestions,items.length>0);
+      const hasMessage=!items.length&&showEmptySuggestion(favoriteSearchSuggestions,message);
+      updateComboboxState(favoriteSearch,favoriteSearchSuggestions,items.length>0||hasMessage);
     }
     symbolInput.addEventListener('input',()=>{
       const requestId=++searchRequestId;
@@ -3539,8 +3551,9 @@
         try{
           const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
           if(requestId!==searchRequestId||symbolInput.value.trim()!==query)return;
-          showSuggestions(payload.quotes||[]);
-        }catch{if(requestId===searchRequestId)showSuggestions([])}
+          const items=payload.quotes||[];
+          showSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
+        }catch{if(requestId===searchRequestId)showSuggestions([],'Arama servisine ulaşılamadı.')}
       },250);
     });
     favoriteSearch.addEventListener('input',()=>{
@@ -3552,8 +3565,9 @@
         try{
           const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
           if(requestId!==favoriteSearchRequestId||favoriteSearch.value.trim()!==query)return;
-          showFavoriteSearchSuggestions(payload.quotes||[]);
-        }catch{if(requestId===favoriteSearchRequestId)showFavoriteSearchSuggestions([])}
+          const items=payload.quotes||[];
+          showFavoriteSearchSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
+        }catch{if(requestId===favoriteSearchRequestId)showFavoriteSearchSuggestions([],'Arama servisine ulaşılamadı.')}
       },250);
     });
     favoriteAddForm.addEventListener('submit',event=>{event.preventDefault();addOverviewFavorite({symbol:favoriteSearch.value,name:favoriteSearch.value})});
@@ -3652,8 +3666,9 @@
         try{
           const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
           if(requestId!==marketSearchRequestId||marketSettingsSearch.value.trim()!==query)return;
-          showMarketSuggestions(payload.quotes||[]);
-        }catch{if(requestId===marketSearchRequestId)showMarketSuggestions([])}
+          const items=payload.quotes||[];
+          showMarketSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
+        }catch{if(requestId===marketSearchRequestId)showMarketSuggestions([],'Arama servisine ulaşılamadı.')}
       },250);
     });
     marketSettingsForm.addEventListener('submit',event=>{
@@ -3782,8 +3797,9 @@
         try{
           const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
           if(requestId!==benchmarkSearchRequestId||benchmarkSearch.value.trim()!==query)return;
-          showBenchmarkSuggestions(payload.quotes||[]);
-        }catch{if(requestId===benchmarkSearchRequestId)showBenchmarkSuggestions([])}
+          const items=payload.quotes||[];
+          showBenchmarkSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
+        }catch{if(requestId===benchmarkSearchRequestId)showBenchmarkSuggestions([],'Arama servisine ulaşılamadı.')}
       },250);
     });
     benchmarkApply.addEventListener('click',()=>{
@@ -3914,8 +3930,10 @@
           const marketQuotes=marketResult.status==='fulfilled'?(marketResult.value.quotes||[]):[];
           const tefasQuotes=tefasResult.status==='fulfilled'?(tefasResult.value.quotes||[]):[];
           const unique=new Map([...tefasQuotes,...marketQuotes].map(item=>[item.symbol,item]));
-          showPortfolioSuggestions([...unique.values()]);
-        }catch{if(requestId===portfolioSearchRequestId)showPortfolioSuggestions([])}
+          const items=[...unique.values()];
+          const bothFailed=marketResult.status==='rejected'&&tefasResult.status==='rejected';
+          showPortfolioSuggestions(items,items.length?'':bothFailed?'Arama servisine ulaşılamadı.':'Eşleşen ürün bulunamadı.');
+        }catch{if(requestId===portfolioSearchRequestId)showPortfolioSuggestions([],'Arama servisine ulaşılamadı.')}
       },250);
     });
     portfolioSymbol.addEventListener('keydown',event=>{

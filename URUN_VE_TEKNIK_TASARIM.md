@@ -775,7 +775,8 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 
 - Portföy araması mevcut piyasa aramasıyla `/api/tefas?action=search` sonucunu paralel çalıştırır; tekrar eden semboller ayıklanır ve ilk beş sonuç gösterilir.
 - TEFAS fonları diğer piyasalarla karışmaması için `TEFAS-{FON_KODU}` biçiminde saklanır. Uzun ad, adet, maliyet, alış tarihi ve maliyet para birimi bütün bağımsız portföyler ve JSON yedekleriyle aynen taşınır.
-- `/api/tefas.py`, yeni TEFAS sitesinin resmî `/api/funds/fonUnvanAra` ve `/api/funds/fonFiyatBilgiGetir` JSON uç noktalarını kullanır. Kapatılmış `/api/DB/BindHistoryInfo` akışına bağımlılık yoktur.
+- `/api/tefas.py`, yeni TEFAS sitesinin resmî `/api/funds/fonUnvanAra`, `/api/statistics/tefas/getFplFonList` ve `/api/funds/fonFiyatBilgiGetir` JSON uç noktalarını kullanır. Hızlı aramada görünmeyen YLB/ENR gibi yatırım fonları tam YAT fon listesinde kod ve unvanla aranır; kapatılmış `/api/DB/BindHistoryInfo` akışına bağımlılık yoktur.
+- Bütün sembol/ad arama kutuları sonuçsuz sorguyu “Eşleşen ürün bulunamadı”, sağlayıcı kesintisini ise “Arama servisine ulaşılamadı” metniyle birbirinden ayırır.
 - TEFAS bot korumasıyla uyum için Python sunucu işlevinde `curl_cffi` ve Chrome 131 TLS taklidi kullanılır; oturum 9 dakika, başarılı cevaplar 10 dakika işlem belleğinde tutulur. Vercel CDN cevabı 10 dakika taze, bir saate kadar yeniden doğrulama sırasında kullanılabilir.
 - Tek fon fiyat servisi, 1 hafta–5 yıl dönem kodlarını TEFAS periyotlarına eşler ve günlük fiyat listesini uygulamanın ortak grafik şemasına dönüştürür. Para birimi TRY, fiyat hassasiyeti altı ondalıktır.
 - TEFAS fonlarının dağıtım etkisi fon birim fiyatına işlendiğinden otomatik temettü geri yatırımı sunulmaz. TEFAS pozisyonlarında seçenek devre dışı bırakılır; eski bir yedekten açık ayar gelse bile normalleştirme sırasında kapatılır.
@@ -850,6 +851,8 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 - [ ] Toplam Portföy kartı bütün portföyleri birleştiriyor; aktif ve birleşik özetler USD/TL arasında doğru dönüşüyor.
 - [ ] Favori kartı iPhone'da basılı tutulunca görünür biçimde parmağı takip ediyor; sağ düğmeler kaybolmuyor, komşular yumuşak yer açıyor ve yeni sıra yenilemeden sonra korunuyor.
 - [ ] Portföy aramasında `MAC` kodu veya Marmara Capital adı TEFAS sonucunu gösteriyor ve seçilen fon TRY maliyetle eklenebiliyor.
+- [ ] Portföy aramasında `YLB` ve `ENR`, hızlı TEFAS aramasında bulunmasa bile tam YAT fon listesinden öneriliyor ve fiyat geçmişi alınabiliyor.
+- [ ] Bütün arama alanlarında sonuçsuz sorgu görünür “Eşleşen ürün bulunamadı” durumu gösteriyor.
 - [ ] TEFAS fonu portföy değerine son resmî fiyatla katılıyor; günlük ve haftalık değişim son iş günü verilerinden hesaplanıyor.
 - [ ] TEFAS fonu seçildiğinde otomatik temettü geri yatırımı kapalı ve devre dışı görünüyor; JSON yedeği bu ayarı yanlışlıkla yeniden açmıyor.
 

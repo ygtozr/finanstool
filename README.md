@@ -12,6 +12,8 @@
 ## v5.8 TEFAS fonları
 
 - Portföy araması artık TEFAS fon kodu veya uzun fon adıyla arama yapar; sonuçlar `TEFAS-MAC` gibi sağlayıcısı belirgin kodlarla gösterilir.
+- TEFAS'ın hızlı aramasında görünmeyebilen YLB ve ENR gibi yatırım fonları, resmî tam fon listesindeki kod ve unvan eşleşmesiyle de bulunur.
+- Arama kutuları sonuçsuz sorgularda “Eşleşen ürün bulunamadı”, sağlayıcı kesintisinde ise ayrı bir bağlantı hatası gösterir.
 - TEFAS fonlarının resmî günlük fiyat geçmişi Özer Finans fiyat biçimine dönüştürülerek portföy değeri, günlük/haftalık değişim ve grafik akışlarında kullanılabilir.
 - TEFAS’ın güncel bot korumasına uyum için ayrı Python sunucu işlevi, Chrome uyumlu TLS oturumu, kısa süreli istek birleştirme ve CDN önbelleği kullanılır.
 - TEFAS fonlarında otomatik temettü geri yatırımı uygulanmaz; bu ürünlerde dağıtım etkisi fon fiyatının içindedir ve seçenek arayüzde devre dışıdır.
