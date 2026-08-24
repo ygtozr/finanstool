@@ -14,6 +14,7 @@ const searchApi=fs.readFileSync(path.join(root,'api','search.js'),'utf8');
 const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
 const tefasApi=fs.readFileSync(path.join(root,'api','tefas.js'),'utf8');
 const logoSvg=fs.readFileSync(path.join(root,'assets','ozer-finans-mark.svg'),'utf8');
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));
 
 function extractFunction(source,name){
   const start=source.indexOf('function '+name);
@@ -154,7 +155,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v6\.1<\/title>/,'Tarayıcı başlığı kalıcı marka ve sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v6\.2 Önizleme<\/title>/,'Tarayıcı başlığı aday marka ve sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -308,6 +309,17 @@ assert.match(html,/function startRefreshTimers\(\)[\s\S]*refreshInterval/,'Otoma
 assert.match(html,/savedRefreshInterval===null\?15000:Number\(savedRefreshInterval\)/,'Yeni kullanıcılar için otomatik yenileme varsayılan olarak 15 saniye olmalı');
 assert.match(html,/themeMedia\.addEventListener\('change'[\s\S]*themePreference==='system'/,'Sistem teması cihaz görünümü değiştiğinde otomatik uygulanmalı');
 assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#f8fafc':'#101827'/,'PWA üst çubuğu seçili temayla eşleşmeli');
+assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=6\.2"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
+assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=6\.2"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
+assert.equal(manifest.name,'Özer Finans','Manifest uygulamanın tam adını taşımalı');
+assert.equal(manifest.display,'standalone','PWA bağımsız uygulama görünümünde açılmalı');
+assert.deepEqual(manifest.icons.map(icon=>icon.sizes),['192x192','512x512'],'Manifest standart PWA ikon boyutlarını içermeli');
+for(const file of ['apple-touch-icon.png','icon-192.png','icon-512.png'])assert.ok(fs.statSync(path.join(root,'assets',file)).size>10000,'PWA ikonu yerelde ve dolu olmalı: '+file);
+assert.match(html,/function quotePriceApiUrl\(symbol\)[\s\S]*range=1mo&interval=1d/,'Piyasa ve Favoriler ortak fiyat URL’si kullanmalı');
+assert.equal((html.match(/cachedApiJson\(quotePriceApiUrl\(item\.symbol\),\{force\}\)/g)||[]).length,2,'Piyasa ve Favoriler aynı fiyat isteğine bağlanmalı');
+assert.match(html,/const inFlightKey=force\?url\+'\|force':url;[\s\S]*apiInFlight\.has\(inFlightKey\)/,'Zorunlu yenilemede de aynı fiyat istekleri birleştirilmeli');
+assert.match(html,/function displaySymbol\(value\)[\s\S]*endsWith\('\.IS'\)\?symbol\.slice\(0,-3\):symbol/,'BIST kodları kullanıcıya .IS eki olmadan gösterilmeli');
+assert.match(html,/async function resolveAssetInput\(value\)[\s\S]*symbol\+'\.IS'[\s\S]*exact\|\|bist/,'Ek içermeyen BIST kodu arama sonucundan otomatik çözülmeli');
 assert.match(html,/for="favoriteSearch">Favorilere eklenecek hisseyi ara/,'Favori aramasının kalıcı erişilebilir adı olmalı');
 assert.match(html,/for="portfolioSymbol">Portföye eklenecek hisseyi ara/,'Portföy aramasının kalıcı erişilebilir adı olmalı');
 assert.match(html,/for="benchmarkSearch">Karşılaştırma ölçütü ara/,'Ölçüt aramasının kalıcı erişilebilir adı olmalı');
@@ -337,4 +349,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v6.1 regresyon testleri başarılı.');
+console.log('Özer Finans v6.2 önizleme regresyon testleri başarılı.');
