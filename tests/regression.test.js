@@ -121,8 +121,10 @@ assert.match(html,/function attachFavoriteReorder\(open,row,item\)[\s\S]*setTime
 assert.match(html,/\.favorite-card \{[^}]*touch-action:none[^}]*user-select:none/,'Safari favori kartındaki dokunma hareketini uygulamaya bırakmalı');
 assert.match(html,/pending\.scrolling\|\|distance>10[\s\S]*window\.scrollBy\(0,scrollDelta\)[\s\S]*requestAnimationFrame\(glide\)/,'Uzun basma başlamadan yapılan hareket sayfayı elle ve ivmeli kaydırmalı');
 assert.match(html,/row\.replaceWith\(placeholder\)[\s\S]*document\.body\.append\(row\)/,'Sürüklemede kopya yerine gerçek favori kartı parmağı takip etmeli');
-assert.match(html,/previousPositions=new Map[\s\S]*playFavoriteMotion\(candidate,[\s\S]*duration:260/,'Favoriler yer değiştirirken komşu kartlar yumuşak FLIP animasyonuyla yer açmalı');
-assert.match(html,/pending\.ghost\.style\.transform=`translate3d[\s\S]*playFavoriteMotion\(ghost,[\s\S]*duration:240/,'Sürüklenen gerçek kart parmağı canlı takip edip bırakılınca hedefe oturmalı');
+assert.match(html,/previousPositions=new Map[\s\S]*playFavoriteMotion\(candidate,[\s\S]*duration:360/,'Favoriler yer değiştirirken komşu kartlar yaylı ve yumuşak FLIP animasyonuyla yer açmalı');
+assert.match(html,/pending\.ghost\.style\.transform=`translate3d[\s\S]*favorite-drag-settling[\s\S]*playFavoriteMotion\(ghost,[\s\S]*duration:320/,'Sürüklenen gerçek kart yumuşakça küçülüp hedefe oturmalı');
+assert.match(html,/@keyframes favorite-card-lift[^}]*transform:scale\(1\)[\s\S]*transform:scale\(1\.04\)/,'Favori kartı sürükleme başlangıcında aniden değil animasyonla yükselmeli');
+assert.match(html,/movePlaceholder\(pending\.ghostY\+pending\.ghostHeight\/2\)/,'Favori sıralama eşiği parmak noktası yerine sürüklenen kartın merkezini kullanmalı');
 assert.match(html,/function playFavoriteMotion[\s\S]*typeof element\.animate==='function'[\s\S]*element\.style\.transition/,'Favori animasyonu eski Safari için CSS geçişi yedeğine sahip olmalı');
 assert.match(html,/localStorage\.setItem\(favoritesKey, JSON\.stringify\(favorites\)\)/,'Favorilerin yeni sırası yerel depolamada kalıcı olmalı');
 assert.doesNotMatch(html,/closest\('\.favorite-card'\)\)openView\('chart'\)/,'Favori kartı panel açılırken arka planda Grafik sekmesine geçmemeli');

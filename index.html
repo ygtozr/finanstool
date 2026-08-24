@@ -38,10 +38,12 @@
     .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 36px; gap:6px; align-items:stretch; will-change:transform; }
     .favorite-card { min-width:0; min-height:76px; padding:9px 11px; display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:10px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; cursor:grab; touch-action:none; -webkit-user-select:none; user-select:none; }
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
-    .favorite-row.favorite-drag-placeholder { opacity:.18; pointer-events:none; transition:opacity .16s ease; }
+    .favorite-row.favorite-drag-placeholder { opacity:.13; pointer-events:none; transition:opacity .22s ease; }
     .favorite-row.favorite-drag-placeholder .favorite-card { border-color:var(--accent); }
     .favorite-row.favorite-drag-ghost { position:fixed; z-index:120; margin:0; pointer-events:none; opacity:.99; filter:drop-shadow(0 18px 28px #020617aa); will-change:transform; }
-    .favorite-row.favorite-drag-ghost .favorite-card { border-color:var(--accent); cursor:grabbing; transform:scale(1.04) rotate(.25deg); box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent); }
+    .favorite-row.favorite-drag-ghost .favorite-card { border-color:var(--accent); cursor:grabbing; box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent); animation:favorite-card-lift .22s cubic-bezier(.16,1,.3,1) both; }
+    .favorite-row.favorite-drag-ghost.favorite-drag-settling .favorite-card { animation:none; transform:scale(1) rotate(0); box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 18%,transparent); transition:transform .32s cubic-bezier(.16,1,.3,1),box-shadow .32s ease; }
+    @keyframes favorite-card-lift { from { transform:scale(1) rotate(0); } to { transform:scale(1.04) rotate(.2deg); } }
     body.favorite-reordering { overflow:hidden; overscroll-behavior:none; }
     .favorite-card-badge { width:44px; height:44px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.74rem; font-weight:800; letter-spacing:.02em; }
     .favorite-card-badge > * { grid-area:1/1; }
@@ -1351,6 +1353,7 @@
         pending.placeholder=placeholder;
         pending.ghostTop=rect.top;
         pending.ghostY=rect.top;
+        pending.ghostHeight=rect.height;
         pending.offsetY=pending.lastY-rect.top;
         navigator.vibrate?.(18);
       };
@@ -1371,7 +1374,7 @@
           playFavoriteMotion(candidate,[
             {transform:`translate3d(0,${delta}px,0)`},
             {transform:'translate3d(0,0,0)'}
-          ],{duration:260,easing:'cubic-bezier(.2,.85,.2,1)'});
+          ],{duration:360,easing:'cubic-bezier(.22,1,.36,1)'});
         });
       };
       const onMove=event=>{
@@ -1397,7 +1400,7 @@
         event.preventDefault();
         pending.ghostY=event.clientY-pending.offsetY;
         pending.ghost.style.transform=`translate3d(0,${pending.ghostY-pending.ghostTop}px,0)`;
-        movePlaceholder(event.clientY);
+        movePlaceholder(pending.ghostY+pending.ghostHeight/2);
         const edge=72;
         if(event.clientY<edge)window.scrollBy(0,-Math.min(14,(edge-event.clientY)/3));
         else if(event.clientY>window.innerHeight-edge)window.scrollBy(0,Math.min(14,(event.clientY-window.innerHeight+edge)/3));
@@ -1415,9 +1418,10 @@
           const ghostRect=ghost.getBoundingClientRect();
           const currentY=pending.ghostY-pending.ghostTop;
           const targetY=currentY+(targetRect.top-ghostRect.top);
+          row.classList.add('favorite-drag-settling');
           const finishSettle=()=>{
             placeholder.replaceWith(row);
-            row.classList.remove('favorite-drag-ghost');
+            row.classList.remove('favorite-drag-ghost','favorite-drag-settling');
             row.style.left='';
             row.style.top='';
             row.style.width='';
@@ -1431,7 +1435,7 @@
           playFavoriteMotion(ghost,[
             {transform:`translate3d(0,${currentY}px,0)`,opacity:.99},
             {transform:`translate3d(0,${targetY}px,0)`,opacity:.9}
-          ],{duration:240,easing:'cubic-bezier(.18,.88,.22,1)'},finishSettle);
+          ],{duration:320,easing:'cubic-bezier(.16,1,.3,1)'},finishSettle);
         }else if(scrolling){
           event.preventDefault();
           favoriteDragSuppressUntil=Date.now()+350;
@@ -1451,7 +1455,7 @@
         cancelAnimationFrame(favoriteScrollMomentum);
         favoriteScrollMomentum=0;
         clearPending();
-        pending={pointerId:event.pointerId,pointerType:event.pointerType,startX:event.clientX,startY:event.clientY,lastY:event.clientY,lastMoveAt:performance.now(),velocity:0,scrolling:false,active:false,ghost:null,placeholder:null,ghostTop:0,ghostY:0,offsetY:0,timer:0};
+        pending={pointerId:event.pointerId,pointerType:event.pointerType,startX:event.clientX,startY:event.clientY,lastY:event.clientY,lastMoveAt:performance.now(),velocity:0,scrolling:false,active:false,ghost:null,placeholder:null,ghostTop:0,ghostY:0,ghostHeight:0,offsetY:0,timer:0};
         pending.timer=setTimeout(activate,400);
         window.addEventListener('pointermove',onMove,{passive:false});
         window.addEventListener('pointerup',onEnd,{passive:false});
