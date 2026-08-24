@@ -14,6 +14,7 @@ const searchApi=fs.readFileSync(path.join(root,'api','search.js'),'utf8');
 const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
 const tefasApi=fs.readFileSync(path.join(root,'api','tefas.py'),'utf8');
 const logoSvg=fs.readFileSync(path.join(root,'assets','ozer-finans-mark.svg'),'utf8');
+const goldMarkSvg=fs.readFileSync(path.join(root,'assets','gold-mark.svg'),'utf8');
 
 function extractFunction(source,name){
   const start=source.indexOf('function '+name);
@@ -161,6 +162,10 @@ assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans mark
 assert.match(html,/\.page-brand \{[^}]*justify-content:center;/,'Sayfa marka kilidi yatay olarak ortalanmalı');
 assert.match(html,/\.version-badge \{[^}]*border:0;[^}]*opacity:\.62;/,'Sürüm bilgisi rozetsiz, küçük ve silik gösterilmeli');
 assert.match(logoSvg,/<rect x="1" y="1" width="62" height="62" rx="16" fill="#fff"/,'Özer Finans logosu beyaz zeminli uygulama ikonu olmalı');
+assert.match(goldMarkSvg,/<title[^>]*>Üç külçeli altın simgesi<\/title>/,'Altın ürünleri seçilen üçlü külçe simgesini kullanmalı');
+assert.match(html,/safe\.startsWith\('ALTIN-'\)\)return\['assets\/gold-mark\.svg'\]/,'Bütün altın ürünleri yerel ve kalıcı altın simgesini kullanmalı');
+assert.match(html,/safe\.startsWith\('TEFAS-'\)\)return\[managerBadgeDataUri\(name\)\]/,'TEFAS fonları yönetim şirketi kimlik rozetini kullanmalı');
+assert.match(html,/function fundManagerIdentity\(name\)[\s\S]*AK PORTFOY[\s\S]*YAPI KREDI PORTFOY[\s\S]*QNB PORTFOY/,'Başlıca fon yönetim şirketleri adından tanınmalı');
 assert.match(html,/\.portfolio-head \{[^}]*padding:16px;[^}]*border:1px solid var\(--line\);[^}]*border-radius:14px;/,'Portföy üst özeti tüm ekranlarda çerçeveli kart olmalı');
 assert.match(html,/\.portfolio-head-value \{[^}]*font-size:1\.5rem;/,'Portföy toplam değeri hafifçe büyütülmeli');
 assert.match(html,/id="portfolioCurrencyToggle"[^>]*aria-pressed="false"[^>]*>⇄<\/button>/,'Portföy üst özetinde dönüşüm düğmesi bulunmalı');
@@ -205,10 +210,10 @@ assert.match(html,/async function refreshActiveViewFromPull\(\)[\s\S]*mainView\.
 assert.match(html,/pullRefreshDistance>=pullRefreshThreshold[\s\S]*runPullRefresh\(\)/,'Yenileme yalnız çekme eşiği aşılıp parmak bırakıldığında başlamalı');
 assert.match(html,/id="periodRangeFill"/,'Dönem içi fiyat konum barı bulunmalı');
 assert.match(html,/className='favorite-market-time'/,'Her favoride fiyat zamanı alanı bulunmalı');
-assert.match(html,/function favoriteLogoUrls\(symbol\)[\s\S]*financialmodelingprep\.com\/image-stock\/[\s\S]*eodhd\.com\/img\/logos\//,'Favori logoları iki bağımsız kaynağı sırayla kullanmalı');
+assert.match(html,/function favoriteLogoUrls\(symbol,name\)[\s\S]*financialmodelingprep\.com\/image-stock\/[\s\S]*eodhd\.com\/img\/logos\//,'Favori logoları iki bağımsız kaynağı sırayla kullanmalı');
 assert.match(html,/suffix==='IS'\?'\/api\/logo\?symbol='/,'BIST logoları için aynı kaynaklı üçüncü yedek bulunmalı');
 assert.match(html,/const exchange=suffix==='IS'\?'IS':'US'/,'BIST sembolleri yedek logo kaynağında doğru borsaya çevrilmeli');
-assert.match(html,/function appendSymbolLogo\(container,className,symbol\)[\s\S]*image\.addEventListener\('error',loadNext\)/,'Logo yükleme hatasında sonraki kaynak otomatik denenmeli');
+assert.match(html,/function appendSymbolLogo\(container,className,symbol,name\)[\s\S]*image\.addEventListener\('error',loadNext\)/,'Logo yükleme hatasında sonraki kaynak otomatik denenmeli');
 assert.match(html,/image\.loading='eager'/,'Favori logoları Safari görünürlük tahminine bırakılmadan yüklenmeli');
 assert.match(logoApi,/scanner\.tradingview\.com\/turkey\/scan[\s\S]*columns:\['name','description','logoid'\]/,'BIST logo yedeği TradingView logo kimliğini kullanmalı');
 assert.match(logoApi,/s3-symbol-logo\.tradingview\.com\/[\s\S]*--big\.svg/,'Doğrulanan TradingView logosu sunucu üzerinden aktarılmalı');

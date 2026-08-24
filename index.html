@@ -1190,7 +1190,7 @@
       favoriteDetailIdentity.replaceChildren();
       const badge=document.createElement('span');badge.className='favorite-card-badge';
       const initials=document.createElement('span');initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';badge.append(initials);
-      appendSymbolLogo(badge,'favorite-card-logo',item.symbol);
+      appendSymbolLogo(badge,'favorite-card-logo',item.symbol,item.name);
       const title=document.createElement('h3');title.id='favoriteDetailTitle';title.textContent=item.symbol;
       const subtitle=document.createElement('p');subtitle.textContent=name!==item.symbol?name:'Hisse';
       favoriteDetailIdentity.append(badge,title,subtitle);
@@ -1248,8 +1248,32 @@
       try{const data=await fetchFavoriteDetail(item);if(requestId!==favoriteDetailRequestId||!favoriteDetailDialog.open)return;renderFavoriteDetailIdentity(item,data.name);renderFavoriteDetail(data)}
       catch{if(requestId!==favoriteDetailRequestId||!favoriteDetailDialog.open)return;favoriteDetailBody.replaceChildren();const error=document.createElement('p');error.className='favorite-detail-error';error.textContent='Detay verileri alınamadı. Daha sonra tekrar deneyin.';favoriteDetailBody.append(error)}
     }
-    function favoriteLogoUrls(symbol) {
+    function fundManagerIdentity(name) {
+      const folded=foldSearchText(name||'');
+      const managers=[
+        {terms:['AK PORTFOY','AKBANK'],label:'AK',bg:'#d71920',fg:'#fff'},
+        {terms:['YAPI KREDI PORTFOY','YAPI KREDI'],label:'YK',bg:'#174b9b',fg:'#fff'},
+        {terms:['IS PORTFOY','IS BANKASI'],label:'IS',bg:'#ffffff',fg:'#0b3b78',ring:'#0b3b78'},
+        {terms:['QNB PORTFOY','QNB FINANS','ENPARA'],label:'QNB',bg:'#6f2c91',fg:'#fff'},
+        {terms:['GARANTI PORTFOY','GARANTI BBVA'],label:'G',bg:'#00854a',fg:'#fff'},
+        {terms:['ZIRAAT PORTFOY','ZIRAAT'],label:'Z',bg:'#cf1f2c',fg:'#fff'},
+        {terms:['VAKIF PORTFOY','VAKIFBANK'],label:'V',bg:'#f5c400',fg:'#182235'},
+        {terms:['HALK PORTFOY','HALKBANK'],label:'H',bg:'#1268b3',fg:'#fff'},
+        {terms:['DENIZ PORTFOY','DENIZBANK'],label:'D',bg:'#0064a8',fg:'#fff'},
+        {terms:['TEB PORTFOY','TURK EKONOMI BANKASI'],label:'TEB',bg:'#008c82',fg:'#fff'},
+        {terms:['FIBA PORTFOY','FIBABANKA'],label:'F',bg:'#244a9b',fg:'#fff'}
+      ];
+      return managers.find(item=>item.terms.some(term=>folded.includes(term)))||{label:'FON',bg:'#1c6f65',fg:'#fff'};
+    }
+    function managerBadgeDataUri(name) {
+      const manager=fundManagerIdentity(name),fontSize=manager.label.length>2?21:27;
+      const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="31" fill="'+manager.bg+'" stroke="'+(manager.ring||manager.bg)+'" stroke-width="2"/><text x="32" y="34" fill="'+manager.fg+'" font-family="Arial,sans-serif" font-size="'+fontSize+'" font-weight="800" text-anchor="middle" dominant-baseline="middle">'+manager.label+'</text></svg>';
+      return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+    }
+    function favoriteLogoUrls(symbol,name) {
       const safe=normalizeSymbol(symbol);
+      if(safe.startsWith('ALTIN-'))return['assets/gold-mark.svg'];
+      if(safe.startsWith('TEFAS-'))return[managerBadgeDataUri(name)];
       if(!/^[A-Z0-9.^=-]{1,30}(?:\.[A-Z]{1,6})?$/.test(safe)||safe.startsWith('^')||safe.includes('=')||safe.endsWith('-USD'))return[];
       const suffix=safe.match(/\.([A-Z]{1,6})$/)?.[1]||'';
       const exchange=suffix==='IS'?'IS':'US';
@@ -1260,8 +1284,8 @@
         suffix==='IS'?'/api/logo?symbol='+encodeURIComponent(safe):''
       ],value=>value);
     }
-    function appendSymbolLogo(container,className,symbol) {
-      const sources=favoriteLogoUrls(symbol);
+    function appendSymbolLogo(container,className,symbol,name) {
+      const sources=favoriteLogoUrls(symbol,name);
       if(!sources.length)return null;
       const image=document.createElement('img');
       image.className=className||'';image.alt='';image.loading='eager';image.referrerPolicy='no-referrer';
@@ -1277,7 +1301,7 @@
         const row=document.createElement('li'),select=document.createElement('button');select.type='button';select.className='chart-asset-item';select.title=item.symbol+' grafiğini aç';
         const logo=document.createElement('span');logo.className='chart-asset-logo';
         const initials=document.createElement('span');initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';logo.appendChild(initials);
-        appendSymbolLogo(logo,'',item.symbol);
+        appendSymbolLogo(logo,'',item.symbol,item.name);
         const name=document.createElement('span');name.className='chart-asset-name';const symbol=document.createElement('strong');symbol.textContent=item.symbol;const company=document.createElement('small');company.textContent=item.name||item.symbol;name.append(symbol,company);select.append(logo,name);
         select.addEventListener('click',()=>{symbolInput.value=item.symbol;updateFavoriteButton();closeChartAssetPanels();chartView.scrollIntoView({behavior:'smooth',block:'start'});loadPrice(item.symbol)});
         row.append(select);list.append(row);
@@ -1555,7 +1579,7 @@
         const initials=document.createElement('span');
         initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';
         badge.append(initials);
-        appendSymbolLogo(badge,'favorite-card-logo',item.symbol);
+        appendSymbolLogo(badge,'favorite-card-logo',item.symbol,item.name);
         const head=document.createElement('span');
         head.className='favorite-card-head';
         const symbol=document.createElement('strong');
@@ -3085,7 +3109,7 @@
         const head=document.createElement('div');head.className='portfolio-row-head';
         const badge=document.createElement('span');badge.className='portfolio-row-logo';
         const initials=document.createElement('span');initials.textContent=position.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';badge.append(initials);
-        appendSymbolLogo(badge,'',position.symbol);
+        appendSymbolLogo(badge,'',position.symbol,position.name);
         const title=document.createElement('div');title.className='portfolio-row-title';
         const symbol=document.createElement('strong');symbol.textContent=position.symbol;
         if(position.drip){const chip=document.createElement('span');chip.className='drip-chip';chip.textContent='DRIP';symbol.append(chip)}
