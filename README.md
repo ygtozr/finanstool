@@ -13,6 +13,8 @@
 
 - Tek cihazda en fazla 50 bağımsız portföy oluşturulabilir; her portföyün hisseleri, nakit bakiyeleri, maliyetleri, alış tarihleri ve temettü yeniden yatırım ayarları ayrı tutulur.
 - Portföy sayfasındaki kompakt seçiciyle aktif portföy değiştirilir; yanındaki kontroller yeni portföy oluşturur, adını değiştirir veya son portföy dışında seçili portföyü siler.
+- Seçicinin üstündeki Toplam Portföy kartı bütün portföylerin birleşik güncel değerini ve günlük değişimini USD veya TL bazında gösterir. Seçicinin altındaki yatay kısayol düğmeleri portföyler arasında tek dokunuşla geçiş sağlar.
+- Aktif portföyün dönüşüm düğmesi TL ağırlıklı portföyde USD karşılığını, USD veya karma portföyde TL karşılığını gösterir; ikinci dokunuş asıl para birimine döner.
 - v5.6 ve daha eski tek portföy verileri ilk açılışta otomatik olarak `Portföyüm` adlı portföye taşınır; eski yerel kayıtlar silinmez.
 - JSON yedek şeması v2'ye yükseltilmiştir. Bütün portföyler tek dosyaya dahil edilir; v1 yedekleri geriye dönük olarak geri yüklenebilir.
 - Grafik sayfasındaki Portföy varlık seçicisi yalnız aktif portföyün hisselerini gösterir.

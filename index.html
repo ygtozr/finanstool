@@ -138,6 +138,7 @@
     .portfolio-drawer.open { transform:translateX(0); }
     .portfolio-head { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:18px; padding:16px; border:1px solid var(--line); border-radius:14px; background:#111a2b; }
     .portfolio-head h2, .dividend-section h3 { margin:0; }
+    .portfolio-overall-head { margin-bottom:12px; background:linear-gradient(135deg,#14253a,#111a2b); }
     .portfolio-switcher { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; align-items:end; margin-bottom:10px; }
     .portfolio-switcher-field { min-width:0; display:grid; gap:5px; color:var(--muted); font-size:.72rem; font-weight:650; }
     .portfolio-switcher select { width:100%; min-width:0; height:44px; padding-block:8px; color:var(--text); background:#111a2b; border:1px solid var(--line); border-radius:10px; font-weight:700; }
@@ -145,6 +146,9 @@
     .portfolio-switcher-actions button { width:44px; height:44px; min-height:44px; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1rem; }
     .portfolio-switcher-actions button:last-child { color:var(--danger); }
     .portfolio-switcher-actions button:disabled { opacity:.38; cursor:not-allowed; }
+    .portfolio-book-tabs { display:flex; gap:7px; margin:-2px 0 12px; padding:2px 0 5px; overflow-x:auto; overscroll-behavior-inline:contain; scrollbar-width:thin; }
+    .portfolio-book-tab { min-height:38px; flex:0 0 auto; padding:7px 12px; color:var(--muted); background:#182235; border:1px solid var(--line); border-radius:999px; font-size:.78rem; font-weight:700; white-space:nowrap; }
+    .portfolio-book-tab[aria-pressed="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
     .portfolio-currency-toggle { width:44px; height:44px; min-height:44px; flex:0 0 44px; display:grid; place-items:center; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1.25rem; line-height:1; }
     .portfolio-currency-toggle[aria-pressed="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
     .portfolio-close { width:40px; height:40px; padding:0; color:var(--text); background:#26344d; font-size:1.35rem; }
@@ -415,6 +419,7 @@
     html[data-theme="light"] .analysis-table { background:#f8fafc; }
     html[data-theme="light"] .portfolio-page .portfolio-head { background:#f1f5f9; }
     html[data-theme="light"] .portfolio-switcher select { background:#f8fafc; }
+    html[data-theme="light"] .portfolio-book-tab { background:#e2e8f0; }
     html[data-theme="light"] .portfolio-currency-toggle { color:var(--text); background:#e2e8f0; }
     html[data-theme="light"] .portfolio-currency-toggle[aria-pressed="true"] { color:#fff; background:#0f766e; }
     @media (max-width:500px) { .app-tabs { flex-wrap:wrap; } .app-tabs button { flex:1; } .analysis-table th, .analysis-table td { padding:9px 8px; font-size:.86rem; } }
@@ -660,7 +665,9 @@
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
       <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.7</span></h1>
+      <div class="portfolio-head portfolio-overall-head"><div class="portfolio-head-metrics"><h2>Toplam Portföy</h2><strong id="allPortfolioTotalValue" class="portfolio-head-value">—</strong><p id="allPortfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="allPortfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Toplam portföyü TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
       <div class="portfolio-switcher"><label class="portfolio-switcher-field" for="portfolioBookSelect">Aktif Portföy<select id="portfolioBookSelect" aria-label="Aktif portföyü seç"></select></label><div class="portfolio-switcher-actions"><button id="portfolioBookAdd" type="button" aria-label="Yeni portföy oluştur" title="Yeni portföy">+</button><button id="portfolioBookRename" type="button" aria-label="Aktif portföyün adını değiştir" title="Adını değiştir">✎</button><button id="portfolioBookDelete" type="button" aria-label="Aktif portföyü sil" title="Portföyü sil">×</button></div></div>
+      <div id="portfolioBookTabs" class="portfolio-book-tabs" role="group" aria-label="Portföy kısayolları"></div>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2 id="portfolioHeading">Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
@@ -979,8 +986,12 @@
     const portfolioSummaryCurrencyNote = document.getElementById('portfolioSummaryCurrencyNote');
     const portfolioList = document.getElementById('portfolioList');
     const portfolioCurrencyToggle = document.getElementById('portfolioCurrencyToggle');
+    const allPortfolioTotalValue = document.getElementById('allPortfolioTotalValue');
+    const allPortfolioDailyChange = document.getElementById('allPortfolioDailyChange');
+    const allPortfolioCurrencyToggle = document.getElementById('allPortfolioCurrencyToggle');
     const portfolioHeading = document.getElementById('portfolioHeading');
     const portfolioBookSelect = document.getElementById('portfolioBookSelect');
+    const portfolioBookTabs = document.getElementById('portfolioBookTabs');
     const portfolioBookAdd = document.getElementById('portfolioBookAdd');
     const portfolioBookRename = document.getElementById('portfolioBookRename');
     const portfolioBookDelete = document.getElementById('portfolioBookDelete');
@@ -1101,6 +1112,9 @@
     let portfolioRenderId = 0;
     let portfolioDividendRequestId = 0;
     let portfolioDisplayCurrency = 'AUTO';
+    let portfolioBaseCurrency = 'USD';
+    let allPortfolioDisplayCurrency = 'USD';
+    let allPortfolioSummaryRequestId = 0;
     let portfolioAllocationChart = null;
     let portfolioCurrencyChart = null;
     let portfolioBenchmarkChart = null;
@@ -2043,7 +2057,11 @@
 
     function renderPortfolioBookSelector() {
       portfolioBookSelect.replaceChildren();
-      portfolioBooks.forEach(book=>{const option=document.createElement('option');option.value=book.id;option.textContent=book.name;portfolioBookSelect.append(option)});
+      portfolioBookTabs.replaceChildren();
+      portfolioBooks.forEach(book=>{
+        const option=document.createElement('option');option.value=book.id;option.textContent=book.name;portfolioBookSelect.append(option);
+        const tab=document.createElement('button');tab.type='button';tab.className='portfolio-book-tab';tab.textContent=book.name;tab.title=book.name;tab.setAttribute('aria-pressed',String(book.id===activePortfolioId));tab.addEventListener('click',()=>switchPortfolio(book.id));portfolioBookTabs.append(tab);
+      });
       portfolioBookSelect.value=activePortfolioId;
       portfolioHeading.textContent=activePortfolioBook().name;
       portfolioBookAdd.disabled=portfolioBooks.length>=50;
@@ -2601,28 +2619,90 @@
       updateComboboxState(benchmarkSearch,benchmarkSuggestions,items.length>0);
     }
 
+    async function renderAllPortfoliosSummary() {
+      const requestId=++allPortfolioSummaryRequestId;
+      const positions=portfolioBooks.flatMap(book=>book.positions);
+      const balances=portfolioBooks.flatMap(book=>book.cashBalances);
+      const showTry=allPortfolioDisplayCurrency==='TRY';
+      allPortfolioDailyChange.className='portfolio-daily-change';
+      allPortfolioCurrencyToggle.setAttribute('aria-pressed',String(showTry));
+      allPortfolioCurrencyToggle.setAttribute('aria-label',showTry?'Toplam portföyü USD olarak göster':'Toplam portföyü TL olarak göster');
+      allPortfolioCurrencyToggle.title=showTry?'USD görünümüne geç':'TL görünümüne geç';
+      if(!positions.length&&!balances.length){allPortfolioTotalValue.textContent=money(0,showTry?'TRY':'USD');allPortfolioDailyChange.textContent='Bugün —';return}
+      allPortfolioTotalValue.textContent='Hesaplanıyor…';
+      allPortfolioDailyChange.textContent='Bugün hesaplanıyor…';
+      const priceResults=await Promise.all(positions.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
+      if(requestId!==allPortfolioSummaryRequestId)return;
+      const failed=priceResults.filter(item=>!item.ok).map(item=>item.position.symbol);
+      const convertedPositions=await Promise.all(priceResults.filter(item=>item.ok).map(async item=>{
+        const position=item.value,effectiveQuantity=position.effectiveQuantity??position.quantity,currency=position.currency;
+        try{
+          const [currentRate,previousRate]=await Promise.all([currency==='USD'?Promise.resolve(1):latestPrice(currency+'USD=X').then(result=>result.price),historicalUsdRate(currency,new Date(position.previousTime*1000).toISOString().slice(0,10))]);
+          if(![currentRate,previousRate].every(value=>Number.isFinite(value)&&value>0))throw new Error('Kur verisi eksik');
+          return{ok:true,current:effectiveQuantity*position.price*currentRate,previous:effectiveQuantity*position.previousPrice*previousRate};
+        }catch{return{ok:false,label:position.symbol}}
+      }));
+      const convertedCash=await Promise.all(balances.map(async balance=>{
+        try{const rate=balance.currency==='USD'?1:(await latestPrice(balance.currency+'USD=X')).price;if(!Number.isFinite(rate)||rate<=0)throw new Error('Kur verisi eksik');return{ok:true,current:balance.amount*rate,previous:balance.amount*rate}}
+        catch{return{ok:false,label:'Nakit '+balance.currency}}
+      }));
+      if(requestId!==allPortfolioSummaryRequestId)return;
+      const conversionFailures=[...convertedPositions,...convertedCash].filter(item=>!item.ok).map(item=>item.label);
+      if(failed.length||conversionFailures.length){
+        allPortfolioTotalValue.textContent='Eksik veri';
+        allPortfolioDailyChange.textContent='Hesaplanamayan: '+[...new Set([...failed,...conversionFailures])].join(', ');
+        allPortfolioDailyChange.classList.add('negative');
+        return;
+      }
+      const values=[...convertedPositions,...convertedCash],totalUsd=values.reduce((sum,item)=>sum+item.current,0),previousUsd=values.reduce((sum,item)=>sum+item.previous,0),dailyUsd=totalUsd-previousUsd,dailyPercent=previousUsd>0?dailyUsd/previousUsd*100:0;
+      let factor=1,currency='USD';
+      if(showTry){
+        try{const tryToUsd=(await latestPrice('TRYUSD=X')).price;if(!Number.isFinite(tryToUsd)||tryToUsd<=0)throw new Error('Geçersiz kur');factor=1/tryToUsd;currency='TRY'}
+        catch{allPortfolioTotalValue.textContent='Eksik veri';allPortfolioDailyChange.textContent='TRY kuru alınamadı.';allPortfolioDailyChange.classList.add('negative');return}
+      }
+      if(requestId!==allPortfolioSummaryRequestId)return;
+      allPortfolioTotalValue.textContent=money(totalUsd*factor,currency);
+      allPortfolioDailyChange.textContent='Bugün '+money(dailyUsd*factor,currency)+' · '+(dailyPercent>=0?'+':'')+dailyPercent.toFixed(2)+'%';
+      allPortfolioDailyChange.classList.add(dailyUsd>=0?'positive':'negative');
+    }
+
     function isPortfolioSummaryComplete(failedPositions,missingRates) {
       return failedPositions.length===0&&missingRates.size===0;
     }
 
+    function portfolioConversionFactor(summaryToUsd,targetToUsd) {
+      if(![summaryToUsd,targetToUsd].every(value=>Number.isFinite(value)&&value>0))throw new Error('Geçersiz dönüşüm kuru');
+      return summaryToUsd/targetToUsd;
+    }
+
+    function portfolioPresentationTarget(summaryCurrency) {
+      portfolioBaseCurrency=summaryCurrency;
+      if(portfolioDisplayCurrency===summaryCurrency)portfolioDisplayCurrency='AUTO';
+      const target=portfolioDisplayCurrency==='AUTO'?summaryCurrency:portfolioDisplayCurrency;
+      const converted=target!==summaryCurrency;
+      const alternate=summaryCurrency==='TRY'?'USD':'TRY';
+      portfolioCurrencyToggle.setAttribute('aria-pressed',String(converted));
+      portfolioCurrencyToggle.setAttribute('aria-label',converted?'Portföy özetini '+summaryCurrency+' olarak göster':'Portföy özetini '+alternate+' olarak göster');
+      portfolioCurrencyToggle.title=converted?summaryCurrency+' görünümüne dön':alternate+' görünümüne geç';
+      portfolioSummaryCurrencyNote.textContent=target==='TRY'?'Portföy özeti ve dağılım değerleri TL bazında gösteriliyor.':target==='USD'?'Portföy özeti ve dağılım değerleri USD bazında gösteriliyor.':'Portföy özeti '+target+' bazında gösteriliyor.';
+      return target;
+    }
+
     async function renderPortfolio({refreshBenchmark=true,refreshDividends=true}={}) {
       const renderId=++portfolioRenderId;
+      renderAllPortfoliosSummary();
       if(refreshDividends)portfolioDividendRequestId++;
       const keepExistingPortfolio=Boolean(portfolioList.querySelector('.portfolio-row'));
       const portfolioTotalValue=document.getElementById('portfolioTotalValue');
       const portfolioDailyChange=document.getElementById('portfolioDailyChange');
       portfolioDailyChange.className='portfolio-daily-change';
-      const showTry=portfolioDisplayCurrency==='TRY';
-      portfolioCurrencyToggle.setAttribute('aria-pressed',String(showTry));
-      portfolioCurrencyToggle.setAttribute('aria-label',showTry?'Portföy özetini asıl para biriminde göster':'Portföy özetini TL olarak göster');
-      portfolioCurrencyToggle.title=showTry?'Asıl para birimine dön':'TL görünümüne geç';
-      portfolioSummaryCurrencyNote.textContent=showTry?'Portföy özeti ve dağılım değerleri TL bazında gösteriliyor.':'Farklı para birimleri varsa toplamlar USD bazında gösterilir.';
       renderCashBalances();
       if(!portfolio.length&&!cashBalances.length){
+        const emptyCurrency=portfolioPresentationTarget('USD');
         portfolioList.replaceChildren();
         portfolioSummary.replaceChildren();
         dividendList.replaceChildren();
-        portfolioTotalValue.textContent=money(0,showTry?'TRY':'USD');
+        portfolioTotalValue.textContent=money(0,emptyCurrency);
         portfolioDailyChange.textContent='Bugün —';
         const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Portföyünüz boş. Hisse veya nakit ekleyin.';portfolioList.append(empty);
         const dividendEmpty=document.createElement('li');dividendEmpty.className='favorites-note';dividendEmpty.textContent='Temettü verisi için portföye hisse ekleyin.';dividendList.append(dividendEmpty);
@@ -2644,10 +2724,12 @@
       const currencies=[...new Set([...valid.flatMap(item=>[item.currency,item.costCurrency||item.currency]),...cashBalances.map(item=>item.currency)])];
       const mixedCurrency=currencies.length>1;
       const summaryCurrency=mixedCurrency?'USD':(currencies[0]||'USD');
+      const presentationCurrency=portfolioPresentationTarget(summaryCurrency);
       const rates=new Map([['USD',1]]);
       const missingRates=new Set();
-      if(mixedCurrency){
-        await Promise.all(currencies.filter(code=>code!=='USD').map(async code=>{
+      const rateCurrencies=[...new Set([...currencies,presentationCurrency])];
+      if(mixedCurrency||presentationCurrency!==summaryCurrency){
+        await Promise.all(rateCurrencies.filter(code=>code!=='USD').map(async code=>{
           try{
             const rate=(await latestPrice(code+'USD=X')).price;
             if(!Number.isFinite(rate)||rate<=0)throw new Error('Geçersiz kur');
@@ -2655,17 +2737,13 @@
           }catch{missingRates.add(code)}
         }));
       }
-      let presentationCurrency=summaryCurrency,presentationFactor=1;
-      if(showTry&&summaryCurrency!=='TRY'){
+      let presentationFactor=1;
+      if(presentationCurrency!==summaryCurrency){
         try{
-          const [summaryToUsd,tryToUsd]=await Promise.all([
-            summaryCurrency==='USD'?Promise.resolve(1):latestPrice(summaryCurrency+'USD=X').then(item=>item.price),
-            rates.get('TRY')?Promise.resolve(rates.get('TRY')):latestPrice('TRYUSD=X').then(item=>item.price)
-          ]);
-          if(![summaryToUsd,tryToUsd].every(value=>Number.isFinite(value)&&value>0))throw new Error('Geçersiz TL kuru');
-          presentationFactor=summaryToUsd/tryToUsd;
-          presentationCurrency='TRY';
-        }catch{missingRates.add('TRY dönüşüm')}
+          const summaryToUsd=summaryCurrency==='USD'?1:(rates.get(summaryCurrency)??(await latestPrice(summaryCurrency+'USD=X')).price);
+          const targetToUsd=presentationCurrency==='USD'?1:(rates.get(presentationCurrency)??(await latestPrice(presentationCurrency+'USD=X')).price);
+          presentationFactor=portfolioConversionFactor(summaryToUsd,targetToUsd);
+        }catch{missingRates.add(presentationCurrency+' dönüşüm')}
       }
       const costRates=new Map();
       await Promise.all(valid.map(async position=>{
@@ -3506,9 +3584,10 @@
     });
     portfolioAdd.addEventListener('click', openPortfolioDialog);
     portfolioCurrencyToggle.addEventListener('click',()=>{
-      portfolioDisplayCurrency=portfolioDisplayCurrency==='TRY'?'AUTO':'TRY';
+      portfolioDisplayCurrency=portfolioDisplayCurrency==='AUTO'?(portfolioBaseCurrency==='TRY'?'USD':'TRY'):'AUTO';
       renderPortfolio({refreshBenchmark:false,refreshDividends:false});
     });
+    allPortfolioCurrencyToggle.addEventListener('click',()=>{allPortfolioDisplayCurrency=allPortfolioDisplayCurrency==='USD'?'TRY':'USD';renderAllPortfoliosSummary()});
     let modalScrollY=0;
     function syncModalScrollLock(){
       const hasOpenDialog=Boolean(document.querySelector('dialog[open]'));

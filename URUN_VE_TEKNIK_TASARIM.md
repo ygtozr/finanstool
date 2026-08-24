@@ -758,7 +758,10 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 ### 17.7 v5.7 Çoklu Bağımsız Portföy Önizlemesi
 
 - Portföy sayfasının üstünde aktif portföy seçicisi ile oluşturma, yeniden adlandırma ve silme kontrolleri bulunur. En az bir portföy zorunludur; son portföy silinemez.
+- Aktif portföy seçicisinin üstünde, bütün portföylerdeki hisse ve nakit değerlerini USD bazında birleştiren **Toplam Portföy** kartı bulunur. Kart güncel toplamı ve bugünkü net/yüzde değişimi gösterir; kendi dönüşüm düğmesiyle USD ve TL arasında geçer.
+- Açılır portföy seçicisinin hemen altında bütün portföy adları yatay, kaydırılabilir ve tıklanabilir kısayol düğmeleri olarak sunulur. Aktif portföy turkuaz dolgu ile belirtilir.
 - Her portföy `id`, `name`, `positions`, `cashBalances` ve `createdAt` alanlarına sahiptir. Pozisyonlar, nakit, toplamlar, dağılım, performans kıyası, temettü takvimi ve Grafik sayfasındaki Portföy seçicisi yalnız aktif kaydı kullanır.
+- Aktif portföy yalnız TRY değerlerinden oluşuyorsa dönüşüm düğmesinin hedefi USD, USD veya karma para birimliyse TRY olur. Çapraz dönüşüm `özet para birimi → USD / hedef para birimi → USD` oranıyla yapılır; böylece tek para birimli TL portföyde düğmenin görünürde hiçbir şey yapmaması engellenir.
 - Eski `finans-grafigi-portfolio` ve `finans-grafigi-cash-balances` kayıtları ilk açılışta otomatik olarak `portfolio-main / Portföyüm` kaydına taşınır. Eski anahtarlar geçiş güvenliği için aktif portföyün uyumlu kopyası olarak güncellenmeye devam eder.
 - Aktif portföy değiştiğinde eski fiyat, temettü ve performans isteklerinin yeni portföyü ezmemesi için ilgili istek kimlikleri geçersizleştirilir.
 - JSON yedek şeması 2, bütün portföyleri ve aktif portföy kimliğini saklar. Şema 1 yedekleri tek bir varsayılan portföye dönüştürülerek açılır; birleştirmede eşleşme portföy kimliğiyle yapılır.

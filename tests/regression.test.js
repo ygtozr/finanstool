@@ -39,8 +39,8 @@ assert.doesNotThrow(()=>new Function('module','exports','require','URLSearchPara
 assert.doesNotThrow(()=>new Function('module','exports','require',searchApi),'Arama API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require','Buffer',logoApi),'Logo API sözdizimi');
 
-const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary','normalizePerformance','resultPriceValues','commonPerformanceWindow','isPortfolioSummaryComplete','calculateDrip'].map(name=>extractFunction(scripts[0],name)).join('\n');
-const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete,calculateDrip}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete,calculateDrip};')();
+const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary','normalizePerformance','resultPriceValues','commonPerformanceWindow','isPortfolioSummaryComplete','portfolioConversionFactor','calculateDrip'].map(name=>extractFunction(scripts[0],name)).join('\n');
+const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete,portfolioConversionFactor,calculateDrip}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete,portfolioConversionFactor,calculateDrip};')();
 const mergePortfolioBooks=new Function(extractFunction(scripts[0],'mergePortfolioBooks')+';return mergePortfolioBooks;')();
 
 assert.deepEqual(fillMissingRates([null,null,2,null,3,null]),[null,null,2,2,3,3],'Gelecekteki kur geçmişe taşınmamalı');
@@ -61,6 +61,8 @@ assert.deepEqual(common.labels,['b','c'],'Portföy ve ölçüt aynı ilk ortak t
 assert.ok(Math.abs(common.portfolio[0])<1e-9&&Math.abs(common.benchmark[0])<1e-9&&Math.abs(common.portfolio[1]-10)<1e-9&&Math.abs(common.benchmark[1]-10)<1e-9,'Ortak başlangıçta her iki seri yüzde sıfıra bazlanmalı');
 assert.equal(isPortfolioSummaryComplete([],new Set()),true,'Eksiksiz portföy özeti yayınlanabilmeli');
 assert.equal(isPortfolioSummaryComplete(['AAPL'],new Set()),false,'Fiyatı eksik pozisyon varken toplam yayınlanmamalı');
+assert.ok(Math.abs(portfolioConversionFactor(0.025,1)-0.025)<1e-12,'Tek para birimli TL portföy USD karşılığına TRYUSD kuruyla dönüşmeli');
+assert.ok(Math.abs(portfolioConversionFactor(1,0.025)-40)<1e-12,'USD portföy TL karşılığına ters TRYUSD kuruyla dönüşmeli');
 const drip=calculateDrip(10,{prices:[{time:100,close:20},{time:200,close:25}],events:[{paymentDate:100,amount:2},{paymentDate:200,amount:1}],splits:[{date:150,numerator:2,denominator:1}],source:'fixture'},10,true);
 assert.ok(Math.abs(drip.quantity-22.5848)<1e-9,'DRIP vergi, ödeme fiyatı ve bölünmeyi kronolojik uygulamalı');
 assert.equal(drip.dividendCount,2,'DRIP işlenen temettü sayısını raporlamalı');
@@ -143,15 +145,20 @@ assert.match(logoSvg,/<rect x="1" y="1" width="62" height="62" rx="16" fill="#ff
 assert.match(html,/\.portfolio-head \{[^}]*padding:16px;[^}]*border:1px solid var\(--line\);[^}]*border-radius:14px;/,'Portföy üst özeti tüm ekranlarda çerçeveli kart olmalı');
 assert.match(html,/\.portfolio-head-value \{[^}]*font-size:1\.5rem;/,'Portföy toplam değeri hafifçe büyütülmeli');
 assert.match(html,/id="portfolioCurrencyToggle"[^>]*aria-pressed="false"[^>]*>⇄<\/button>/,'Portföy üst özetinde dönüşüm düğmesi bulunmalı');
+assert.match(html,/Toplam Portföy[\s\S]*id="allPortfolioTotalValue"[\s\S]*id="allPortfolioDailyChange"[\s\S]*id="allPortfolioCurrencyToggle"/,'Aktif portföy menüsünün üstünde bütün portföylerin birleşik özet kartı bulunmalı');
 assert.match(html,/id="portfolioBookSelect"[\s\S]*id="portfolioBookAdd"[\s\S]*id="portfolioBookRename"[\s\S]*id="portfolioBookDelete"/,'Portföy seçme, oluşturma, yeniden adlandırma ve silme kontrolleri bulunmalı');
+assert.match(html,/id="portfolioBookTabs"[^>]*aria-label="Portföy kısayolları"/,'Seçim menüsünün altında tıklanabilir portföy kısayolları bulunmalı');
+assert.match(html,/portfolioBookTabs\.replaceChildren\(\)[\s\S]*className='portfolio-book-tab'[\s\S]*switchPortfolio\(book\.id\)/,'Portföy kısayolları aktif portföyü doğrudan değiştirmeli');
 assert.match(html,/const portfolioBooksKey = 'finans-grafigi-portfolios-v2'/,'Çoklu portföyler ayrı ve kalıcı bir veri modelinde saklanmalı');
 assert.match(html,/if\(!portfolioBooks\.length\)portfolioBooks=\[\{id:'portfolio-main',name:'Portföyüm',positions:legacyPortfolio,cashBalances:legacyCashBalances/,'Eski tek portföy ve nakit verisi kayıpsız varsayılan portföye taşınmalı');
 assert.match(html,/function switchPortfolio\(bookId\)[\s\S]*bindActivePortfolio\(\)[\s\S]*renderChartAssetPanels\(\)[\s\S]*renderPortfolio\(\)/,'Portföy değişiminde aktif veriler, grafik seçici ve özet birlikte yenilenmeli');
 assert.match(html,/portfolioBooks\.length===1[\s\S]*En az bir portföy bulunmalıdır/,'Son portföy yanlışlıkla silinememeli');
 assert.match(html,/portfolioBookAdd\.disabled=portfolioBooks\.length>=50[\s\S]*En fazla 50 portföy oluşturulabilir/,'Yerel veri ve seçici kullanılabilirliği için portföy sayısı 50 ile sınırlandırılmalı');
-assert.match(html,/let portfolioDisplayCurrency = 'AUTO';[\s\S]*presentationFactor=summaryToUsd\/tryToUsd;/,'Portföy özeti TL dönüşümünü çapraz kurla hesaplamalı');
-assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*portfolioDisplayCurrency==='TRY'\?'AUTO':'TRY'[\s\S]*renderPortfolio\(\{refreshBenchmark:false,refreshDividends:false\}\)/,'Dönüşüm düğmesi yalnız fiyat özetini yeniden hesaplamalı');
-assert.match(html,/portfolioSummaryCurrencyNote\.textContent=showTry\?'Portföy özeti ve dağılım değerleri TL bazında gösteriliyor\.'/,'TL görünümünde özet açıklaması seçili para birimini doğru anlatmalı');
+assert.match(html,/function portfolioPresentationTarget\(summaryCurrency\)[\s\S]*summaryCurrency==='TRY'\?'USD':'TRY'/,'Aktif portföy dönüşüm hedefi TL portföyde USD, diğerlerinde TL olmalı');
+assert.match(html,/portfolioConversionFactor\(summaryToUsd,targetToUsd\)/,'Portföy özeti bütün para birimi yönlerinde çapraz kurla hesaplanmalı');
+assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*portfolioBaseCurrency==='TRY'\?'USD':'TRY'[\s\S]*renderPortfolio\(\{refreshBenchmark:false,refreshDividends:false\}\)/,'Dönüşüm düğmesi TL portföyde USD karşılığını göstermeli');
+assert.match(html,/async function renderAllPortfoliosSummary\(\)[\s\S]*portfolioBooks\.flatMap\(book=>book\.positions\)[\s\S]*totalUsd[\s\S]*allPortfolioTotalValue\.textContent/,'Toplam Portföy kartı bütün portföyleri USD bazında birleştirmeli');
+assert.match(html,/portfolioSummaryCurrencyNote\.textContent=target==='TRY'\?'Portföy özeti ve dağılım değerleri TL bazında gösteriliyor\.'[\s\S]*target==='USD'\?'Portföy özeti ve dağılım değerleri USD bazında gösteriliyor\.'/,'Özet açıklaması seçilen TL veya USD para birimini doğru anlatmalı');
 assert.match(html,/\.market-summary-head #marketRefresh,\.favorites-panel-head #favoriteRefresh \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
 assert.ok((html.match(/labels:solidLegendLabels\(colors\.text\)/g)||[]).length>=2,'Fiyat ve RSI grafiklerinin lejant örnekleri dolu renk kullanmalı');
 assert.match(html,/function solidLegendLabels\(color\)[\s\S]*fillStyle:fill,strokeStyle:fill,lineWidth:0/,'Lejant renk kutularının içi seri rengiyle tamamen doldurulmalı');
