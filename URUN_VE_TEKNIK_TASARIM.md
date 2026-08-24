@@ -1,7 +1,7 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 5.7
-**Uygulama sürümü:** v5.7
+**Belge sürümü:** 5.8 Önizleme
+**Uygulama sürümü:** v5.8 Önizleme
 **Durum:** Kullanıcı tarafından onaylandı
 **Canlı adres:** https://finanstool.vercel.app
 **Kaynak depo:** https://github.com/ygtozr/finanstool
@@ -43,6 +43,7 @@ Kullanıcı tarafından belirlenen ve sonraki geliştirmelerde korunması gereke
 ### 2.1 Sürümleme ve arşiv standardı
 
 - Güncel onaylı sürüm: **v5.7**.
+- İncelenen sürüm: **v5.8 Önizleme**.
 - Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v5.8** olur.
 - Depo kökü her zaman canlı sürümü temsil eder.
 - Arşiv yolu: `archive/vX/` veya `archive/vX.Y/`.
@@ -770,6 +771,16 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 - Mobil `nth-child` görünürlük kuralları havadaki karta uygulanmaz; kart ile hızlı işlem/yıldız düğmeleri sürükleme boyunca görünür kalır. Metin seçimi, dokunma çağrı balonu ve ikinci yer tutucu görünümü engellenir.
 - Bırakılan favori sırası `localStorage` içindeki favori dizisine yazılır ve yeniden açılışta korunur.
 
+### 17.8 v5.8 TEFAS Fonları
+
+- Portföy araması mevcut piyasa aramasıyla `/api/tefas?action=search` sonucunu paralel çalıştırır; tekrar eden semboller ayıklanır ve ilk beş sonuç gösterilir.
+- TEFAS fonları diğer piyasalarla karışmaması için `TEFAS-{FON_KODU}` biçiminde saklanır. Uzun ad, adet, maliyet, alış tarihi ve maliyet para birimi bütün bağımsız portföyler ve JSON yedekleriyle aynen taşınır.
+- `/api/tefas.py`, yeni TEFAS sitesinin resmî `/api/funds/fonUnvanAra` ve `/api/funds/fonFiyatBilgiGetir` JSON uç noktalarını kullanır. Kapatılmış `/api/DB/BindHistoryInfo` akışına bağımlılık yoktur.
+- TEFAS bot korumasıyla uyum için Python sunucu işlevinde `curl_cffi` ve Chrome 131 TLS taklidi kullanılır; oturum 9 dakika, başarılı cevaplar 10 dakika işlem belleğinde tutulur. Vercel CDN cevabı 10 dakika taze, bir saate kadar yeniden doğrulama sırasında kullanılabilir.
+- Tek fon fiyat servisi, 1 hafta–5 yıl dönem kodlarını TEFAS periyotlarına eşler ve günlük fiyat listesini uygulamanın ortak grafik şemasına dönüştürür. Para birimi TRY, fiyat hassasiyeti altı ondalıktır.
+- TEFAS fonlarının dağıtım etkisi fon birim fiyatına işlendiğinden otomatik temettü geri yatırımı sunulmaz. TEFAS pozisyonlarında seçenek devre dışı bırakılır; eski bir yedekten açık ayar gelse bile normalleştirme sırasında kapatılır.
+- TEFAS’ın sağladığı değerler gün sonu fon fiyatlarıdır; gerçek zamanlı borsa fiyatı gibi yorumlanmaz.
+
 ## 18. Bilinen sınırlar ve ertelenen işler
 
 - Üçüncü taraf ücretsiz finans verilerinde gecikme, piyasa kapsamı ve oran sınırı olabilir.
@@ -838,6 +849,9 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 - [ ] Birden fazla bağımsız portföy oluşturulabiliyor; aktif portföyün hisse, nakit, maliyet ve temettü ayarları diğerlerinden ayrı kalıyor.
 - [ ] Toplam Portföy kartı bütün portföyleri birleştiriyor; aktif ve birleşik özetler USD/TL arasında doğru dönüşüyor.
 - [ ] Favori kartı iPhone'da basılı tutulunca görünür biçimde parmağı takip ediyor; sağ düğmeler kaybolmuyor, komşular yumuşak yer açıyor ve yeni sıra yenilemeden sonra korunuyor.
+- [ ] Portföy aramasında `MAC` kodu veya Marmara Capital adı TEFAS sonucunu gösteriyor ve seçilen fon TRY maliyetle eklenebiliyor.
+- [ ] TEFAS fonu portföy değerine son resmî fiyatla katılıyor; günlük ve haftalık değişim son iş günü verilerinden hesaplanıyor.
+- [ ] TEFAS fonu seçildiğinde otomatik temettü geri yatırımı kapalı ve devre dışı görünüyor; JSON yedeği bu ayarı yanlışlıkla yeniden açmıyor.
 
 ### Diğer ve Ayarlar
 
@@ -866,8 +880,8 @@ Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında me
 5. Kişisel veriler tarayıcıda kalıcıdır ve JSON ile taşınabilir.
 6. Yahoo/Nasdaq yedek sağlayıcı zinciri sunucu tarafında çalışır.
 7. Otomatik yenileme yalnız gerekli sayısal alanları değiştirir; görünür yerleşim hareket etmez.
-8. v5.7 kabul testi kontrol listesi geçer.
-9. Güncel belge depo kökünde, aynı belge `archive/v5.7/` altında bulunur.
+8. v5.8 kabul testi kontrol listesi geçer.
+9. Güncel belge depo kökünde bulunur; kullanıcı onayından sonra aynı belge `archive/v5.8/` altında oluşturulur.
 10. Kullanıcı canlı sürümü kontrol edip onaylamıştır.
 
 ## 21. Belge bakım kuralı

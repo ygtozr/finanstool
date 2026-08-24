@@ -1,4 +1,4 @@
-# Özer Finans v5.7
+# Özer Finans v5.8 Önizleme
 
 Özer Finans; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
@@ -7,6 +7,14 @@
 - Vercel: https://finanstool.vercel.app
 - Arayüz dili: Türkçe
 - Güncel kalıcı sürüm: **v5.7**
+- İncelenen sürüm: **v5.8 Önizleme**
+
+## v5.8 TEFAS fonları
+
+- Portföy araması artık TEFAS fon kodu veya uzun fon adıyla arama yapar; sonuçlar `TEFAS-MAC` gibi sağlayıcısı belirgin kodlarla gösterilir.
+- TEFAS fonlarının resmî günlük fiyat geçmişi Özer Finans fiyat biçimine dönüştürülerek portföy değeri, günlük/haftalık değişim ve grafik akışlarında kullanılabilir.
+- TEFAS’ın güncel bot korumasına uyum için ayrı Python sunucu işlevi, Chrome uyumlu TLS oturumu, kısa süreli istek birleştirme ve CDN önbelleği kullanılır.
+- TEFAS fonlarında otomatik temettü geri yatırımı uygulanmaz; bu ürünlerde dağıtım etkisi fon fiyatının içindedir ve seçenek arayüzde devre dışıdır.
 
 ## v5.7 çoklu bağımsız portföy ve favori sıralaması
 

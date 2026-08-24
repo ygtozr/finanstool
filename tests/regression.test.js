@@ -12,6 +12,7 @@ const dividendHistoryApi=fs.readFileSync(path.join(root,'api','dividend-history.
 const goldApi=fs.readFileSync(path.join(root,'api','gold.js'),'utf8');
 const searchApi=fs.readFileSync(path.join(root,'api','search.js'),'utf8');
 const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
+const tefasApi=fs.readFileSync(path.join(root,'api','tefas.py'),'utf8');
 const logoSvg=fs.readFileSync(path.join(root,'assets','ozer-finans-mark.svg'),'utf8');
 
 function extractFunction(source,name){
@@ -153,7 +154,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v5\.7<\/title>/,'Tarayıcı başlığı kalıcı marka ve sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v5\.8 Önizleme<\/title>/,'Tarayıcı başlığı önizleme marka ve sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -269,6 +270,12 @@ assert.match(html,/toggle\.textContent=expanded\?'Daralt':'Tümünü Göster'/,'
 assert.match(html,/renderDistributionCenter\(allocationCenter,sortedAllocations\)/,'Halka grafiğinin merkezinde en büyük pay gösterilmeli');
 assert.match(html,/label\.textContent=items\[0\]\.label/,'Halka grafiğinin merkezinde en büyük paya sahip ürünün adı gösterilmeli');
 assert.doesNotMatch(html,/id="themeToggle"/,'Tema düğmesi ekranın üzerinde sabit kalmamalı');
+assert.match(html,/priceApiUrl\(symbol,query\)[\s\S]*startsWith\('TEFAS-'\)[\s\S]*\/api\/tefas\?action=price/,'TEFAS fon fiyatları ayrı sağlayıcı işlevine yönlenmeli');
+assert.match(html,/Promise\.allSettled\(\[[\s\S]*\/api\/search\?q=[\s\S]*\/api\/tefas\?action=search/,'Portföy araması piyasa ve TEFAS sonuçlarını birlikte getirmeli');
+assert.match(html,/dripUnsupported=symbol\.startsWith\('ALTIN-'\)\|\|symbol\.startsWith\('TEFAS-'\)/,'TEFAS fonlarında otomatik temettü seçimi kapalı olmalı');
+assert.match(tefasApi,/\/api\/funds\/fonFiyatBilgiGetir/,'TEFAS fiyat işlevi yeni resmî fiyat geçmişi uç noktasını kullanmalı');
+assert.match(tefasApi,/\/api\/funds\/fonUnvanAra/,'TEFAS araması yeni resmî fon arama uç noktasını kullanmalı');
+assert.match(tefasApi,/Session\(impersonate="chrome131"\)/,'TEFAS bot koruması için Chrome uyumlu TLS oturumu kullanılmalı');
 assert.match(html,/id="otherView"[\s\S]*data-theme-choice="light"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="system"/,'Diğer ekranı Açık, Koyu ve Sistem tema seçeneklerini içermeli');
 assert.match(html,/id="otherView"[\s\S]*id="backupDownload"[\s\S]*id="restoreBackup"/,'Veri yedekleme araçları Diğer ekranında korunmalı');
 assert.match(html,/function startRefreshTimers\(\)[\s\S]*refreshInterval/,'Otomatik yenileme süresi kullanıcı tercihine göre yeniden başlatılmalı');
@@ -304,4 +311,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v5.7 kalıcı sürüm regresyon testleri başarılı.');
+console.log('Özer Finans v5.8 önizleme regresyon testleri başarılı.');
