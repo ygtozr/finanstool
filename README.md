@@ -17,6 +17,7 @@
 - YLB ve ENR resmî Türkçe unvanlarıyla eş anlamlı kaydedilir ve banka adıyla gelen kalabalık sonuçlarda ilk önerilere taşınır.
 - Bu iki fon kod, banka veya ürün adıyla eşleştiğinde ağ yanıtı beklenmeden anında önerilir; TEFAS ve piyasa sonuçları arka planda listeye eklenir.
 - Hızlı YLB/ENR eşleşmesi yalnız Portföy alanıyla sınırlı değildir; Grafik, Favoriler, Piyasa ve Performans Kıyaslama aramaları da aynı öneriyi kullanır.
+- Bu alanların tamamı ayrıca TEFAS'ın tam YAT yatırım fonu aramasını piyasa aramasıyla aşamalı birleştirir; YLB/ENR dışındaki fonlar da kod veya uzun unvanla bulunabilir.
 - Arama kutuları sonuçsuz sorgularda “Eşleşen ürün bulunamadı”, sağlayıcı kesintisinde ise ayrı bir bağlantı hatası gösterir.
 - TEFAS fonlarının resmî günlük fiyat geçmişi Özer Finans fiyat biçimine dönüştürülerek portföy değeri, günlük/haftalık değişim ve grafik akışlarında kullanılabilir.
 - TEFAS’ın güncel bot korumasına uyum için ayrı Python sunucu işlevi, Chrome uyumlu TLS oturumu, kısa süreli istek birleştirme ve CDN önbelleği kullanılır.

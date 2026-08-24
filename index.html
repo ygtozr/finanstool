@@ -2458,6 +2458,23 @@
         return tokens.every(token=>searchable.includes(token));
       }).map(({symbol,name})=>({symbol,name,exchange:'TEFAS',type:'MUTUALFUND',provider:'TEFAS'}));
     }
+    function startUnifiedAssetSearch(query,isCurrent,render,seed=[]){
+      const merged=new Map(seed.map(item=>[item.symbol,item]));
+      let settled=0,failed=0;
+      const finish=()=>{
+        settled++;
+        if(settled!==2||!isCurrent())return;
+        const items=[...merged.values()];
+        render(items,items.length?'':failed===2?'Arama servisine ulaşılamadı.':'Eşleşen ürün bulunamadı.');
+      };
+      [
+        cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000}),
+        cachedApiJson('/api/tefas?action=search&q='+encodeURIComponent(query),{ttl:600000})
+      ].forEach(request=>request.then(payload=>{
+        (payload.quotes||[]).forEach(item=>merged.set(item.symbol,item));
+        if(isCurrent()&&merged.size)render([...merged.values()]);
+      }).catch(()=>{failed++}).finally(finish));
+    }
 
     function openPortfolioDialog(position=null) {
       const editing=position&&position.symbol;
@@ -3564,15 +3581,8 @@
       const query=symbolInput.value.trim();
       if(query.length<2)return showSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      if(quickFundQuotes.length)showSuggestions(quickFundQuotes);
-      searchTimer=setTimeout(async()=>{
-        try{
-          const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
-          if(requestId!==searchRequestId||symbolInput.value.trim()!==query)return;
-          const items=[...new Map([...quickFundQuotes,...(payload.quotes||[])].map(item=>[item.symbol,item])).values()];
-          showSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
-        }catch{if(requestId===searchRequestId)showSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Arama servisine ulaşılamadı.')}
-      },250);
+      showSuggestions(quickFundQuotes);
+      searchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===searchRequestId&&symbolInput.value.trim()===query,showSuggestions,quickFundQuotes),250);
     });
     favoriteSearch.addEventListener('input',()=>{
       const requestId=++favoriteSearchRequestId;
@@ -3580,15 +3590,8 @@
       const query=favoriteSearch.value.trim();
       if(query.length<2)return showFavoriteSearchSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      if(quickFundQuotes.length)showFavoriteSearchSuggestions(quickFundQuotes);
-      favoriteSearchTimer=setTimeout(async()=>{
-        try{
-          const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
-          if(requestId!==favoriteSearchRequestId||favoriteSearch.value.trim()!==query)return;
-          const items=[...new Map([...quickFundQuotes,...(payload.quotes||[])].map(item=>[item.symbol,item])).values()];
-          showFavoriteSearchSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
-        }catch{if(requestId===favoriteSearchRequestId)showFavoriteSearchSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Arama servisine ulaşılamadı.')}
-      },250);
+      showFavoriteSearchSuggestions(quickFundQuotes);
+      favoriteSearchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===favoriteSearchRequestId&&favoriteSearch.value.trim()===query,showFavoriteSearchSuggestions,quickFundQuotes),250);
     });
     favoriteAddForm.addEventListener('submit',event=>{event.preventDefault();addOverviewFavorite({symbol:favoriteSearch.value,name:favoriteSearch.value})});
     favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol)) { favorites=favorites.filter(item=>item.symbol!==symbol); favoriteQuotes.delete(symbol); } else favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); refreshFavoriteQuotes(); });
@@ -3683,15 +3686,8 @@
       const query=marketSettingsSearch.value.trim();
       if(query.length<2)return showMarketSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      if(quickFundQuotes.length)showMarketSuggestions(quickFundQuotes);
-      marketSearchTimer=setTimeout(async()=>{
-        try{
-          const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
-          if(requestId!==marketSearchRequestId||marketSettingsSearch.value.trim()!==query)return;
-          const items=[...new Map([...quickFundQuotes,...(payload.quotes||[])].map(item=>[item.symbol,item])).values()];
-          showMarketSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
-        }catch{if(requestId===marketSearchRequestId)showMarketSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Arama servisine ulaşılamadı.')}
-      },250);
+      showMarketSuggestions(quickFundQuotes);
+      marketSearchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===marketSearchRequestId&&marketSettingsSearch.value.trim()===query,showMarketSuggestions,quickFundQuotes),250);
     });
     marketSettingsForm.addEventListener('submit',event=>{
       event.preventDefault();
@@ -3816,15 +3812,8 @@
       const query=benchmarkSearch.value.trim();
       if(query.length<2)return showBenchmarkSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      if(quickFundQuotes.length)showBenchmarkSuggestions(quickFundQuotes);
-      benchmarkSearchTimer=setTimeout(async()=>{
-        try{
-          const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
-          if(requestId!==benchmarkSearchRequestId||benchmarkSearch.value.trim()!==query)return;
-          const items=[...new Map([...quickFundQuotes,...(payload.quotes||[])].map(item=>[item.symbol,item])).values()];
-          showBenchmarkSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
-        }catch{if(requestId===benchmarkSearchRequestId)showBenchmarkSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Arama servisine ulaşılamadı.')}
-      },250);
+      showBenchmarkSuggestions(quickFundQuotes);
+      benchmarkSearchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===benchmarkSearchRequestId&&benchmarkSearch.value.trim()===query,showBenchmarkSuggestions,quickFundQuotes),250);
     });
     benchmarkApply.addEventListener('click',()=>{
       const symbol=String(benchmarkSelection?.symbol||benchmarkSearch.value).trim().toUpperCase();
@@ -3945,22 +3934,8 @@
       const query=portfolioSymbol.value.trim();
       if(query.length<2)return showPortfolioSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      if(quickFundQuotes.length)showPortfolioSuggestions(quickFundQuotes);
-      portfolioSearchTimer=setTimeout(async()=>{
-        try{
-          const [marketResult,tefasResult]=await Promise.allSettled([
-            cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000}),
-            cachedApiJson('/api/tefas?action=search&q='+encodeURIComponent(query),{ttl:600000})
-          ]);
-          if(requestId!==portfolioSearchRequestId||portfolioSymbol.value.trim()!==query)return;
-          const marketQuotes=marketResult.status==='fulfilled'?(marketResult.value.quotes||[]):[];
-          const tefasQuotes=tefasResult.status==='fulfilled'?(tefasResult.value.quotes||[]):[];
-          const unique=new Map([...quickFundQuotes,...tefasQuotes,...marketQuotes].map(item=>[item.symbol,item]));
-          const items=[...unique.values()];
-          const bothFailed=marketResult.status==='rejected'&&tefasResult.status==='rejected';
-          showPortfolioSuggestions(items,items.length?'':bothFailed?'Arama servisine ulaşılamadı.':'Eşleşen ürün bulunamadı.');
-        }catch{if(requestId===portfolioSearchRequestId)showPortfolioSuggestions([],'Arama servisine ulaşılamadı.')}
-      },250);
+      showPortfolioSuggestions(quickFundQuotes);
+      portfolioSearchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===portfolioSearchRequestId&&portfolioSymbol.value.trim()===query,showPortfolioSuggestions,quickFundQuotes),250);
     });
     portfolioSymbol.addEventListener('keydown',event=>{
       if(event.key==='Enter'&&!portfolioSuggestions.classList.contains('visible')){event.preventDefault();openPortfolioDialog()}
