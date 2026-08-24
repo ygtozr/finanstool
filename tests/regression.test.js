@@ -276,6 +276,7 @@ assert.match(html,/function rankSearchResults\(items,query\)[\s\S]*baseSymbol===
 assert.match(html,/dripUnsupported=symbol\.startsWith\('ALTIN-'\)\|\|symbol\.startsWith\('TEFAS-'\)/,'TEFAS fonlarında otomatik temettü seçimi kapalı olmalı');
 assert.match(tefasApi,/\/api\/funds\/fonFiyatBilgiGetir/,'TEFAS fiyat işlevi yeni resmî fiyat geçmişi uç noktasını kullanmalı');
 assert.match(tefasApi,/\/api\/funds\/fonUnvanAra/,'TEFAS araması yeni resmî fon arama uç noktasını kullanmalı');
+assert.match(tefasApi,/catalog_payload = _post\([\s\S]*\/api\/funds\/fonUnvanAra[\s\S]*\{\},[\s\S]*cache_ttl=FUND_LIST_TTL/,'TEFAS araması işlem listesi dışında kalabilen fonlar için genel unvan katalogunu kullanmalı');
 assert.match(tefasApi,/\/api\/statistics\/tefas\/getFplFonList/,'TEFAS araması hızlı aramada görünmeyen yatırım fonları için tam fon listesini kullanmalı');
 assert.match(tefasApi,/FUND_LIST_TTL\s*=\s*6\s*\*\s*60\s*\*\s*60/,'TEFAS tam fon listesi sağlayıcı sınırını korumak için uzun süre önbelleklenmeli');
 assert.match(tefasApi,/def _search_text\(value\):[\s\S]*unicodedata\.normalize\("NFKD", text\)/,'TEFAS fon araması Türkçe karakter ve aksan farklarından etkilenmemeli');

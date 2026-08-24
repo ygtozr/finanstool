@@ -175,6 +175,22 @@ def _search(query):
         ):
             rows.insert(0, {"fonKod": code, "unvan": official_name})
 
+    # Bos arama, aktif TEFAS islem listesinin disinda kalabilen ancak kodla
+    # fiyatlanabilen fonlari da iceren genel unvan katalogunu dondurur.
+    try:
+        catalog_payload = _post(
+            "/api/funds/fonUnvanAra",
+            {},
+            cache_ttl=FUND_LIST_TTL,
+        )
+        for row in catalog_payload.get("resultList") or []:
+            code = _clean_code(row.get("fonKod") or row.get("fonKodu") or row.get("kod"))
+            name = str(row.get("unvan") or row.get("fonUnvan") or row.get("fonAdi") or "").strip()
+            if normalized_query and _matches_search(normalized_query, code, name):
+                rows.append(row)
+    except Exception:
+        pass
+
     # TEFAS'in hizli ad aramasi, alim-satimi sinirli veya dagitimi kapali
     # bazi yatirim fonlarini (ornegin YLB/ENR) her zaman dondurmuyor.
     # Tam YAT fon listesini uzun sureli onbellekten okuyup yerelde aramak,
