@@ -36,7 +36,7 @@
     .favorite-add-search > button { flex:0 0 44px; width:44px; min-height:44px; padding:0; font-size:1.15rem; }
     .favorite-add-search .search-suggestions { right:50px; }
     .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 36px; gap:6px; align-items:stretch; }
-    .favorite-card { min-width:0; min-height:76px; padding:9px 11px; display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:10px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; cursor:grab; touch-action:pan-y; -webkit-user-select:none; user-select:none; }
+    .favorite-card { min-width:0; min-height:76px; padding:9px 11px; display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:10px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; cursor:grab; touch-action:none; -webkit-user-select:none; user-select:none; }
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
     .favorite-row.favorite-drag-placeholder { opacity:.28; }
     .favorite-row.favorite-drag-placeholder .favorite-card { border-color:var(--accent); }
@@ -1290,6 +1290,7 @@
     }
 
     let favoriteDragSuppressUntil=0;
+    let favoriteScrollMomentum=0;
     function persistFavoriteOrderFromDom() {
       const bySymbol=new Map(favorites.map(item=>[item.symbol,item]));
       const ordered=[...favoritesList.querySelectorAll(':scope > .favorite-row')].map(row=>bySymbol.get(row.dataset.symbol)).filter(Boolean);
@@ -1333,10 +1334,22 @@
       };
       const onMove=event=>{
         if(!pending||event.pointerId!==pending.pointerId)return;
+        const previousY=pending.lastY;
+        const previousMoveAt=pending.lastMoveAt;
         pending.lastY=event.clientY;
+        pending.lastMoveAt=performance.now();
         const distance=Math.hypot(event.clientX-pending.startX,event.clientY-pending.startY);
         if(!pending.active){
-          if(distance>10)clearPending();
+          if(pending.scrolling||distance>10){
+            clearTimeout(pending.timer);
+            if(pending.pointerType==='mouse'){clearPending();return}
+            pending.scrolling=true;
+            event.preventDefault();
+            const scrollDelta=previousY-event.clientY;
+            window.scrollBy(0,scrollDelta);
+            const elapsed=Math.max(1,pending.lastMoveAt-previousMoveAt);
+            pending.velocity=(pending.velocity*.45)+(scrollDelta/elapsed*.55);
+          }
           return;
         }
         event.preventDefault();
@@ -1350,6 +1363,7 @@
         if(!pending||event.pointerId!==pending.pointerId)return;
         const active=pending.active;
         const ghost=pending.ghost;
+        const scrolling=pending.scrolling;
         if(active){
           event.preventDefault();
           row.classList.remove('favorite-drag-placeholder');
@@ -1357,13 +1371,26 @@
           document.body.classList.remove('favorite-reordering');
           favoriteDragSuppressUntil=Date.now()+500;
           persistFavoriteOrderFromDom();
+        }else if(scrolling){
+          event.preventDefault();
+          favoriteDragSuppressUntil=Date.now()+350;
+          let speed=Math.max(-24,Math.min(24,pending.velocity*16));
+          const glide=()=>{
+            if(Math.abs(speed)<.35){favoriteScrollMomentum=0;return}
+            window.scrollBy(0,speed);
+            speed*=.9;
+            favoriteScrollMomentum=requestAnimationFrame(glide);
+          };
+          favoriteScrollMomentum=requestAnimationFrame(glide);
         }
         clearPending();
       };
       open.addEventListener('pointerdown',event=>{
         if(!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
+        cancelAnimationFrame(favoriteScrollMomentum);
+        favoriteScrollMomentum=0;
         clearPending();
-        pending={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,lastY:event.clientY,active:false,ghost:null,offsetY:0,timer:0};
+        pending={pointerId:event.pointerId,pointerType:event.pointerType,startX:event.clientX,startY:event.clientY,lastY:event.clientY,lastMoveAt:performance.now(),velocity:0,scrolling:false,active:false,ghost:null,offsetY:0,timer:0};
         pending.timer=setTimeout(activate,400);
         window.addEventListener('pointermove',onMove,{passive:false});
         window.addEventListener('pointerup',onEnd,{passive:false});
