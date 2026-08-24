@@ -24,6 +24,7 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v5.4](./v5.4/) | Arşivlendi | v5.4 ana dal yayını |
 | [v5.5](./v5.5/) | Arşivlendi | v5.5 ana dal yayını |
 | [v5.6](./v5.6/) | Arşivlendi | v5.6 ana dal yayını |
-| [v5.7](./v5.7/) | Kalıcı onaylı sürüm | v5.7 ana dal yayını |
+| [v5.7](./v5.7/) | Arşivlendi | v5.7 ana dal yayını |
+| [v6.0](./v6.0/) | Kalıcı onaylı sürüm | v6.0 ana dal yayını |
 
 Bir sonraki onaylı sürüm yayınlanırken mevcut sürüm aynı düzenle arşivlenecektir.
