@@ -72,7 +72,7 @@
 ## v5 ürün ve ayar merkezi sürümü
 
 - Favori kartlarına hızlı işlem menüsü ve sade ekonomik gösterge paneli eklendi; ana grafik karşılaştırma akışı kaldırıldı.
-- Favori kartları ayrı bir tutamaç olmadan yaklaşık 0,4 saniye basılı tutulup sürüklenerek sıralanabilir; iPhone için bağımsız TouchEvent akışı gerçek kartı 60 FPS yaylı ara karelerle parmağın yatay ve dikey hareketinde taşır. Görünmez yer tutucu sayesinde sağ işlem düğmeleri ikinci kez görünmez; metin seçimi ve dokunma çağrı balonu engellenir. Yeni sıra otomatik olarak cihazda saklanır.
+- Favori kartları ayrı bir tutamaç olmadan yaklaşık 0,4 saniye basılı tutulup sürüklenerek sıralanabilir; iPhone için bağımsız TouchEvent akışı gerçek kartı ve sağ işlem düğmelerini 60 FPS yaylı ara karelerle parmağın yatay ve dikey hareketinde birlikte taşır. Görünmez yer tutucu ikinci bir kart oluşturmaz; metin seçimi ve dokunma çağrı balonu engellenir. Yeni sıra otomatik olarak cihazda saklanır.
 - RSI ana grafiğin altında sürekli görünür; MA50/100/200 kontrolü grafik içine, Favoriler ve Portföy varlık seçicileri grafik sayfasının altına yerleştirildi.
 - Portföye TRY, USD, EUR ve GBP nakit ekleme; bütün grafik dönemleriyle performans karşılaştırması ve yaklaşan temettü listesi eklendi.
 - Portföy varlık kartları iki satırlı kompakt düzene, dağılım grafikleri yan yana mini halka görünümüne geçirildi. İlk üç kalem doğrudan, diğerleri açılır özetle gösterilir.

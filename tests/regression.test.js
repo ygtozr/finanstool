@@ -130,7 +130,8 @@ assert.match(html,/ghostTargetX[\s\S]*ghostTargetY[\s\S]*translate3d\(\$\{pendin
 assert.match(html,/open\.addEventListener\('touchstart'[\s\S]*beginInteraction\(touch\.identifier,'touch'/,'Favori kartı iPhone için ayrı TouchEvent etkileşimi başlatmalı');
 assert.match(html,/window\.addEventListener\('touchmove',onTouchMove,\{passive:false\}\)[\s\S]*window\.addEventListener\('touchend',onTouchEnd,\{passive:false\}\)/,'iPhone sürüklemesi pasif olmayan touchmove ve touchend dinleyicilerine sahip olmalı');
 assert.match(html,/\.favorite-row\.favorite-drag-placeholder \{ visibility:hidden; opacity:0; pointer-events:none; \}/,'Sürükleme yer tutucusundaki sağ işlem düğmeleri ikinci seçim gibi görünmemeli');
-assert.match(html,/\.favorite-row\.favorite-drag-ghost \.favorite-actions \{ visibility:hidden; \}/,'Havada sürüklenen kartın sağ işlem düğmeleri ek seçim gibi görünmemeli');
+assert.match(html,/\.favorite-row\.favorite-drag-ghost \{[^}]*display:grid !important; visibility:visible !important/,'Mobil nth-child kuralı havada sürüklenen gerçek favori kartını gizlememeli');
+assert.doesNotMatch(html,/\.favorite-row\.favorite-drag-ghost \.favorite-actions \{ visibility:hidden; \}/,'Havada sürüklenen kartın sağ işlem düğmeleri görünür kalmalı');
 assert.match(html,/-webkit-touch-callout:none[\s\S]*document\.getSelection\(\)\?\.removeAllRanges\(\)/,'iPhone metin seçimi ve dokunma çağrı balonu sürükleme sırasında engellenmeli');
 assert.match(html,/function playFavoriteMotion[\s\S]*typeof element\.animate==='function'[\s\S]*element\.style\.transition/,'Favori animasyonu eski Safari için CSS geçişi yedeğine sahip olmalı');
 assert.match(html,/localStorage\.setItem\(favoritesKey, JSON\.stringify\(favorites\)\)/,'Favorilerin yeni sırası yerel depolamada kalıcı olmalı');
