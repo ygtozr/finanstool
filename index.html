@@ -3563,13 +3563,15 @@
       updateFavoriteButton();clearTimeout(searchTimer);
       const query=symbolInput.value.trim();
       if(query.length<2)return showSuggestions([]);
+      const quickFundQuotes=knownTefasMatches(query);
+      if(quickFundQuotes.length)showSuggestions(quickFundQuotes);
       searchTimer=setTimeout(async()=>{
         try{
           const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
           if(requestId!==searchRequestId||symbolInput.value.trim()!==query)return;
-          const items=payload.quotes||[];
+          const items=[...new Map([...quickFundQuotes,...(payload.quotes||[])].map(item=>[item.symbol,item])).values()];
           showSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
-        }catch{if(requestId===searchRequestId)showSuggestions([],'Arama servisine ulaşılamadı.')}
+        }catch{if(requestId===searchRequestId)showSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Arama servisine ulaşılamadı.')}
       },250);
     });
     favoriteSearch.addEventListener('input',()=>{
@@ -3577,13 +3579,15 @@
       clearTimeout(favoriteSearchTimer);
       const query=favoriteSearch.value.trim();
       if(query.length<2)return showFavoriteSearchSuggestions([]);
+      const quickFundQuotes=knownTefasMatches(query);
+      if(quickFundQuotes.length)showFavoriteSearchSuggestions(quickFundQuotes);
       favoriteSearchTimer=setTimeout(async()=>{
         try{
           const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
           if(requestId!==favoriteSearchRequestId||favoriteSearch.value.trim()!==query)return;
-          const items=payload.quotes||[];
+          const items=[...new Map([...quickFundQuotes,...(payload.quotes||[])].map(item=>[item.symbol,item])).values()];
           showFavoriteSearchSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
-        }catch{if(requestId===favoriteSearchRequestId)showFavoriteSearchSuggestions([],'Arama servisine ulaşılamadı.')}
+        }catch{if(requestId===favoriteSearchRequestId)showFavoriteSearchSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Arama servisine ulaşılamadı.')}
       },250);
     });
     favoriteAddForm.addEventListener('submit',event=>{event.preventDefault();addOverviewFavorite({symbol:favoriteSearch.value,name:favoriteSearch.value})});
@@ -3678,13 +3682,15 @@
       clearTimeout(marketSearchTimer);
       const query=marketSettingsSearch.value.trim();
       if(query.length<2)return showMarketSuggestions([]);
+      const quickFundQuotes=knownTefasMatches(query);
+      if(quickFundQuotes.length)showMarketSuggestions(quickFundQuotes);
       marketSearchTimer=setTimeout(async()=>{
         try{
           const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
           if(requestId!==marketSearchRequestId||marketSettingsSearch.value.trim()!==query)return;
-          const items=payload.quotes||[];
+          const items=[...new Map([...quickFundQuotes,...(payload.quotes||[])].map(item=>[item.symbol,item])).values()];
           showMarketSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
-        }catch{if(requestId===marketSearchRequestId)showMarketSuggestions([],'Arama servisine ulaşılamadı.')}
+        }catch{if(requestId===marketSearchRequestId)showMarketSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Arama servisine ulaşılamadı.')}
       },250);
     });
     marketSettingsForm.addEventListener('submit',event=>{
@@ -3809,13 +3815,15 @@
       clearTimeout(benchmarkSearchTimer);
       const query=benchmarkSearch.value.trim();
       if(query.length<2)return showBenchmarkSuggestions([]);
+      const quickFundQuotes=knownTefasMatches(query);
+      if(quickFundQuotes.length)showBenchmarkSuggestions(quickFundQuotes);
       benchmarkSearchTimer=setTimeout(async()=>{
         try{
           const payload=await cachedApiJson('/api/search?q='+encodeURIComponent(query),{ttl:60000});
           if(requestId!==benchmarkSearchRequestId||benchmarkSearch.value.trim()!==query)return;
-          const items=payload.quotes||[];
+          const items=[...new Map([...quickFundQuotes,...(payload.quotes||[])].map(item=>[item.symbol,item])).values()];
           showBenchmarkSuggestions(items,items.length?'':'Eşleşen ürün bulunamadı.');
-        }catch{if(requestId===benchmarkSearchRequestId)showBenchmarkSuggestions([],'Arama servisine ulaşılamadı.')}
+        }catch{if(requestId===benchmarkSearchRequestId)showBenchmarkSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Arama servisine ulaşılamadı.')}
       },250);
     });
     benchmarkApply.addEventListener('click',()=>{
