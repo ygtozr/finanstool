@@ -31,7 +31,7 @@
     .favorites-panel-head button { min-height:44px; padding:7px 11px; color:#062019; background:var(--accent); border:1px solid var(--accent); font-size:.8rem; font-weight:700; }
     .favorites-note { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
     .favorites-list { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
-    .favorite-add-search { position:relative; display:flex; gap:8px; margin:12px 0 0; }
+    .favorite-add-search { position:relative; z-index:45; display:flex; gap:8px; margin:12px 0 0; }
     .favorite-add-search input { min-height:42px; padding:9px 11px; font-size:.84rem; }
     .favorite-add-search > button { flex:0 0 44px; width:44px; min-height:44px; padding:0; font-size:1.15rem; }
     .favorite-add-search .search-suggestions { right:50px; }
@@ -88,7 +88,7 @@
     .favorite-toggle { color:#ffd66b; background:#302714; border:1px solid #7a6130; font-size:1.55rem; }
     .favorite-toggle.is-favorite { background:#5b4817; border-color:#d7aa38; }
     .search-field { position:relative; }
-    .search-suggestions {display:none;position:absolute;z-index:5;top:calc(100% + 5px);left:0;right:54px;margin:0;padding:5px;list-style:none;border:1px solid var(--line);border-radius:10px;background:#101827;box-shadow:0 12px 25px #0008}.search-suggestions.visible{display:grid;gap:3px}.suggestion{width:100%;padding:8px 10px;text-align:left;color:var(--text);background:transparent;border-radius:7px;font-size:.88rem}.suggestion:hover{background:#26344d}.suggestion-empty{padding:10px;color:var(--muted);font-size:.84rem;text-align:left}
+    .search-suggestions {display:none;position:absolute;z-index:70;top:calc(100% + 5px);left:0;right:54px;max-height:var(--suggestion-space,280px);overflow-y:auto;overscroll-behavior:contain;margin:0;padding:5px;list-style:none;border:1px solid var(--line);border-radius:10px;background:#101827;box-shadow:0 12px 25px #0008}.search-suggestions.visible{display:grid;gap:3px}.search-suggestions.open-up{top:auto;bottom:calc(100% + 5px);box-shadow:0 -12px 25px #0008}.suggestion{width:100%;padding:8px 10px;text-align:left;color:var(--text);background:transparent;border-radius:7px;font-size:.88rem}.suggestion:hover{background:#26344d}.suggestion-empty{padding:10px;color:var(--muted);font-size:.84rem;text-align:left}
     input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:uppercase; }
     input:focus { outline:3px solid #52d5b166; border-color:var(--accent); }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
@@ -1825,11 +1825,30 @@
       });
     }
 
+    function positionSuggestionList(input,list) {
+      if(!list.classList.contains('visible'))return;
+      const viewport=window.visualViewport;
+      const viewportTop=viewport?.offsetTop||0,viewportBottom=viewportTop+(viewport?.height||window.innerHeight);
+      const rect=input.getBoundingClientRect(),mobileNav=document.querySelector('.mobile-bottom-nav');
+      const navTop=mobileNav&&getComputedStyle(mobileNav).display!=='none'?mobileNav.getBoundingClientRect().top:viewportBottom;
+      const lowerLimit=Math.min(viewportBottom,navTop),spaceBelow=Math.max(0,lowerLimit-rect.bottom-8),spaceAbove=Math.max(0,rect.top-viewportTop-8);
+      const openUp=spaceBelow<Math.min(190,spaceAbove);
+      list.classList.toggle('open-up',openUp);
+      list.style.setProperty('--suggestion-space',Math.max(96,Math.min(280,openUp?spaceAbove:spaceBelow))+'px');
+    }
+
     function updateComboboxState(input,list,visible) {
       list.classList.toggle('visible',visible);
       input.setAttribute('aria-expanded',String(visible));
-      if(!visible)input.removeAttribute('aria-activedescendant');
+      if(visible)requestAnimationFrame(()=>positionSuggestionList(input,list));
+      else{input.removeAttribute('aria-activedescendant');list.classList.remove('open-up');list.style.removeProperty('--suggestion-space')}
     }
+
+    function repositionVisibleSuggestions(){
+      document.querySelectorAll('input[aria-controls][aria-expanded="true"]').forEach(input=>{const list=document.getElementById(input.getAttribute('aria-controls'));if(list)positionSuggestionList(input,list)});
+    }
+    window.visualViewport?.addEventListener('resize',repositionVisibleSuggestions);
+    window.visualViewport?.addEventListener('scroll',repositionVisibleSuggestions);
 
     function prepareSuggestionButton(button,list,index) {
       button.setAttribute('role','option');

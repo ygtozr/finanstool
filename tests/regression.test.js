@@ -168,6 +168,8 @@ assert.match(html,/function fundManagerIdentity\(name\)[\s\S]*AK PORTFOY[\s\S]*Y
 assert.match(html,/function managerLogoUrl\(name\)[\s\S]*return manager\.asset\|\|''/,'Fon yönetim şirketi logosu ağdan değil yerel varlıktan çözülmeli');
 for(const file of ['ak.png','yapi-kredi.png','is.png','qnb.png','garanti.png','ziraat.png','vakif.png','halk.png','deniz.png','teb.png','fiba.png'])assert.ok(fs.statSync(path.join(root,'assets','fund-managers',file)).size>700,'Fon yönetim şirketi logosu yerelde bulunmalı: '+file);
 assert.match(html,/fund-manager-logo \{[^}]*object-fit:contain !important;[^}]*background:#fff !important;/,'Fon logoları yuvarlak kart içinde kırpılmadan görünmeli');
+assert.match(html,/function positionSuggestionList\(input,list\)[\s\S]*visualViewport[\s\S]*spaceBelow<Math\.min\(190,spaceAbove\)[\s\S]*classList\.toggle\('open-up',openUp\)/,'Arama önerileri klavye ve alt menü alanına göre yukarı veya aşağı açılmalı');
+assert.match(html,/\.search-suggestions\.open-up\{top:auto;bottom:calc\(100% \+ 5px\)/,'Yukarı açılan öneri listesi arama kutusunun üzerinde konumlanmalı');
 assert.match(html,/\.portfolio-head \{[^}]*padding:16px;[^}]*border:1px solid var\(--line\);[^}]*border-radius:14px;/,'Portföy üst özeti tüm ekranlarda çerçeveli kart olmalı');
 assert.match(html,/\.portfolio-head-value \{[^}]*font-size:1\.5rem;/,'Portföy toplam değeri hafifçe büyütülmeli');
 assert.match(html,/id="portfolioCurrencyToggle"[^>]*aria-pressed="false"[^>]*>⇄<\/button>/,'Portföy üst özetinde dönüşüm düğmesi bulunmalı');
