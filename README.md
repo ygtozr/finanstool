@@ -11,8 +11,8 @@
 
 ## v5.8 TEFAS fonları
 
-- Altın ürünleri, seçilen üçlü külçe tasarımına sahip yerel bir SVG rozet kullanır.
-- TEFAS fonlarında fon adından yönetim şirketi tanınır; Ak, Yapı Kredi, İş, QNB/Enpara, Garanti, Ziraat, Vakıf, Halk, Deniz, TEB ve Fiba için kurum renkli kimlik rozeti, diğer fonlar için nötr `FON` rozeti gösterilir.
+- Altın ürünleri, seçilen D alternatifindeki üçlü külçe çiziminin yüksek çözünürlüklü yerel rozetini kullanır.
+- TEFAS fonlarında fon adından yönetim şirketi tanınır; Ak, Yapı Kredi, İş, QNB/Enpara, Garanti, Ziraat, Vakıf, Halk, Deniz, TEB ve Fiba logoları uygulamanın yerel varlıklarından gösterilir. Ağ erişimi gerekmez; yalnız tanınmayan yönetici için nötr `FON` rozeti kullanılır.
 - Altın ve fon rozetleri yerel/veri URI tabanlıdır; fiyat yenilemelerinde yeniden indirilmez ve kart yerleşimini oynatmaz.
 
 - Portföy araması artık TEFAS fon kodu veya uzun fon adıyla arama yapar; sonuçlar `TEFAS-MAC` gibi sağlayıcısı belirgin kodlarla gösterilir.

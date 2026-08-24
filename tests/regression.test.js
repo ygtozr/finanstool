@@ -14,7 +14,6 @@ const searchApi=fs.readFileSync(path.join(root,'api','search.js'),'utf8');
 const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
 const tefasApi=fs.readFileSync(path.join(root,'api','tefas.py'),'utf8');
 const logoSvg=fs.readFileSync(path.join(root,'assets','ozer-finans-mark.svg'),'utf8');
-const goldMarkSvg=fs.readFileSync(path.join(root,'assets','gold-mark.svg'),'utf8');
 
 function extractFunction(source,name){
   const start=source.indexOf('function '+name);
@@ -162,10 +161,13 @@ assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans mark
 assert.match(html,/\.page-brand \{[^}]*justify-content:center;/,'Sayfa marka kilidi yatay olarak ortalanmalı');
 assert.match(html,/\.version-badge \{[^}]*border:0;[^}]*opacity:\.62;/,'Sürüm bilgisi rozetsiz, küçük ve silik gösterilmeli');
 assert.match(logoSvg,/<rect x="1" y="1" width="62" height="62" rx="16" fill="#fff"/,'Özer Finans logosu beyaz zeminli uygulama ikonu olmalı');
-assert.match(goldMarkSvg,/<title[^>]*>Üç külçeli altın simgesi<\/title>/,'Altın ürünleri seçilen üçlü külçe simgesini kullanmalı');
-assert.match(html,/safe\.startsWith\('ALTIN-'\)\)return\['assets\/gold-mark\.svg'\]/,'Bütün altın ürünleri yerel ve kalıcı altın simgesini kullanmalı');
-assert.match(html,/safe\.startsWith\('TEFAS-'\)\)return\[managerBadgeDataUri\(name\)\]/,'TEFAS fonları yönetim şirketi kimlik rozetini kullanmalı');
+assert.ok(fs.statSync(path.join(root,'assets','gold-mark-d.png')).size>100000,'Seçilen D altın çizimi yüksek çözünürlüklü yerel görsel olarak saklanmalı');
+assert.match(html,/safe\.startsWith\('ALTIN-'\)\)return\['assets\/gold-mark-d\.png'\]/,'Bütün altın ürünleri seçilen D simgesini kullanmalı');
+assert.match(html,/safe\.startsWith\('TEFAS-'\)\)return uniqueBy\(\[managerLogoUrl\(name\),managerBadgeDataUri\(name\)\]/,'TEFAS fonları önce gerçek kurum simgesini, yalnız hata halinde harf yedeğini kullanmalı');
 assert.match(html,/function fundManagerIdentity\(name\)[\s\S]*AK PORTFOY[\s\S]*YAPI KREDI PORTFOY[\s\S]*QNB PORTFOY/,'Başlıca fon yönetim şirketleri adından tanınmalı');
+assert.match(html,/function managerLogoUrl\(name\)[\s\S]*return manager\.asset\|\|''/,'Fon yönetim şirketi logosu ağdan değil yerel varlıktan çözülmeli');
+for(const file of ['ak.png','yapi-kredi.png','is.png','qnb.png','garanti.png','ziraat.png','vakif.png','halk.png','deniz.png','teb.png','fiba.png'])assert.ok(fs.statSync(path.join(root,'assets','fund-managers',file)).size>700,'Fon yönetim şirketi logosu yerelde bulunmalı: '+file);
+assert.match(html,/fund-manager-logo \{[^}]*object-fit:contain !important;[^}]*background:#fff !important;/,'Fon logoları yuvarlak kart içinde kırpılmadan görünmeli');
 assert.match(html,/\.portfolio-head \{[^}]*padding:16px;[^}]*border:1px solid var\(--line\);[^}]*border-radius:14px;/,'Portföy üst özeti tüm ekranlarda çerçeveli kart olmalı');
 assert.match(html,/\.portfolio-head-value \{[^}]*font-size:1\.5rem;/,'Portföy toplam değeri hafifçe büyütülmeli');
 assert.match(html,/id="portfolioCurrencyToggle"[^>]*aria-pressed="false"[^>]*>⇄<\/button>/,'Portföy üst özetinde dönüşüm düğmesi bulunmalı');
