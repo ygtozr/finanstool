@@ -934,6 +934,18 @@
       return endpoint+'?symbol='+encodeURIComponent(safeSymbol)+'&query='+encodeURIComponent(query);
     }
 
+    async function prefetchPortfolioPrices(positions) {
+      const query='range=1mo&interval=1d';
+      const codes=[...new Set((positions||[]).map(item=>String(item.symbol||'')).filter(symbol=>symbol.startsWith('TEFAS-')).map(symbol=>symbol.slice(6)))].sort();
+      if(!codes.length)return;
+      const chunks=[];for(let index=0;index<codes.length;index+=25)chunks.push(codes.slice(index,index+25));
+      const payloads=await Promise.all(chunks.map(chunk=>cachedApiJson('/api/tefas?action=batch-price&symbols='+encodeURIComponent(chunk.join(','))+'&query='+encodeURIComponent(query),{ttl:600000}).catch(()=>null)));
+      payloads.forEach(payload=>Object.entries(payload?.results||{}).forEach(([code,result])=>{
+        if(!result?.ok||!result.data)return;
+        apiCache.set(priceApiUrl('TEFAS-'+code,query),{time:Date.now(),data:result.data});
+      }));
+    }
+
     const saveMarketItems = () => localStorage.setItem(marketItemsKey,JSON.stringify(marketItems));
     const themeChoiceButtons = [...document.querySelectorAll('[data-theme-choice]')];
     const refreshIntervalSelect = document.getElementById('refreshIntervalSelect');
@@ -1081,6 +1093,7 @@
     const cashKey = 'finans-grafigi-cash-balances';
     const portfolioBooksKey = 'finans-grafigi-portfolios-v2';
     const activePortfolioKey = 'finans-grafigi-active-portfolio';
+    const portfolioSnapshotsKey = 'finans-grafigi-portfolio-snapshots-v1';
     const supportedCashCurrencies = ['TRY','USD','EUR','GBP'];
     function normalizedPortfolioItem(item) {
       const quantity=Number(item?.baseQuantity??item?.quantity),unitCost=Number(item?.unitCost),symbol=String(item?.symbol||'').toUpperCase(),costCurrency=['TRY','USD','EUR','GBP'].includes(String(item?.costCurrency||'').toUpperCase())?String(item.costCurrency).toUpperCase():null,purchaseDate=/^\d{4}-\d{2}-\d{2}$/.test(item?.purchaseDate||'')?item.purchaseDate:null;
@@ -1110,11 +1123,19 @@
     if(!portfolioBooks.length)portfolioBooks=[{id:'portfolio-main',name:'Portföyüm',positions:legacyPortfolio,cashBalances:legacyCashBalances,createdAt:new Date().toISOString()}];
     let activePortfolioId=localStorage.getItem(activePortfolioKey)||portfolioBooks[0].id;
     if(!portfolioBooks.some(item=>item.id===activePortfolioId))activePortfolioId=portfolioBooks[0].id;
+    let portfolioSnapshots=(()=>{try{const saved=JSON.parse(localStorage.getItem(portfolioSnapshotsKey)||'{}');return saved&&typeof saved==='object'?saved:{}}catch{return{}}})();
     let portfolio=[];
     let cashBalances=[];
     let portfolioBookEditMode='create';
     function activePortfolioBook(){return portfolioBooks.find(item=>item.id===activePortfolioId)||portfolioBooks[0]}
     function bindActivePortfolio(){const book=activePortfolioBook();activePortfolioId=book.id;portfolio=book.positions;cashBalances=book.cashBalances}
+    function portfolioSnapshotFingerprint(book=activePortfolioBook()){
+      return JSON.stringify({positions:book.positions.map(item=>[item.symbol,item.quantity,item.unitCost,item.costCurrency,item.purchaseDate,item.dripEnabled]),cash:book.cashBalances.map(item=>[item.currency,item.amount])});
+    }
+    function savePortfolioSnapshot(snapshot){
+      portfolioSnapshots[activePortfolioId]={...snapshot,fingerprint:portfolioSnapshotFingerprint(),savedAt:Date.now()};
+      try{localStorage.setItem(portfolioSnapshotsKey,JSON.stringify(portfolioSnapshots))}catch{}
+    }
     bindActivePortfolio();
     localStorage.setItem(portfolioBooksKey,JSON.stringify(portfolioBooks));
     localStorage.setItem(activePortfolioKey,activePortfolioId);
@@ -2983,7 +3004,7 @@
       updateComboboxState(benchmarkSearch,benchmarkSuggestions,items.length>0||hasMessage);
     }
 
-    async function renderAllPortfoliosSummary() {
+    async function renderAllPortfoliosSummary(priceWarmup=null) {
       const requestId=++allPortfolioSummaryRequestId;
       const positions=portfolioBooks.flatMap(book=>book.positions);
       const balances=portfolioBooks.flatMap(book=>book.cashBalances);
@@ -2995,6 +3016,8 @@
       if(!positions.length&&!balances.length){allPortfolioTotalValue.textContent=money(0,showTry?'TRY':'USD');allPortfolioDailyChange.textContent='Bugün —';return}
       allPortfolioTotalValue.textContent='Hesaplanıyor…';
       allPortfolioDailyChange.textContent='Bugün hesaplanıyor…';
+      if(priceWarmup)await priceWarmup;
+      else await prefetchPortfolioPrices(positions);
       const priceResults=await Promise.all(positions.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
       if(requestId!==allPortfolioSummaryRequestId)return;
       const failed=priceResults.filter(item=>!item.ok).map(item=>item.position.symbol);
@@ -3052,10 +3075,38 @@
       return target;
     }
 
+    function renderCachedPortfolioSnapshot(){
+      const snapshot=portfolioSnapshots[activePortfolioId];
+      if(!snapshot||snapshot.fingerprint!==portfolioSnapshotFingerprint()||!Array.isArray(snapshot.rows)||Date.now()-Number(snapshot.savedAt)>7*86400000)return false;
+      const portfolioTotalValue=document.getElementById('portfolioTotalValue'),portfolioDailyChange=document.getElementById('portfolioDailyChange');
+      portfolioList.replaceChildren();
+      snapshot.rows.forEach(item=>{
+        const position=portfolio.find(saved=>saved.symbol===item.symbol);
+        if(!position)return;
+        const row=document.createElement('article');row.className='portfolio-row';row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label',item.symbol+' pozisyonunu düzenle');
+        const head=document.createElement('div');head.className='portfolio-row-head';
+        const badge=document.createElement('span');badge.className='portfolio-row-logo';const initials=document.createElement('span');initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';badge.append(initials);appendSymbolLogo(badge,'',item.symbol,item.name);
+        const title=document.createElement('div');title.className='portfolio-row-title';const symbol=document.createElement('strong');symbol.textContent=item.symbol;const name=document.createElement('small');name.textContent=item.name;name.title=item.name;title.append(symbol,name);
+        const currentValue=document.createElement('strong');currentValue.className='portfolio-current-value';currentValue.textContent=item.currentValue;
+        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.textContent='×';remove.setAttribute('aria-label',item.symbol+' pozisyonunu sil');remove.addEventListener('click',event=>{event.stopPropagation();portfolio=portfolio.filter(saved=>saved.symbol!==item.symbol);savePortfolio();renderPortfolio()});
+        const compactLine=document.createElement('div');compactLine.className='portfolio-compact-line';const details=document.createElement('div');details.className='portfolio-compact-detail';details.textContent=item.details;details.title=item.details;const profit=document.createElement('span');profit.className='portfolio-compact-profit '+(item.tone||'');profit.textContent=item.profit;compactLine.append(details,profit);head.append(badge,title,currentValue,remove);row.append(head,compactLine);
+        const edit=()=>openPortfolioDialog(position);row.addEventListener('click',event=>{if(!event.target.closest('button'))edit()});row.addEventListener('keydown',event=>{if(event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();edit()}});portfolioList.append(row);
+      });
+      if(!portfolioList.children.length)return false;
+      portfolioTotalValue.textContent=snapshot.totalValue;
+      portfolioDailyChange.className='portfolio-daily-change '+(snapshot.dailyTone||'');
+      portfolioDailyChange.textContent=snapshot.dailyChange+' · Son kayıt '+formatUpdateTime(new Date(snapshot.savedAt));
+      portfolioSummary.replaceChildren();const note=document.createElement('p');note.className='portfolio-summary-note';note.textContent='Son kayıt gösteriliyor; güncel veriler arka planda alınıyor…';portfolioSummary.append(note);
+      return true;
+    }
+
     async function renderPortfolio({refreshBenchmark=true,refreshDividends=true}={}) {
       const renderId=++portfolioRenderId;
-      renderAllPortfoliosSummary();
+      const allPortfolioPositions=portfolioBooks.flatMap(book=>book.positions);
+      const priceWarmup=prefetchPortfolioPrices(allPortfolioPositions);
+      renderAllPortfoliosSummary(priceWarmup);
       if(refreshDividends)portfolioDividendRequestId++;
+      if(!portfolioList.querySelector('.portfolio-row'))renderCachedPortfolioSnapshot();
       const keepExistingPortfolio=Boolean(portfolioList.querySelector('.portfolio-row'));
       const portfolioTotalValue=document.getElementById('portfolioTotalValue');
       const portfolioDailyChange=document.getElementById('portfolioDailyChange');
@@ -3081,6 +3132,7 @@
         portfolioDailyChange.textContent='Bugün hesaplanıyor…';
         const loading=document.createElement('div');loading.className='portfolio-empty';loading.textContent=portfolio.length?'Portföy fiyatları güncelleniyor…':'Henüz hisse pozisyonu yok.';portfolioList.append(loading);
       }
+      await priceWarmup;
       const results=await Promise.all(portfolio.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
       if(renderId!==portfolioRenderId)return;
       const valid=results.filter(result=>result.ok).map(result=>result.value);
@@ -3130,6 +3182,7 @@
       let totalCost=0,totalValue=0,totalPreviousValue=0,totalWeekStartValue=0;
       const allocationValues=[];
       const currencyValues=new Map();
+      const snapshotRows=[];
       results.forEach(result=>{
         const position=result.ok?result.value:result.position;
         const row=document.createElement('article');row.className='portfolio-row';row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label',position.symbol+' pozisyonunu düzenle');
@@ -3175,6 +3228,7 @@
           profitValue.textContent='Hesaplanamadı';
           profitValue.classList.add('negative');
         }
+        if(result.ok)snapshotRows.push({symbol:position.symbol,name:position.name,currentValue:currentValue.textContent,details:details.textContent,profit:profitValue.textContent,tone:profitValue.classList.contains('positive')?'positive':'negative'});
         const editPosition=()=>{const saved=portfolio.find(item=>item.symbol===position.symbol);if(saved)openPortfolioDialog(saved)};
         row.addEventListener('click',event=>{if(!event.target.closest('button'))editPosition()});
         row.addEventListener('keydown',event=>{if(event.target!==row||!['Enter',' '].includes(event.key))return;event.preventDefault();editPosition()});
@@ -3219,6 +3273,7 @@
         addAnalysisRow(table,'Hafta başından kâr / zarar (%)',(weekPercent>=0?'+':'')+weekPercent.toFixed(2)+'%',weekPercent>=0?'positive':'negative');
         portfolioSummary.append(table);
         renderPortfolioDistribution(allocationValues.map(item=>({...item,value:item.value*presentationFactor})),new Map([...currencyValues].map(([code,value])=>[code,value*presentationFactor])),presentationCurrency);
+        savePortfolioSnapshot({totalValue:portfolioTotalValue.textContent,dailyChange:portfolioDailyChange.textContent,dailyTone:dailyProfit>=0?'positive':'negative',rows:snapshotRows});
       }
       if(refreshDividends)renderPortfolioDividends(valid);
       if(refreshBenchmark)renderPortfolioBenchmark(valid);

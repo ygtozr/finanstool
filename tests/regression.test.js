@@ -12,7 +12,7 @@ const dividendHistoryApi=fs.readFileSync(path.join(root,'api','dividend-history.
 const goldApi=fs.readFileSync(path.join(root,'api','gold.js'),'utf8');
 const searchApi=fs.readFileSync(path.join(root,'api','search.js'),'utf8');
 const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
-const tefasApi=fs.readFileSync(path.join(root,'api','tefas.py'),'utf8');
+const tefasApi=fs.readFileSync(path.join(root,'api','tefas.js'),'utf8');
 const logoSvg=fs.readFileSync(path.join(root,'assets','ozer-finans-mark.svg'),'utf8');
 
 function extractFunction(source,name){
@@ -185,7 +185,7 @@ assert.match(html,/portfolioBookAdd\.disabled=portfolioBooks\.length>=50[\s\S]*E
 assert.match(html,/function portfolioPresentationTarget\(summaryCurrency\)[\s\S]*summaryCurrency==='TRY'\?'USD':'TRY'/,'Aktif portföy dönüşüm hedefi TL portföyde USD, diğerlerinde TL olmalı');
 assert.match(html,/portfolioConversionFactor\(summaryToUsd,targetToUsd\)/,'Portföy özeti bütün para birimi yönlerinde çapraz kurla hesaplanmalı');
 assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*portfolioBaseCurrency==='TRY'\?'USD':'TRY'[\s\S]*renderPortfolio\(\{refreshBenchmark:false,refreshDividends:false\}\)/,'Dönüşüm düğmesi TL portföyde USD karşılığını göstermeli');
-assert.match(html,/async function renderAllPortfoliosSummary\(\)[\s\S]*portfolioBooks\.flatMap\(book=>book\.positions\)[\s\S]*totalUsd[\s\S]*allPortfolioTotalValue\.textContent/,'Toplam Portföy kartı bütün portföyleri USD bazında birleştirmeli');
+assert.match(html,/async function renderAllPortfoliosSummary\(priceWarmup=null\)[\s\S]*portfolioBooks\.flatMap\(book=>book\.positions\)[\s\S]*totalUsd[\s\S]*allPortfolioTotalValue\.textContent/,'Toplam Portföy kartı bütün portföyleri USD bazında birleştirmeli');
 assert.match(html,/portfolioSummaryCurrencyNote\.textContent=target==='TRY'\?'Portföy özeti ve dağılım değerleri TL bazında gösteriliyor\.'[\s\S]*target==='USD'\?'Portföy özeti ve dağılım değerleri USD bazında gösteriliyor\.'/,'Özet açıklaması seçilen TL veya USD para birimini doğru anlatmalı');
 assert.match(html,/\.market-summary-head #marketRefresh,\.favorites-panel-head #favoriteRefresh \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
 assert.ok((html.match(/labels:solidLegendLabels\(colors\.text\)/g)||[]).length>=2,'Fiyat ve RSI grafiklerinin lejant örnekleri dolu renk kullanmalı');
@@ -285,18 +285,13 @@ assert.match(html,/function rankSearchResults\(items,query\)[\s\S]*baseSymbol===
 assert.match(html,/managerTerms=\[[\s\S]*'AKBANK'[\s\S]*'GARANTI BBVA'[\s\S]*managerIntent[\s\S]*isTefas&&managerIntent\?0/,'Banka adı aramasında fonlar aynı adlı banka hisselerinin önünde gösterilmeli');
 assert.match(html,/dripUnsupported=symbol\.startsWith\('ALTIN-'\)\|\|symbol\.startsWith\('TEFAS-'\)/,'TEFAS fonlarında otomatik temettü seçimi kapalı olmalı');
 assert.match(tefasApi,/\/api\/funds\/fonFiyatBilgiGetir/,'TEFAS fiyat işlevi yeni resmî fiyat geçmişi uç noktasını kullanmalı');
-assert.match(tefasApi,/MIRROR_URL = "https:\/\/fon\.org\.tr"[\s\S]*\/api\/fund-prices\/[\s\S]*Fon\.org\.tr \/ TEFAS/,'Vercel erişim kesintisinde TEFAS kaynaklı açık fiyat geçmişi yedeği kullanılmalı');
-assert.match(tefasApi,/\/api\/funds\?search=[\s\S]*def _search\(query\):[\s\S]*_search_official\(query\)/,'Fon araması açık katalogdan yapılmalı ve resmî TEFAS yedeğini korumalı');
+assert.match(tefasApi,/export const config = \{ runtime: 'edge' \}/,'TEFAS servisi düşük başlangıç gecikmeli Edge çalışma zamanını kullanmalı');
+assert.match(tefasApi,/MIRROR_URL = 'https:\/\/fon\.org\.tr'[\s\S]*\/api\/fund-prices\/[\s\S]*Fon\.org\.tr \/ TEFAS/,'Vercel erişim kesintisinde TEFAS kaynaklı açık fiyat geçmişi yedeği kullanılmalı');
+assert.match(tefasApi,/\/api\/funds\?search=[\s\S]*async function search\(query\)[\s\S]*officialPost/,'Fon araması açık katalogdan yapılmalı ve resmî TEFAS yedeğini korumalı');
 assert.match(tefasApi,/\/api\/funds\/fonUnvanAra/,'TEFAS araması yeni resmî fon arama uç noktasını kullanmalı');
-assert.match(tefasApi,/catalog_payload = _post\([\s\S]*\/api\/funds\/fonUnvanAra[\s\S]*\{\},[\s\S]*cache_ttl=FUND_LIST_TTL/,'TEFAS araması işlem listesi dışında kalabilen fonlar için genel unvan katalogunu kullanmalı');
-assert.match(tefasApi,/\/api\/statistics\/tefas\/getFplFonList/,'TEFAS araması hızlı aramada görünmeyen yatırım fonları için tam fon listesini kullanmalı');
-assert.match(tefasApi,/FUND_LIST_TTL\s*=\s*6\s*\*\s*60\s*\*\s*60/,'TEFAS tam fon listesi sağlayıcı sınırını korumak için uzun süre önbelleklenmeli');
-assert.match(tefasApi,/def _search_text\(value\):[\s\S]*unicodedata\.normalize\("NFKD", text\)/,'TEFAS fon araması Türkçe karakter ve aksan farklarından etkilenmemeli');
-assert.match(tefasApi,/SEARCH_SYNONYMS\s*=\s*\{[\s\S]*"PARA": \("MONEY",\)[\s\S]*"PIYASASI": \("MARKET",\)/,'TEFAS fon araması Türkçe para piyasası terimlerini İngilizce unvanlarla eşleştirmeli');
-assert.match(tefasApi,/def _matches_search\(query, code, name\):[\s\S]*for token in query\.split\(\)/,'TEFAS fon araması kelime sırasından bağımsız bütün sorgu terimlerini eşleştirmeli');
-assert.match(tefasApi,/MANAGER_SEARCH_ALIASES\s*=\s*\([\s\S]*AK ASSET MANAGEMENT[\s\S]*AKBANK[\s\S]*ISBANK[\s\S]*GARANTI BBVA/,'Banka adları ilgili portföy yönetim şirketlerinin fonlarıyla eşleşmeli');
-assert.match(tefasApi,/"YLB": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU"[\s\S]*"YVD": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI \(TL\) FONU"[\s\S]*"ENR": "QNB PORTFÖY ENPARA PARA PİYASASI \(TL\) FONU"/,'YLB, YVD ve ENR resmî Türkçe adlarıyla banka adı aramasında bulunmalı');
-assert.match(tefasApi,/from urllib\.request import Request, urlopen[\s\S]*with urlopen\(request, timeout=8\)/,'TEFAS çağrıları Vercel ile uyumlu, zaman aşımı sınırlı standart HTTPS istemcisini kullanmalı');
+assert.match(tefasApi,/action==='batch-price'[\s\S]*Promise\.all\(codes\.map/,'Çok sayıdaki TEFAS portföy fiyatı tek toplu istekte paralel alınmalı');
+assert.match(tefasApi,/s-maxage=900, stale-while-revalidate=86400/,'Günlük TEFAS fiyatları Edge önbelleğinde tekrar kullanılmalı');
+assert.match(tefasApi,/YLB:'YAPI KREDİ PORTFÖY PARA PİYASASI FONU'[\s\S]*YVD:'YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI \(TL\) FONU'[\s\S]*ENR:'QNB PORTFÖY ENPARA PARA PİYASASI \(TL\) FONU'/,'YLB, YVD ve ENR resmî Türkçe adlarıyla korunmalı');
 assert.match(html,/Eşleşen ürün bulunamadı\./,'Boş arama sonuçları kullanıcıya görünür şekilde bildirilmeli');
 assert.match(html,/Arama servisine ulaşılamadı\./,'Arama kesintisi ürün bulunamamasından ayrılmalı');
 assert.match(html,/Fonlar ve hisseler aranıyor…/,'TEFAS yanıtı beklenirken aramanın sürdüğü görünür olmalı');
@@ -304,6 +299,9 @@ assert.match(html,/knownTefasFunds=[\s\S]*TEFAS-YLB[\s\S]*TEFAS-YVD[\s\S]*TEFAS-
 assert.match(html,/async function fetchPortfolioItem\(position\)[\s\S]*const dripPromise=[\s\S]*const payload=await cachedApiJson[\s\S]*const dripResult=await dripPromise/,'Portföy fiyatı ile temettü yeniden yatırım hesabı paralel başlamalı');
 assert.match(html,/const quickFundQuotes=knownTefasMatches\(query\)[\s\S]*showPortfolioSuggestions\(quickFundQuotes,/,'Portföy araması bilinen TEFAS fonlarını anında göstermeli');
 assert.ok((html.match(/const quickFundQuotes=knownTefasMatches\(query\)/g)||[]).length>=5,'Grafik, Favoriler, Piyasa, Kıyaslama ve Portföy aramaları aynı hızlı TEFAS eşleşmesini kullanmalı');
+assert.match(html,/async function prefetchPortfolioPrices\(positions\)[\s\S]*action=batch-price[\s\S]*apiCache\.set/,'Portföydeki TEFAS fiyatları tek toplu istekle istemci önbelleğine yerleştirilmeli');
+assert.match(html,/portfolioSnapshotsKey[\s\S]*function renderCachedPortfolioSnapshot\(\)[\s\S]*Son kayıt gösteriliyor; güncel veriler arka planda alınıyor/,'Son başarılı portföy değerleri ekran açılır açılmaz cihazdan gösterilmeli');
+assert.match(html,/savePortfolioSnapshot\(\{totalValue:[\s\S]*rows:snapshotRows\}\)/,'Başarılı portföy hesaplaması sonraki hızlı açılış için saklanmalı');
 assert.match(html,/id="otherView"[\s\S]*data-theme-choice="light"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="system"/,'Diğer ekranı Açık, Koyu ve Sistem tema seçeneklerini içermeli');
 assert.match(html,/id="otherView"[\s\S]*id="backupDownload"[\s\S]*id="restoreBackup"/,'Veri yedekleme araçları Diğer ekranında korunmalı');
 assert.match(html,/function startRefreshTimers\(\)[\s\S]*refreshInterval/,'Otomatik yenileme süresi kullanıcı tercihine göre yeniden başlatılmalı');
