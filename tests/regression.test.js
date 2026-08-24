@@ -41,6 +41,7 @@ assert.doesNotThrow(()=>new Function('module','exports','require','Buffer',logoA
 
 const clientFunctions=['fillMissingRates','calculateRsi','sma','calculatePeriodSummary','normalizePerformance','resultPriceValues','commonPerformanceWindow','isPortfolioSummaryComplete','calculateDrip'].map(name=>extractFunction(scripts[0],name)).join('\n');
 const {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete,calculateDrip}=new Function(clientFunctions+';return {fillMissingRates,calculateRsi,sma,calculatePeriodSummary,resultPriceValues,commonPerformanceWindow,isPortfolioSummaryComplete,calculateDrip};')();
+const mergePortfolioBooks=new Function(extractFunction(scripts[0],'mergePortfolioBooks')+';return mergePortfolioBooks;')();
 
 assert.deepEqual(fillMissingRates([null,null,2,null,3,null]),[null,null,2,2,3,3],'Gelecekteki kur geçmişe taşınmamalı');
 assert.deepEqual(sma([null,1,2,3],3),[null,null,null,2],'Eksik değer içeren MA penceresi hesaplanmamalı');
@@ -63,6 +64,10 @@ assert.equal(isPortfolioSummaryComplete(['AAPL'],new Set()),false,'Fiyatı eksik
 const drip=calculateDrip(10,{prices:[{time:100,close:20},{time:200,close:25}],events:[{paymentDate:100,amount:2},{paymentDate:200,amount:1}],splits:[{date:150,numerator:2,denominator:1}],source:'fixture'},10,true);
 assert.ok(Math.abs(drip.quantity-22.5848)<1e-9,'DRIP vergi, ödeme fiyatı ve bölünmeyi kronolojik uygulamalı');
 assert.equal(drip.dividendCount,2,'DRIP işlenen temettü sayısını raporlamalı');
+const mergedBooks=mergePortfolioBooks([{id:'a',name:'Eski',positions:[{symbol:'OLD'}],cashBalances:[]},{id:'b',name:'Korunan',positions:[],cashBalances:[]}],[{id:'a',name:'Yedek',positions:[{symbol:'AAPL',purchaseDate:'2026-01-01',dripEnabled:true}],cashBalances:[{currency:'USD',amount:10}]},{id:'c',name:'Yeni',positions:[],cashBalances:[]}]);
+assert.deepEqual(mergedBooks.map(item=>item.id),['a','b','c'],'Çoklu portföy yedeği mevcut sıralamayı koruyup yeni portföyleri eklemeli');
+assert.equal(mergedBooks[0].name,'Yedek','Aynı kimlikli portföy yedekteki içerikle geri yüklenmeli');
+assert.equal(mergedBooks[0].positions[0].dripEnabled,true,'Temettü ayarı portföyle birlikte geri yüklenmeli');
 
 const sandbox={module:{exports:{}},exports:{},require,URLSearchParams,URL,AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
 vm.runInNewContext(priceApi+'\nmodule.exports._test={numberValue,cleanQuery};',sandbox);
@@ -128,7 +133,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v5\.6<\/title>/,'Tarayıcı başlığı kalıcı marka ve sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v5\.7 Önizleme<\/title>/,'Tarayıcı başlığı önizleme marka ve sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -138,6 +143,12 @@ assert.match(logoSvg,/<rect x="1" y="1" width="62" height="62" rx="16" fill="#ff
 assert.match(html,/\.portfolio-head \{[^}]*padding:16px;[^}]*border:1px solid var\(--line\);[^}]*border-radius:14px;/,'Portföy üst özeti tüm ekranlarda çerçeveli kart olmalı');
 assert.match(html,/\.portfolio-head-value \{[^}]*font-size:1\.5rem;/,'Portföy toplam değeri hafifçe büyütülmeli');
 assert.match(html,/id="portfolioCurrencyToggle"[^>]*aria-pressed="false"[^>]*>⇄<\/button>/,'Portföy üst özetinde dönüşüm düğmesi bulunmalı');
+assert.match(html,/id="portfolioBookSelect"[\s\S]*id="portfolioBookAdd"[\s\S]*id="portfolioBookRename"[\s\S]*id="portfolioBookDelete"/,'Portföy seçme, oluşturma, yeniden adlandırma ve silme kontrolleri bulunmalı');
+assert.match(html,/const portfolioBooksKey = 'finans-grafigi-portfolios-v2'/,'Çoklu portföyler ayrı ve kalıcı bir veri modelinde saklanmalı');
+assert.match(html,/if\(!portfolioBooks\.length\)portfolioBooks=\[\{id:'portfolio-main',name:'Portföyüm',positions:legacyPortfolio,cashBalances:legacyCashBalances/,'Eski tek portföy ve nakit verisi kayıpsız varsayılan portföye taşınmalı');
+assert.match(html,/function switchPortfolio\(bookId\)[\s\S]*bindActivePortfolio\(\)[\s\S]*renderChartAssetPanels\(\)[\s\S]*renderPortfolio\(\)/,'Portföy değişiminde aktif veriler, grafik seçici ve özet birlikte yenilenmeli');
+assert.match(html,/portfolioBooks\.length===1[\s\S]*En az bir portföy bulunmalıdır/,'Son portföy yanlışlıkla silinememeli');
+assert.match(html,/portfolioBookAdd\.disabled=portfolioBooks\.length>=50[\s\S]*En fazla 50 portföy oluşturulabilir/,'Yerel veri ve seçici kullanılabilirliği için portföy sayısı 50 ile sınırlandırılmalı');
 assert.match(html,/let portfolioDisplayCurrency = 'AUTO';[\s\S]*presentationFactor=summaryToUsd\/tryToUsd;/,'Portföy özeti TL dönüşümünü çapraz kurla hesaplamalı');
 assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*portfolioDisplayCurrency==='TRY'\?'AUTO':'TRY'[\s\S]*renderPortfolio\(\{refreshBenchmark:false,refreshDividends:false\}\)/,'Dönüşüm düğmesi yalnız fiyat özetini yeniden hesaplamalı');
 assert.match(html,/portfolioSummaryCurrencyNote\.textContent=showTry\?'Portföy özeti ve dağılım değerleri TL bazında gösteriliyor\.'/,'TL görünümünde özet açıklaması seçili para birimini doğru anlatmalı');
@@ -245,8 +256,9 @@ assert.match(html,/for="benchmarkSearch">Karşılaştırma ölçütü ara/,'Öl�
 assert.match(html,/dialog\.addEventListener\('cancel',event=>\{event\.preventDefault\(\);dialog\.close\(\)\}\)/,'Tüm paneller Escape ile kapanmalı');
 assert.match(html,/document\.addEventListener\('keydown',event=>\{[\s\S]*event\.key!=='Escape'[\s\S]*dialog\.close\(\)/,'Native cancel üretmeyen tarayıcılarda Escape yedeği bulunmalı');
 assert.match(html,/id="backupFileName"/,'Özel Türkçe dosya seçici seçilen dosya adını göstermeli');
-assert.match(html,/portfolio:portfolio\.map\(\(\{symbol,name,quantity,baseQuantity,unitCost,costCurrency,purchaseDate,dripEnabled,dripTaxRate,dripFractional\}\)/,'Yedek dosyası alış tarihi ve bütün temettü yeniden yatırım ayarlarını içermeli');
-assert.match(html,/function mergePortfolioBackup\(current,incoming\)[\s\S]*restored\.get\(item\.symbol\)[\s\S]*portfolio=mergePortfolioBackup\(portfolio,data\.portfolio\)/,'Birleştirerek geri yüklemede aynı sembolün tarih ve temettü ayarları yedekten geri alınmalı');
+assert.match(html,/schemaVersion:2[\s\S]*portfolios:portfolioBooks\.map\(book=>[\s\S]*purchaseDate,dripEnabled,dripTaxRate,dripFractional/,'Yedek dosyası bütün portföyleri, alış tarihlerini ve temettü ayarlarını içermeli');
+assert.match(html,/if\(!\[1,2\]\.includes\(payload\.schemaVersion\)\)[\s\S]*payload\.schemaVersion===2[\s\S]*raw\.portfolio/,'Yeni yedek şeması eski tek portföylü yedekleri de kabul etmeli');
+assert.match(html,/function mergePortfolioBooks\(current,incoming\)[\s\S]*portfolioBooks=mergePortfolioBooks\(portfolioBooks,data\.portfolios\)/,'Birleştirerek geri yükleme portföyleri kimlikleriyle ekleyip güncellemeli');
 assert.match(html,/Alım tarihi kayıtlı pozisyonlar:[\s\S]*Temettü yeniden yatırımı açık pozisyonlar:/,'Yedek önizlemesi tarih ve temettü ayarı kapsamını göstermeli');
 assert.match(html,/id="portfolioCostCurrency"[\s\S]*id="portfolioPurchaseDate"/,'Portföy maliyet para birimi ve alım tarihi kaydedilebilmeli');
 assert.match(html,/function openPortfolioDialog\(position=null\)[\s\S]*portfolioQuantity\.value = editing\?String\(position\.baseQuantity\?\?position\.quantity\)[\s\S]*portfolioCost\.value = editing\?String\(position\.unitCost\)[\s\S]*portfolioPurchaseDate\.value = editing\?\(position\.purchaseDate\|\|''\)/,'Pozisyon düzenleme penceresi mevcut adet, maliyet ve alış tarihini doldurmalı');
@@ -267,4 +279,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v5.6 regresyon testleri başarılı.');
+console.log('Özer Finans v5.7 önizleme regresyon testleri başarılı.');

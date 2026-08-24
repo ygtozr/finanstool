@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Özer Finans">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com https://eodhd.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>Özer Finans v5.6</title>
+  <title>Özer Finans v5.7 Önizleme</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
   <style>
     :root { color-scheme: dark; --bg:#101827; --panel:#192337; --line:#2b3a55; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --danger:#ff8f9c; }
@@ -138,6 +138,13 @@
     .portfolio-drawer.open { transform:translateX(0); }
     .portfolio-head { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:18px; padding:16px; border:1px solid var(--line); border-radius:14px; background:#111a2b; }
     .portfolio-head h2, .dividend-section h3 { margin:0; }
+    .portfolio-switcher { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; align-items:end; margin-bottom:10px; }
+    .portfolio-switcher-field { min-width:0; display:grid; gap:5px; color:var(--muted); font-size:.72rem; font-weight:650; }
+    .portfolio-switcher select { width:100%; min-width:0; height:44px; padding-block:8px; color:var(--text); background:#111a2b; border:1px solid var(--line); border-radius:10px; font-weight:700; }
+    .portfolio-switcher-actions { display:flex; gap:6px; }
+    .portfolio-switcher-actions button { width:44px; height:44px; min-height:44px; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1rem; }
+    .portfolio-switcher-actions button:last-child { color:var(--danger); }
+    .portfolio-switcher-actions button:disabled { opacity:.38; cursor:not-allowed; }
     .portfolio-currency-toggle { width:44px; height:44px; min-height:44px; flex:0 0 44px; display:grid; place-items:center; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1.25rem; line-height:1; }
     .portfolio-currency-toggle[aria-pressed="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
     .portfolio-close { width:40px; height:40px; padding:0; color:var(--text); background:#26344d; font-size:1.35rem; }
@@ -407,6 +414,7 @@
     html[data-theme="light"] .app-tabs button.active { color:#fff; background:var(--accent); }
     html[data-theme="light"] .analysis-table { background:#f8fafc; }
     html[data-theme="light"] .portfolio-page .portfolio-head { background:#f1f5f9; }
+    html[data-theme="light"] .portfolio-switcher select { background:#f8fafc; }
     html[data-theme="light"] .portfolio-currency-toggle { color:var(--text); background:#e2e8f0; }
     html[data-theme="light"] .portfolio-currency-toggle[aria-pressed="true"] { color:#fff; background:#0f766e; }
     @media (max-width:500px) { .app-tabs { flex-wrap:wrap; } .app-tabs button { flex:1; } .analysis-table th, .analysis-table td { padding:9px 8px; font-size:.86rem; } }
@@ -607,11 +615,11 @@
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small>v5.6</small>
+      <small>v5.7</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.6</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.7</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -621,7 +629,7 @@
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.6</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.7</span></h1>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -651,8 +659,9 @@
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.6</span></h1>
-      <div class="portfolio-head"><div class="portfolio-head-metrics"><h2>Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.7</span></h1>
+      <div class="portfolio-switcher"><label class="portfolio-switcher-field" for="portfolioBookSelect">Aktif Portföy<select id="portfolioBookSelect" aria-label="Aktif portföyü seç"></select></label><div class="portfolio-switcher-actions"><button id="portfolioBookAdd" type="button" aria-label="Yeni portföy oluştur" title="Yeni portföy">+</button><button id="portfolioBookRename" type="button" aria-label="Aktif portföyün adını değiştir" title="Adını değiştir">✎</button><button id="portfolioBookDelete" type="button" aria-label="Aktif portföyü sil" title="Portföyü sil">×</button></div></div>
+      <div class="portfolio-head"><div class="portfolio-head-metrics"><h2 id="portfolioHeading">Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
       <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
       <div id="portfolioList" class="portfolio-list"></div>
@@ -678,7 +687,7 @@
       <section class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.6</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/ozer-finans-mark.svg" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v5.7</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
         <section class="settings-card settings-horizontal" aria-labelledby="appearanceTitle">
@@ -702,7 +711,7 @@
         </section>
         <section class="settings-card settings-wide other-backup" aria-labelledby="backupTitle">
           <h3 id="backupTitle">Veri Yedekleme</h3>
-          <p>Favoriler, hisse ve nakit portföyü, fiyat alarmları, piyasa özeti ve ayarlarınızı tek bir JSON dosyasında saklayın.</p>
+          <p>Favoriler, bütün bağımsız portföyler, hisse ve nakit bakiyeleri, temettü ayarları, fiyat alarmları, piyasa özeti ve tercihlerinizi tek bir JSON dosyasında saklayın.</p>
           <div class="data-actions"><button id="backupDownload" type="button">Yedek Dosyasını İndir</button></div>
           <div class="backup-file-label"><span>Geri yüklenecek JSON dosyası</span><label class="dialog-cancel" for="backupFile">Yedek Dosyası Seç</label><input id="backupFile" class="sr-only" type="file" accept=".json,application/json"><small id="backupFileName">Henüz dosya seçilmedi.</small></div>
           <label class="restore-mode">Geri yükleme yöntemi<select id="restoreMode"><option value="merge">Mevcut verilerle birleştir (önerilen)</option><option value="replace">Mevcut verilerin yerine koy</option></select></label>
@@ -712,7 +721,7 @@
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v5.6</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerine <code>.IS</code> ekleyin: <code>THYAO.IS</code>.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v5.7 Önizleme</strong></div></div>
         </section>
       </div>
     </section>
@@ -724,6 +733,13 @@
     <button id="mobileMoreNav" type="button"><span>•••</span>Diğer</button>
   </nav>
 
+  <dialog id="portfolioBookDialog" class="portfolio-dialog" aria-labelledby="portfolioBookDialogTitle">
+    <h3 id="portfolioBookDialogTitle">Yeni Portföy</h3><p id="portfolioBookDialogNote" class="portfolio-dialog-symbol">Hisseleri ve nakit bakiyeleri diğer portföylerden bağımsız tutulur.</p>
+    <form id="portfolioBookForm" class="portfolio-form">
+      <label>Portföy adı<input id="portfolioBookName" type="text" maxlength="40" autocomplete="off" placeholder="Örn. Uzun Vadeli" required></label>
+      <div class="dialog-actions"><button id="portfolioBookCancel" class="dialog-cancel" type="button">Vazgeç</button><button id="portfolioBookSave" type="submit">Oluştur</button></div>
+    </form>
+  </dialog>
   <dialog id="portfolioDialog" class="portfolio-dialog">
     <h3 id="portfolioDialogTitle">Portföye Ekle</h3><p id="portfolioDialogSymbol" class="portfolio-dialog-symbol"></p>
     <form id="portfolioForm" class="portfolio-form" method="dialog">
@@ -963,6 +979,18 @@
     const portfolioSummaryCurrencyNote = document.getElementById('portfolioSummaryCurrencyNote');
     const portfolioList = document.getElementById('portfolioList');
     const portfolioCurrencyToggle = document.getElementById('portfolioCurrencyToggle');
+    const portfolioHeading = document.getElementById('portfolioHeading');
+    const portfolioBookSelect = document.getElementById('portfolioBookSelect');
+    const portfolioBookAdd = document.getElementById('portfolioBookAdd');
+    const portfolioBookRename = document.getElementById('portfolioBookRename');
+    const portfolioBookDelete = document.getElementById('portfolioBookDelete');
+    const portfolioBookDialog = document.getElementById('portfolioBookDialog');
+    const portfolioBookDialogTitle = document.getElementById('portfolioBookDialogTitle');
+    const portfolioBookDialogNote = document.getElementById('portfolioBookDialogNote');
+    const portfolioBookForm = document.getElementById('portfolioBookForm');
+    const portfolioBookName = document.getElementById('portfolioBookName');
+    const portfolioBookCancel = document.getElementById('portfolioBookCancel');
+    const portfolioBookSave = document.getElementById('portfolioBookSave');
     const dividendList = document.getElementById('dividendList');
     const benchmarkStatus = document.getElementById('benchmarkStatus');
     const benchmarkSearch = document.getElementById('benchmarkSearch');
@@ -1026,15 +1054,46 @@
     const alarmKey = 'finans-grafigi-alarms';
     let alarms = (() => { try { const saved=JSON.parse(localStorage.getItem(alarmKey)); return Array.isArray(saved) ? saved : []; } catch { return []; } })();
     const portfolioKey = 'finans-grafigi-portfolio';
+    const cashKey = 'finans-grafigi-cash-balances';
+    const portfolioBooksKey = 'finans-grafigi-portfolios-v2';
+    const activePortfolioKey = 'finans-grafigi-active-portfolio';
+    const supportedCashCurrencies = ['TRY','USD','EUR','GBP'];
     function normalizedPortfolioItem(item) {
       const quantity=Number(item?.baseQuantity??item?.quantity),unitCost=Number(item?.unitCost),symbol=String(item?.symbol||'').toUpperCase(),costCurrency=['TRY','USD','EUR','GBP'].includes(String(item?.costCurrency||'').toUpperCase())?String(item.costCurrency).toUpperCase():null,purchaseDate=/^\d{4}-\d{2}-\d{2}$/.test(item?.purchaseDate||'')?item.purchaseDate:null;
       const dripEnabled=Boolean(item?.dripEnabled)&&Boolean(purchaseDate)&&!symbol.startsWith('ALTIN-'),dripTaxRate=Math.min(100,Math.max(0,Number(item?.dripTaxRate)||0)),dripFractional=item?.dripFractional!==false;
       return{symbol,name:item?.name||symbol,quantity,baseQuantity:quantity,unitCost,costCurrency,purchaseDate,dripEnabled,dripTaxRate,dripFractional};
     }
-    let portfolio = (() => { try { const saved = JSON.parse(localStorage.getItem(portfolioKey)); return Array.isArray(saved) ? saved.map(normalizedPortfolioItem).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0) : []; } catch { return []; } })();
-    const cashKey = 'finans-grafigi-cash-balances';
-    const supportedCashCurrencies = ['TRY','USD','EUR','GBP'];
-    let cashBalances = (()=>{try{const saved=JSON.parse(localStorage.getItem(cashKey));return Array.isArray(saved)?saved.map(item=>({currency:String(item?.currency||'').toUpperCase(),amount:Number(item?.amount)})).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0):[]}catch{return[]}})();
+    function normalizedCashBalance(item) {
+      return{currency:String(item?.currency||'').toUpperCase(),amount:Number(item?.amount)};
+    }
+    function validPortfolioPositions(value) {
+      return(Array.isArray(value)?value:[]).map(normalizedPortfolioItem).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0);
+    }
+    function validCashBalances(value) {
+      return(Array.isArray(value)?value:[]).map(normalizedCashBalance).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0);
+    }
+    function createPortfolioId() {
+      return typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?crypto.randomUUID():'portfolio-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
+    }
+    function normalizedPortfolioBook(item,index=0) {
+      const id=String(item?.id||('portfolio-'+(index+1))).trim().slice(0,80)||createPortfolioId();
+      const name=String(item?.name||('Portföy '+(index+1))).trim().slice(0,40)||('Portföy '+(index+1));
+      return{id,name,positions:validPortfolioPositions(item?.positions??item?.portfolio),cashBalances:validCashBalances(item?.cashBalances),createdAt:item?.createdAt||new Date().toISOString()};
+    }
+    const legacyPortfolio=(()=>{try{return validPortfolioPositions(JSON.parse(localStorage.getItem(portfolioKey)||'[]'))}catch{return[]}})();
+    const legacyCashBalances=(()=>{try{return validCashBalances(JSON.parse(localStorage.getItem(cashKey)||'[]'))}catch{return[]}})();
+    let portfolioBooks=(()=>{try{const saved=JSON.parse(localStorage.getItem(portfolioBooksKey)||'[]');return Array.isArray(saved)?saved.slice(0,50).map(normalizedPortfolioBook):[]}catch{return[]}})();
+    if(!portfolioBooks.length)portfolioBooks=[{id:'portfolio-main',name:'Portföyüm',positions:legacyPortfolio,cashBalances:legacyCashBalances,createdAt:new Date().toISOString()}];
+    let activePortfolioId=localStorage.getItem(activePortfolioKey)||portfolioBooks[0].id;
+    if(!portfolioBooks.some(item=>item.id===activePortfolioId))activePortfolioId=portfolioBooks[0].id;
+    let portfolio=[];
+    let cashBalances=[];
+    let portfolioBookEditMode='create';
+    function activePortfolioBook(){return portfolioBooks.find(item=>item.id===activePortfolioId)||portfolioBooks[0]}
+    function bindActivePortfolio(){const book=activePortfolioBook();activePortfolioId=book.id;portfolio=book.positions;cashBalances=book.cashBalances}
+    bindActivePortfolio();
+    localStorage.setItem(portfolioBooksKey,JSON.stringify(portfolioBooks));
+    localStorage.setItem(activePortfolioKey,activePortfolioId);
     let portfolioSearchTimer;
     let portfolioSelection = null;
     let portfolioEditSymbol = null;
@@ -1697,20 +1756,24 @@
 
     function normalizeBackup(payload) {
       if(!payload || typeof payload!=='object' || Array.isArray(payload))throw new Error('Dosya geçerli bir yedek nesnesi değil.');
-      if(payload.schemaVersion!==1)throw new Error('Bu yedek sürümü desteklenmiyor.');
+      if(![1,2].includes(payload.schemaVersion))throw new Error('Bu yedek sürümü desteklenmiyor.');
       if(!payload.data || typeof payload.data!=='object' || Array.isArray(payload.data))throw new Error('Yedek veri bölümü eksik.');
       const raw=payload.data;
       const sourceArray=value=>Array.isArray(value)?value.slice(0,500):[];
       const cleanText=(value,fallback)=>String(value||fallback||'').trim().slice(0,120);
       const cleanFavorites=sourceArray(raw.favorites).map(item=>{const symbol=normalizeSymbol(item?.symbol);return{symbol,name:cleanText(item?.name,symbol)}}).filter(item=>item.symbol);
-      const cleanPortfolio=sourceArray(raw.portfolio).map(item=>normalizedPortfolioItem({...item,symbol:normalizeSymbol(item?.symbol),name:cleanText(item?.name,item?.symbol)})).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0);
-      const cleanCash=sourceArray(raw.cashBalances).map(item=>({currency:String(item?.currency||'').toUpperCase(),amount:Number(item?.amount)})).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0);
+      const cleanPositions=value=>sourceArray(value).map(item=>normalizedPortfolioItem({...item,symbol:normalizeSymbol(item?.symbol),name:cleanText(item?.name,item?.symbol)})).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0);
+      const cleanCash=value=>sourceArray(value).map(normalizedCashBalance).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0);
+      const rawBooks=payload.schemaVersion===2&&Array.isArray(raw.portfolios)?raw.portfolios:[{id:'portfolio-main',name:'Portföyüm',positions:raw.portfolio,cashBalances:raw.cashBalances}];
+      const cleanBooks=rawBooks.slice(0,50).map((item,index)=>({id:cleanText(item?.id,'yedek-portfoy-'+(index+1)).slice(0,80),name:cleanText(item?.name,'Portföy '+(index+1)).slice(0,40),positions:uniqueBy(cleanPositions(item?.positions??item?.portfolio),position=>position.symbol),cashBalances:uniqueBy(cleanCash(item?.cashBalances),balance=>balance.currency),createdAt:item?.createdAt||null}));
+      const portfolios=uniqueBy(cleanBooks,item=>item.id);
+      if(!portfolios.length)portfolios.push({id:'portfolio-main',name:'Portföyüm',positions:[],cashBalances:[],createdAt:null});
       const cleanAlarms=sourceArray(raw.alarms).map(item=>{const symbol=normalizeSymbol(item?.symbol),target=Number(item?.target),condition=item?.condition==='below'?'below':'above';return{id:cleanText(item?.id,Date.now().toString(36)+Math.random().toString(36).slice(2)),symbol,target,condition,triggered:Boolean(item?.triggered)}}).filter(item=>item.symbol&&Number.isFinite(item.target)&&item.target>0);
       const cleanMarketItems=sourceArray(raw.marketItems).map(item=>{const symbol=normalizeSymbol(item?.symbol);return{symbol,label:cleanText(item?.label||item?.name,symbol)}}).filter(item=>item.symbol);
       return {
         favorites:uniqueBy(cleanFavorites,item=>item.symbol),
-        portfolio:uniqueBy(cleanPortfolio,item=>item.symbol),
-        cashBalances:uniqueBy(cleanCash,item=>item.currency),
+        portfolios,
+        activePortfolioId:portfolios.some(item=>item.id===raw.activePortfolioId)?raw.activePortfolioId:portfolios[0].id,
         alarms:uniqueBy(cleanAlarms,item=>item.id||item.symbol+'|'+item.condition+'|'+item.target),
         marketItems:uniqueBy(cleanMarketItems,item=>item.symbol),
         theme:['light','dark','system'].includes(raw.theme)?raw.theme:'system',
@@ -1721,14 +1784,17 @@
     }
 
     function createBackup() {
+      const activeBook=activePortfolioBook();
+      activeBook.positions=portfolio;
+      activeBook.cashBalances=cashBalances;
       return {
-        schemaVersion:1,
-        appVersion:'5.6',
+        schemaVersion:2,
+        appVersion:'5.7',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
-          portfolio:portfolio.map(({symbol,name,quantity,baseQuantity,unitCost,costCurrency,purchaseDate,dripEnabled,dripTaxRate,dripFractional})=>({symbol,name,quantity,baseQuantity:baseQuantity??quantity,unitCost,costCurrency:costCurrency||null,purchaseDate:purchaseDate||null,dripEnabled:Boolean(dripEnabled),dripTaxRate:Number(dripTaxRate)||0,dripFractional:dripFractional!==false})),
-          cashBalances:cashBalances.map(({currency,amount})=>({currency,amount})),
+          portfolios:portfolioBooks.map(book=>({id:book.id,name:book.name,createdAt:book.createdAt||null,positions:book.positions.map(({symbol,name,quantity,baseQuantity,unitCost,costCurrency,purchaseDate,dripEnabled,dripTaxRate,dripFractional})=>({symbol,name,quantity,baseQuantity:baseQuantity??quantity,unitCost,costCurrency:costCurrency||null,purchaseDate:purchaseDate||null,dripEnabled:Boolean(dripEnabled),dripTaxRate:Number(dripTaxRate)||0,dripFractional:dripFractional!==false})),cashBalances:book.cashBalances.map(({currency,amount})=>({currency,amount}))})),
+          activePortfolioId,
           alarms:alarms.map(({id,symbol,target,condition,triggered})=>({id,symbol,target,condition,triggered:Boolean(triggered)})),
           marketItems:marketItems.map(({symbol,label})=>({symbol,label})),
           theme:themePreference,
@@ -1741,9 +1807,11 @@
 
     function backupSummary(data) {
       const themeLabel={light:'Açık',dark:'Koyu',system:'Sistem'}[data.theme]||'Sistem';
-      const datedPositions=data.portfolio.filter(item=>item.purchaseDate).length;
-      const dripPositions=data.portfolio.filter(item=>item.dripEnabled).length;
-      return 'Favoriler: '+data.favorites.length+'\nPortföy pozisyonları: '+data.portfolio.length+'\nAlım tarihi kayıtlı pozisyonlar: '+datedPositions+'\nTemettü yeniden yatırımı açık pozisyonlar: '+dripPositions+'\nNakit bakiyeleri: '+data.cashBalances.length+'\nFiyat alarmları: '+data.alarms.length+'\nPiyasa özeti öğeleri: '+data.marketItems.length+'\nTema: '+themeLabel;
+      const positions=data.portfolios.flatMap(item=>item.positions);
+      const datedPositions=positions.filter(item=>item.purchaseDate).length;
+      const dripPositions=positions.filter(item=>item.dripEnabled).length;
+      const cashCount=data.portfolios.reduce((sum,item)=>sum+item.cashBalances.length,0);
+      return 'Portföyler: '+data.portfolios.length+'\nToplam pozisyon: '+positions.length+'\nAlım tarihi kayıtlı pozisyonlar: '+datedPositions+'\nTemettü yeniden yatırımı açık pozisyonlar: '+dripPositions+'\nNakit bakiyeleri: '+cashCount+'\nFavoriler: '+data.favorites.length+'\nFiyat alarmları: '+data.alarms.length+'\nPiyasa özeti öğeleri: '+data.marketItems.length+'\nTema: '+themeLabel;
     }
 
     function mergeUnique(current,incoming,key) {
@@ -1751,19 +1819,20 @@
       return current.concat(incoming.filter(item=>{const value=key(item);if(known.has(value))return false;known.add(value);return true}));
     }
 
-    function mergePortfolioBackup(current,incoming) {
-      const restored=new Map(incoming.map(item=>[item.symbol,{...item}]));
-      const merged=current.map(item=>restored.has(item.symbol)?restored.get(item.symbol):item);
-      const known=new Set(current.map(item=>item.symbol));
-      incoming.forEach(item=>{if(!known.has(item.symbol))merged.push({...item})});
+    function mergePortfolioBooks(current,incoming) {
+      const restored=new Map(incoming.map(item=>[item.id,{...item,positions:item.positions.map(position=>({...position})),cashBalances:item.cashBalances.map(balance=>({...balance}))}]));
+      const merged=current.map(item=>restored.has(item.id)?restored.get(item.id):item);
+      const known=new Set(current.map(item=>item.id));
+      incoming.forEach(item=>{if(!known.has(item.id))merged.push({...item,positions:item.positions.map(position=>({...position})),cashBalances:item.cashBalances.map(balance=>({...balance}))})});
       return merged;
     }
 
     function applyBackup(data,mode) {
       if(mode==='replace'){
         favorites=data.favorites;
-        portfolio=data.portfolio;
-        cashBalances=data.cashBalances;
+        portfolioBooks=data.portfolios;
+        activePortfolioId=data.activePortfolioId;
+        bindActivePortfolio();
         alarms=data.alarms;
         marketItems=data.marketItems;
         applyTheme(data.theme);
@@ -1777,20 +1846,21 @@
         startRefreshTimers();
       }else{
         favorites=mergeUnique(favorites,data.favorites,item=>item.symbol);
-        portfolio=mergePortfolioBackup(portfolio,data.portfolio);
-        data.cashBalances.forEach(incoming=>{const existing=cashBalances.find(item=>item.currency===incoming.currency);if(existing)existing.amount+=incoming.amount;else cashBalances.push({...incoming})});
+        portfolioBooks=mergePortfolioBooks(portfolioBooks,data.portfolios);
+        bindActivePortfolio();
         alarms=mergeUnique(alarms,data.alarms,item=>item.id||item.symbol+'|'+item.condition+'|'+item.target);
         marketItems=mergeUnique(marketItems,data.marketItems,item=>item.symbol);
       }
       saveFavorites();
-      savePortfolio();
-      saveCashBalances();
+      savePortfolioBooks();
       saveAlarms();
       saveMarketItems();
       renderFavorites();
       updateFavoriteButton();
       renderAlarms();
       renderMarketSettings();
+      renderPortfolioBookSelector();
+      renderChartAssetPanels();
       renderPortfolio();
       loadMarketSummary();
     }
@@ -1959,8 +2029,76 @@
       });
     }
 
-    const savePortfolio = () => localStorage.setItem(portfolioKey, JSON.stringify(portfolio));
-    const saveCashBalances = () => localStorage.setItem(cashKey,JSON.stringify(cashBalances));
+    function savePortfolioBooks() {
+      const book=activePortfolioBook();
+      book.positions=portfolio;
+      book.cashBalances=cashBalances;
+      localStorage.setItem(portfolioBooksKey,JSON.stringify(portfolioBooks));
+      localStorage.setItem(activePortfolioKey,activePortfolioId);
+      localStorage.setItem(portfolioKey,JSON.stringify(portfolio));
+      localStorage.setItem(cashKey,JSON.stringify(cashBalances));
+    }
+    const savePortfolio = () => {savePortfolioBooks();renderChartAssetPanels()};
+    const saveCashBalances = () => savePortfolioBooks();
+
+    function renderPortfolioBookSelector() {
+      portfolioBookSelect.replaceChildren();
+      portfolioBooks.forEach(book=>{const option=document.createElement('option');option.value=book.id;option.textContent=book.name;portfolioBookSelect.append(option)});
+      portfolioBookSelect.value=activePortfolioId;
+      portfolioHeading.textContent=activePortfolioBook().name;
+      portfolioBookAdd.disabled=portfolioBooks.length>=50;
+      portfolioBookAdd.title=portfolioBooks.length>=50?'En fazla 50 portföy oluşturulabilir':'Yeni portföy';
+      portfolioBookDelete.disabled=portfolioBooks.length===1;
+      portfolioBookDelete.title=portfolioBooks.length===1?'En az bir portföy bulunmalıdır':'Portföyü sil';
+    }
+
+    function switchPortfolio(bookId) {
+      if(!portfolioBooks.some(item=>item.id===bookId)||bookId===activePortfolioId)return;
+      savePortfolioBooks();
+      activePortfolioId=bookId;
+      bindActivePortfolio();
+      portfolioRenderId++;
+      portfolioDividendRequestId++;
+      portfolioBenchmarkRequestId++;
+      portfolioSelection=null;
+      portfolioEditSymbol=null;
+      cashEditCurrency=null;
+      localStorage.setItem(activePortfolioKey,activePortfolioId);
+      renderPortfolioBookSelector();
+      renderChartAssetPanels();
+      renderPortfolio();
+    }
+
+    function openPortfolioBookDialog(mode='create') {
+      if(mode==='create'&&portfolioBooks.length>=50)return;
+      portfolioBookEditMode=mode;
+      const renaming=mode==='rename';
+      portfolioBookDialogTitle.textContent=renaming?'Portföy Adını Değiştir':'Yeni Portföy';
+      portfolioBookDialogNote.textContent=renaming?'Bu işlem portföyün içeriğini değiştirmez.':'Hisseleri ve nakit bakiyeleri diğer portföylerden bağımsız tutulur.';
+      portfolioBookSave.textContent=renaming?'Kaydet':'Oluştur';
+      portfolioBookName.value=renaming?activePortfolioBook().name:'';
+      portfolioBookName.setCustomValidity('');
+      portfolioBookDialog.showModal();
+      portfolioBookName.focus();
+      if(renaming)portfolioBookName.select();
+    }
+
+    function removeActivePortfolio() {
+      if(portfolioBooks.length===1)return;
+      const current=activePortfolioBook();
+      if(!confirm('“'+current.name+'” portföyü ve içindeki bütün pozisyonlar silinsin mi? Bu işlem yalnız bir yedekten geri alınabilir.'))return;
+      const index=portfolioBooks.findIndex(item=>item.id===current.id);
+      portfolioBooks.splice(index,1);
+      activePortfolioId=portfolioBooks[Math.min(index,portfolioBooks.length-1)].id;
+      bindActivePortfolio();
+      portfolioRenderId++;
+      portfolioDividendRequestId++;
+      portfolioBenchmarkRequestId++;
+      savePortfolioBooks();
+      renderPortfolioBookSelector();
+      renderChartAssetPanels();
+      renderPortfolio();
+    }
 
     function openCashDialog(balance=null){
       cashEditCurrency=balance?.currency||null;
@@ -3335,6 +3473,37 @@
       tabs[next].click();
       requestAnimationFrame(()=>tabs[next].focus());
     });
+    portfolioBookSelect.addEventListener('change',()=>switchPortfolio(portfolioBookSelect.value));
+    portfolioBookAdd.addEventListener('click',()=>openPortfolioBookDialog('create'));
+    portfolioBookRename.addEventListener('click',()=>openPortfolioBookDialog('rename'));
+    portfolioBookDelete.addEventListener('click',removeActivePortfolio);
+    portfolioBookCancel.addEventListener('click',()=>portfolioBookDialog.close());
+    portfolioBookDialog.addEventListener('close',()=>portfolioBookName.setCustomValidity(''));
+    portfolioBookForm.addEventListener('submit',event=>{
+      event.preventDefault();
+      const name=portfolioBookName.value.trim().replace(/\s+/g,' ').slice(0,40);
+      if(!name)return portfolioBookName.reportValidity();
+      const duplicate=portfolioBooks.find(item=>item.name.toLocaleLowerCase('tr-TR')===name.toLocaleLowerCase('tr-TR')&&(portfolioBookEditMode!=='rename'||item.id!==activePortfolioId));
+      if(duplicate){portfolioBookName.setCustomValidity('Bu adla başka bir portföy bulunuyor.');portfolioBookName.reportValidity();return}
+      portfolioBookName.setCustomValidity('');
+      if(portfolioBookEditMode==='rename'){
+        activePortfolioBook().name=name;
+      }else{
+        savePortfolioBooks();
+        const created={id:createPortfolioId(),name,positions:[],cashBalances:[],createdAt:new Date().toISOString()};
+        portfolioBooks.push(created);
+        activePortfolioId=created.id;
+        bindActivePortfolio();
+      }
+      portfolioRenderId++;
+      portfolioDividendRequestId++;
+      portfolioBenchmarkRequestId++;
+      savePortfolioBooks();
+      portfolioBookDialog.close();
+      renderPortfolioBookSelector();
+      renderChartAssetPanels();
+      renderPortfolio();
+    });
     portfolioAdd.addEventListener('click', openPortfolioDialog);
     portfolioCurrencyToggle.addEventListener('click',()=>{
       portfolioDisplayCurrency=portfolioDisplayCurrency==='TRY'?'AUTO':'TRY';
@@ -3449,6 +3618,8 @@
     });
     applyTheme(themePreference,{persist:false});
     syncSettingsControls();
+    renderPortfolioBookSelector();
+    renderChartAssetPanels();
     renderFavorites();
     updateFavoriteButton();
     loadPrice('AAPL');

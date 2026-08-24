@@ -1,11 +1,11 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 5.6
-**Uygulama sürümü:** v5.6
-**Durum:** Kullanıcı tarafından onaylandı
+**Belge sürümü:** 5.7 önizleme
+**Uygulama sürümü:** v5.7 önizleme
+**Durum:** Kullanıcı kontrolü ve kalıcı yayın onayı bekleniyor
 **Canlı adres:** https://finanstool.vercel.app
 **Kaynak depo:** https://github.com/ygtozr/finanstool
-**Son güncelleme:** 23 Ağustos 2026
+**Son güncelleme:** 24 Ağustos 2026
 
 Bu belge Özer Finans uygulamasının amacını, kullanıcı tercihlerini, mevcut işlevlerini, görsel tasarımını, veri modelini ve teknik mimarisini tek yerde tanımlar. Hedefi, mevcut kaynak kod görülmeden uygulama sıfırdan geliştirilse bile aynı davranışın ve mümkün olduğunca aynı görünümün yeniden üretilebilmesidir.
 
@@ -68,7 +68,7 @@ Uygulamada dört bağımsız ana sayfa bulunur:
 
 - **Özet:** Piyasa Özeti ilk sırada, Favoriler hemen altında gösterilir. Mobilde piyasa kartları her satırda iki adet olacak şekilde aşağı doğru devam eder.
 - **Grafik Ve Teknik Analiz:** Arama, teknik analiz seçenekleri, fiyat grafiği, RSI ve dönem seçenekleri doğrudan görünür.
-- **Portföy:** Toplam portföy, Portföy Özet Analizi, hisseler, dağılım, performans karşılaştırması ve Temettü Takvimi sırasıyla gösterilir.
+- **Portföy:** Aktif portföy seçici, toplam portföy, Portföy Özet Analizi, hisseler, dağılım, performans karşılaştırması ve Temettü Takvimi sırasıyla gösterilir. Her bağımsız portföyün hisse ve nakit kayıtları ayrıdır.
 - **Diğer:** Tema, otomatik yenileme, varsayılan grafik dönemi, alarm denetimi, veri yedekleme, yardım ve sürüm bilgilerini içerir.
 
 Uygulama her yeni açılışta varsayılan olarak **Özet** sayfasını gösterir. Önceki oturumda açık kalan Grafik veya Portföy görünümü açılış tercihini değiştirmez.
@@ -385,7 +385,7 @@ Kullanıcı verileri JSON dosyası olarak dışa aktarılabilir ve daha sonra ge
 Yedek kapsamı:
 
 - Favoriler,
-- Hisse ve çoklu para birimli nakit portföyü; pozisyonların alım tarihi, maliyet para birimi, temel adedi ve temettü yeniden yatırım ayarları,
+- Bütün bağımsız portföyler; her birinin hisse ve çoklu para birimli nakit kayıtları, pozisyon alım tarihi, maliyet para birimi, temel adedi ve temettü yeniden yatırım ayarları,
 - Fiyat alarmları,
 - Piyasa Özeti öğeleri,
 - Açık/Koyu/Sistem tema tercihi,
@@ -393,34 +393,41 @@ Yedek kapsamı:
 - Varsayılan grafik dönemi,
 - Alarm denetimi tercihi.
 
-Şema sürümü 1 için örnek:
+Şema sürümü 2 için özet örnek:
 
 ```json
 {
-  "schemaVersion": 1,
-  "appVersion": "5.6",
+  "schemaVersion": 2,
+  "appVersion": "5.7",
   "exportedAt": "2026-08-08T00:00:00.000Z",
   "data": {
     "favorites": [
       { "symbol": "AAPL", "name": "Apple Inc." }
     ],
-    "portfolio": [
+    "portfolios": [
       {
-        "symbol": "AAPL",
-        "name": "Apple Inc.",
-        "quantity": 1,
-        "baseQuantity": 1,
-        "unitCost": 100,
-        "costCurrency": "USD",
-        "purchaseDate": "2026-01-15",
-        "dripEnabled": true,
-        "dripTaxRate": 15,
-        "dripFractional": true
+        "id": "portfolio-main",
+        "name": "Portföyüm",
+        "positions": [
+          {
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "quantity": 1,
+            "baseQuantity": 1,
+            "unitCost": 100,
+            "costCurrency": "USD",
+            "purchaseDate": "2026-01-15",
+            "dripEnabled": true,
+            "dripTaxRate": 15,
+            "dripFractional": true
+          }
+        ],
+        "cashBalances": [
+          { "currency": "USD", "amount": 100 }
+        ]
       }
     ],
-    "cashBalances": [
-      { "currency": "USD", "amount": 100 }
-    ],
+    "activePortfolioId": "portfolio-main",
     "alarms": [
       {
         "id": "benzersiz-kimlik",
@@ -443,10 +450,10 @@ Yedek kapsamı:
 
 Geri yükleme seçenekleri:
 
-- **Birleştir:** Mevcut kayıtları korur, yedekteki kayıtları ekler. Aynı portföy sembolü iki tarafta da varsa yedekteki adet, maliyet, alım tarihi ve temettü yeniden yatırım ayarları geri yüklenir.
+- **Birleştir:** Mevcut portföyleri korur ve yeni portföyleri ekler. Aynı portföy kimliği iki tarafta da varsa portföyün hisseleri, nakdi, maliyetleri, tarihleri ve temettü ayarları yedekteki kayıtla geri yüklenir.
 - **Değiştir:** Mevcut yerel veriyi yedek içeriğiyle değiştirir.
 
-Yüklenen dosya JSON olarak doğrulanır, beklenmeyen alanlar ayıklanır ve yaklaşık 1 MB dosya sınırı uygulanır.
+Yüklenen dosya JSON olarak doğrulanır, beklenmeyen alanlar ayıklanır ve yaklaşık 1 MB dosya sınırı uygulanır. Şema v1 tek portföylü yedekleri `Portföyüm` kaydına dönüştürülerek geriye uyumlu biçimde desteklenir.
 
 ## 7. Teknik mimari
 …497 tokens truncated…aktır.
@@ -479,7 +486,10 @@ Yerel saklama anahtarları:
 | `finans-grafigi-theme` | `light` veya `dark` |
 | `finans-grafigi-favorites` | Favori sembol ve adları |
 | `finans-grafigi-alarms` | Fiyat alarmı kayıtları |
-| `finans-grafigi-portfolio` | Portföy adet ve maliyet kayıtları |
+| `finans-grafigi-portfolios-v2` | Bağımsız portföy kimlikleri, adları, pozisyonları ve nakit bakiyeleri |
+| `finans-grafigi-active-portfolio` | Son seçilen aktif portföy kimliği |
+| `finans-grafigi-portfolio` | v5.6 geriye uyumluluğu için aktif portföyün eski biçimli kopyası |
+| `finans-grafigi-cash-balances` | v5.6 geriye uyumluluğu için aktif nakit bakiyelerinin eski biçimli kopyası |
 | `finans-grafigi-market-items` | Özelleştirilmiş piyasa kartları |
 | `finans-grafigi-market-defaults-version` | Sekiz sabit piyasa değerinin bir defalık v4.0 taşıma işareti |
 | `finans-grafigi-portfolio-benchmark` | Seçili karşılaştırma ölçütü |
@@ -744,6 +754,14 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 - Portföy varlık kartına dokunmak mevcut adet, maliyet, maliyet para birimi, alış tarihi ve yeniden yatırım ayarlarını düzenleme formunda açar. Kaydetme yeni kayıt eklemek yerine ilgili pozisyonu günceller.
 - Nakit kartına dokunmak para birimi ve bakiye tutarını düzenleme formunda açar. Aynı para biriminden ikinci kayıt oluşturulmaz; silme düğmesi kart içinde `24×24px` görünür boyutta kalır.
 - iOS'un 16 pikselden küçük girişlere odaklanırken yaptığı otomatik yakınlaştırmayı önlemek için mobil form kontrolleri en az `16px` kullanır. Viewport ölçeği 1'e sabitlenmiş ve iki parmak yakınlaştırması engellenmiştir; kaydırma ve çekerek yenileme davranışları korunur.
+
+### 17.7 v5.7 Çoklu Bağımsız Portföy Önizlemesi
+
+- Portföy sayfasının üstünde aktif portföy seçicisi ile oluşturma, yeniden adlandırma ve silme kontrolleri bulunur. En az bir portföy zorunludur; son portföy silinemez.
+- Her portföy `id`, `name`, `positions`, `cashBalances` ve `createdAt` alanlarına sahiptir. Pozisyonlar, nakit, toplamlar, dağılım, performans kıyası, temettü takvimi ve Grafik sayfasındaki Portföy seçicisi yalnız aktif kaydı kullanır.
+- Eski `finans-grafigi-portfolio` ve `finans-grafigi-cash-balances` kayıtları ilk açılışta otomatik olarak `portfolio-main / Portföyüm` kaydına taşınır. Eski anahtarlar geçiş güvenliği için aktif portföyün uyumlu kopyası olarak güncellenmeye devam eder.
+- Aktif portföy değiştiğinde eski fiyat, temettü ve performans isteklerinin yeni portföyü ezmemesi için ilgili istek kimlikleri geçersizleştirilir.
+- JSON yedek şeması 2, bütün portföyleri ve aktif portföy kimliğini saklar. Şema 1 yedekleri tek bir varsayılan portföye dönüştürülerek açılır; birleştirmede eşleşme portföy kimliğiyle yapılır.
 
 ## 18. Bilinen sınırlar ve ertelenen işler
 
