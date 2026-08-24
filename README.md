@@ -14,6 +14,7 @@
 - Portföy araması artık TEFAS fon kodu veya uzun fon adıyla arama yapar; sonuçlar `TEFAS-MAC` gibi sağlayıcısı belirgin kodlarla gösterilir.
 - TEFAS'ın hızlı aramasında görünmeyebilen YLB ve ENR gibi yatırım fonları, resmî tam fon listesindeki kod ve unvan eşleşmesiyle de bulunur.
 - Fon araması `Yapı Kredi`, `Yapi Kredi`, `QNB` ve `Enpara` gibi banka/portföy yöneticisi ifadelerinde Türkçe karakter farklarını önemsemez.
+- YLB ve ENR resmî Türkçe unvanlarıyla eş anlamlı kaydedilir ve banka adıyla gelen kalabalık sonuçlarda ilk önerilere taşınır.
 - Arama kutuları sonuçsuz sorgularda “Eşleşen ürün bulunamadı”, sağlayıcı kesintisinde ise ayrı bir bağlantı hatası gösterir.
 - TEFAS fonlarının resmî günlük fiyat geçmişi Özer Finans fiyat biçimine dönüştürülerek portföy değeri, günlük/haftalık değişim ve grafik akışlarında kullanılabilir.
 - TEFAS’ın güncel bot korumasına uyum için ayrı Python sunucu işlevi, Chrome uyumlu TLS oturumu, kısa süreli istek birleştirme ve CDN önbelleği kullanılır.

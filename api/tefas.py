@@ -14,6 +14,10 @@ FUND_CODE = re.compile(r"^[A-Z0-9]{2,8}$")
 SESSION_TTL = 9 * 60
 CACHE_TTL = 10 * 60
 FUND_LIST_TTL = 6 * 60 * 60
+KNOWN_FUND_NAMES = {
+    "YLB": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
+    "ENR": "QNB PORTFÖY ENPARA PARA PİYASASI (TL) FONU",
+}
 
 _lock = threading.Lock()
 _session = None
@@ -134,6 +138,15 @@ def _search(query):
     payload = _post("/api/funds/fonUnvanAra", {"aramaMetni": query})
     rows = payload.get("resultList") or []
     normalized_query = _search_text(query)
+
+    # Tam listede unvani Ingilizce donen ozel fonlari resmi Turkce adlariyla
+    # arat ve cok sayidaki banka fonu arasinda ilk onerilere tasi.
+    for code, official_name in reversed(KNOWN_FUND_NAMES.items()):
+        searchable = _search_text(code + " " + official_name)
+        if normalized_query in searchable or all(
+            token in searchable for token in normalized_query.split()
+        ):
+            rows.insert(0, {"fonKod": code, "unvan": official_name})
 
     # TEFAS'in hizli ad aramasi, alim-satimi sinirli veya dagitimi kapali
     # bazi yatirim fonlarini (ornegin YLB/ENR) her zaman dondurmuyor.
