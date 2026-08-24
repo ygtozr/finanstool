@@ -20,6 +20,7 @@
 - Bu alanların tamamı ayrıca TEFAS'ın tam YAT yatırım fonu aramasını piyasa aramasıyla aşamalı birleştirir; YLB/ENR dışındaki fonlar da kod veya uzun unvanla bulunabilir.
 - Fon unvanı araması kelime sırasından bağımsızdır ve `para piyasası`/`money market`, `portföy`/`asset management` gibi Türkçe–İngilizce finans terimlerini eşleştirir; örneğin `para piyasası yapı` YVD dahil ilgili Yapı Kredi fonlarını getirir.
 - Aktif TEFAS işlem listesi, boş sorguyla alınan genel fon unvan kataloğuyla birleştirilir; YVD gibi kodla fiyatlanabilen fakat tam işlem listesinde görünmeyen fonlar da özellik/yönetici aramasına katılır.
+- Banka markaları ilgili portföy yönetim şirketleriyle eşleştirilir; örneğin `Akbank` araması Ak Portföy, `İş Bankası` araması İş Portföy ve `Garanti BBVA` araması Garanti Portföy fonlarını getirir.
 - Arama kutuları sonuçsuz sorgularda “Eşleşen ürün bulunamadı”, sağlayıcı kesintisinde ise ayrı bir bağlantı hatası gösterir.
 - TEFAS fonlarının resmî günlük fiyat geçmişi Özer Finans fiyat biçimine dönüştürülerek portföy değeri, günlük/haftalık değişim ve grafik akışlarında kullanılabilir.
 - TEFAS’ın güncel bot korumasına uyum için ayrı Python sunucu işlevi, Chrome uyumlu TLS oturumu, kısa süreli istek birleştirme ve CDN önbelleği kullanılır.

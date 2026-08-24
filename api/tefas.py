@@ -34,6 +34,19 @@ SEARCH_SYNONYMS = {
     "IKINCI": ("SECOND",),
     "UCUNCU": ("THIRD",),
 }
+MANAGER_SEARCH_ALIASES = (
+    (("AK PORTFOY", "AK ASSET MANAGEMENT"), "AKBANK AK BANK"),
+    (("YAPI KREDI PORTFOY", "YAPI KREDI ASSET MANAGEMENT"), "YAPI KREDI BANKASI YKB"),
+    (("IS PORTFOY", "IS ASSET MANAGEMENT"), "ISBANK IS BANKASI TURKIYE IS BANKASI"),
+    (("GARANTI PORTFOY", "GARANTI ASSET MANAGEMENT"), "GARANTI BBVA GARANTI BANKASI"),
+    (("QNB PORTFOY", "QNB ASSET MANAGEMENT"), "QNB FINANSBANK"),
+    (("ZIRAAT PORTFOY", "ZIRAAT ASSET MANAGEMENT"), "ZIRAAT BANKASI"),
+    (("VAKIF PORTFOY", "VAKIF ASSET MANAGEMENT"), "VAKIFBANK VAKIF BANKASI"),
+    (("HALK PORTFOY", "HALK ASSET MANAGEMENT"), "HALKBANK HALK BANKASI"),
+    (("DENIZ PORTFOY", "DENIZ ASSET MANAGEMENT"), "DENIZBANK DENIZ BANK"),
+    (("TEB PORTFOY", "TEB ASSET MANAGEMENT"), "TEB TURK EKONOMI BANKASI"),
+    (("FIBA PORTFOY", "FIBA ASSET MANAGEMENT"), "FIBABANKA FIBA BANKA"),
+)
 
 _lock = threading.Lock()
 _session = None
@@ -116,6 +129,9 @@ def _search_text(value):
 
 def _matches_search(query, code, name):
     searchable = _search_text(code + " " + name)
+    for markers, aliases in MANAGER_SEARCH_ALIASES:
+        if any(marker in searchable for marker in markers):
+            searchable += " " + aliases
     if query in searchable:
         return True
     for token in query.split():
