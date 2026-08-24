@@ -125,6 +125,8 @@ assert.match(html,/previousPositions=new Map[\s\S]*playFavoriteMotion\(candidate
 assert.match(html,/pending\.ghost\.style\.transform=`translate3d[\s\S]*favorite-drag-settling[\s\S]*playFavoriteMotion\(ghost,[\s\S]*duration:320/,'Sürüklenen gerçek kart yumuşakça küçülüp hedefe oturmalı');
 assert.match(html,/@keyframes favorite-card-lift[^}]*transform:scale\(1\)[\s\S]*transform:scale\(1\.04\)/,'Favori kartı sürükleme başlangıcında aniden değil animasyonla yükselmeli');
 assert.match(html,/movePlaceholder\(pending\.ghostY\+pending\.ghostHeight\/2\)/,'Favori sıralama eşiği parmak noktası yerine sürüklenen kartın merkezini kullanmalı');
+assert.match(html,/const followFavoriteGhost=now=>[\s\S]*requestAnimationFrame\(followFavoriteGhost\)/,'Sürüklenen favori kartı ekran yenileme hızında ara karelerle akıcı hareket etmeli');
+assert.match(html,/ghostTargetX[\s\S]*ghostTargetY[\s\S]*translate3d\(\$\{pending\.ghostX-pending\.ghostLeft\}px,\$\{pending\.ghostY-pending\.ghostTop\}px,0\)/,'Sürüklenen favori kartı parmağı hem yatay hem dikey eksende takip etmeli');
 assert.match(html,/function playFavoriteMotion[\s\S]*typeof element\.animate==='function'[\s\S]*element\.style\.transition/,'Favori animasyonu eski Safari için CSS geçişi yedeğine sahip olmalı');
 assert.match(html,/localStorage\.setItem\(favoritesKey, JSON\.stringify\(favorites\)\)/,'Favorilerin yeni sırası yerel depolamada kalıcı olmalı');
 assert.doesNotMatch(html,/closest\('\.favorite-card'\)\)openView\('chart'\)/,'Favori kartı panel açılırken arka planda Grafik sekmesine geçmemeli');
