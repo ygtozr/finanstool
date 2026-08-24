@@ -127,6 +127,11 @@ assert.match(html,/@keyframes favorite-card-lift[^}]*transform:scale\(1\)[\s\S]*
 assert.match(html,/movePlaceholder\(pending\.ghostY\+pending\.ghostHeight\/2\)/,'Favori sıralama eşiği parmak noktası yerine sürüklenen kartın merkezini kullanmalı');
 assert.match(html,/const followFavoriteGhost=now=>[\s\S]*requestAnimationFrame\(followFavoriteGhost\)/,'Sürüklenen favori kartı ekran yenileme hızında ara karelerle akıcı hareket etmeli');
 assert.match(html,/ghostTargetX[\s\S]*ghostTargetY[\s\S]*translate3d\(\$\{pending\.ghostX-pending\.ghostLeft\}px,\$\{pending\.ghostY-pending\.ghostTop\}px,0\)/,'Sürüklenen favori kartı parmağı hem yatay hem dikey eksende takip etmeli');
+assert.match(html,/open\.addEventListener\('touchstart'[\s\S]*beginInteraction\(touch\.identifier,'touch'/,'Favori kartı iPhone için ayrı TouchEvent etkileşimi başlatmalı');
+assert.match(html,/window\.addEventListener\('touchmove',onTouchMove,\{passive:false\}\)[\s\S]*window\.addEventListener\('touchend',onTouchEnd,\{passive:false\}\)/,'iPhone sürüklemesi pasif olmayan touchmove ve touchend dinleyicilerine sahip olmalı');
+assert.match(html,/\.favorite-row\.favorite-drag-placeholder \{ visibility:hidden; opacity:0; pointer-events:none; \}/,'Sürükleme yer tutucusundaki sağ işlem düğmeleri ikinci seçim gibi görünmemeli');
+assert.match(html,/\.favorite-row\.favorite-drag-ghost \.favorite-actions \{ visibility:hidden; \}/,'Havada sürüklenen kartın sağ işlem düğmeleri ek seçim gibi görünmemeli');
+assert.match(html,/-webkit-touch-callout:none[\s\S]*document\.getSelection\(\)\?\.removeAllRanges\(\)/,'iPhone metin seçimi ve dokunma çağrı balonu sürükleme sırasında engellenmeli');
 assert.match(html,/function playFavoriteMotion[\s\S]*typeof element\.animate==='function'[\s\S]*element\.style\.transition/,'Favori animasyonu eski Safari için CSS geçişi yedeğine sahip olmalı');
 assert.match(html,/localStorage\.setItem\(favoritesKey, JSON\.stringify\(favorites\)\)/,'Favorilerin yeni sırası yerel depolamada kalıcı olmalı');
 assert.doesNotMatch(html,/closest\('\.favorite-card'\)\)openView\('chart'\)/,'Favori kartı panel açılırken arka planda Grafik sekmesine geçmemeli');

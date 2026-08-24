@@ -35,16 +35,19 @@
     .favorite-add-search input { min-height:42px; padding:9px 11px; font-size:.84rem; }
     .favorite-add-search > button { flex:0 0 44px; width:44px; min-height:44px; padding:0; font-size:1.15rem; }
     .favorite-add-search .search-suggestions { right:50px; }
-    .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 36px; gap:6px; align-items:stretch; will-change:transform; }
+    .favorite-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 36px; gap:6px; align-items:stretch; will-change:transform; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent; }
+    .favorite-row * { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
     .favorite-card { min-width:0; min-height:76px; padding:9px 11px; display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:10px; text-align:left; color:var(--text); background:#0d1523; border:1px solid #40516e; border-radius:11px; cursor:grab; touch-action:none; -webkit-user-select:none; user-select:none; }
     .favorite-card:hover { border-color:var(--accent); transform:translateY(-1px); }
-    .favorite-row.favorite-drag-placeholder { opacity:.13; pointer-events:none; transition:opacity .22s ease; }
+    .favorite-row.favorite-drag-placeholder { visibility:hidden; opacity:0; pointer-events:none; }
     .favorite-row.favorite-drag-placeholder .favorite-card { border-color:var(--accent); }
     .favorite-row.favorite-drag-ghost { position:fixed; z-index:120; margin:0; pointer-events:none; opacity:.99; filter:drop-shadow(0 18px 28px #020617aa); will-change:transform; }
+    .favorite-row.favorite-drag-ghost .favorite-actions { visibility:hidden; }
     .favorite-row.favorite-drag-ghost .favorite-card { border-color:var(--accent); cursor:grabbing; box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent); animation:favorite-card-lift .22s cubic-bezier(.16,1,.3,1) both; }
     .favorite-row.favorite-drag-ghost.favorite-drag-settling .favorite-card { animation:none; transform:scale(1) rotate(0); box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 18%,transparent); transition:transform .32s cubic-bezier(.16,1,.3,1),box-shadow .32s ease; }
     @keyframes favorite-card-lift { from { transform:scale(1) rotate(0); } to { transform:scale(1.04) rotate(.2deg); } }
-    body.favorite-reordering { overflow:hidden; overscroll-behavior:none; }
+    body.favorite-reordering { overflow:hidden; overscroll-behavior:none; -webkit-user-select:none; user-select:none; }
+    body.favorite-reordering .favorite-row,body.favorite-reordering .favorite-row:focus,body.favorite-reordering .favorite-row:focus-within { outline:none !important; -webkit-tap-highlight-color:transparent; }
     .favorite-card-badge { width:44px; height:44px; display:grid; place-items:center; overflow:hidden; border:1px solid #40516e; border-radius:50%; color:var(--accent); background:#182235; font-size:.74rem; font-weight:800; letter-spacing:.02em; }
     .favorite-card-badge > * { grid-area:1/1; }
     .favorite-card-logo { width:100%; height:100%; padding:0; object-fit:cover; border-radius:50%; background:#111a2a; }
@@ -1330,6 +1333,9 @@
         window.removeEventListener('pointermove',onMove);
         window.removeEventListener('pointerup',onEnd);
         window.removeEventListener('pointercancel',onEnd);
+        window.removeEventListener('touchmove',onTouchMove);
+        window.removeEventListener('touchend',onTouchEnd);
+        window.removeEventListener('touchcancel',onTouchCancel);
         pending=null;
       };
       const activate=()=>{
@@ -1340,7 +1346,7 @@
         placeholder.classList.add('favorite-drag-placeholder');
         placeholder.setAttribute('aria-hidden','true');
         placeholder.style.height=rect.height+'px';
-        try{open.setPointerCapture(pending.pointerId)}catch{}
+        if(pending.pointerType!=='touch')try{open.setPointerCapture(pending.pointerId)}catch{}
         row.replaceWith(placeholder);
         row.classList.add('favorite-drag-ghost');
         row.style.left=rect.left+'px';
@@ -1399,21 +1405,21 @@
         movePlaceholder(pending.ghostY+pending.ghostHeight/2);
         pending.followFrame=requestAnimationFrame(followFavoriteGhost);
       };
-      const onMove=event=>{
-        if(!pending||event.pointerId!==pending.pointerId)return;
+      const handleInteractionMove=(clientX,clientY,event)=>{
+        if(!pending)return;
         const previousY=pending.lastY;
         const previousMoveAt=pending.lastMoveAt;
-        pending.lastX=event.clientX;
-        pending.lastY=event.clientY;
+        pending.lastX=clientX;
+        pending.lastY=clientY;
         pending.lastMoveAt=performance.now();
-        const distance=Math.hypot(event.clientX-pending.startX,event.clientY-pending.startY);
+        const distance=Math.hypot(clientX-pending.startX,clientY-pending.startY);
         if(!pending.active){
           if(pending.scrolling||distance>10){
             clearTimeout(pending.timer);
             if(pending.pointerType==='mouse'){clearPending();return}
             pending.scrolling=true;
             event.preventDefault();
-            const scrollDelta=previousY-event.clientY;
+            const scrollDelta=previousY-clientY;
             window.scrollBy(0,scrollDelta);
             const elapsed=Math.max(1,pending.lastMoveAt-previousMoveAt);
             pending.velocity=(pending.velocity*.45)+(scrollDelta/elapsed*.55);
@@ -1421,18 +1427,21 @@
           return;
         }
         event.preventDefault();
-        pending.ghostTargetX=Math.max(8,Math.min(window.innerWidth-pending.ghostWidth-8,event.clientX-pending.offsetX));
-        pending.ghostTargetY=event.clientY-pending.offsetY;
+        pending.ghostTargetX=Math.max(8,Math.min(window.innerWidth-pending.ghostWidth-8,clientX-pending.offsetX));
+        pending.ghostTargetY=clientY-pending.offsetY;
         const edge=72;
-        if(event.clientY<edge)window.scrollBy(0,-Math.min(14,(edge-event.clientY)/3));
-        else if(event.clientY>window.innerHeight-edge)window.scrollBy(0,Math.min(14,(event.clientY-window.innerHeight+edge)/3));
+        if(clientY<edge)window.scrollBy(0,-Math.min(14,(edge-clientY)/3));
+        else if(clientY>window.innerHeight-edge)window.scrollBy(0,Math.min(14,(clientY-window.innerHeight+edge)/3));
       };
-      const onEnd=event=>{
-        if(!pending||event.pointerId!==pending.pointerId)return;
+      const onMove=event=>{if(pending&&event.pointerId===pending.pointerId)handleInteractionMove(event.clientX,event.clientY,event)};
+      const finishInteraction=(event,{cancelled=false}={})=>{
+        if(!pending)return;
         const active=pending.active;
         const ghost=pending.ghost;
         const placeholder=pending.placeholder;
         const scrolling=pending.scrolling;
+        const inputType=pending.pointerType;
+        if(inputType==='touch')event.preventDefault();
         if(active){
           event.preventDefault();
           cancelAnimationFrame(pending.followFrame);
@@ -1474,19 +1483,46 @@
           };
           favoriteScrollMomentum=requestAnimationFrame(glide);
         }
+        const openDetail=!cancelled&&!active&&!scrolling&&inputType==='touch';
         clearPending();
+        if(openDetail){favoriteDragSuppressUntil=Date.now()+500;openFavoriteDetail(item)}
       };
-      open.addEventListener('pointerdown',event=>{
-        if(!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
+      const onEnd=event=>{if(pending&&event.pointerId===pending.pointerId)finishInteraction(event,{cancelled:event.type==='pointercancel'})};
+      const findPendingTouch=list=>[...list].find(touch=>pending&&touch.identifier===pending.pointerId);
+      const onTouchMove=event=>{
+        const touch=findPendingTouch(event.touches);
+        if(touch)handleInteractionMove(touch.clientX,touch.clientY,event);
+      };
+      const onTouchEnd=event=>{if(findPendingTouch(event.changedTouches))finishInteraction(event)};
+      const onTouchCancel=event=>{if(findPendingTouch(event.changedTouches))finishInteraction(event,{cancelled:true})};
+      const beginInteraction=(pointerId,pointerType,clientX,clientY)=>{
         cancelAnimationFrame(favoriteScrollMomentum);
         favoriteScrollMomentum=0;
         clearPending();
-        pending={pointerId:event.pointerId,pointerType:event.pointerType,startX:event.clientX,startY:event.clientY,lastX:event.clientX,lastY:event.clientY,lastMoveAt:performance.now(),velocity:0,scrolling:false,active:false,ghost:null,placeholder:null,ghostLeft:0,ghostTop:0,ghostX:0,ghostY:0,ghostTargetX:0,ghostTargetY:0,ghostWidth:0,ghostHeight:0,offsetX:0,offsetY:0,followLastAt:0,followFrame:0,timer:0};
+        pending={pointerId,pointerType,startX:clientX,startY:clientY,lastX:clientX,lastY:clientY,lastMoveAt:performance.now(),velocity:0,scrolling:false,active:false,ghost:null,placeholder:null,ghostLeft:0,ghostTop:0,ghostX:0,ghostY:0,ghostTargetX:0,ghostTargetY:0,ghostWidth:0,ghostHeight:0,offsetX:0,offsetY:0,followLastAt:0,followFrame:0,timer:0};
         pending.timer=setTimeout(activate,400);
-        window.addEventListener('pointermove',onMove,{passive:false});
-        window.addEventListener('pointerup',onEnd,{passive:false});
-        window.addEventListener('pointercancel',onEnd,{passive:false});
+        if(pointerType==='touch'){
+          window.addEventListener('touchmove',onTouchMove,{passive:false});
+          window.addEventListener('touchend',onTouchEnd,{passive:false});
+          window.addEventListener('touchcancel',onTouchCancel,{passive:false});
+        }else{
+          window.addEventListener('pointermove',onMove,{passive:false});
+          window.addEventListener('pointerup',onEnd,{passive:false});
+          window.addEventListener('pointercancel',onEnd,{passive:false});
+        }
+      };
+      open.addEventListener('pointerdown',event=>{
+        if(event.pointerType==='touch'||!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
+        beginInteraction(event.pointerId,event.pointerType,event.clientX,event.clientY);
       });
+      open.addEventListener('touchstart',event=>{
+        if(event.touches.length!==1)return;
+        event.preventDefault();
+        event.stopPropagation();
+        document.getSelection()?.removeAllRanges();
+        const touch=event.changedTouches[0];
+        beginInteraction(touch.identifier,'touch',touch.clientX,touch.clientY);
+      },{passive:false});
       open.addEventListener('contextmenu',event=>event.preventDefault());
       open.addEventListener('dragstart',event=>event.preventDefault());
       open.addEventListener('keydown',event=>{
