@@ -2443,6 +2443,22 @@
       updateComboboxState(portfolioSymbol,portfolioSuggestions,items.length>0||hasMessage);
     }
 
+    const knownTefasFunds=[
+      {symbol:'TEFAS-YLB',name:'YAPI KREDİ PORTFÖY PARA PİYASASI FONU',aliases:'YLB YAPI KREDI YAPIKREDI PARA PIYASASI'},
+      {symbol:'TEFAS-ENR',name:'QNB PORTFÖY ENPARA PARA PİYASASI (TL) FONU',aliases:'ENR QNB ENPARA PARA PIYASASI'}
+    ];
+    function foldSearchText(value){
+      return String(value||'').replaceAll('ı','i').replaceAll('İ','I').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+    }
+    function knownTefasMatches(query){
+      const tokens=foldSearchText(query).split(/\s+/).filter(Boolean);
+      if(!tokens.length)return[];
+      return knownTefasFunds.filter(item=>{
+        const searchable=foldSearchText(item.symbol+' '+item.name+' '+item.aliases);
+        return tokens.every(token=>searchable.includes(token));
+      }).map(({symbol,name})=>({symbol,name,exchange:'TEFAS',type:'MUTUALFUND',provider:'TEFAS'}));
+    }
+
     function openPortfolioDialog(position=null) {
       const editing=position&&position.symbol;
       const symbol = String(editing?position.symbol:(portfolioSelection?.symbol || portfolioSymbol.value)).trim().toUpperCase();
@@ -3920,6 +3936,8 @@
       clearTimeout(portfolioSearchTimer);
       const query=portfolioSymbol.value.trim();
       if(query.length<2)return showPortfolioSuggestions([]);
+      const quickFundQuotes=knownTefasMatches(query);
+      if(quickFundQuotes.length)showPortfolioSuggestions(quickFundQuotes);
       portfolioSearchTimer=setTimeout(async()=>{
         try{
           const [marketResult,tefasResult]=await Promise.allSettled([
@@ -3929,7 +3947,7 @@
           if(requestId!==portfolioSearchRequestId||portfolioSymbol.value.trim()!==query)return;
           const marketQuotes=marketResult.status==='fulfilled'?(marketResult.value.quotes||[]):[];
           const tefasQuotes=tefasResult.status==='fulfilled'?(tefasResult.value.quotes||[]):[];
-          const unique=new Map([...tefasQuotes,...marketQuotes].map(item=>[item.symbol,item]));
+          const unique=new Map([...quickFundQuotes,...tefasQuotes,...marketQuotes].map(item=>[item.symbol,item]));
           const items=[...unique.values()];
           const bothFailed=marketResult.status==='rejected'&&tefasResult.status==='rejected';
           showPortfolioSuggestions(items,items.length?'':bothFailed?'Arama servisine ulaşılamadı.':'Eşleşen ürün bulunamadı.');
