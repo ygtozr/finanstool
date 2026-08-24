@@ -3590,7 +3590,7 @@
       const query=symbolInput.value.trim();
       if(query.length<2)return showSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      showSuggestions(quickFundQuotes);
+      showSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Fonlar ve hisseler aranıyor…');
       searchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===searchRequestId&&symbolInput.value.trim()===query,showSuggestions,quickFundQuotes),250);
     });
     favoriteSearch.addEventListener('input',()=>{
@@ -3599,7 +3599,7 @@
       const query=favoriteSearch.value.trim();
       if(query.length<2)return showFavoriteSearchSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      showFavoriteSearchSuggestions(quickFundQuotes);
+      showFavoriteSearchSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Fonlar ve hisseler aranıyor…');
       favoriteSearchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===favoriteSearchRequestId&&favoriteSearch.value.trim()===query,showFavoriteSearchSuggestions,quickFundQuotes),250);
     });
     favoriteAddForm.addEventListener('submit',event=>{event.preventDefault();addOverviewFavorite({symbol:favoriteSearch.value,name:favoriteSearch.value})});
@@ -3695,7 +3695,7 @@
       const query=marketSettingsSearch.value.trim();
       if(query.length<2)return showMarketSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      showMarketSuggestions(quickFundQuotes);
+      showMarketSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Fonlar ve hisseler aranıyor…');
       marketSearchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===marketSearchRequestId&&marketSettingsSearch.value.trim()===query,showMarketSuggestions,quickFundQuotes),250);
     });
     marketSettingsForm.addEventListener('submit',event=>{
@@ -3821,7 +3821,7 @@
       const query=benchmarkSearch.value.trim();
       if(query.length<2)return showBenchmarkSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      showBenchmarkSuggestions(quickFundQuotes);
+      showBenchmarkSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Fonlar ve hisseler aranıyor…');
       benchmarkSearchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===benchmarkSearchRequestId&&benchmarkSearch.value.trim()===query,showBenchmarkSuggestions,quickFundQuotes),250);
     });
     benchmarkApply.addEventListener('click',()=>{
@@ -3943,7 +3943,7 @@
       const query=portfolioSymbol.value.trim();
       if(query.length<2)return showPortfolioSuggestions([]);
       const quickFundQuotes=knownTefasMatches(query);
-      showPortfolioSuggestions(quickFundQuotes);
+      showPortfolioSuggestions(quickFundQuotes,quickFundQuotes.length?'':'Fonlar ve hisseler aranıyor…');
       portfolioSearchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===portfolioSearchRequestId&&portfolioSymbol.value.trim()===query,showPortfolioSuggestions,quickFundQuotes),250);
     });
     portfolioSymbol.addEventListener('keydown',event=>{
