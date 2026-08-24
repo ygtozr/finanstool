@@ -5,17 +5,16 @@ import time
 import unicodedata
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
-
-from curl_cffi import requests
+from urllib.request import Request, urlopen
 
 
 BASE_URL = "https://www.tefas.gov.tr"
 FUND_CODE = re.compile(r"^[A-Z0-9]{2,8}$")
-SESSION_TTL = 9 * 60
 CACHE_TTL = 10 * 60
 FUND_LIST_TTL = 6 * 60 * 60
 KNOWN_FUND_NAMES = {
     "YLB": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU",
+    "YVD": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI (TL) FONU",
     "ENR": "QNB PORTFÖY ENPARA PARA PİYASASI (TL) FONU",
 }
 SEARCH_SYNONYMS = {
@@ -49,36 +48,7 @@ MANAGER_SEARCH_ALIASES = (
 )
 
 _lock = threading.Lock()
-_session = None
-_session_started = 0.0
 _cache = {}
-
-
-def _new_session():
-    global _session, _session_started
-    session = requests.Session(impersonate="chrome131")
-    session.headers.update({
-        "Accept": "*/*",
-        "Content-Type": "application/json",
-        "Origin": BASE_URL,
-        "Referer": BASE_URL + "/tr/fon-verileri",
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/131.0.0.0 Safari/537.36"
-        ),
-    })
-    session.get(BASE_URL + "/tr/", timeout=18)
-    _session = session
-    _session_started = time.time()
-    return session
-
-
-def _get_session():
-    with _lock:
-        if _session is None or time.time() - _session_started > SESSION_TTL:
-            return _new_session()
-        return _session
 
 
 def _post(path, body, cache_ttl=CACHE_TTL):
@@ -87,30 +57,37 @@ def _post(path, body, cache_ttl=CACHE_TTL):
     if cached and time.time() - cached[0] < cache_ttl:
         return cached[1]
 
+    request_body = json.dumps(body, ensure_ascii=False).encode("utf-8")
     last_error = None
-    for attempt in range(3):
+    for attempt in range(2):
         try:
-            response = _get_session().post(BASE_URL + path, json=body, timeout=22)
-            if response.status_code == 429:
-                raise RuntimeError("TEFAS istek sınırına ulaşıldı.")
-            response.raise_for_status()
-            if "json" not in (response.headers.get("content-type") or "").lower() or not response.text:
+            request = Request(
+                BASE_URL + path,
+                data=request_body,
+                method="POST",
+                headers={
+                    "Accept": "application/json, text/plain, */*",
+                    "Content-Type": "application/json",
+                    "Origin": BASE_URL,
+                    "Referer": BASE_URL + "/tr/fon-verileri",
+                    "User-Agent": "Mozilla/5.0",
+                },
+            )
+            with urlopen(request, timeout=8) as response:
+                content_type = response.headers.get("content-type") or ""
+                response_body = response.read().decode("utf-8")
+            if "json" not in content_type.lower() or not response_body:
                 raise RuntimeError("TEFAS geçici olarak boş yanıt verdi.")
-            payload = response.json()
+            payload = json.loads(response_body)
             if payload.get("errorCode") or payload.get("errorMessage"):
                 raise RuntimeError(payload.get("errorMessage") or "TEFAS veri hatası.")
-            _cache[key] = (time.time(), payload)
+            with _lock:
+                _cache[key] = (time.time(), payload)
             return payload
         except Exception as error:
             last_error = error
             if attempt == 0:
-                time.sleep(0.7)
-            else:
-                global _session, _session_started
-                with _lock:
-                    _session = None
-                    _session_started = 0.0
-                time.sleep(1.2)
+                time.sleep(0.25)
     raise RuntimeError(str(last_error or "TEFAS verisine ulaşılamadı."))
 
 

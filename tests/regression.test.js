@@ -154,7 +154,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v6\.0<\/title>/,'Tarayıcı başlığı kalıcı marka ve sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v6\.1 Önizleme<\/title>/,'Tarayıcı başlığı aday marka ve sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -293,12 +293,13 @@ assert.match(tefasApi,/def _search_text\(value\):[\s\S]*unicodedata\.normalize\(
 assert.match(tefasApi,/SEARCH_SYNONYMS\s*=\s*\{[\s\S]*"PARA": \("MONEY",\)[\s\S]*"PIYASASI": \("MARKET",\)/,'TEFAS fon araması Türkçe para piyasası terimlerini İngilizce unvanlarla eşleştirmeli');
 assert.match(tefasApi,/def _matches_search\(query, code, name\):[\s\S]*for token in query\.split\(\)/,'TEFAS fon araması kelime sırasından bağımsız bütün sorgu terimlerini eşleştirmeli');
 assert.match(tefasApi,/MANAGER_SEARCH_ALIASES\s*=\s*\([\s\S]*AK ASSET MANAGEMENT[\s\S]*AKBANK[\s\S]*ISBANK[\s\S]*GARANTI BBVA/,'Banka adları ilgili portföy yönetim şirketlerinin fonlarıyla eşleşmeli');
-assert.match(tefasApi,/"YLB": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU"[\s\S]*"ENR": "QNB PORTFÖY ENPARA PARA PİYASASI \(TL\) FONU"/,'YLB ve ENR resmî Türkçe adlarıyla banka adı aramasında bulunmalı');
-assert.match(tefasApi,/Session\(impersonate="chrome131"\)/,'TEFAS bot koruması için Chrome uyumlu TLS oturumu kullanılmalı');
+assert.match(tefasApi,/"YLB": "YAPI KREDİ PORTFÖY PARA PİYASASI FONU"[\s\S]*"YVD": "YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI \(TL\) FONU"[\s\S]*"ENR": "QNB PORTFÖY ENPARA PARA PİYASASI \(TL\) FONU"/,'YLB, YVD ve ENR resmî Türkçe adlarıyla banka adı aramasında bulunmalı');
+assert.match(tefasApi,/from urllib\.request import Request, urlopen[\s\S]*with urlopen\(request, timeout=8\)/,'TEFAS çağrıları Vercel ile uyumlu, zaman aşımı sınırlı standart HTTPS istemcisini kullanmalı');
 assert.match(html,/Eşleşen ürün bulunamadı\./,'Boş arama sonuçları kullanıcıya görünür şekilde bildirilmeli');
 assert.match(html,/Arama servisine ulaşılamadı\./,'Arama kesintisi ürün bulunamamasından ayrılmalı');
 assert.match(html,/Fonlar ve hisseler aranıyor…/,'TEFAS yanıtı beklenirken aramanın sürdüğü görünür olmalı');
-assert.match(html,/knownTefasFunds=[\s\S]*TEFAS-YLB[\s\S]*TEFAS-ENR[\s\S]*function knownTefasMatches/,'YLB ve ENR ağ yanıtı beklenmeden yerel hızlı öneri olarak bulunmalı');
+assert.match(html,/knownTefasFunds=[\s\S]*TEFAS-YLB[\s\S]*TEFAS-YVD[\s\S]*TEFAS-ENR[\s\S]*function knownTefasMatches/,'YLB, YVD ve ENR ağ yanıtı beklenmeden yerel hızlı öneri olarak bulunmalı');
+assert.match(html,/async function fetchPortfolioItem\(position\)[\s\S]*const dripPromise=[\s\S]*const payload=await cachedApiJson[\s\S]*const dripResult=await dripPromise/,'Portföy fiyatı ile temettü yeniden yatırım hesabı paralel başlamalı');
 assert.match(html,/const quickFundQuotes=knownTefasMatches\(query\)[\s\S]*showPortfolioSuggestions\(quickFundQuotes,/,'Portföy araması bilinen TEFAS fonlarını anında göstermeli');
 assert.ok((html.match(/const quickFundQuotes=knownTefasMatches\(query\)/g)||[]).length>=5,'Grafik, Favoriler, Piyasa, Kıyaslama ve Portföy aramaları aynı hızlı TEFAS eşleşmesini kullanmalı');
 assert.match(html,/id="otherView"[\s\S]*data-theme-choice="light"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="system"/,'Diğer ekranı Açık, Koyu ve Sistem tema seçeneklerini içermeli');
@@ -336,4 +337,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v6.0 regresyon testleri başarılı.');
+console.log('Özer Finans v6.1 önizleme regresyon testleri başarılı.');
