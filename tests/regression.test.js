@@ -285,6 +285,8 @@ assert.match(html,/function rankSearchResults\(items,query\)[\s\S]*baseSymbol===
 assert.match(html,/managerTerms=\[[\s\S]*'AKBANK'[\s\S]*'GARANTI BBVA'[\s\S]*managerIntent[\s\S]*isTefas&&managerIntent\?0/,'Banka adı aramasında fonlar aynı adlı banka hisselerinin önünde gösterilmeli');
 assert.match(html,/dripUnsupported=symbol\.startsWith\('ALTIN-'\)\|\|symbol\.startsWith\('TEFAS-'\)/,'TEFAS fonlarında otomatik temettü seçimi kapalı olmalı');
 assert.match(tefasApi,/\/api\/funds\/fonFiyatBilgiGetir/,'TEFAS fiyat işlevi yeni resmî fiyat geçmişi uç noktasını kullanmalı');
+assert.match(tefasApi,/MIRROR_URL = "https:\/\/fon\.org\.tr"[\s\S]*\/api\/fund-prices\/[\s\S]*Fon\.org\.tr \/ TEFAS/,'Vercel erişim kesintisinde TEFAS kaynaklı açık fiyat geçmişi yedeği kullanılmalı');
+assert.match(tefasApi,/\/api\/funds\?search=[\s\S]*def _search\(query\):[\s\S]*_search_official\(query\)/,'Fon araması açık katalogdan yapılmalı ve resmî TEFAS yedeğini korumalı');
 assert.match(tefasApi,/\/api\/funds\/fonUnvanAra/,'TEFAS araması yeni resmî fon arama uç noktasını kullanmalı');
 assert.match(tefasApi,/catalog_payload = _post\([\s\S]*\/api\/funds\/fonUnvanAra[\s\S]*\{\},[\s\S]*cache_ttl=FUND_LIST_TTL/,'TEFAS araması işlem listesi dışında kalabilen fonlar için genel unvan katalogunu kullanmalı');
 assert.match(tefasApi,/\/api\/statistics\/tefas\/getFplFonList/,'TEFAS araması hızlı aramada görünmeyen yatırım fonları için tam fon listesini kullanmalı');

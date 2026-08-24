@@ -4,11 +4,12 @@ import threading
 import time
 import unicodedata
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote, urlparse
 from urllib.request import Request, urlopen
 
 
 BASE_URL = "https://www.tefas.gov.tr"
+MIRROR_URL = "https://fon.org.tr"
 FUND_CODE = re.compile(r"^[A-Z0-9]{2,8}$")
 CACHE_TTL = 10 * 60
 FUND_LIST_TTL = 6 * 60 * 60
@@ -91,6 +92,18 @@ def _post(path, body, cache_ttl=CACHE_TTL):
     raise RuntimeError(str(last_error or "TEFAS verisine ulaşılamadı."))
 
 
+def _get_json(url, cache_ttl=CACHE_TTL):
+    cached = _cache.get(url)
+    if cached and time.time() - cached[0] < cache_ttl:
+        return cached[1]
+    request = Request(url, headers={"Accept": "application/json", "User-Agent": "Mozilla/5.0"})
+    with urlopen(request, timeout=8) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+    with _lock:
+        _cache[url] = (time.time(), payload)
+    return payload
+
+
 def _clean_code(value):
     code = str(value or "").upper().replace("TEFAS-", "").strip()
     return code if FUND_CODE.fullmatch(code) else ""
@@ -154,7 +167,31 @@ def _number(value):
         return None
 
 
-def _search(query):
+def _mirror_search(query):
+    payload = _get_json(MIRROR_URL + "/api/funds?search=" + quote(query), FUND_LIST_TTL)
+    normalized_query = _search_text(query)
+    quotes = []
+    for row in payload.get("results") or []:
+        code = _clean_code(row.get("code"))
+        name = str(row.get("title") or "").strip()
+        if not code or not name or not _matches_search(normalized_query, code, name):
+            continue
+        quotes.append({
+            "symbol": "TEFAS-" + code,
+            "name": name,
+            "exchange": "TEFAS",
+            "type": "MUTUALFUND",
+            "provider": "Fon.org.tr / TEFAS",
+        })
+    quotes.sort(key=lambda item: (
+        0 if item["symbol"] == "TEFAS-" + normalized_query else
+        1 if item["symbol"].replace("TEFAS-", "").startswith(normalized_query) else
+        2 if _search_text(item["name"]).startswith(normalized_query) else 3
+    ))
+    return {"quotes": quotes[:5], "provider": "Fon.org.tr / TEFAS"}
+
+
+def _search_official(query):
     payload = _post("/api/funds/fonUnvanAra", {"aramaMetni": query})
     rows = payload.get("resultList") or []
     normalized_query = _search_text(query)
@@ -230,7 +267,106 @@ def _search(query):
     return {"quotes": quotes[:5], "provider": "TEFAS"}
 
 
-def _price(symbol, query):
+def _search(query):
+    try:
+        mirror = _mirror_search(query)
+        if mirror["quotes"]:
+            return mirror
+    except Exception:
+        pass
+    return _search_official(query)
+
+
+def _chart_payload(code, fund_name, points, provider):
+    timestamps = [point[0] for point in points]
+    closes = [point[1] for point in points]
+    last_time = timestamps[-1]
+    return {
+        "chart": {
+            "result": [{
+                "meta": {
+                    "currency": "TRY",
+                    "symbol": "TEFAS-" + code,
+                    "shortName": code,
+                    "longName": fund_name,
+                    "exchangeName": "TEFAS",
+                    "fullExchangeName": "Türkiye Elektronik Fon Alım Satım Platformu",
+                    "instrumentType": "MUTUALFUND",
+                    "regularMarketTime": last_time,
+                    "regularMarketPrice": closes[-1],
+                    "chartPreviousClose": closes[-2] if len(closes) > 1 else closes[-1],
+                    "priceHint": 6,
+                    "timezone": "Europe/Istanbul",
+                    "exchangeTimezoneName": "Europe/Istanbul",
+                    "dataGranularity": "1d",
+                    "dataProvider": provider,
+                    "tefasFund": True,
+                },
+                "timestamp": timestamps,
+                "indicators": {
+                    "quote": [{
+                        "open": closes,
+                        "high": closes,
+                        "low": closes,
+                        "close": closes,
+                        "volume": [None] * len(closes),
+                    }],
+                    "adjclose": [{"adjclose": closes}],
+                },
+                "events": {},
+            }],
+            "error": None,
+        },
+        "_finansTool": {
+            "provider": provider,
+            "asOf": last_time,
+            "servedAt": int(time.time() * 1000),
+            "stale": False,
+            "tefasFund": True,
+        },
+    }
+
+
+def _range_start(query, last_time):
+    params = parse_qs(query or "")
+    if "period1" in params:
+        try:
+            return int(params["period1"][0])
+        except (TypeError, ValueError):
+            return None
+    value = (params.get("range") or ["6mo"])[0]
+    days = {"5d": 14, "1mo": 35, "3mo": 100, "6mo": 190, "1y": 370, "2y": 740, "5y": 1860, "10y": 3720}.get(value)
+    return last_time - days * 86400 if days else None
+
+
+def _mirror_price(code, query):
+    payload = _get_json(MIRROR_URL + "/api/fund-prices/" + quote(code), CACHE_TTL)
+    points = []
+    for row in payload.get("points") or []:
+        stamp = _timestamp(row.get("date"))
+        price = _number(row.get("price"))
+        if stamp is not None and price is not None:
+            points.append((stamp, price))
+    points.sort(key=lambda item: item[0])
+    if not points:
+        raise LookupError("TEFAS fon fiyatı bulunamadı.")
+    start = _range_start(query, points[-1][0])
+    if start:
+        filtered = [point for point in points if point[0] >= start]
+        if len(filtered) >= 2:
+            points = filtered
+    fund_name = KNOWN_FUND_NAMES.get(code, code)
+    try:
+        details = _get_json(MIRROR_URL + "/api/funds?search=" + quote(code), FUND_LIST_TTL)
+        exact = next((row for row in details.get("results") or [] if _clean_code(row.get("code")) == code), None)
+        if exact and exact.get("title"):
+            fund_name = str(exact["title"]).strip()
+    except Exception:
+        pass
+    return _chart_payload(code, fund_name, points, "Fon.org.tr / TEFAS")
+
+
+def _price_official(symbol, query):
     code = _clean_code(symbol)
     if not code:
         raise ValueError("Geçersiz TEFAS fon kodu.")
@@ -259,55 +395,19 @@ def _price(symbol, query):
     if not unique:
         raise LookupError("TEFAS fon fiyatı bulunamadı.")
 
-    timestamps = [point[0] for point in unique]
-    closes = [point[1] for point in unique]
-    last_time = timestamps[-1]
-    result = {
-        "chart": {
-            "result": [{
-                "meta": {
-                    "currency": "TRY",
-                    "symbol": "TEFAS-" + code,
-                    "shortName": code,
-                    "longName": fund_name,
-                    "exchangeName": "TEFAS",
-                    "fullExchangeName": "Türkiye Elektronik Fon Alım Satım Platformu",
-                    "instrumentType": "MUTUALFUND",
-                    "regularMarketTime": last_time,
-                    "regularMarketPrice": closes[-1],
-                    "chartPreviousClose": closes[-2] if len(closes) > 1 else closes[-1],
-                    "priceHint": 6,
-                    "timezone": "Europe/Istanbul",
-                    "exchangeTimezoneName": "Europe/Istanbul",
-                    "dataGranularity": "1d",
-                    "range": str(periyod),
-                    "dataProvider": "TEFAS",
-                    "tefasFund": True,
-                },
-                "timestamp": timestamps,
-                "indicators": {
-                    "quote": [{
-                        "open": closes,
-                        "high": closes,
-                        "low": closes,
-                        "close": closes,
-                        "volume": [None] * len(closes),
-                    }],
-                    "adjclose": [{"adjclose": closes}],
-                },
-                "events": {},
-            }],
-            "error": None,
-        },
-        "_finansTool": {
-            "provider": "TEFAS",
-            "asOf": last_time,
-            "servedAt": int(time.time() * 1000),
-            "stale": False,
-            "tefasFund": True,
-        },
-    }
-    return result
+    return _chart_payload(code, fund_name, unique, "TEFAS")
+
+
+def _price(symbol, query):
+    code = _clean_code(symbol)
+    if not code:
+        raise ValueError("Geçersiz TEFAS fon kodu.")
+    try:
+        return _mirror_price(code, query)
+    except LookupError:
+        raise
+    except Exception:
+        return _price_official(code, query)
 
 
 class handler(BaseHTTPRequestHandler):
