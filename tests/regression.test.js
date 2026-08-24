@@ -116,7 +116,10 @@ assert.doesNotMatch(html,/data-action=['"]compare['"]/,'Favorilerde karşılaşt
 assert.match(html,/className='favorite-menu-trigger'/,'Favorilerde hızlı işlem düğmesi bulunmalı');
 assert.match(html,/menuAction\('Grafiği Aç'[^]*menuAction\('Fiyat Alarmı Kur'[^]*menuAction\('Portföye Ekle'[^]*menuAction\('Favorilerden Çıkar'/,'Hızlı işlem menüsü dört temel eylemi içermeli');
 assert.match(html,/id="favoriteDetailDialog"[^>]*aria-labelledby="favoriteDetailTitle"/,'Favoriler için erişilebilir hızlı detay paneli bulunmalı');
-assert.match(html,/open\.addEventListener\('click',\(\)=>openFavoriteDetail\(item\)\)/,'Favori kartı hızlı detay panelini açmalı');
+assert.match(html,/open\.addEventListener\('click',event=>\{if\(Date\.now\(\)<favoriteDragSuppressUntil\)/,'Favori kartı hızlı detay panelini açmalı ve sürükleme sonrası yanlışlıkla açılmamalı');
+assert.match(html,/function attachFavoriteReorder\(open,row,item\)[\s\S]*setTimeout\(activate,400\)[\s\S]*persistFavoriteOrderFromDom\(\)/,'Favori kartının tamamında uzun basarak sürükleme sıralaması bulunmalı');
+assert.match(html,/\.favorite-card \{[^}]*touch-action:pan-y[^}]*user-select:none/,'Favori sıralaması dikey sayfa kaydırmasını korumalı');
+assert.match(html,/localStorage\.setItem\(favoritesKey, JSON\.stringify\(favorites\)\)/,'Favorilerin yeni sırası yerel depolamada kalıcı olmalı');
 assert.doesNotMatch(html,/closest\('\.favorite-card'\)\)openView\('chart'\)/,'Favori kartı panel açılırken arka planda Grafik sekmesine geçmemeli');
 assert.doesNotMatch(html,/activeView\.focus\(/,'Sekme paneline programatik odak verilerek mavi kenar çizgisi oluşturulmamalı');
 assert.doesNotMatch(html,/class="app-view[^>]*tabindex="-1"/,'Sekme kapsayıcıları Safari tarafından yeniden odaklanabilir olmamalı');
