@@ -157,7 +157,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v6\.3<\/title>/,'Tarayıcı başlığı kalıcı marka ve sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v6\.4 Önizleme<\/title>/,'Tarayıcı başlığı önizleme marka ve sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/ozer-finans-mark\.svg[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -323,9 +323,13 @@ assert.match(html,/function optionalQuoteNumber\(value\)[\s\S]*value===null\|\|v
 assert.match(html,/async function fetchFavoriteQuote\(item,\{force=false\}=\{\}\) \{[\s\S]*return fetchCompactQuote\(item,\{force\}\)/,'Favoriler ortak kompakt fiyat katmanını kullanmalı');
 assert.match(html,/async function loadMarketSummary[\s\S]*return\{ok:true,\.\.\.await fetchCompactQuote\(item,\{force\}\)\}/,'Piyasa özeti favorilerle aynı fiyat katmanını kullanmalı');
 assert.match(quoteApi,/'close','change','change_abs'[\s\S]*scanner\.tradingview\.com\/turkey\/scan/,'BIST fiyatı ve günlük değişimi aynı TradingView anlık görüntüsünden gelmeli');
+assert.match(quoteApi,/'last_bar_update_time'[\s\S]*lastPriceTime=Number\(row\?\.\[7\]\)[\s\S]*asOf:lastPriceTime/,'BIST kartı sorgu saatini değil son fiyatın gerçek oluşum zamanını kullanmalı');
+assert.doesNotMatch(quoteApi,/priceType:'delayed_quote'[\s\S]{0,160}asOf:Math\.floor\(Date\.now/,'BIST fiyat zamanı istek anından üretilmemeli');
 assert.match(quoteApi,/Promise\.allSettled\(\[mirrorFund\(code\),officialFund\(code\)\]\)[\s\S]*points\.at\(-1\)\.time[\s\S]*priority/,'TEFAS için iki kaynak karşılaştırılıp en yeni tarih ve resmî kaynak önceliği uygulanmalı');
 assert.match(quoteApi,/previousWeekday\(last\.time\)[\s\S]*incompletePreviousClose:!previous/,'BIST yedeği eksik işlem gününü yanlış günlük değişim olarak kullanmamalı');
 assert.match(html,/priceType==='official_daily'\?'Son resmî · '/,'Fon fiyatının resmî günlük veri olduğu kartta açıkça gösterilmeli');
+assert.match(html,/\.favorite-card \{[^}]*position:relative;[^}]*padding:7px 11px 19px;/,'Favori kartı aşağı taşınan fiyat zamanı için yer ayırmalı');
+assert.match(html,/\.favorite-market-time \{[^}]*position:absolute;[^}]*right:11px;[^}]*bottom:4px;/,'Fiyat zamanı şirket adı sütununun genişliğini daraltmadan aşağıda konumlanmalı');
 assert.match(html,/const inFlightKey=force\?url\+'\|force':url;[\s\S]*apiInFlight\.has\(inFlightKey\)/,'Zorunlu yenilemede de aynı fiyat istekleri birleştirilmeli');
 assert.match(html,/function displaySymbol\(value\)[\s\S]*endsWith\('\.IS'\)\?symbol\.slice\(0,-3\):symbol/,'BIST kodları kullanıcıya .IS eki olmadan gösterilmeli');
 assert.match(html,/async function resolveAssetInput\(value\)[\s\S]*symbol\+'\.IS'[\s\S]*exact\|\|bist/,'Ek içermeyen BIST kodu arama sonucundan otomatik çözülmeli');
@@ -358,4 +362,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v6.3 regresyon testleri başarılı.');
+console.log('Özer Finans v6.4 önizleme regresyon testleri başarılı.');

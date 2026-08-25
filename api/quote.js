@@ -63,11 +63,11 @@ async function tefasQuote(symbol){
 }
 
 async function tradingViewBist(symbol){
-  const code=symbol.slice(0,-3),columns=['name','description','close','change','change_abs','update_mode','currency'];
+  const code=symbol.slice(0,-3),columns=['name','description','close','change','change_abs','update_mode','currency','last_bar_update_time'];
   const payload=await fetchJson('https://scanner.tradingview.com/turkey/scan',{method:'POST',headers:{'Content-Type':'application/json',Origin:'https://www.tradingview.com',Referer:'https://www.tradingview.com/'},body:JSON.stringify({symbols:{tickers:['BIST:'+code],query:{types:[]}},columns})},5000);
-  const row=payload?.data?.[0]?.d,price=Number(row?.[2]),change=Number(row?.[3]),delta=Number(row?.[4]);
-  if(!Number.isFinite(price)||price<=0||!Number.isFinite(change)||!Number.isFinite(delta))throw new Error('BIST anlık fiyatı bulunamadı.');
-  return{symbol,name:String(row[1]||code),currency:String(row[6]||'TRY').toUpperCase(),price,previousClose:price-delta,delta,change,asOf:Math.floor(Date.now()/1000),provider:'TradingView BIST',priceType:'delayed_quote',delayed:String(row[5]||'').includes('delayed'),stale:false};
+  const row=payload?.data?.[0]?.d,price=Number(row?.[2]),change=Number(row?.[3]),delta=Number(row?.[4]),lastPriceTime=Number(row?.[7]);
+  if(!Number.isFinite(price)||price<=0||!Number.isFinite(change)||!Number.isFinite(delta)||!Number.isFinite(lastPriceTime)||lastPriceTime<=0)throw new Error('BIST anlık fiyatı veya fiyat zamanı bulunamadı.');
+  return{symbol,name:String(row[1]||code),currency:String(row[6]||'TRY').toUpperCase(),price,previousClose:price-delta,delta,change,asOf:lastPriceTime,provider:'TradingView BIST',priceType:'delayed_quote',delayed:String(row[5]||'').includes('delayed'),stale:false};
 }
 
 function previousWeekday(time){
