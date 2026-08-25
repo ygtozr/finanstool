@@ -319,6 +319,7 @@ assert.deepEqual(manifest.icons.map(icon=>icon.sizes),['192x192','512x512'],'Man
 for(const file of ['apple-touch-icon.png','icon-192.png','icon-512.png'])assert.ok(fs.statSync(path.join(root,'assets',file)).size>10000,'PWA ikonu yerelde ve dolu olmalı: '+file);
 assert.match(html,/function quotePriceApiUrl\(symbol\)[\s\S]*range=1mo&interval=1d/,'Piyasa ve Favoriler ortak fiyat URL’si kullanmalı');
 assert.match(html,/async function fetchCompactQuote\(item,\{force=false\}=\{\}\)[\s\S]*fetchSnapshotQuote\(item\.symbol,\{force\}\)[\s\S]*cachedApiJson\(quotePriceApiUrl\(item\.symbol\),\{force\}\)/,'BIST ve TEFAS güncel fiyatı ortak katmandan, diğer ürünler ortak geçmişten alınmalı');
+assert.match(html,/function optionalQuoteNumber\(value\)[\s\S]*value===null\|\|value===undefined\|\|value===''[\s\S]*return Number\.isFinite\(number\)\?number:null/,'Eksik önceki kapanış null değeri yanlışlıkla sıfıra çevrilmemeli');
 assert.match(html,/async function fetchFavoriteQuote\(item,\{force=false\}=\{\}\) \{[\s\S]*return fetchCompactQuote\(item,\{force\}\)/,'Favoriler ortak kompakt fiyat katmanını kullanmalı');
 assert.match(html,/async function loadMarketSummary[\s\S]*return\{ok:true,\.\.\.await fetchCompactQuote\(item,\{force\}\)\}/,'Piyasa özeti favorilerle aynı fiyat katmanını kullanmalı');
 assert.match(quoteApi,/'close','change','change_abs'[\s\S]*scanner\.tradingview\.com\/turkey\/scan/,'BIST fiyatı ve günlük değişimi aynı TradingView anlık görüntüsünden gelmeli');

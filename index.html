@@ -956,6 +956,12 @@
       return cachedApiJson('/api/quote?symbol='+encodeURIComponent(safeSymbol),{ttl:safeSymbol.startsWith('TEFAS-')?300000:10000,force});
     }
 
+    function optionalQuoteNumber(value) {
+      if(value===null||value===undefined||value==='')return null;
+      const number=Number(value);
+      return Number.isFinite(number)?number:null;
+    }
+
     async function fetchCompactQuote(item,{force=false}={}) {
       if(usesSnapshotQuote(item.symbol)){
         try{
@@ -963,9 +969,7 @@
           return {
             symbol:item.symbol,name:quote.name&&quote.name!==item.symbol.replace(/^TEFAS-/,'')?quote.name:(item.name||item.symbol),
             currency:String(quote.currency||'TRY').toUpperCase(),price:Number(quote.price),
-            previousClose:Number.isFinite(Number(quote.previousClose))?Number(quote.previousClose):null,
-            delta:Number.isFinite(Number(quote.delta))?Number(quote.delta):null,
-            change:Number.isFinite(Number(quote.change))?Number(quote.change):null,
+            previousClose:optionalQuoteNumber(quote.previousClose),delta:optionalQuoteNumber(quote.delta),change:optionalQuoteNumber(quote.change),
             marketTimestamp:Number(quote.asOf),updatedAt:Date.now(),stale:Boolean(quote.stale),provider:quote.provider||null,
             priceType:quote.priceType||'',delayed:Boolean(quote.delayed),sourceMismatch:Boolean(quote.sourceMismatch),
             incompletePreviousClose:Boolean(quote.incompletePreviousClose)
