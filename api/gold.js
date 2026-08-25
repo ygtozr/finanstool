@@ -41,11 +41,11 @@ async function yahoo(symbol,params){
 }
 
 async function tradingViewSpot(){
-  const scan=(endpoint,ticker)=>json('https://scanner.tradingview.com/'+endpoint+'/scan',{method:'POST',headers:{'Content-Type':'application/json','Origin':'https://www.tradingview.com'},body:JSON.stringify({symbols:{tickers:[ticker],query:{types:[]}},columns:['name','close','change']})});
+  const scan=(endpoint,ticker)=>json('https://scanner.tradingview.com/'+endpoint+'/scan',{method:'POST',headers:{'Content-Type':'application/json','Origin':'https://www.tradingview.com'},body:JSON.stringify({symbols:{tickers:[ticker],query:{types:[]}},columns:['name','close','change','last_bar_update_time']})});
   const [gold,fx]=await Promise.all([scan('cfd','OANDA:XAUUSD'),scan('forex','FX_IDC:USDTRY')]);
-  const ounce=Number(gold?.data?.[0]?.d?.[1]),usdTry=Number(fx?.data?.[0]?.d?.[1]);
-  if(!Number.isFinite(ounce)||ounce<=0||!Number.isFinite(usdTry)||usdTry<=0)throw new Error('TradingView spot altın veya kur verisi bulunamadı.');
-  return{ounce,usdTry};
+  const ounce=Number(gold?.data?.[0]?.d?.[1]),usdTry=Number(fx?.data?.[0]?.d?.[1]),goldTime=Number(gold?.data?.[0]?.d?.[3]),fxTime=Number(fx?.data?.[0]?.d?.[3]);
+  if(!Number.isFinite(ounce)||ounce<=0||!Number.isFinite(usdTry)||usdTry<=0||!Number.isFinite(goldTime)||!Number.isFinite(fxTime))throw new Error('TradingView spot altın, kur veya güncelleme zamanı bulunamadı.');
+  return{ounce,usdTry,asOf:Math.min(goldTime,fxTime)};
 }
 
 function alignCalculated(ounce,fx){
@@ -67,7 +67,9 @@ async function calculatedGram(params){
   const latestFxIndex=fx.indicators.quote[0].close.length-1;if(spot&&latestFxIndex>=0)fx.indicators.quote[0].close[latestFxIndex]=spot.usdTry;
   const points=alignCalculated(ounce,fx);
   if(!points.length)throw new Error('Gram altın hesabı için ons veya kur verisi bulunamadı.');
-  return yahooShape('ALTIN-GRAM',PRODUCTS['ALTIN-GRAM'],points,spot?'TradingView spot formülü; geçmiş seri GC=F ile ölçekli':'GC=F × USD/TRY ÷ 31,1034768 yedek hesabı');
+  const payload=yahooShape('ALTIN-GRAM',PRODUCTS['ALTIN-GRAM'],points,spot?'TradingView spot formülü; geçmiş seri GC=F ile ölçekli':'GC=F × USD/TRY ÷ 31,1034768 yedek hesabı');
+  if(spot?.asOf){payload.chart.result[0].meta.regularMarketTime=spot.asOf;payload._finansTool.asOf=spot.asOf}
+  return payload;
 }
 
 function yahooShape(symbol,product,points,source,{buy=null,sell=null}={}){
