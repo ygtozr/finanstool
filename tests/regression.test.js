@@ -313,14 +313,13 @@ assert.match(html,/async function prefetchPortfolioPrices\(positions\)[\s\S]*act
 assert.match(html,/portfolioSnapshotsKey[\s\S]*function renderCachedPortfolioSnapshot\(\)[\s\S]*Son kayıt gösteriliyor; güncel veriler arka planda alınıyor/,'Son başarılı portföy değerleri ekran açılır açılmaz cihazdan gösterilmeli');
 assert.match(html,/savePortfolioSnapshot\(\{totalValue:[\s\S]*rows:snapshotRows\}\)/,'Başarılı portföy hesaplaması sonraki hızlı açılış için saklanmalı');
 assert.match(html,/id="otherView"[\s\S]*data-theme-choice="light"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="system"/,'Diğer ekranı Açık, Koyu ve Sistem tema seçeneklerini içermeli');
-assert.match(html,/data-theme-choice="ocean"[\s\S]*data-theme-choice="plum"[\s\S]*data-theme-choice="sand"[\s\S]*data-theme-choice="contrast"[\s\S]*data-theme-choice="oled"/,'Diğer ekranı beş ek renk paletini içermeli');
-assert.match(html,/const themeOptions = \['light','dark','system','ocean','plum','sand','contrast','oled'\]/,'Tema tercihleri saklama ve geri yüklemede ortak listeden doğrulanmalı');
-assert.match(html,/html\[data-palette="ocean"\][\s\S]*html\[data-palette="plum"\][\s\S]*html\[data-palette="sand"\][\s\S]*html\[data-palette="contrast"\][\s\S]*html\[data-palette="oled"\]/,'Ek paletlerin semantik renk değişkenleri bulunmalı');
+assert.doesNotMatch(html,/data-theme-choice="(?:ocean|plum|sand|contrast|oled)"/,'Ek renk paleti düğmeleri kaldırılmış olmalı');
+assert.match(html,/const themeOptions = \['light','dark','system'\]/,'Tema tercihleri yalnız standart üç seçenekle doğrulanmalı');
 assert.match(html,/id="otherView"[\s\S]*id="backupDownload"[\s\S]*id="restoreBackup"/,'Veri yedekleme araçları Diğer ekranında korunmalı');
 assert.match(html,/function startRefreshTimers\(\)[\s\S]*refreshInterval/,'Otomatik yenileme süresi kullanıcı tercihine göre yeniden başlatılmalı');
 assert.match(html,/savedRefreshInterval===null\?15000:Number\(savedRefreshInterval\)/,'Yeni kullanıcılar için otomatik yenileme varsayılan olarak 15 saniye olmalı');
 assert.match(html,/themeMedia\.addEventListener\('change'[\s\S]*themePreference==='system'/,'Sistem teması cihaz görünümü değiştiğinde otomatik uygulanmalı');
-assert.match(html,/const themeMetaColors=\{light:'#eef3f8',dark:'#101827',ocean:'#061723',plum:'#170d1b',sand:'#f4efe6',contrast:'#000000',oled:'#000000'\}/,'PWA üst çubuğu seçili paletle eşleşmeli');
+assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#eef3f8':'#101827'/,'PWA üst çubuğu açık veya koyu temayla eşleşmeli');
 assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=6\.6"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
 assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=6\.6"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
 assert.equal(manifest.name,'Özer Finans','Manifest uygulamanın tam adını taşımalı');
