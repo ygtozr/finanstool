@@ -84,8 +84,8 @@ async function yahooSafeFallback(symbol){
   const payload=await fetchJson('https://query1.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(symbol)+'?range=10d&interval=1d'),result=payload?.chart?.result?.[0];
   const closes=result?.indicators?.quote?.[0]?.close||[],points=(result?.timestamp||[]).map((time,index)=>({time,price:Number(closes[index])})).filter(item=>Number.isFinite(item.price)&&item.price>0);
   if(!points.length)throw new Error('Yedek fiyat bulunamadı.');
-  const last=points.at(-1),expected=previousWeekday(last.time),previous=[...points].reverse().slice(1).find(item=>new Date(item.time*1000).toISOString().slice(0,10)===expected)||null;
-  return{symbol,name:result.meta?.longName||result.meta?.shortName||symbol,currency:String(result.meta?.currency||'TRY').toUpperCase(),price:last.price,previousClose:previous?.price??null,delta:previous?last.price-previous.price:null,change:previous?(last.price/previous.price-1)*100:null,asOf:Number(result.meta?.regularMarketTime)||last.time,provider:'Yahoo Finance yedek',priceType:'chart_fallback',delayed:false,stale:false,incompletePreviousClose:!previous};
+  const last=points.at(-1),expected=previousWeekday(last.time),previous=points.length>1?points.at(-2):null,previousDate=previous?new Date(previous.time*1000).toISOString().slice(0,10):null;
+  return{symbol,name:result.meta?.longName||result.meta?.shortName||symbol,currency:String(result.meta?.currency||'TRY').toUpperCase(),price:last.price,previousClose:previous?.price??null,delta:previous?last.price-previous.price:null,change:previous?(last.price/previous.price-1)*100:null,asOf:Number(result.meta?.regularMarketTime)||last.time,provider:'Yahoo Finance yedek',priceType:'chart_fallback',delayed:false,stale:false,incompletePreviousClose:!previous,missingSessions:previous&&previousDate!==expected?{expected,actual:previousDate}:null};
 }
 
 async function bistQuote(symbol){

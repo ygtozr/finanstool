@@ -41,12 +41,12 @@ function rangeStart(query,lastTime){
   return days?lastTime-days*86400:null;
 }
 
-function chartPayload(code,name,rawPoints,provider){
+function chartPayload(code,name,rawPoints,provider,extra={}){
   let points=rawPoints.map(item=>({time:timestamp(item.date||item.tarih),price:Number(item.price??item.fiyat)})).filter(item=>Number.isFinite(item.time)&&Number.isFinite(item.price)&&item.price>0).sort((a,b)=>a.time-b.time);
   points=points.filter((item,index)=>!index||item.time!==points[index-1].time);
   if(points.length<1)throw new Error('TEFAS fon fiyatı bulunamadı.');
   const timestamps=points.map(item=>item.time),closes=points.map(item=>item.price),lastTime=timestamps.at(-1);
-  return {chart:{result:[{meta:{currency:'TRY',symbol:'TEFAS-'+code,shortName:code,longName:name||code,exchangeName:'TEFAS',fullExchangeName:'Türkiye Elektronik Fon Alım Satım Platformu',instrumentType:'MUTUALFUND',regularMarketTime:lastTime,regularMarketPrice:closes.at(-1),chartPreviousClose:closes.at(-2)??closes.at(-1),priceHint:6,timezone:'Europe/Istanbul',exchangeTimezoneName:'Europe/Istanbul',dataGranularity:'1d',dataProvider:provider,tefasFund:true},timestamp:timestamps,indicators:{quote:[{open:closes,high:closes,low:closes,close:closes,volume:closes.map(()=>null)}],adjclose:[{adjclose:closes}]},events:{}}],error:null},_finansTool:{provider,asOf:lastTime,servedAt:Date.now(),stale:false,tefasFund:true}};
+  return {chart:{result:[{meta:{currency:'TRY',symbol:'TEFAS-'+code,shortName:code,longName:name||code,exchangeName:'TEFAS',fullExchangeName:'Türkiye Elektronik Fon Alım Satım Platformu',instrumentType:'MUTUALFUND',regularMarketTime:lastTime,regularMarketPrice:closes.at(-1),chartPreviousClose:closes.at(-2)??closes.at(-1),priceHint:6,timezone:'Europe/Istanbul',exchangeTimezoneName:'Europe/Istanbul',dataGranularity:'1d',dataProvider:provider,tefasFund:true,...extra},timestamp:timestamps,indicators:{quote:[{open:closes,high:closes,low:closes,close:closes,volume:closes.map(()=>null)}],adjclose:[{adjclose:closes}]},events:{}}],error:null},_finansTool:{provider,asOf:lastTime,servedAt:Date.now(),stale:false,tefasFund:true,...extra}};
 }
 
 async function mirrorFundNames(codes){
@@ -79,11 +79,13 @@ async function officialPost(path,body){
 }
 
 async function officialPrice(code,query){
-  const range=new URLSearchParams(query||'').get('range')||'6mo';
-  const period={'5d':13,'1mo':1,'3mo':3,'6mo':6,'1y':12,'2y':36,'5y':60,'10y':60,max:60}[range]||6;
+  const params=new URLSearchParams(query||''),range=params.get('range')||'6mo';
+  const requestedStart=Number(params.get('period1'))||null,requestedEnd=Number(params.get('period2'))||Math.floor(Date.now()/1000);
+  const requestedMonths=requestedStart?Math.max(1,Math.ceil((requestedEnd-requestedStart)/(30.4375*86400))):({'5d':1,'1mo':1,'3mo':3,'6mo':6,'1y':12,'2y':24,'5y':60,'10y':120,max:120}[range]||6);
+  const period=Math.min(60,requestedMonths),rangeLimited=requestedMonths>60;
   const payload=await officialPost('/api/funds/fonFiyatBilgiGetir',{fonKodu:code,dil:'TR',periyod:period});
-  const rows=payload.resultList||[];
-  return chartPayload(code,String(rows.at(-1)?.fonUnvan||KNOWN_FUND_NAMES[code]||code).trim(),rows,'TEFAS');
+  const rows=(payload.resultList||[]).filter(row=>!requestedStart||Number(timestamp(row.tarih||row.date))>=requestedStart);
+  return chartPayload(code,String(rows.at(-1)?.fonUnvan||KNOWN_FUND_NAMES[code]||code).trim(),rows,'TEFAS',{rangeLimited,requestedStart});
 }
 
 async function price(code,query,name=''){

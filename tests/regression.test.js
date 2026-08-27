@@ -15,6 +15,7 @@ const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
 const tefasApi=fs.readFileSync(path.join(root,'api','tefas.js'),'utf8');
 const quoteApi=fs.readFileSync(path.join(root,'api','quote.js'),'utf8');
 const brandPng=fs.readFileSync(path.join(root,'assets','brand-symbol-a.png'));
+const chartVendor=fs.readFileSync(path.join(root,'assets','chart.umd.min.js'),'utf8');
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));
 
 function pngDimensions(buffer){
@@ -89,6 +90,7 @@ assert.match(priceApi,/TradingView anlık yedek/,'BIST ve FX için bağımsız a
 assert.match(priceApi,/providerChoice==='tradingview'/,'Yedek sağlayıcı bağımsız olarak doğrulanabilmeli');
 assert.match(priceApi,/s-maxage=10, stale-while-revalidate=5/,'Fiyat önbelleği seçilebilir 15 saniyelik yenilemeyle uyumlu olmalı');
 assert.match(priceApi,/lastKnownGood/,'Sağlayıcı kesintisi için son başarılı veri koruması bulunmalı');
+assert.match(priceApi,/columns:\['name','description','close','change','currency','last_bar_update_time'\][\s\S]*timeUnknown:!hasMarketTime/,'TradingView yedeği gerçek fiyat zamanını istemeli ve yoksa bilinmiyor olarak işaretlemeli');
 const fundamentalSandbox={module:{exports:{}},exports:{},AbortSignal,fetch:()=>{throw new Error('testte ağ çağrısı yapılmamalı')}};
 vm.runInNewContext(fundamentalsApi+'\nmodule.exports._test={numberValue,trailingEps};',fundamentalSandbox);
 assert.equal(fundamentalSandbox.module.exports._test.numberValue('0.35%'),0.35,'Temettü yüzdesi doğru ayrıştırılmalı');
@@ -301,6 +303,7 @@ assert.match(tefasApi,/\/api\/funds\?search=[\s\S]*async function search\(query\
 assert.match(tefasApi,/\/api\/funds\/fonUnvanAra/,'TEFAS araması yeni resmî fon arama uç noktasını kullanmalı');
 assert.match(tefasApi,/action==='batch-price'[\s\S]*Promise\.all\(codes\.map/,'Çok sayıdaki TEFAS portföy fiyatı tek toplu istekte paralel alınmalı');
 assert.match(tefasApi,/s-maxage=900, stale-while-revalidate=86400/,'Günlük TEFAS fiyatları Edge önbelleğinde tekrar kullanılmalı');
+assert.match(tefasApi,/requestedStart=Number\(params\.get\('period1'\)\)[\s\S]*requestedMonths[\s\S]*Math\.min\(60,requestedMonths\)[\s\S]*rangeLimited/,'TEFAS resmî yedeği özel tarih aralığını hesaplamalı ve sağlayıcı sınırını bildirmeli');
 assert.match(tefasApi,/YLB:'YAPI KREDİ PORTFÖY PARA PİYASASI FONU'[\s\S]*YVD:'YAPI KREDİ PORTFÖY İKİNCİ PARA PİYASASI \(TL\) FONU'[\s\S]*ENR:'QNB PORTFÖY ENPARA PARA PİYASASI \(TL\) FONU'/,'YLB, YVD ve ENR resmî Türkçe adlarıyla korunmalı');
 assert.match(html,/Eşleşen ürün bulunamadı\./,'Boş arama sonuçları kullanıcıya görünür şekilde bildirilmeli');
 assert.match(html,/Arama servisine ulaşılamadı\./,'Arama kesintisi ürün bulunamamasından ayrılmalı');
@@ -320,6 +323,9 @@ assert.match(html,/function startRefreshTimers\(\)[\s\S]*refreshInterval/,'Otoma
 assert.match(html,/savedRefreshInterval===null\?15000:Number\(savedRefreshInterval\)/,'Yeni kullanıcılar için otomatik yenileme varsayılan olarak 15 saniye olmalı');
 assert.match(html,/themeMedia\.addEventListener\('change'[\s\S]*themePreference==='system'/,'Sistem teması cihaz görünümü değiştiğinde otomatik uygulanmalı');
 assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#eef3f8':'#101827'/,'PWA üst çubuğu açık veya koyu temayla eşleşmeli');
+assert.match(html,/src="assets\/chart\.umd\.min\.js\?v=4\.4\.4"/,'Chart.js uygulamanın kendi dosyasından yüklenmeli');
+assert.doesNotMatch(html,/cdn\.jsdelivr\.net\/npm\/chart\.js/,'Grafikler çalışma anında harici CDN’ye bağlı olmamalı');
+assert.ok(chartVendor.length>150000&&/Chart/.test(chartVendor),'Yerel Chart.js paketi eksiksiz görünmeli');
 assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=6\.6"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
 assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=6\.6"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
 assert.equal(manifest.name,'Özer Finans','Manifest uygulamanın tam adını taşımalı');
@@ -335,7 +341,7 @@ assert.match(quoteApi,/'close','change','change_abs'[\s\S]*scanner\.tradingview\
 assert.match(quoteApi,/'last_bar_update_time'[\s\S]*yahooSafeFallback\(symbol\)\.catch\(\(\)=>null\)[\s\S]*Math\.min\(lastPriceTime,exchangeTradeTime\)/,'BIST kartı gecikmeli iletim saatini borsadaki gerçek son işlem zamanıyla sınırlandırmalı');
 assert.doesNotMatch(quoteApi,/priceType:'delayed_quote'[\s\S]{0,160}asOf:Math\.floor\(Date\.now/,'BIST fiyat zamanı istek anından üretilmemeli');
 assert.match(quoteApi,/Promise\.allSettled\(\[mirrorFund\(code\),officialFund\(code\)\]\)[\s\S]*points\.at\(-1\)\.time[\s\S]*priority/,'TEFAS için iki kaynak karşılaştırılıp en yeni tarih ve resmî kaynak önceliği uygulanmalı');
-assert.match(quoteApi,/previousWeekday\(last\.time\)[\s\S]*incompletePreviousClose:!previous/,'BIST yedeği eksik işlem gününü yanlış günlük değişim olarak kullanmamalı');
+assert.match(quoteApi,/previous=points\.length>1\?points\.at\(-2\):null[\s\S]*missingSessions:/,'BIST yedeği tatil sonrası gerçek önceki fiyat noktasını kullanmalı');
 assert.match(html,/priceType==='official_daily'\?'Son resmî · '/,'Fon fiyatının resmî günlük veri olduğu kartta açıkça gösterilmeli');
 assert.match(html,/\.favorite-card \{[^}]*position:relative;[^}]*padding:8px 11px 15px;/,'Favori kartı ölçülü biçimde aşağı taşınan fiyat zamanı için yer ayırmalı');
 assert.match(html,/\.favorite-market-time \{[^}]*position:absolute;[^}]*right:11px;[^}]*bottom:7px;/,'Fiyat zamanı şirket adı sütununu daraltmadan karta daha yakın konumlanmalı');
@@ -356,8 +362,11 @@ assert.match(html,/id="portfolioCostCurrency"[\s\S]*id="portfolioPurchaseDate"/,
 assert.match(html,/function openPortfolioDialog\(position=null\)[\s\S]*portfolioQuantity\.value = editing\?String\(position\.baseQuantity\?\?position\.quantity\)[\s\S]*portfolioCost\.value = editing\?String\(position\.unitCost\)[\s\S]*portfolioPurchaseDate\.value = editing\?\(position\.purchaseDate\|\|''\)/,'Pozisyon düzenleme penceresi mevcut adet, maliyet ve alış tarihini doldurmalı');
 assert.match(html,/row\.setAttribute\('aria-label',position\.symbol\+' pozisyonunu düzenle'\)[\s\S]*const editPosition=\(\)=>\{const saved=portfolio\.find[\s\S]*openPortfolioDialog\(saved\)[\s\S]*row\.addEventListener\('click'/,'Portföy kartına tıklamak erişilebilir düzenleme akışını açmalı');
 assert.match(html,/if\(edited\)\{[\s\S]*edited\.quantity=quantity;edited\.baseQuantity=quantity;edited\.unitCost=unitCost;edited\.costCurrency=costCurrency;edited\.purchaseDate=purchaseDate;/,'Düzenleme kaydı yeni adet eklemek yerine mevcut pozisyonu güncellemeli');
-assert.match(html,/event\.stopPropagation\(\);portfolio=portfolio\.filter/,'Silme düğmesi kart düzenleme olayını tetiklememeli');
+assert.match(html,/function removePortfolioWithUndo\(symbol\)[\s\S]*offerUndo[\s\S]*event\.stopPropagation\(\);removePortfolioWithUndo/,'Pozisyon silme kart düzenlemeyi tetiklemeden geri alma sunmalı');
 assert.match(html,/historicalUsdRate\(costCurrency,position\.purchaseDate\)/,'Maliyet, alım tarihindeki kurla özet para birimine çevrilmeli');
+assert.match(html,/previousTime:previousPoint\.time/,'Günlük portföy hesabı fiyat oluşum saatini önceki kapanış tarihi yerine kullanmamalı');
+assert.match(html,/convertedCash=[\s\S]*historicalUsdRate\(balance\.currency,previousDate\)/,'Nakit bakiyenin günlük değişimi önceki işlem günü kurunu kullanmalı');
+assert.match(html,/previousPresentationFactor[\s\S]*displayedPrevious=totalPreviousValue\*previousPresentationFactor/,'Dönüştürülmüş portföyün günlük değişimi önceki günün sunum kuruyla hesaplanmalı');
 assert.match(html,/Kısmi sonuç gösterilmedi\. Eksik veri/,'Eksik varlıkla performans kıyası sessizce yayınlanmamalı');
 assert.match(html,/prepareVisibleRsi\(symbol,points\)/,'Kısa dönem RSI için görünür dönem öncesi veri kullanılmalı');
 assert.match(html,/En yeni fiyat:/,'Piyasa özetinde istek zamanından ayrı gerçek fiyat zamanı gösterilmeli');
@@ -366,6 +375,12 @@ assert.match(html,/name="viewport" content="width=device-width, initial-scale=1,
 assert.match(html,/@media \(max-width:760px\)[\s\S]*input,select,textarea \{ font-size:16px !important; \}/,'iOS odak yakınlaştırmasını önlemek için mobil girişler en az 16 px olmalı');
 assert.match(html,/\['gesturestart','gesturechange','gestureend'\][\s\S]*event=>event\.preventDefault\(\)[\s\S]*event\.touches\.length>1/,'iOS pinch ve gesture yakınlaştırması engellenmeli');
 assert.match(html,/mobileMoreNav'\)\.addEventListener\('click',[\s\S]*openView\('other'\)/,'Mobil Diğer düğmesi sabit ayarlar ekranını açmalı');
+assert.match(html,/id="otherAlarmShortcut"[\s\S]*id="otherAlarmCount"/,'Mobil Diğer ekranında fiyat alarmları kısayolu ve aktif alarm sayısı bulunmalı');
+assert.match(html,/function syncPortfolioEmptyState\(\)[\s\S]*portfolioEmptyStart\.hidden/,'Boş portföyde uzun analiz alanları tek başlangıç kartına daraltılmalı');
+assert.match(html,/allPortfolioHead\.hidden=portfolioBooks\.length<2/,'Birleşik toplam kartı yalnız birden fazla portföy varken gösterilmeli');
+assert.match(html,/function removeFavoriteWithUndo[\s\S]*function removePortfolioWithUndo[\s\S]*function removeCashWithUndo/,'Favori, pozisyon ve nakit silme işlemlerinin geri alma akışı olmalı');
+assert.match(html,/setAttribute\('aria-pressed',String\(active\)\)/,'Seçili grafik ve karşılaştırma dönemleri erişilebilir durumda bildirilmelı');
+assert.match(html,/className='market-card-status'[\s\S]*15 dk Gecikmeli/,'Piyasa kartında gecikme ve fiyat zamanı mobilde görünür olmalı');
 assert.match(html,/\.settings-grid \{ display:grid; grid-template-columns:1fr;/,'Diğer ekranındaki ayar kartları yatay satırlar halinde sıralanmalı');
 assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:minmax\(210px,\.8fr\) minmax\(320px,1\.2fr\)/,'İlk dört ayar kartının içeriği masaüstünde yatay yerleşmeli');
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');

@@ -160,13 +160,13 @@ async function fetchTradingViewLatest(symbol,params) {
   if(params.get('interval')!=='1d')return null;
   const descriptor=tradingViewDescriptor(symbol);
   if(!descriptor)return null;
-  const body={symbols:{tickers:[descriptor.ticker],query:{types:[]}},columns:['name','description','close','change','currency']};
+  const body={symbols:{tickers:[descriptor.ticker],query:{types:[]}},columns:['name','description','close','change','currency','last_bar_update_time']};
   const data=await fetchJson('https://scanner.tradingview.com/'+descriptor.endpoint+'/scan',{'User-Agent':PROVIDER_HEADERS['User-Agent'],'Accept':'application/json','Content-Type':'application/json','Origin':'https://www.tradingview.com'},{method:'POST',body:JSON.stringify(body)});
-  const values=data?.data?.[0]?.d,price=numberValue(values?.[2]),change=numberValue(values?.[3]);
+  const values=data?.data?.[0]?.d,price=numberValue(values?.[2]),change=numberValue(values?.[3]),marketTime=numberValue(values?.[5]);
   if(!Number.isFinite(price)||price<=0)return null;
   const previous=Number.isFinite(change)&&change>-99?price/(1+change/100):price;
-  const now=Math.floor(Date.now()/1000),previousTime=now-86400;
-  return{chart:{result:[{meta:{currency:String(values?.[4]||descriptor.currency||'USD').toUpperCase(),symbol,longName:String(values?.[1]||values?.[0]||symbol),shortName:String(values?.[0]||symbol),regularMarketTime:now,regularMarketPrice:price,chartPreviousClose:previous,priceHint:price<1?6:2,dataGranularity:'1d',dataProvider:'TradingView anlık yedek',fallbackLimited:true},timestamp:[previousTime,now],indicators:{quote:[{open:[previous,price],high:[previous,price],low:[previous,price],close:[previous,price],volume:[null,null]}],adjclose:[{adjclose:[previous,price]}]},events:{}}],error:null}};
+  const hasMarketTime=Number.isFinite(marketTime)&&marketTime>0,lastTime=hasMarketTime?marketTime:Math.floor(Date.now()/1000),previousTime=lastTime-86400;
+  return{chart:{result:[{meta:{currency:String(values?.[4]||descriptor.currency||'USD').toUpperCase(),symbol,longName:String(values?.[1]||values?.[0]||symbol),shortName:String(values?.[0]||symbol),regularMarketTime:hasMarketTime?marketTime:null,regularMarketPrice:price,chartPreviousClose:previous,priceHint:price<1?6:2,dataGranularity:'1d',dataProvider:'TradingView anlık yedek',fallbackLimited:true,timeUnknown:!hasMarketTime},timestamp:[previousTime,lastTime],indicators:{quote:[{open:[previous,price],high:[previous,price],low:[previous,price],close:[previous,price],volume:[null,null]}],adjclose:[{adjclose:[previous,price]}]},events:{}}],error:null}};
 }
 
 async function resolvePrice(symbol,params,forcedFallback,forcedTradingView=false) {
@@ -189,8 +189,8 @@ async function resolvePrice(symbol,params,forcedFallback,forcedTradingView=false
 }
 
 function annotate(data,{stale=false,servedAt=Date.now()}={}) {
-  const result=data?.chart?.result?.[0],provider=result?.meta?.dataProvider||'Bilinmeyen',asOf=Number(result?.meta?.regularMarketTime)||Number(result?.timestamp?.at(-1))||null;
-  data._finansTool={provider,asOf,servedAt,stale:Boolean(stale),fallbackLimited:Boolean(result?.meta?.fallbackLimited)};
+  const result=data?.chart?.result?.[0],provider=result?.meta?.dataProvider||'Bilinmeyen',timeUnknown=Boolean(result?.meta?.timeUnknown),asOf=timeUnknown?null:(Number(result?.meta?.regularMarketTime)||Number(result?.timestamp?.at(-1))||null);
+  data._finansTool={provider,asOf,servedAt,stale:Boolean(stale),fallbackLimited:Boolean(result?.meta?.fallbackLimited),timeUnknown};
   return data;
 }
 

@@ -11,12 +11,13 @@
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=6.6">
   <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=6.6">
   <link rel="manifest" href="manifest.webmanifest?v=6.6">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com https://eodhd.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com https://eodhd.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
   <title>Özer Finans v6.6 Önizleme</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
+  <script src="assets/chart.umd.min.js?v=4.4.4"></script>
   <style>
     :root { color-scheme:dark; --surface-page:#101827; --surface-main:#192337; --surface-section:#111a2b; --surface-card:#0d1523; --surface-soft:#182235; --surface-control:#26344d; --line:#2b3a55; --border-strong:#40516e; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --on-accent:#062019; --positive:#34d399; --negative:#ff8f9c; --warning:#ffd66b; --info:#60a5fa; --focus-ring:#7dd3fc; --chart-fill:rgba(82,213,177,.14); --chart-fill-soft:rgba(82,213,177,.08); --bg:var(--surface-page); --panel:var(--surface-main); --danger:var(--negative); }
     * { box-sizing:border-box; }
+    [hidden][hidden] { display:none !important; }
     html { min-height:100%; background:var(--bg); touch-action:pan-x pan-y; }
     body { margin:0; min-height:100vh; min-height:100dvh; display:grid; place-items:center; padding:24px; font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, #263b62 0, var(--bg) 45%); touch-action:pan-x pan-y; }
     .pull-refresh-indicator { position:fixed; z-index:80; top:max(8px,env(safe-area-inset-top,0px)); left:50%; display:flex; align-items:center; gap:7px; min-height:34px; padding:6px 12px; opacity:0; pointer-events:none; color:var(--text); background:#0d1523ee; border:1px solid var(--line); border-radius:999px; box-shadow:0 8px 24px #0005; font-size:.75rem; font-weight:750; transform:translate(-50%,-150%); transition:opacity .16s ease,transform .16s ease; }
@@ -189,6 +190,11 @@
     .summary-card strong { display:block; margin-top:3px; }
     .portfolio-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
     .portfolio-empty { grid-column:1/-1; padding:18px; text-align:center; color:var(--muted); border:1px dashed #40516e; border-radius:12px; }
+    .portfolio-empty-start { display:grid; gap:12px; margin:12px 0; padding:20px; text-align:center; border:1px dashed var(--border-strong); border-radius:14px; background:var(--surface-section); }
+    .portfolio-empty-start h3,.portfolio-empty-start p { margin:0; }
+    .portfolio-empty-start p { color:var(--muted); font-size:.84rem; }
+    .portfolio-empty-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .portfolio-empty-actions button { min-height:44px; padding:8px; font-size:.78rem; }
     .portfolio-row { min-width:0; padding:8px 9px; border:1px solid var(--line); border-radius:10px; background:#0d1523; cursor:pointer; }
     .portfolio-row:hover,.portfolio-row:focus-visible { border-color:var(--accent); }
     .portfolio-row:focus-visible { outline:3px solid #52d5b166; outline-offset:2px; }
@@ -309,6 +315,14 @@
     .setting-switch input { flex:0 0 auto; width:20px; height:20px; }
     .settings-help { display:grid; gap:8px; margin:0; padding-left:18px; color:var(--muted); font-size:.82rem; line-height:1.45; }
     .settings-version { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line); color:var(--muted); font-size:.78rem; }
+    .alarm-shortcut { width:100%; min-height:48px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; color:var(--text); background:var(--surface-control); border:1px solid var(--line); }
+    .alarm-shortcut span { color:var(--muted); font-size:.75rem; }
+    .market-card-status { grid-column:1/-1; justify-self:start; min-height:14px; color:var(--muted); font-size:.62rem !important; }
+    .market-card-status.warning { color:var(--warning); }
+    .undo-toast { position:fixed; z-index:160; left:50%; bottom:calc(82px + env(safe-area-inset-bottom,0px)); width:min(420px,calc(100vw - 24px)); display:flex; align-items:center; gap:12px; padding:11px 12px 11px 15px; color:var(--text); background:var(--surface-control); border:1px solid var(--border-strong); border-radius:12px; box-shadow:0 16px 36px #0008; transform:translate(-50%,140%); opacity:0; pointer-events:none; transition:.2s ease; }
+    .undo-toast.visible { transform:translate(-50%,0); opacity:1; pointer-events:auto; }
+    .undo-toast span { flex:1; min-width:0; font-size:.84rem; }
+    .undo-toast button { min-height:40px; padding:7px 11px; font-size:.78rem; }
     .other-backup .data-actions { margin-bottom:11px; }
     html[data-theme="light"] { color-scheme:light; --surface-page:#eef3f8; --surface-main:#ffffff; --surface-section:#f1f5f9; --surface-card:#f8fafc; --surface-soft:#eaf0f6; --surface-control:#e2e8f0; --line:#cbd5e1; --border-strong:#94a3b8; --text:#172033; --muted:#5f6f86; --accent:#0f766e; --on-accent:#fff; --positive:#087a66; --negative:#c9344f; --warning:#9a5b13; --info:#2563eb; --focus-ring:#0369a1; --chart-fill:rgba(15,118,110,.13); --chart-fill-soft:rgba(15,118,110,.07); --bg:var(--surface-page); --panel:var(--surface-main); --danger:var(--negative); }
     html[data-theme="light"] body { background:radial-gradient(circle at top,#dbeafe 0,#eef3f8 48%); }
@@ -334,6 +348,7 @@
       .rsi-wrap { height:190px; }
       .periods button { flex:1 1 calc(33.333% - 8px); }
       .settings-horizontal { grid-template-columns:1fr; gap:13px; align-items:stretch; }
+      .portfolio-empty-actions { grid-template-columns:1fr; }
     }
     @media (max-width:420px) {
       body { padding:8px; }
@@ -640,6 +655,7 @@
     :is(.pull-refresh-indicator.ready,.favorites-panel-head button,.favorite-menu-trigger[aria-expanded="true"],.chart-ma-toggle[aria-pressed="true"],.chart-asset-switcher-buttons button[aria-expanded="true"],.periods button.active,.portfolio-book-tab[aria-pressed="true"],.portfolio-currency-toggle[aria-pressed="true"],.drip-chip,.theme-choice.active,.app-tabs button.active,.benchmark-presets button.active,.benchmark-ranges button.active,.market-summary-head #marketRefresh,.portfolio-detail-controls button[aria-expanded="true"]) { color:var(--on-accent); background:var(--accent); border-color:var(--accent); }
     .portfolio-overall-head,.portfolio-glance { background:var(--surface-section); }
     .brand-lockup-mark { border:1px solid var(--line); }
+    main [hidden][hidden] { display:none !important; }
       @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
     .portfolio-warning { margin:0 0 12px; padding:10px 12px; border:1px solid var(--danger); border-radius:10px; color:var(--danger); }
   </style>
@@ -679,7 +695,7 @@
     <div class="toolbar"><button id="advancedSearchButton" type="button">Gelişmiş Arama</button><button id="alarmButton" type="button">Fiyat Alarmı</button><button id="exportCsv" type="button">CSV İndir</button><button id="exportPng" type="button">PNG İndir</button></div><div id="meta" class="meta" aria-live="polite"></div>
     <div class="chart-wrap"><button id="maToggle" class="chart-ma-toggle" type="button" aria-pressed="false">MA50/100/200</button><canvas id="priceChart" aria-label="Hisse kapanış fiyatı grafiği" role="img" aria-describedby="priceChartSummary"></canvas><p id="priceChartSummary" class="sr-only" aria-live="polite"></p></div>
     <div id="rsiWrap" class="rsi-wrap"><canvas id="rsiChart" aria-label="RSI göstergesi grafiği" role="img" aria-describedby="rsiChartSummary"></canvas><p id="rsiChartSummary" class="sr-only"></p></div>
-    <section class="periods" aria-label="Grafik süresi">
+    <section class="periods" role="group" aria-label="Grafik süresi">
       <button type="button" data-range="5d">1 hafta</button>
       <button type="button" data-range="1mo">1 ay</button>
       <button type="button" data-range="3mo">3 ay</button>
@@ -700,38 +716,40 @@
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
       <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.6" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.6</span></h1>
-      <div class="portfolio-head portfolio-overall-head"><div class="portfolio-head-metrics"><h2>Toplam Portföy</h2><strong id="allPortfolioTotalValue" class="portfolio-head-value">—</strong><p id="allPortfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="allPortfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Toplam portföyü TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
+      <div id="allPortfolioHead" class="portfolio-head portfolio-overall-head"><div class="portfolio-head-metrics"><h2>Toplam Portföy</h2><strong id="allPortfolioTotalValue" class="portfolio-head-value">—</strong><p id="allPortfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="allPortfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Toplam portföyü TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
       <div class="portfolio-switcher"><label class="portfolio-switcher-field" for="portfolioBookSelect">Aktif Portföy<select id="portfolioBookSelect" aria-label="Aktif portföyü seç"></select></label><div class="portfolio-switcher-actions"><button id="portfolioBookAdd" type="button" aria-label="Yeni portföy oluştur" title="Yeni portföy">+</button><button id="portfolioBookRename" type="button" aria-label="Aktif portföyün adını değiştir" title="Adını değiştir">✎</button><button id="portfolioBookDelete" type="button" aria-label="Aktif portföyü sil" title="Portföyü sil">×</button></div></div>
       <div id="portfolioBookTabs" class="portfolio-book-tabs" role="group" aria-label="Portföy kısayolları"></div>
       <div class="portfolio-head"><div class="portfolio-head-metrics"><h2 id="portfolioHeading">Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
-      <section class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
+      <section id="portfolioEmptyStart" class="portfolio-empty-start" hidden><h3>Portföyünüzü Oluşturmaya Başlayın</h3><p>İlk varlığınızı veya nakit bakiyenizi ekleyin; isterseniz mevcut yedeğinizi geri yükleyin.</p><div class="portfolio-empty-actions"><button id="emptyAddAsset" type="button">Hisse Veya Fon Ekle</button><button id="emptyAddCash" type="button">Nakit Ekle</button><button id="emptyRestoreBackup" type="button">Yedekten Yükle</button></div></section>
+      <section id="portfolioAnalysisSection" class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
       <div id="portfolioList" class="portfolio-list"></div>
       <div class="portfolio-search"><label class="sr-only" for="portfolioSymbol">Portföye eklenecek hisseyi ara</label><input id="portfolioSymbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="portfolioSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" role="listbox" aria-label="Portföy hisse önerileri"></ul></div>
-      <section class="portfolio-cash" aria-labelledby="portfolioCashTitle"><div class="portfolio-cash-head"><h3 id="portfolioCashTitle">Nakit Bakiyeleri</h3><button id="cashAddButton" type="button">+ Nakit Ekle</button></div><div id="portfolioCashList" class="portfolio-cash-list"></div></section>
-      <section class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
+      <section id="portfolioCashSection" class="portfolio-cash" aria-labelledby="portfolioCashTitle"><div class="portfolio-cash-head"><h3 id="portfolioCashTitle">Nakit Bakiyeleri</h3><button id="cashAddButton" type="button">+ Nakit Ekle</button></div><div id="portfolioCashList" class="portfolio-cash-list"></div></section>
+      <section id="portfolioDistributionSection" class="portfolio-distribution" aria-labelledby="portfolioDistributionTitle">
         <h3 id="portfolioDistributionTitle">Portföy Dağılımı</h3>
         <div class="distribution-grid">
           <article class="distribution-card"><h4>Varlık Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioAllocationChart" role="img" aria-label="Portföyün hisselere göre güncel değer dağılımı"></canvas><div id="portfolioAllocationCenter" class="distribution-center" aria-hidden="true"></div><p id="portfolioAllocationEmpty" class="distribution-empty" hidden>Dağılım için portföye hisse ekleyin.</p></div><ul id="portfolioAllocationSummary" class="distribution-summary" aria-label="Varlık dağılımı özeti"></ul><button id="portfolioAllocationSummaryToggle" class="distribution-toggle" type="button" aria-controls="portfolioAllocationSummary" hidden>Tümünü Göster</button></article>
           <article class="distribution-card"><h4>Para Birimi Bazında</h4><div class="distribution-chart-wrap"><canvas id="portfolioCurrencyChart" role="img" aria-label="Portföyün para birimlerine göre güncel değer dağılımı"></canvas><div id="portfolioCurrencyCenter" class="distribution-center" aria-hidden="true"></div><p id="portfolioCurrencyEmpty" class="distribution-empty" hidden>Para birimi dağılımı bulunamadı.</p></div><ul id="portfolioCurrencySummary" class="distribution-summary" aria-label="Para birimi dağılımı özeti"></ul><button id="portfolioCurrencySummaryToggle" class="distribution-toggle" type="button" aria-controls="portfolioCurrencySummary" hidden>Tümünü Göster</button></article>
         </div>
       </section>
-      <section class="portfolio-benchmark" aria-labelledby="portfolioBenchmarkTitle">
+      <section id="portfolioBenchmarkSection" class="portfolio-benchmark" aria-labelledby="portfolioBenchmarkTitle">
         <div class="portfolio-benchmark-head"><div><h3 id="portfolioBenchmarkTitle">Performans Karşılaştırması</h3><p id="benchmarkStatus" class="benchmark-status">Portföy verisi bekleniyor…</p></div></div>
         <div class="benchmark-controls">
           <div class="benchmark-presets" aria-label="Hazır karşılaştırma ölçütleri"><button type="button" data-benchmark-symbol="^GSPC" data-benchmark-name="S&P 500">S&P 500</button><button type="button" data-benchmark-symbol="^IXIC" data-benchmark-name="Nasdaq">Nasdaq</button><button type="button" data-benchmark-symbol="XU100.IS" data-benchmark-name="BIST 100">BIST 100</button><button type="button" data-benchmark-symbol="GLD" data-benchmark-name="Altın">Altın</button></div>
           <div class="benchmark-search"><label class="sr-only" for="benchmarkSearch">Karşılaştırma ölçütü ara</label><input id="benchmarkSearch" type="search" role="combobox" aria-autocomplete="list" aria-controls="benchmarkSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Başka ölçüt ara"><button id="benchmarkApply" type="button">Karşılaştır</button><ul id="benchmarkSuggestions" class="search-suggestions" role="listbox" aria-label="Karşılaştırma ölçütü önerileri"></ul></div>
-          <div class="benchmark-ranges" aria-label="Karşılaştırma süresi"><button type="button" data-benchmark-range="5d">1 Hafta</button><button type="button" data-benchmark-range="1mo">1 Ay</button><button type="button" data-benchmark-range="3mo">3 Ay</button><button type="button" data-benchmark-range="6mo">6 Ay</button><button type="button" data-benchmark-range="1y">1 Yıl</button><button type="button" data-benchmark-range="5y">5 Yıl</button><button id="benchmarkCustomRange" type="button" data-benchmark-range="custom">Şu Tarihten İtibaren</button></div><div id="benchmarkDatePicker" class="date-picker"><input id="benchmarkStartDate" type="date" aria-label="Karşılaştırma başlangıç tarihi"><p id="benchmarkDateError" class="error" role="alert"></p></div>
+          <div class="benchmark-ranges" role="group" aria-label="Karşılaştırma süresi"><button type="button" data-benchmark-range="5d">1 Hafta</button><button type="button" data-benchmark-range="1mo">1 Ay</button><button type="button" data-benchmark-range="3mo">3 Ay</button><button type="button" data-benchmark-range="6mo">6 Ay</button><button type="button" data-benchmark-range="1y">1 Yıl</button><button type="button" data-benchmark-range="5y">5 Yıl</button><button id="benchmarkCustomRange" type="button" data-benchmark-range="custom">Şu Tarihten İtibaren</button></div><div id="benchmarkDatePicker" class="date-picker"><input id="benchmarkStartDate" type="date" aria-label="Karşılaştırma başlangıç tarihi"><p id="benchmarkDateError" class="error" role="alert"></p></div>
         </div>
         <div class="benchmark-chart-wrap"><canvas id="portfolioBenchmarkChart" role="img" aria-label="Portföy ve karşılaştırma ölçütü performans grafiği"></canvas><p id="benchmarkEmpty" class="benchmark-empty">Karşılaştırma için portföye hisse ekleyin.</p></div>
         <div id="benchmarkStats" class="benchmark-stats"></div>
       </section>
-      <section class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
+      <section id="portfolioDividendSection" class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
       <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.6" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.6</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
+        <section class="settings-card settings-horizontal" aria-labelledby="alarmShortcutTitle"><div class="settings-card-copy"><h3 id="alarmShortcutTitle">Fiyat Alarmları</h3><p>Kaydettiğiniz fiyat hedeflerini görüntüleyin veya yeni alarm kurun.</p></div><button id="otherAlarmShortcut" class="alarm-shortcut settings-card-controls" type="button"><strong>Alarmları Aç</strong><span id="otherAlarmCount">0 aktif alarm</span></button></section>
         <section class="settings-card settings-horizontal" aria-labelledby="appearanceTitle">
           <div class="settings-card-copy"><h3 id="appearanceTitle">Görünüm</h3><p>Uygulamanın görünümünü seçin veya cihazınızın temasını otomatik takip edin.</p></div>
           <div class="theme-choices settings-card-controls" role="group" aria-label="Tema seçimi">
@@ -767,6 +785,7 @@
         </section>
       </div>
     </section>
+    <div id="undoToast" class="undo-toast" role="status" aria-live="polite" aria-atomic="true"><span id="undoMessage"></span><button id="undoButton" type="button">Geri Al</button></div>
   </main>
   <nav class="mobile-bottom-nav" aria-label="Mobil gezinme">
     <button id="mobileOverviewNav" class="is-active" type="button" aria-current="page"><span>⌂</span>Özet</button>
@@ -1091,10 +1110,21 @@
     const portfolioSummary = document.getElementById('portfolioSummary');
     const portfolioSummaryCurrencyNote = document.getElementById('portfolioSummaryCurrencyNote');
     const portfolioList = document.getElementById('portfolioList');
+    const portfolioPositionsTitle = document.querySelector('.portfolio-positions-title');
     const portfolioCurrencyToggle = document.getElementById('portfolioCurrencyToggle');
     const allPortfolioTotalValue = document.getElementById('allPortfolioTotalValue');
     const allPortfolioDailyChange = document.getElementById('allPortfolioDailyChange');
     const allPortfolioCurrencyToggle = document.getElementById('allPortfolioCurrencyToggle');
+    const allPortfolioHead = document.getElementById('allPortfolioHead');
+    const portfolioEmptyStart = document.getElementById('portfolioEmptyStart');
+    const portfolioAnalysisSection = document.getElementById('portfolioAnalysisSection');
+    const portfolioCashSection = document.getElementById('portfolioCashSection');
+    const portfolioDistributionSection = document.getElementById('portfolioDistributionSection');
+    const portfolioBenchmarkSection = document.getElementById('portfolioBenchmarkSection');
+    const portfolioDividendSection = document.getElementById('portfolioDividendSection');
+    const emptyAddAsset = document.getElementById('emptyAddAsset');
+    const emptyAddCash = document.getElementById('emptyAddCash');
+    const emptyRestoreBackup = document.getElementById('emptyRestoreBackup');
     const portfolioHeading = document.getElementById('portfolioHeading');
     const portfolioBookSelect = document.getElementById('portfolioBookSelect');
     const portfolioBookTabs = document.getElementById('portfolioBookTabs');
@@ -1169,8 +1199,21 @@
     const alarmTarget = document.getElementById('alarmTarget');
     const alarmClose = document.getElementById('alarmClose');
     const alarmList = document.getElementById('alarmList');
+    const otherAlarmShortcut = document.getElementById('otherAlarmShortcut');
+    const otherAlarmCount = document.getElementById('otherAlarmCount');
+    const undoToast = document.getElementById('undoToast');
+    const undoMessage = document.getElementById('undoMessage');
+    const undoButton = document.getElementById('undoButton');
     const alarmKey = 'finans-grafigi-alarms';
     let alarms = (() => { try { const saved=JSON.parse(localStorage.getItem(alarmKey)); return Array.isArray(saved) ? saved : []; } catch { return []; } })();
+    let undoTimer=null,undoAction=null;
+    function offerUndo(message,restore){
+      clearTimeout(undoTimer);undoAction=restore;undoMessage.textContent=message;undoToast.classList.add('visible');
+      undoTimer=setTimeout(()=>{undoToast.classList.remove('visible');undoAction=null},6000);
+    }
+    undoButton.addEventListener('click',()=>{
+      const restore=undoAction;clearTimeout(undoTimer);undoAction=null;undoToast.classList.remove('visible');restore?.();
+    });
     const portfolioKey = 'finans-grafigi-portfolio';
     const cashKey = 'finans-grafigi-cash-balances';
     const portfolioBooksKey = 'finans-grafigi-portfolios-v2';
@@ -1252,6 +1295,11 @@
       localStorage.removeItem(legacyFavoritesKey);
     }
     const saveFavorites = () => localStorage.setItem(favoritesKey, JSON.stringify(favorites));
+    function removeFavoriteWithUndo(symbol){
+      const index=favorites.findIndex(item=>item.symbol===symbol);if(index<0)return;
+      const removed=favorites[index],quote=favoriteQuotes.get(symbol);favorites.splice(index,1);favoriteQuotes.delete(symbol);saveFavorites();renderFavorites();updateFavoriteButton();
+      offerUndo(displaySymbol(symbol)+' favorilerden çıkarıldı.',()=>{if(isFavorite(symbol))return;favorites.splice(Math.min(index,favorites.length),0,removed);if(quote)favoriteQuotes.set(symbol,quote);saveFavorites();renderFavorites();updateFavoriteButton()});
+    }
     const currentSymbol = () => symbolInput.value.trim().toUpperCase();
     const isFavorite = symbol => favorites.some(item => item.symbol === symbol);
     function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
@@ -1752,11 +1800,7 @@
         menuAction('Fiyat Alarmı Kur',()=>openFavoriteAlarm(item));
         menuAction('Portföye Ekle',()=>openFavoritePortfolio(item));
         menuAction('Favorilerden Çıkar',()=>{
-          favorites=favorites.filter(f=>f.symbol!==item.symbol);
-          favoriteQuotes.delete(item.symbol);
-          saveFavorites();
-          renderFavorites();
-          updateFavoriteButton();
+          removeFavoriteWithUndo(item.symbol);
         },'danger');
         const remove=document.createElement('button');
         remove.type='button';
@@ -1765,11 +1809,7 @@
         remove.title=item.symbol+' favorilerden çıkar';
         remove.setAttribute('aria-label',remove.title);
         remove.addEventListener('click',()=>{
-          favorites=favorites.filter(f=>f.symbol!==item.symbol);
-          favoriteQuotes.delete(item.symbol);
-          saveFavorites();
-          renderFavorites();
-          updateFavoriteButton();
+          removeFavoriteWithUndo(item.symbol);
         });
         trigger.addEventListener('click',event=>{
           event.stopPropagation();
@@ -2015,8 +2055,11 @@
       const change=document.createElement('small');
       change.className='market-card-change positive';
       change.textContent='Canlı veri';
+      const status=document.createElement('small');
+      status.className='market-card-status';
+      status.textContent='Fiyat zamanı bekleniyor';
       card.disabled=true;
-      card.append(label,value,change);
+      card.append(label,value,change,status);
       return card;
     }
 
@@ -2024,7 +2067,8 @@
       const label=card.querySelector('.market-card-label');
       const value=card.querySelector('.market-card-value');
       const change=card.querySelector('.market-card-change');
-      if(!label||!value||!change)return;
+      const status=card.querySelector('.market-card-status');
+      if(!label||!value||!change||!status)return;
       label.textContent=item.label+' ';
       const symbol=document.createElement('small');symbol.className='market-card-symbol';symbol.textContent='· '+displaySymbol(item.symbol);label.append(symbol);
       change.classList.remove('positive','negative');
@@ -2034,7 +2078,11 @@
         change.textContent=hasChange?(data.change>=0?'+':'')+data.change.toFixed(2)+'%':'Önceki kapanış yok';
         if(hasChange)change.classList.add(data.change>=0?'positive':'negative');
         const updated=data.priceType==='official_daily'?formatQuoteDate(data.marketTimestamp):formatMarketDataTime(data.marketTimestamp);
+        const statusLabel=data.stale?'Önbellekteki Son Fiyat':data.priceType==='official_daily'?'Son Resmî':data.delayed?'15 dk Gecikmeli':'Fiyat Zamanı';
+        status.textContent=statusLabel+' · '+updated;
+        status.classList.toggle('warning',Boolean(data.stale||data.delayed));
         card.title=(data.stale?'Önbellekteki son fiyat · ':'')+(data.priceType==='official_daily'?'Son resmî fon fiyatı ':data.delayed?'15 dk gecikmeli · ':'Fiyat zamanı ')+updated+(data.provider?' · '+data.provider:'')+' · '+item.label+' grafiğini aç';
+        card.setAttribute('aria-label',item.label+', '+value.textContent+', '+change.textContent+', '+status.textContent+(data.provider?', kaynak '+data.provider:''));
         card.disabled=false;
         if(!card.dataset.bound){
           card.addEventListener('click',()=>{chartTab.click();symbolInput.value=item.symbol;updateFavoriteButton();loadPrice(item.symbol)});
@@ -2044,6 +2092,7 @@
         value.textContent='Veri alınamadı';
         change.textContent='Tekrar yenileyin';
         change.classList.add('negative');
+        status.textContent='Fiyat kaynağına ulaşılamadı';status.classList.add('warning');
         card.title='';
         card.disabled=true;
       }
@@ -2087,12 +2136,14 @@
     }
 
     function formatMarketDataTime(timestamp) {
+      if(timestamp===null||timestamp===undefined||timestamp==='')return 'bilinmiyor';
       const milliseconds=Number(timestamp)*1000;
       if(!Number.isFinite(milliseconds))return 'bilinmiyor';
       return new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(milliseconds));
     }
 
     function formatQuoteDate(timestamp) {
+      if(timestamp===null||timestamp===undefined||timestamp==='')return 'bilinmiyor';
       const milliseconds=Number(timestamp)*1000;
       if(!Number.isFinite(milliseconds))return 'bilinmiyor';
       return new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(milliseconds));
@@ -2136,7 +2187,8 @@
       defaultRangeSelect.value=selectedRange;
       alarmNotificationsToggle.checked=alarmsEnabled;
       alarmPreferenceStatus.textContent=alarmsEnabled?'Alarmlar düzenli olarak kontrol edilir.':'Alarm denetimleri duraklatıldı.';
-      periodButtons.forEach(button=>button.classList.toggle('active',button.dataset.range===selectedRange));
+      periodButtons.forEach(button=>{const active=!selectedStart&&button.dataset.range===selectedRange;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});
+      customPeriod.setAttribute('aria-pressed',String(Boolean(selectedStart)));
     }
 
     function startRefreshTimers() {
@@ -2377,6 +2429,7 @@
 
     function renderAlarms() {
       alarmList.replaceChildren();
+      otherAlarmCount.textContent=alarms.filter(item=>!item.triggered).length+' aktif alarm';
       if (!alarms.length) {
         const empty=document.createElement('p');
         empty.className='favorites-note';
@@ -2429,6 +2482,12 @@
       return points.at(-1).value;
     }
 
+    function previousBusinessDate(referenceTime=Math.floor(Date.now()/1000)) {
+      const date=new Date(referenceTime*1000);date.setUTCDate(date.getUTCDate()-1);
+      while([0,6].includes(date.getUTCDay()))date.setUTCDate(date.getUTCDate()-1);
+      return date.toISOString().slice(0,10);
+    }
+
     async function checkAlarms() {
       if(!alarmsEnabled)return;
       const active=alarms.filter(alarm=>!alarm.triggered);
@@ -2477,6 +2536,25 @@
     const savePortfolio = () => {savePortfolioBooks();renderChartAssetPanels()};
     const saveCashBalances = () => savePortfolioBooks();
 
+    function removePortfolioWithUndo(symbol){
+      const index=portfolio.findIndex(item=>item.symbol===symbol);if(index<0)return;
+      const removed=portfolio[index];portfolio.splice(index,1);savePortfolio();renderPortfolio();
+      offerUndo(displaySymbol(symbol)+' portföyden silindi.',()=>{if(portfolio.some(item=>item.symbol===symbol))return;portfolio.splice(Math.min(index,portfolio.length),0,removed);savePortfolio();renderPortfolio()});
+    }
+
+    function removeCashWithUndo(currency){
+      const index=cashBalances.findIndex(item=>item.currency===currency);if(index<0)return;
+      const removed=cashBalances[index];cashBalances.splice(index,1);saveCashBalances();renderPortfolio();
+      offerUndo(currency+' nakit bakiyesi silindi.',()=>{if(cashBalances.some(item=>item.currency===currency))return;cashBalances.splice(Math.min(index,cashBalances.length),0,removed);saveCashBalances();renderPortfolio()});
+    }
+
+    function syncPortfolioEmptyState(){
+      const empty=!portfolio.length&&!cashBalances.length;
+      portfolioEmptyStart.hidden=!empty;
+      [portfolioAnalysisSection,portfolioCashSection,portfolioDistributionSection,portfolioBenchmarkSection,portfolioDividendSection,portfolioPositionsTitle,portfolioList].forEach(item=>item.hidden=empty);
+      return empty;
+    }
+
     function renderPortfolioBookSelector() {
       portfolioBookSelect.replaceChildren();
       portfolioBookTabs.replaceChildren();
@@ -2490,6 +2568,8 @@
       portfolioBookAdd.title=portfolioBooks.length>=50?'En fazla 50 portföy oluşturulabilir':'Yeni portföy';
       portfolioBookDelete.disabled=portfolioBooks.length===1;
       portfolioBookDelete.title=portfolioBooks.length===1?'En az bir portföy bulunmalıdır':'Portföyü sil';
+      allPortfolioHead.hidden=portfolioBooks.length<2;
+      syncPortfolioEmptyState();
     }
 
     function switchPortfolio(bookId) {
@@ -2564,7 +2644,7 @@
         const edit=()=>openCashDialog(balance);
         item.addEventListener('click',edit);
         item.addEventListener('keydown',event=>{if(event.target===item&&(event.key==='Enter'||event.key===' ')){event.preventDefault();edit()}});
-        remove.addEventListener('click',event=>{event.stopPropagation();cashBalances=cashBalances.filter(item=>item.currency!==balance.currency);saveCashBalances();renderPortfolio()});
+        remove.addEventListener('click',event=>{event.stopPropagation();removeCashWithUndo(balance.currency)});
         item.append(value,remove);portfolioCashList.append(item);
       });
     }
@@ -2730,7 +2810,7 @@
       const drip=dripResult.value,dripError=dripResult.error;
       const effectiveQuantity=drip?.quantity??position.quantity;
       const snapshotPrice=Number(snapshot?.price),snapshotPrevious=Number(snapshot?.previousClose);
-      return {...position,name:snapshot?.name||name,currency:String(snapshot?.currency||currency).toUpperCase(),effectiveQuantity,drip,dripError,price:Number.isFinite(snapshotPrice)&&snapshotPrice>0?snapshotPrice:points.at(-1).close,previousPrice:Number.isFinite(snapshotPrevious)&&snapshotPrevious>0?snapshotPrevious:previousPoint.close,previousTime:Number(snapshot?.asOf)||previousPoint.time,weekStartPrice:weekBase.close,weekStartTime:weekBase.time,provider:snapshot?.provider||payload._finansTool?.provider||result.meta?.dataProvider||'',asOf:Number(snapshot?.asOf)||Number(payload._finansTool?.asOf)||Number(result.meta?.regularMarketTime)||points.at(-1).time,priceType:snapshot?.priceType||'chart',delayed:Boolean(snapshot?.delayed),goldProduct:Boolean(result.meta?.goldProduct),goldBuyPrice:Number(result.meta?.goldBuyPrice),goldSellPrice:Number(result.meta?.goldSellPrice),result};
+      return {...position,name:snapshot?.name||name,currency:String(snapshot?.currency||currency).toUpperCase(),effectiveQuantity,drip,dripError,price:Number.isFinite(snapshotPrice)&&snapshotPrice>0?snapshotPrice:points.at(-1).close,previousPrice:Number.isFinite(snapshotPrevious)&&snapshotPrevious>0?snapshotPrevious:previousPoint.close,previousTime:previousPoint.time,weekStartPrice:weekBase.close,weekStartTime:weekBase.time,provider:snapshot?.provider||payload._finansTool?.provider||result.meta?.dataProvider||'',asOf:Number(snapshot?.asOf)||Number(payload._finansTool?.asOf)||Number(result.meta?.regularMarketTime)||points.at(-1).time,priceType:snapshot?.priceType||'chart',delayed:Boolean(snapshot?.delayed),goldProduct:Boolean(result.meta?.goldProduct),goldBuyPrice:Number(result.meta?.goldBuyPrice),goldSellPrice:Number(result.meta?.goldSellPrice),result};
     }
 
     async function fetchPortfolioDividends(position) {
@@ -2922,8 +3002,8 @@
     }
 
     function updateBenchmarkControls() {
-      benchmarkPresetButtons.forEach(button=>button.classList.toggle('active',button.dataset.benchmarkSymbol===benchmarkSettings.symbol));
-      benchmarkRangeButtons.forEach(button=>button.classList.toggle('active',button.dataset.benchmarkRange===benchmarkSettings.range));
+      benchmarkPresetButtons.forEach(button=>{const active=button.dataset.benchmarkSymbol===benchmarkSettings.symbol;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});
+      benchmarkRangeButtons.forEach(button=>{const active=button.dataset.benchmarkRange===benchmarkSettings.range;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});
       benchmarkSearch.value=benchmarkSettings.symbol;
       const custom=benchmarkSettings.range==='custom';
       benchmarkDatePicker.classList.toggle('visible',custom);
@@ -3121,6 +3201,8 @@
       const priceResults=await Promise.all(positions.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
       if(requestId!==allPortfolioSummaryRequestId)return;
       const failed=priceResults.filter(item=>!item.ok).map(item=>item.position.symbol);
+      const previousReferenceTime=Math.max(0,...priceResults.filter(item=>item.ok).map(item=>Number(item.value.previousTime)||0));
+      const previousDate=previousReferenceTime?new Date(previousReferenceTime*1000).toISOString().slice(0,10):previousBusinessDate();
       const convertedPositions=await Promise.all(priceResults.filter(item=>item.ok).map(async item=>{
         const position=item.value,effectiveQuantity=position.effectiveQuantity??position.quantity,currency=position.currency;
         try{
@@ -3130,7 +3212,7 @@
         }catch{return{ok:false,label:position.symbol}}
       }));
       const convertedCash=await Promise.all(balances.map(async balance=>{
-        try{const rate=balance.currency==='USD'?1:(await latestPrice(balance.currency+'USD=X')).price;if(!Number.isFinite(rate)||rate<=0)throw new Error('Kur verisi eksik');return{ok:true,current:balance.amount*rate,previous:balance.amount*rate}}
+        try{const [rate,previousRate]=await Promise.all([balance.currency==='USD'?Promise.resolve(1):latestPrice(balance.currency+'USD=X').then(item=>item.price),historicalUsdRate(balance.currency,previousDate)]);if(![rate,previousRate].every(value=>Number.isFinite(value)&&value>0))throw new Error('Kur verisi eksik');return{ok:true,current:balance.amount*rate,previous:balance.amount*previousRate}}
         catch{return{ok:false,label:'Nakit '+balance.currency}}
       }));
       if(requestId!==allPortfolioSummaryRequestId)return;
@@ -3142,15 +3224,16 @@
         return;
       }
       const values=[...convertedPositions,...convertedCash],totalUsd=values.reduce((sum,item)=>sum+item.current,0),previousUsd=values.reduce((sum,item)=>sum+item.previous,0),dailyUsd=totalUsd-previousUsd,dailyPercent=previousUsd>0?dailyUsd/previousUsd*100:0;
-      let factor=1,currency='USD';
+      let factor=1,previousFactor=1,currency='USD';
       if(showTry){
-        try{const tryToUsd=(await latestPrice('TRYUSD=X')).price;if(!Number.isFinite(tryToUsd)||tryToUsd<=0)throw new Error('Geçersiz kur');factor=1/tryToUsd;currency='TRY'}
+        try{const [tryToUsd,previousTryToUsd]=await Promise.all([latestPrice('TRYUSD=X').then(item=>item.price),historicalUsdRate('TRY',previousDate)]);if(![tryToUsd,previousTryToUsd].every(value=>Number.isFinite(value)&&value>0))throw new Error('Geçersiz kur');factor=1/tryToUsd;previousFactor=1/previousTryToUsd;currency='TRY'}
         catch{allPortfolioTotalValue.textContent='Eksik veri';allPortfolioDailyChange.textContent='TRY kuru alınamadı.';allPortfolioDailyChange.classList.add('negative');return}
       }
       if(requestId!==allPortfolioSummaryRequestId)return;
-      allPortfolioTotalValue.textContent=money(totalUsd*factor,currency);
-      allPortfolioDailyChange.textContent='Bugün '+money(dailyUsd*factor,currency)+' · '+(dailyPercent>=0?'+':'')+dailyPercent.toFixed(2)+'%';
-      allPortfolioDailyChange.classList.add(dailyUsd>=0?'positive':'negative');
+      const displayedTotal=totalUsd*factor,displayedPrevious=previousUsd*previousFactor,displayedDaily=displayedTotal-displayedPrevious,displayedPercent=displayedPrevious>0?displayedDaily/displayedPrevious*100:dailyPercent;
+      allPortfolioTotalValue.textContent=money(displayedTotal,currency);
+      allPortfolioDailyChange.textContent='Bugün '+money(displayedDaily,currency)+' · '+(displayedPercent>=0?'+':'')+displayedPercent.toFixed(2)+'%';
+      allPortfolioDailyChange.classList.add(displayedDaily>=0?'positive':'negative');
     }
 
     function isPortfolioSummaryComplete(failedPositions,missingRates) {
@@ -3188,7 +3271,7 @@
         const badge=document.createElement('span');badge.className='portfolio-row-logo';const initials=document.createElement('span');initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';badge.append(initials);appendSymbolLogo(badge,'',item.symbol,item.name);
         const title=document.createElement('div');title.className='portfolio-row-title';const symbol=document.createElement('strong');symbol.textContent=displaySymbol(item.symbol);const name=document.createElement('small');name.textContent=item.name;name.title=item.name;title.append(symbol,name);
         const currentValue=document.createElement('strong');currentValue.className='portfolio-current-value';currentValue.textContent=item.currentValue;
-        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.textContent='×';remove.setAttribute('aria-label',item.symbol+' pozisyonunu sil');remove.addEventListener('click',event=>{event.stopPropagation();portfolio=portfolio.filter(saved=>saved.symbol!==item.symbol);savePortfolio();renderPortfolio()});
+        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.textContent='×';remove.setAttribute('aria-label',item.symbol+' pozisyonunu sil');remove.addEventListener('click',event=>{event.stopPropagation();removePortfolioWithUndo(item.symbol)});
         const compactLine=document.createElement('div');compactLine.className='portfolio-compact-line';const details=document.createElement('div');details.className='portfolio-compact-detail';details.textContent=item.details;details.title=item.details;const profit=document.createElement('span');profit.className='portfolio-compact-profit '+(item.tone||'');profit.textContent=item.profit;compactLine.append(details,profit);head.append(badge,title,currentValue,remove);row.append(head,compactLine);
         const edit=()=>openPortfolioDialog(position);row.addEventListener('click',event=>{if(!event.target.closest('button'))edit()});row.addEventListener('keydown',event=>{if(event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();edit()}});portfolioList.append(row);
       });
@@ -3202,6 +3285,7 @@
 
     async function renderPortfolio({refreshBenchmark=true,refreshDividends=true}={}) {
       const renderId=++portfolioRenderId;
+      const emptyState=syncPortfolioEmptyState();
       const allPortfolioPositions=portfolioBooks.flatMap(book=>book.positions);
       const priceWarmup=prefetchPortfolioPrices(allPortfolioPositions);
       renderAllPortfoliosSummary(priceWarmup);
@@ -3212,17 +3296,14 @@
       const portfolioDailyChange=document.getElementById('portfolioDailyChange');
       portfolioDailyChange.className='portfolio-daily-change';
       renderCashBalances();
-      if(!portfolio.length&&!cashBalances.length){
+      if(emptyState){
         const emptyCurrency=portfolioPresentationTarget('USD');
         portfolioList.replaceChildren();
         portfolioSummary.replaceChildren();
         dividendList.replaceChildren();
         portfolioTotalValue.textContent=money(0,emptyCurrency);
         portfolioDailyChange.textContent='Bugün —';
-        const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Portföyünüz boş. Hisse veya nakit ekleyin.';portfolioList.append(empty);
-        const dividendEmpty=document.createElement('li');dividendEmpty.className='favorites-note';dividendEmpty.textContent='Temettü verisi için portföye hisse ekleyin.';dividendList.append(dividendEmpty);
         renderPortfolioDistribution([],new Map(),'USD');
-        if(refreshBenchmark)renderPortfolioBenchmark();
         return;
       }
       if(!keepExistingPortfolio){
@@ -3236,6 +3317,8 @@
       const results=await Promise.all(portfolio.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
       if(renderId!==portfolioRenderId)return;
       const valid=results.filter(result=>result.ok).map(result=>result.value);
+      const previousReferenceTime=Math.max(0,...valid.map(item=>Number(item.previousTime)||0));
+      const previousDate=previousReferenceTime?new Date(previousReferenceTime*1000).toISOString().slice(0,10):previousBusinessDate();
       const failedPositions=results.filter(result=>!result.ok).map(result=>result.position.symbol);
       const currencies=[...new Set([...valid.flatMap(item=>[item.currency,item.costCurrency||item.currency]),...cashBalances.map(item=>item.currency)])];
       const mixedCurrency=currencies.length>1;
@@ -3253,12 +3336,15 @@
           }catch{missingRates.add(code)}
         }));
       }
-      let presentationFactor=1;
+      let presentationFactor=1,previousPresentationFactor=1;
       if(presentationCurrency!==summaryCurrency){
         try{
           const summaryToUsd=summaryCurrency==='USD'?1:(rates.get(summaryCurrency)??(await latestPrice(summaryCurrency+'USD=X')).price);
           const targetToUsd=presentationCurrency==='USD'?1:(rates.get(presentationCurrency)??(await latestPrice(presentationCurrency+'USD=X')).price);
           presentationFactor=portfolioConversionFactor(summaryToUsd,targetToUsd);
+          const previousSummaryToUsd=await historicalUsdRate(summaryCurrency,previousDate);
+          const previousTargetToUsd=await historicalUsdRate(presentationCurrency,previousDate);
+          previousPresentationFactor=portfolioConversionFactor(previousSummaryToUsd,previousTargetToUsd);
         }catch{missingRates.add(presentationCurrency+' dönüşüm')}
       }
       const costRates=new Map();
@@ -3275,6 +3361,8 @@
           costRates.set(position.symbol,{cost,current:rates.get(position.currency),previous,week});
         }catch{costRates.set(position.symbol,{cost:null,current:rates.get(position.currency),previous:null,week:null})}
       }));
+      const cashPreviousRates=new Map([['USD',1]]);
+      if(mixedCurrency)await Promise.all(cashBalances.filter(item=>item.currency!=='USD').map(async balance=>{try{cashPreviousRates.set(balance.currency,await historicalUsdRate(balance.currency,previousDate))}catch{missingRates.add(balance.currency+' önceki gün kuru')}}));
       if(renderId!==portfolioRenderId)return;
       const scrollBeforeCommit=window.scrollY;
       portfolioList.replaceChildren();
@@ -3294,7 +3382,7 @@
         const symbol=document.createElement('strong');symbol.textContent=displaySymbol(position.symbol);
         if(position.drip){const chip=document.createElement('span');chip.className='drip-chip';chip.textContent='DRIP';symbol.append(chip)}
         const name=document.createElement('small');name.textContent=result.ok?position.name:result.error.message;name.title=name.textContent;title.append(symbol,name);
-        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.title=position.symbol+' pozisyonunu sil';remove.setAttribute('aria-label',position.symbol+' pozisyonunu sil');remove.textContent='×';remove.addEventListener('click',event=>{event.stopPropagation();portfolio=portfolio.filter(item=>item.symbol!==position.symbol);savePortfolio();renderPortfolio()});
+        const remove=document.createElement('button');remove.type='button';remove.className='portfolio-delete';remove.title=position.symbol+' pozisyonunu sil';remove.setAttribute('aria-label',position.symbol+' pozisyonunu sil');remove.textContent='×';remove.addEventListener('click',event=>{event.stopPropagation();removePortfolioWithUndo(position.symbol)});
         const currentValue=document.createElement('strong');currentValue.className='portfolio-current-value';
         head.append(badge,title,currentValue,remove);
         const compactLine=document.createElement('div');compactLine.className='portfolio-compact-line';
@@ -3338,9 +3426,10 @@
       if(!portfolio.length){const empty=document.createElement('div');empty.className='portfolio-empty';empty.textContent='Henüz hisse pozisyonu yok.';portfolioList.append(empty)}
       cashBalances.forEach(balance=>{
         const factor=mixedCurrency?rates.get(balance.currency):1;
-        if(Number.isFinite(factor)&&factor>0){
+        const previousFactor=mixedCurrency?cashPreviousRates.get(balance.currency):1;
+        if([factor,previousFactor].every(value=>Number.isFinite(value)&&value>0)){
           const convertedValue=balance.amount*factor;
-          totalCost+=convertedValue;totalValue+=convertedValue;totalPreviousValue+=convertedValue;totalWeekStartValue+=convertedValue;
+          totalCost+=convertedValue;totalValue+=convertedValue;totalPreviousValue+=balance.amount*previousFactor;totalWeekStartValue+=convertedValue;
           allocationValues.push({label:'Nakit '+balance.currency,value:convertedValue});
           currencyValues.set(balance.currency,(currencyValues.get(balance.currency)||0)+convertedValue);
         }else missingRates.add(balance.currency);
@@ -3358,9 +3447,9 @@
         portfolioSummary.append(warning);
         renderPortfolioDistribution([],new Map(),'USD');
       }else{
-        const dailyProfit=totalValue-totalPreviousValue,dailyPercent=totalPreviousValue>0?dailyProfit/totalPreviousValue*100:0;
-        portfolioTotalValue.textContent=money(totalValue*presentationFactor,presentationCurrency);
-        portfolioDailyChange.textContent='Bugün '+money(dailyProfit*presentationFactor,presentationCurrency)+' · '+(dailyPercent>=0?'+':'')+dailyPercent.toFixed(2)+'%';
+        const displayedTotal=totalValue*presentationFactor,displayedPrevious=totalPreviousValue*previousPresentationFactor,dailyProfit=displayedTotal-displayedPrevious,dailyPercent=displayedPrevious>0?dailyProfit/displayedPrevious*100:0;
+        portfolioTotalValue.textContent=money(displayedTotal,presentationCurrency);
+        portfolioDailyChange.textContent='Bugün '+money(dailyProfit,presentationCurrency)+' · '+(dailyPercent>=0?'+':'')+dailyPercent.toFixed(2)+'%';
         portfolioDailyChange.classList.add(dailyProfit>=0?'positive':'negative');
         const netProfit=totalValue-totalCost,profitPercent=totalCost>0?netProfit/totalCost*100:0;
         const weekProfit=totalValue-totalWeekStartValue,weekPercent=totalWeekStartValue>0?weekProfit/totalWeekStartValue*100:0;
@@ -3517,8 +3606,9 @@
     }
 
     function setActivePeriod(button) {
-      periodButtons.forEach(item => item.classList.toggle('active', item === button));
+      periodButtons.forEach(item => {const active=item===button;item.classList.toggle('active',active);item.setAttribute('aria-pressed',String(active))});
       customPeriod.classList.remove('active');
+      customPeriod.setAttribute('aria-pressed','false');
     }
 
     function changeLabel() {
@@ -3594,7 +3684,9 @@
       dateError.textContent = '';
       selectedStart = iso;
       periodButtons.forEach(item => item.classList.remove('active'));
+      periodButtons.forEach(item => item.setAttribute('aria-pressed','false'));
       customPeriod.classList.add('active');
+      customPeriod.setAttribute('aria-pressed','true');
       customPeriod.textContent = `${startDate.value} tarihinden itibaren`;
       datePicker.classList.remove('visible');
       loadPrice(symbolInput.value.trim().toUpperCase());
@@ -3819,7 +3911,7 @@
       favoriteSearchTimer=setTimeout(()=>startUnifiedAssetSearch(query,()=>requestId===favoriteSearchRequestId&&favoriteSearch.value.trim()===query,showFavoriteSearchSuggestions,quickFundQuotes),250);
     });
     favoriteAddForm.addEventListener('submit',async event=>{event.preventDefault();addOverviewFavorite(await resolveAssetInput(favoriteSearch.value))});
-    favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol)) { favorites=favorites.filter(item=>item.symbol!==symbol); favoriteQuotes.delete(symbol); } else favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); refreshFavoriteQuotes(); });
+    favoriteButton.addEventListener('click', () => { const symbol=currentSymbol(); if (!symbol) return symbolInput.focus(); if (isFavorite(symbol))return removeFavoriteWithUndo(symbol); favorites.push({symbol,name:currentName||symbol}); saveFavorites(); renderFavorites(); updateFavoriteButton(); refreshFavoriteQuotes(); });
     periodButtons.forEach(periodButton => periodButton.addEventListener('click', () => {
       selectedRange = periodButton.dataset.range;
       selectedStart = '';
@@ -3995,6 +4087,10 @@
       }catch{renderAdvancedResults([])}
     });
     alarmButton.addEventListener('click',()=>{alarmSymbol.value=currentSymbol();alarmTarget.value='';renderAlarms();alarmDialog.showModal()});
+    otherAlarmShortcut.addEventListener('click',()=>{chartTab.click();alarmButton.click()});
+    emptyAddAsset.addEventListener('click',()=>portfolioSymbol.focus());
+    emptyAddCash.addEventListener('click',()=>openCashDialog());
+    emptyRestoreBackup.addEventListener('click',()=>{otherTab.click();backupFile.click()});
     alarmClose.addEventListener('click',()=>alarmDialog.close());
     alarmForm.addEventListener('submit',async event=>{
       event.preventDefault();
