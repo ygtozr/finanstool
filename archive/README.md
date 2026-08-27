@@ -30,6 +30,7 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v6.2](./v6.2/) | Arşivlendi | [35a429c](https://github.com/ygtozr/finanstool/commit/35a429cc0917ff000051ab34b1201abafb0ddce1) |
 | [v6.3](./v6.3/) | Arşivlendi | [bb38919](https://github.com/ygtozr/finanstool/commit/bb38919) |
 | [v6.4](./v6.4/) | Arşivlendi | v6.4 ana dal yayını |
-| [v6.5](./v6.5/) | Kalıcı onaylı sürüm | v6.5 siyah-beyaz marka sembolü yayını |
+| [v6.5](./v6.5/) | Arşivlendi | v6.5 siyah-beyaz marka sembolü yayını |
+| [v6.6](./v6.6/) | Kalıcı onaylı sürüm | v6.6 portföy, ayarlar ve veri dayanıklılığı yayını |
 
 Bir sonraki onaylı sürüm yayınlanırken mevcut sürüm aynı düzenle arşivlenecektir.
