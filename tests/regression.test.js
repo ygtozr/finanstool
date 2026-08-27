@@ -365,7 +365,7 @@ assert.match(html,/renderCashBalances\(baseCurrencyPreference==='NATIVE'\?null:c
 assert.match(html,/const targetCurrency=baseCurrencyPreference==='NATIVE'\?null:baseCurrencyPreference[\s\S]*shownCurrency=targetCurrency\|\|item\.currency/,'Temettü tutarları kendi para birimi veya genel tercih ile gösterilmeli');
 assert.match(html,/range=2y&interval=1d&events=div[\s\S]*Yaklaşan temettü bulunamadı; en son geçmiş temettüler gösteriliyor/,'Yaklaşan temettü yoksa geçmiş temettüler gösterilmeli');
 assert.match(html,/\.settings-switches \{ display:grid; gap:11px; \}[\s\S]*\.settings-switches \.setting-switch \{ width:100%; \}/,'Bildirim anahtarları ayrı satırlarda kendi metinlerinin sağında durmalı');
-assert.match(html,/\.setting-switch \{ display:grid; grid-template-columns:minmax\(0,1fr\) auto;[\s\S]*\.setting-switch span \{ grid-column:1 \/ -1;[\s\S]*\.setting-switch input \{ grid-column:2; justify-self:end;/,'Bildirim anahtarları açıklamanın alt satırında sağa yaslanmalı');
+assert.match(html,/\.setting-switch \{ display:flex; align-items:center; justify-content:space-between;[\s\S]*\.setting-switch input \{ flex:0 0 auto;/,'Bildirim anahtarları açıklamanın doğrudan sağında ve sağa yaslı durmalı');
 assert.doesNotMatch(html,/id="layoutDensitySelect"/,'Etkisiz yoğunluk seçimi ayarlardan kaldırılmalı');
 assert.match(html,/function mergePortfolioBooks\(current,incoming\)[\s\S]*portfolioBooks=mergePortfolioBooks\(portfolioBooks,data\.portfolios\)/,'Birleştirerek geri yükleme portföyleri kimlikleriyle ekleyip güncellemeli');
 assert.match(html,/Alım tarihi kayıtlı pozisyonlar:[\s\S]*Temettü yeniden yatırımı açık pozisyonlar:/,'Yedek önizlemesi tarih ve temettü ayarı kapsamını göstermeli');
