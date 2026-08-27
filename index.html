@@ -779,7 +779,7 @@
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="portfolioDefaultsTitle">
           <div class="settings-card-copy"><h3 id="portfolioDefaultsTitle">Portföy Ve Gösterim</h3><p>Açılışta seçilecek portföyü, aktif portföyün tercih edilen para birimini ve varsayılan performans ölçütünü belirleyin.</p></div>
-          <div class="settings-options settings-card-controls"><label>Varsayılan portföy<select id="defaultPortfolioSelect"></select></label><div class="settings-options two-column"><label>Tercih edilen para birimi<select id="baseCurrencySelect"><option value="TRY">Türk lirası</option><option value="USD">ABD doları</option></select></label><label>Varsayılan kıyas<select id="defaultBenchmarkSelect"><option value="^GSPC">S&amp;P 500</option><option value="^IXIC">Nasdaq</option><option value="XU100.IS">BIST 100</option><option value="GLD">Altın</option></select></label></div></div>
+          <div class="settings-options settings-card-controls"><label>Varsayılan portföy<select id="defaultPortfolioSelect"></select></label><div class="settings-options two-column"><label>Tercih edilen para birimi<select id="baseCurrencySelect"><option value="NATIVE">Ürünün kendi para birimi</option><option value="TRY">Türk lirası</option><option value="USD">ABD doları</option></select></label><label>Varsayılan kıyas<select id="defaultBenchmarkSelect"><option value="^GSPC">S&amp;P 500</option><option value="^IXIC">Nasdaq</option><option value="XU100.IS">BIST 100</option><option value="GLD">Altın</option></select></label></div></div>
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="numberFormatTitle">
           <div class="settings-card-copy"><h3 id="numberFormatTitle">Sayı Biçimi</h3><p>Fiyat ve yüzdelerde gösterilecek ondalık hassasiyetini seçin.</p></div>
@@ -1141,7 +1141,7 @@
     if(!supportedRefreshIntervals.includes(refreshInterval))refreshInterval=15000;
     let alarmsEnabled = localStorage.getItem(alarmPreferenceKey)!=='false';
     let fontSize=['small','standard','large'].includes(localStorage.getItem(fontSizeKey))?localStorage.getItem(fontSizeKey):'standard';
-    let baseCurrencyPreference=['AUTO','TRY','USD'].includes(localStorage.getItem(baseCurrencyPreferenceKey))?localStorage.getItem(baseCurrencyPreferenceKey):'AUTO';
+    let baseCurrencyPreference=['NATIVE','TRY','USD'].includes(localStorage.getItem(baseCurrencyPreferenceKey))?localStorage.getItem(baseCurrencyPreferenceKey):(localStorage.getItem(baseCurrencyPreferenceKey)==='AUTO'?'NATIVE':'USD');
     let priceDecimalsPreference=['auto','2','4','6'].includes(localStorage.getItem(priceDecimalsKey))?localStorage.getItem(priceDecimalsKey):'auto';
     let percentDecimalsPreference=['1','2','3'].includes(localStorage.getItem(percentDecimalsKey))?localStorage.getItem(percentDecimalsKey):'2';
     let defaultBenchmarkPreference=['^GSPC','^IXIC','XU100.IS','GLD'].includes(localStorage.getItem(defaultBenchmarkKey))?localStorage.getItem(defaultBenchmarkKey):'^GSPC';
@@ -1318,13 +1318,14 @@
     function normalizedPortfolioBook(item,index=0) {
       const id=String(item?.id||('portfolio-'+(index+1))).trim().slice(0,80)||createPortfolioId();
       const name=String(item?.name||('Portföy '+(index+1))).trim().slice(0,40)||('Portföy '+(index+1));
-      const displayCurrency=['TRY','USD'].includes(item?.displayCurrency)?item.displayCurrency:(baseCurrencyPreference==='TRY'?'TRY':'USD');
+      const displayCurrency=baseCurrencyPreference;
       return{id,name,displayCurrency,positions:validPortfolioPositions(item?.positions??item?.portfolio),cashBalances:validCashBalances(item?.cashBalances),createdAt:item?.createdAt||new Date().toISOString()};
     }
     const legacyPortfolio=(()=>{try{return validPortfolioPositions(JSON.parse(localStorage.getItem(portfolioKey)||'[]'))}catch{return[]}})();
     const legacyCashBalances=(()=>{try{return validCashBalances(JSON.parse(localStorage.getItem(cashKey)||'[]'))}catch{return[]}})();
     let portfolioBooks=(()=>{try{const saved=JSON.parse(localStorage.getItem(portfolioBooksKey)||'[]');return Array.isArray(saved)?saved.slice(0,50).map(normalizedPortfolioBook):[]}catch{return[]}})();
-    if(!portfolioBooks.length)portfolioBooks=[{id:'portfolio-main',name:'Portföyüm',displayCurrency:baseCurrencyPreference==='TRY'?'TRY':'USD',positions:legacyPortfolio,cashBalances:legacyCashBalances,createdAt:new Date().toISOString()}];
+    if(!portfolioBooks.length)portfolioBooks=[{id:'portfolio-main',name:'Portföyüm',displayCurrency:baseCurrencyPreference,positions:legacyPortfolio,cashBalances:legacyCashBalances,createdAt:new Date().toISOString()}];
+    portfolioBooks.forEach(book=>{book.displayCurrency=baseCurrencyPreference});
     let defaultPortfolioPreference=localStorage.getItem(defaultPortfolioPreferenceKey)||'';
     let activePortfolioId=(portfolioBooks.some(item=>item.id===defaultPortfolioPreference)?defaultPortfolioPreference:localStorage.getItem(activePortfolioKey))||portfolioBooks[0].id;
     if(!portfolioBooks.some(item=>item.id===activePortfolioId))activePortfolioId=portfolioBooks[0].id;
@@ -1350,9 +1351,9 @@
     let cashEditCurrency = null;
     let portfolioRenderId = 0;
     let portfolioDividendRequestId = 0;
-    let portfolioDisplayCurrency = activePortfolioBook().displayCurrency||'USD';
+    let portfolioDisplayCurrency = baseCurrencyPreference;
     let portfolioBaseCurrency = 'USD';
-    let allPortfolioDisplayCurrency = portfolioDisplayCurrency;
+    let allPortfolioDisplayCurrency = baseCurrencyPreference==='TRY'?'TRY':'USD';
     let allPortfolioSummaryRequestId = 0;
     let portfolioAllocationChart = null;
     let portfolioCurrencyChart = null;
@@ -2258,7 +2259,7 @@
       refreshIntervalSelect.value=String(refreshInterval);
       defaultRangeSelect.value=selectedRange;
       fontSizeSelect.value=fontSize;
-      baseCurrencySelect.value=activePortfolioBook().displayCurrency||'USD';
+      baseCurrencySelect.value=baseCurrencyPreference;
       defaultBenchmarkSelect.value=defaultBenchmarkPreference;
       priceDecimalsSelect.value=priceDecimalsPreference;
       percentDecimalsSelect.value=percentDecimalsPreference;
@@ -2369,7 +2370,8 @@
       const cleanPositions=value=>sourceArray(value).map(item=>normalizedPortfolioItem({...item,symbol:normalizeSymbol(item?.symbol),name:cleanText(item?.name,item?.symbol)})).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0);
       const cleanCash=value=>sourceArray(value).map(normalizedCashBalance).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0);
       const rawBooks=payload.schemaVersion>=2&&Array.isArray(raw.portfolios)?raw.portfolios:[{id:'portfolio-main',name:'Portföyüm',positions:raw.portfolio,cashBalances:raw.cashBalances}];
-      const cleanBooks=rawBooks.slice(0,50).map((item,index)=>({id:cleanText(item?.id,'yedek-portfoy-'+(index+1)).slice(0,80),name:cleanText(item?.name,'Portföy '+(index+1)).slice(0,40),displayCurrency:['TRY','USD'].includes(item?.displayCurrency)?item.displayCurrency:(raw.preferences?.baseCurrency==='TRY'?'TRY':'USD'),positions:uniqueBy(cleanPositions(item?.positions??item?.portfolio),position=>position.symbol),cashBalances:uniqueBy(cleanCash(item?.cashBalances),balance=>balance.currency),createdAt:item?.createdAt||null}));
+      const restoredCurrency=['NATIVE','TRY','USD'].includes(raw.preferences?.baseCurrency)?raw.preferences.baseCurrency:(raw.preferences?.baseCurrency==='AUTO'?'NATIVE':'USD');
+      const cleanBooks=rawBooks.slice(0,50).map((item,index)=>({id:cleanText(item?.id,'yedek-portfoy-'+(index+1)).slice(0,80),name:cleanText(item?.name,'Portföy '+(index+1)).slice(0,40),displayCurrency:restoredCurrency,positions:uniqueBy(cleanPositions(item?.positions??item?.portfolio),position=>position.symbol),cashBalances:uniqueBy(cleanCash(item?.cashBalances),balance=>balance.currency),createdAt:item?.createdAt||null}));
       const portfolios=uniqueBy(cleanBooks,item=>item.id);
       if(!portfolios.length)portfolios.push({id:'portfolio-main',name:'Portföyüm',positions:[],cashBalances:[],createdAt:null});
       const cleanAlarms=sourceArray(raw.alarms).map(item=>{const symbol=normalizeSymbol(item?.symbol),target=Number(item?.target),condition=item?.condition==='below'?'below':'above';return{id:cleanText(item?.id,Date.now().toString(36)+Math.random().toString(36).slice(2)),symbol,target,condition,triggered:Boolean(item?.triggered),lastTriggeredAt:Number(item?.lastTriggeredAt)||null}}).filter(item=>item.symbol&&Number.isFinite(item.target)&&item.target>0);
@@ -2384,7 +2386,7 @@
         refreshInterval:supportedRefreshIntervals.includes(Number(raw.refreshInterval))?Number(raw.refreshInterval):15000,
         defaultRange:supportedDefaultRanges.includes(raw.defaultRange)?raw.defaultRange:'6mo',
         alarmsEnabled:raw.alarmsEnabled!==false,
-        preferences:{defaultPortfolioId:portfolios.some(item=>item.id===raw.preferences?.defaultPortfolioId)?raw.preferences.defaultPortfolioId:portfolios[0].id,baseCurrency:['AUTO','TRY','USD'].includes(raw.preferences?.baseCurrency)?raw.preferences.baseCurrency:'AUTO',fontSize:['small','standard','large'].includes(raw.preferences?.fontSize)?raw.preferences.fontSize:'standard',priceDecimals:['auto','2','4','6'].includes(String(raw.preferences?.priceDecimals))?String(raw.preferences.priceDecimals):'auto',percentDecimals:['1','2','3'].includes(String(raw.preferences?.percentDecimals))?String(raw.preferences.percentDecimals):'2',defaultBenchmark:['^GSPC','^IXIC','XU100.IS','GLD'].includes(raw.preferences?.defaultBenchmark)?raw.preferences.defaultBenchmark:'^GSPC',alarmSound:raw.preferences?.alarmSound!==false,alarmVibration:raw.preferences?.alarmVibration!==false,alarmAutoDisable:raw.preferences?.alarmAutoDisable!==false,alarmCheckInterval:[15000,30000,60000,300000].includes(Number(raw.preferences?.alarmCheckInterval))?Number(raw.preferences.alarmCheckInterval):60000,backupReminderDays:[0,7,14,30].includes(Number(raw.preferences?.backupReminderDays))?Number(raw.preferences.backupReminderDays):14,lastBackup:Number(raw.preferences?.lastBackup)||null}
+        preferences:{defaultPortfolioId:portfolios.some(item=>item.id===raw.preferences?.defaultPortfolioId)?raw.preferences.defaultPortfolioId:portfolios[0].id,baseCurrency:restoredCurrency,fontSize:['small','standard','large'].includes(raw.preferences?.fontSize)?raw.preferences.fontSize:'standard',priceDecimals:['auto','2','4','6'].includes(String(raw.preferences?.priceDecimals))?String(raw.preferences.priceDecimals):'auto',percentDecimals:['1','2','3'].includes(String(raw.preferences?.percentDecimals))?String(raw.preferences.percentDecimals):'2',defaultBenchmark:['^GSPC','^IXIC','XU100.IS','GLD'].includes(raw.preferences?.defaultBenchmark)?raw.preferences.defaultBenchmark:'^GSPC',alarmSound:raw.preferences?.alarmSound!==false,alarmVibration:raw.preferences?.alarmVibration!==false,alarmAutoDisable:raw.preferences?.alarmAutoDisable!==false,alarmCheckInterval:[15000,30000,60000,300000].includes(Number(raw.preferences?.alarmCheckInterval))?Number(raw.preferences.alarmCheckInterval):60000,backupReminderDays:[0,7,14,30].includes(Number(raw.preferences?.backupReminderDays))?Number(raw.preferences.backupReminderDays):14,lastBackup:Number(raw.preferences?.lastBackup)||null}
       };
     }
 
@@ -2447,7 +2449,7 @@
         alarmsEnabled=data.alarmsEnabled;
         const preferences=data.preferences||{};
         defaultPortfolioPreference=preferences.defaultPortfolioId||activePortfolioId;
-        baseCurrencyPreference=preferences.baseCurrency||'AUTO';portfolioDisplayCurrency=activePortfolioBook().displayCurrency||'USD';allPortfolioDisplayCurrency=portfolioDisplayCurrency;
+        baseCurrencyPreference=['NATIVE','TRY','USD'].includes(preferences.baseCurrency)?preferences.baseCurrency:'NATIVE';portfolioBooks.forEach(book=>{book.displayCurrency=baseCurrencyPreference});portfolioDisplayCurrency=baseCurrencyPreference;allPortfolioDisplayCurrency=baseCurrencyPreference==='TRY'?'TRY':'USD';
         fontSize=preferences.fontSize||'standard';priceDecimalsPreference=preferences.priceDecimals||'auto';percentDecimalsPreference=preferences.percentDecimals||'2';defaultBenchmarkPreference=preferences.defaultBenchmark||'^GSPC';
         alarmSoundEnabled=preferences.alarmSound!==false;alarmVibrationEnabled=preferences.alarmVibration!==false;alarmAutoDisable=preferences.alarmAutoDisable!==false;alarmCheckInterval=preferences.alarmCheckInterval||60000;backupReminderDays=preferences.backupReminderDays??14;
         document.documentElement.dataset.fontSize=fontSize;
@@ -2662,6 +2664,13 @@
       localStorage.setItem(portfolioKey,JSON.stringify(portfolio));
       localStorage.setItem(cashKey,JSON.stringify(cashBalances));
     }
+    function applyPreferredCurrency(value){
+      baseCurrencyPreference=['NATIVE','TRY','USD'].includes(value)?value:'NATIVE';
+      portfolioBooks.forEach(book=>{book.displayCurrency=baseCurrencyPreference});
+      portfolioDisplayCurrency=baseCurrencyPreference;
+      allPortfolioDisplayCurrency=baseCurrencyPreference==='TRY'?'TRY':'USD';
+      localStorage.setItem(baseCurrencyPreferenceKey,baseCurrencyPreference);savePortfolioBooks();syncSettingsControls();
+    }
     const savePortfolio = () => {savePortfolioBooks();renderChartAssetPanels()};
     const saveCashBalances = () => savePortfolioBooks();
 
@@ -2772,7 +2781,7 @@
       savePortfolioBooks();
       activePortfolioId=bookId;
       bindActivePortfolio();
-      portfolioDisplayCurrency=activePortfolioBook().displayCurrency||'USD';allPortfolioDisplayCurrency=portfolioDisplayCurrency;
+      portfolioDisplayCurrency=baseCurrencyPreference;allPortfolioDisplayCurrency=baseCurrencyPreference==='TRY'?'TRY':'USD';
       portfolioRenderId++;
       portfolioDividendRequestId++;
       portfolioBenchmarkRequestId++;
@@ -2809,7 +2818,7 @@
       activePortfolioId=portfolioBooks[Math.min(index,portfolioBooks.length-1)].id;
       if(wasDefault){defaultPortfolioPreference=activePortfolioId;localStorage.setItem(defaultPortfolioPreferenceKey,defaultPortfolioPreference)}
       bindActivePortfolio();
-      portfolioDisplayCurrency=activePortfolioBook().displayCurrency||'USD';allPortfolioDisplayCurrency=portfolioDisplayCurrency;
+      portfolioDisplayCurrency=baseCurrencyPreference;allPortfolioDisplayCurrency=baseCurrencyPreference==='TRY'?'TRY':'USD';
       portfolioRenderId++;
       portfolioDividendRequestId++;
       portfolioBenchmarkRequestId++;
@@ -2823,7 +2832,7 @@
         activePortfolioId=current.id;
         if(wasDefault){defaultPortfolioPreference=current.id;localStorage.setItem(defaultPortfolioPreferenceKey,defaultPortfolioPreference)}
         bindActivePortfolio();
-        portfolioDisplayCurrency=current.displayCurrency||'USD';allPortfolioDisplayCurrency=portfolioDisplayCurrency;
+        portfolioDisplayCurrency=baseCurrencyPreference;allPortfolioDisplayCurrency=baseCurrencyPreference==='TRY'?'TRY':'USD';
         portfolioRenderId++;portfolioDividendRequestId++;portfolioBenchmarkRequestId++;
         savePortfolioBooks();renderPortfolioBookSelector();renderChartAssetPanels();renderPortfolio();
       });
@@ -3030,9 +3039,16 @@
         const events=(upcoming.events||[]).map(event=>{
           const exDate=Number(event.exDate),paymentDate=Number(event.paymentDate),amountPerShare=Number(event.amount);
           const quantity=position.effectiveQuantity??position.quantity;
-          return{symbol:position.symbol,name:position.name,date:Number.isFinite(exDate)&&exDate>=today?exDate:paymentDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency:String(event.currency||position.currency||'USD').toUpperCase()};
+          return{symbol:position.symbol,name:position.name,date:Number.isFinite(exDate)&&exDate>=today?exDate:paymentDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency:String(event.currency||position.currency||'USD').toUpperCase(),past:false};
         }).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
-        return{symbol:position.symbol,status:upcoming.status||'ok',events};
+        if(events.length)return{symbol:position.symbol,status:upcoming.status||'ok',events};
+        if(position.symbol.startsWith('TEFAS-')||position.symbol.startsWith('ALTIN-'))return{symbol:position.symbol,status:upcoming.status||'no_events',events:[]};
+        try{
+          const history=await cachedApiJson(priceApiUrl(position.symbol,'range=2y&interval=1d&events=div'),{ttl:3600000});
+          const result=history.chart?.result?.[0],currency=String(result?.meta?.currency||position.currency||'USD').toUpperCase(),quantity=position.effectiveQuantity??position.quantity;
+          const past=Object.values(result?.events?.dividends||{}).map(event=>{const seconds=Number(event.date),amountPerShare=Number(event.amount),date=seconds*1000;return{symbol:position.symbol,name:position.name,date,paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency,past:true}}).filter(item=>Number.isFinite(item.date)&&item.date<today&&Number.isFinite(item.amount)&&item.amount>0).sort((a,b)=>b.date-a.date).slice(0,5);
+          return{symbol:position.symbol,status:past.length?'past':'no_events',events:past};
+        }catch{return{symbol:position.symbol,status:upcoming.status||'no_events',events:[]}}
       }catch{return{symbol:position.symbol,status:'provider_error',events:[]}}
     }
 
@@ -3046,23 +3062,24 @@
       const results=await Promise.all(positions.map(fetchPortfolioDividends));
       if(requestId!==portfolioDividendRequestId)return;
       dividendList.replaceChildren();
-      const dividends=results.flatMap(item=>item.events).sort((a,b)=>a.date-b.date).slice(0,5);
+      const allEvents=results.flatMap(item=>item.events),upcomingDividends=allEvents.filter(item=>!item.past).sort((a,b)=>a.date-b.date),pastDividends=allEvents.filter(item=>item.past).sort((a,b)=>b.date-a.date),showingPast=!upcomingDividends.length&&pastDividends.length>0,dividends=(showingPast?pastDividends:upcomingDividends).slice(0,5);
       if(!dividends.length){
         const empty=document.createElement('li');empty.className='favorites-note';
         const providerErrors=results.filter(item=>item.status==='provider_error').map(item=>item.symbol),unsupported=results.filter(item=>item.status==='unsupported').map(item=>item.symbol);
         empty.textContent=providerErrors.length?'Temettü sağlayıcısına erişilemedi: '+providerErrors.join(', '):unsupported.length?'Temettü takvimi desteklenmeyen ürünler: '+unsupported.join(', '):'Açıklanmış yaklaşan temettü bulunamadı.';
         dividendList.append(empty);return;
       }
-      const targetCurrency=activePortfolioBook().displayCurrency||'USD';
-      const currencies=[...new Set(dividends.map(item=>item.currency).concat(targetCurrency))],usdRates=new Map([['USD',1]]);
+      if(showingPast){const note=document.createElement('li');note.className='favorites-note';note.textContent='Yaklaşan temettü bulunamadı; en son geçmiş temettüler gösteriliyor.';dividendList.append(note)}
+      const targetCurrency=baseCurrencyPreference==='NATIVE'?null:baseCurrencyPreference;
+      const currencies=[...new Set(dividends.map(item=>item.currency).concat(targetCurrency||[]))],usdRates=new Map([['USD',1]]);
       await Promise.all(currencies.filter(code=>code!=='USD').map(async code=>{try{usdRates.set(code,(await latestPrice(code+'USD=X')).price)}catch{usdRates.set(code,null)}}));
       if(requestId!==portfolioDividendRequestId)return;
       dividends.forEach(item=>{
         const row=document.createElement('li');row.className='dividend-row';
         const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));
         const symbol=document.createElement('span');symbol.textContent=displaySymbol(item.symbol)+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');
-        const sourceRate=usdRates.get(item.currency),targetRate=usdRates.get(targetCurrency),factor=Number.isFinite(sourceRate)&&Number.isFinite(targetRate)&&targetRate>0?sourceRate/targetRate:null;
-        const amount=document.createElement('strong');amount.textContent=(Number.isFinite(factor)?money(item.amount*factor,targetCurrency):'Kur yok')+' · '+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(item.quantity)+' adet';amount.title=Number.isFinite(factor)?'Hisse başı '+money(item.amountPerShare*factor,targetCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi';
+        const sourceRate=usdRates.get(item.currency),targetRate=targetCurrency?usdRates.get(targetCurrency):sourceRate,factor=targetCurrency?(Number.isFinite(sourceRate)&&Number.isFinite(targetRate)&&targetRate>0?sourceRate/targetRate:null):1,shownCurrency=targetCurrency||item.currency;
+        const amount=document.createElement('strong');amount.textContent=(Number.isFinite(factor)?money(item.amount*factor,shownCurrency):'Kur yok')+' · '+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(item.quantity)+' adet';amount.title=Number.isFinite(factor)?'Hisse başı '+money(item.amountPerShare*factor,shownCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi';
         row.append(date,symbol,amount);dividendList.append(row);
       });
     }
@@ -3462,13 +3479,14 @@
 
     function portfolioPresentationTarget(summaryCurrency) {
       portfolioBaseCurrency=summaryCurrency;
-      const target=portfolioDisplayCurrency==='AUTO'?summaryCurrency:portfolioDisplayCurrency;
+      const nativeMode=baseCurrencyPreference==='NATIVE';
+      const target=nativeMode?summaryCurrency:baseCurrencyPreference;
       const converted=target!==summaryCurrency;
       const alternate=summaryCurrency==='TRY'?'USD':'TRY';
       portfolioCurrencyToggle.setAttribute('aria-pressed',String(converted));
       portfolioCurrencyToggle.setAttribute('aria-label',converted?'Portföy özetini '+summaryCurrency+' olarak göster':'Portföy özetini '+alternate+' olarak göster');
       portfolioCurrencyToggle.title=converted?summaryCurrency+' görünümüne dön':alternate+' görünümüne geç';
-      portfolioSummaryCurrencyNote.textContent=target==='TRY'?'Portföy özeti ve dağılım değerleri TL bazında gösteriliyor.':target==='USD'?'Portföy özeti ve dağılım değerleri USD bazında gösteriliyor.':'Portföy özeti '+target+' bazında gösteriliyor.';
+      portfolioSummaryCurrencyNote.textContent=nativeMode?(summaryCurrency==='USD'?'Ürünler kendi para biriminde; karma portföy toplamı USD bazında hesaplanıyor.':'Ürünler ve portföy özeti kendi para biriminde gösteriliyor.'):target==='TRY'?'Portföydeki bütün değerler TL bazında gösteriliyor.':'Portföydeki bütün değerler USD bazında gösteriliyor.';
       return target;
     }
 
@@ -3609,14 +3627,15 @@
         const goldDetail=result.ok&&position.goldProduct?' · Günlük '+percentText((position.price/position.previousPrice-1)*100)+' · '+position.provider+' · '+new Intl.DateTimeFormat('tr-TR',{dateStyle:'short',timeStyle:'medium'}).format(new Date(position.asOf*1000)):'';
         if(result.ok){
           const value=effectiveQuantity*position.price,positionRates=costRates.get(position.symbol)||{},currentFactor=positionRates.current,costFactor=positionRates.cost,convertedValue=value*currentFactor,convertedCost=cost*costFactor,profit=convertedValue-convertedCost,percent=convertedCost>0?profit/convertedCost*100:0,tone=profit>=0?'positive':'negative';
-          const displayedValue=convertedValue*presentationFactor,displayedUnitCost=position.unitCost*costFactor*presentationFactor;
-          details.textContent=quantityText+' adet · Maliyet '+(Number.isFinite(displayedUnitCost)?money(displayedUnitCost,presentationCurrency):'Kur yok')+(position.purchaseDate?' · '+new Intl.DateTimeFormat('tr-TR').format(new Date(position.purchaseDate+'T00:00:00')):'')+(position.drip?' · +'+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(position.drip.addedQuantity)+' temettü payı':position.dripError?' · DRIP verisi yok':'')+goldDetail;
-          details.title=details.textContent;details.setAttribute('aria-label',quantityText+' adet, birim maliyet '+(Number.isFinite(displayedUnitCost)?money(displayedUnitCost,presentationCurrency):'kur verisi yok'));
-          currentValue.textContent=Number.isFinite(displayedValue)?money(displayedValue,presentationCurrency):'Kur yok';
+          const nativeMode=baseCurrencyPreference==='NATIVE',displayedValue=nativeMode?value:convertedValue*presentationFactor,displayedUnitCost=nativeMode?position.unitCost:position.unitCost*costFactor*presentationFactor,valueCurrency=nativeMode?position.currency:presentationCurrency,shownCostCurrency=nativeMode?costCurrency:presentationCurrency;
+          details.textContent=quantityText+' adet · Maliyet '+(Number.isFinite(displayedUnitCost)?money(displayedUnitCost,shownCostCurrency):'Kur yok')+(position.purchaseDate?' · '+new Intl.DateTimeFormat('tr-TR').format(new Date(position.purchaseDate+'T00:00:00')):'')+(position.drip?' · +'+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(position.drip.addedQuantity)+' temettü payı':position.dripError?' · DRIP verisi yok':'')+goldDetail;
+          details.title=details.textContent;details.setAttribute('aria-label',quantityText+' adet, birim maliyet '+(Number.isFinite(displayedUnitCost)?money(displayedUnitCost,shownCostCurrency):'kur verisi yok'));
+          currentValue.textContent=Number.isFinite(displayedValue)?money(displayedValue,valueCurrency):'Kur yok';
           currentValue.setAttribute('aria-label','Güncel toplam değer '+currentValue.textContent);
-          profitValue.textContent=Number.isFinite(profit)?money(profit*presentationFactor,presentationCurrency)+' · '+percentText(percent):'Kur verisi eksik';
-          profitValue.classList.add(Number.isFinite(profit)?tone:'negative');
-          profitValue.setAttribute('aria-label',Number.isFinite(profit)?'Kâr zarar '+money(profit*presentationFactor,presentationCurrency)+', yüzde '+(percent>=0?'+':'')+percent.toFixed(2):'Kâr zarar kur verisi eksik olduğu için hesaplanamadı');
+          const nativeComparable=nativeMode&&costCurrency===position.currency,nativeProfit=value-cost,nativePercent=cost>0?nativeProfit/cost*100:0,shownProfit=nativeComparable?nativeProfit:profit,shownPercent=nativeComparable?nativePercent:percent,shownProfitCurrency=nativeComparable?position.currency:presentationCurrency;
+          profitValue.textContent=nativeMode&&!nativeComparable?'Farklı para birimi':Number.isFinite(shownProfit)?money(shownProfit*(nativeComparable?1:presentationFactor),shownProfitCurrency)+' · '+percentText(shownPercent):'Kur verisi eksik';
+          profitValue.classList.add(Number.isFinite(shownProfit)&&(nativeComparable?nativeProfit:profit)>=0?'positive':'negative');
+          profitValue.setAttribute('aria-label',profitValue.textContent);
           if([currentFactor,costFactor,positionRates.previous,positionRates.week].every(value=>Number.isFinite(value)&&value>0)){
             totalCost+=convertedCost;totalValue+=convertedValue;totalPreviousValue+=effectiveQuantity*position.previousPrice*positionRates.previous;totalWeekStartValue+=effectiveQuantity*position.weekStartPrice*positionRates.week;
             if(convertedValue>0){
@@ -3651,7 +3670,7 @@
           currencyValues.set(balance.currency,(currencyValues.get(balance.currency)||0)+convertedValue);
         }else{missingRates.add(balance.currency);cashDisplayValues.set(balance.currency,null)}
       });
-      renderCashBalances(cashDisplayValues,presentationCurrency);
+      renderCashBalances(baseCurrencyPreference==='NATIVE'?null:cashDisplayValues,presentationCurrency);
       savePortfolio();
       if(!isPortfolioSummaryComplete(failedPositions,missingRates)){
         const codes=[...missingRates].join(', ');
@@ -4241,7 +4260,7 @@
     themeMedia.addEventListener('change',()=>{if(themePreference==='system')applyTheme('system',{persist:false})});
     fontSizeSelect.addEventListener('change',()=>{fontSize=['small','large'].includes(fontSizeSelect.value)?fontSizeSelect.value:'standard';localStorage.setItem(fontSizeKey,fontSize);document.documentElement.dataset.fontSize=fontSize;syncSettingsControls();window.dispatchEvent(new Event('resize'))});
     defaultPortfolioSelect.addEventListener('change',()=>{if(!portfolioBooks.some(book=>book.id===defaultPortfolioSelect.value))return;defaultPortfolioPreference=defaultPortfolioSelect.value;localStorage.setItem(defaultPortfolioPreferenceKey,defaultPortfolioPreference);switchPortfolio(defaultPortfolioPreference);syncSettingsControls()});
-    baseCurrencySelect.addEventListener('change',()=>{const selected=baseCurrencySelect.value==='TRY'?'TRY':'USD';activePortfolioBook().displayCurrency=selected;portfolioDisplayCurrency=selected;allPortfolioDisplayCurrency=selected;savePortfolioBooks();syncSettingsControls();renderPortfolio()});
+    baseCurrencySelect.addEventListener('change',()=>{applyPreferredCurrency(baseCurrencySelect.value);renderPortfolio()});
     defaultBenchmarkSelect.addEventListener('change',()=>{defaultBenchmarkPreference=['^GSPC','^IXIC','XU100.IS','GLD'].includes(defaultBenchmarkSelect.value)?defaultBenchmarkSelect.value:'^GSPC';localStorage.setItem(defaultBenchmarkKey,defaultBenchmarkPreference);benchmarkSettings={...benchmarkSettings,symbol:defaultBenchmarkPreference,name:benchmarkNames[defaultBenchmarkPreference]};saveBenchmarkSettings();syncSettingsControls();if(portfolioView.classList.contains('active'))renderPortfolioBenchmark()});
     priceDecimalsSelect.addEventListener('change',()=>{priceDecimalsPreference=['2','4','6'].includes(priceDecimalsSelect.value)?priceDecimalsSelect.value:'auto';localStorage.setItem(priceDecimalsKey,priceDecimalsPreference);syncSettingsControls();renderFavorites();refreshMarketAndFavorites();if(portfolioView.classList.contains('active'))renderPortfolio();if(lastLabels.length)renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,lastRsiValues)});
     percentDecimalsSelect.addEventListener('change',()=>{percentDecimalsPreference=['1','3'].includes(percentDecimalsSelect.value)?percentDecimalsSelect.value:'2';localStorage.setItem(percentDecimalsKey,percentDecimalsPreference);syncSettingsControls();renderFavorites();refreshMarketAndFavorites();if(portfolioView.classList.contains('active'))renderPortfolio();if(lastLabels.length)renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,lastRsiValues)});
@@ -4421,11 +4440,11 @@
         activePortfolioBook().name=name;
       }else{
         savePortfolioBooks();
-        const created={id:createPortfolioId(),name,displayCurrency:'USD',positions:[],cashBalances:[],createdAt:new Date().toISOString()};
+        const created={id:createPortfolioId(),name,displayCurrency:baseCurrencyPreference,positions:[],cashBalances:[],createdAt:new Date().toISOString()};
         portfolioBooks.push(created);
         activePortfolioId=created.id;
         bindActivePortfolio();
-        portfolioDisplayCurrency=created.displayCurrency;
+        portfolioDisplayCurrency=baseCurrencyPreference;
       }
       portfolioRenderId++;
       portfolioDividendRequestId++;
@@ -4440,10 +4459,10 @@
     portfolioCurrencyToggle.addEventListener('click',()=>{
       const visibleCurrency=portfolioDisplayCurrency==='AUTO'?portfolioBaseCurrency:portfolioDisplayCurrency;
       portfolioDisplayCurrency=visibleCurrency==='TRY'?'USD':'TRY';
-      activePortfolioBook().displayCurrency=portfolioDisplayCurrency;allPortfolioDisplayCurrency=portfolioDisplayCurrency;savePortfolioBooks();syncSettingsControls();
+      applyPreferredCurrency(portfolioDisplayCurrency);
       renderPortfolio({refreshBenchmark:false,refreshDividends:false});
     });
-    allPortfolioCurrencyToggle.addEventListener('click',()=>{const selected=allPortfolioDisplayCurrency==='USD'?'TRY':'USD';allPortfolioDisplayCurrency=selected;portfolioDisplayCurrency=selected;activePortfolioBook().displayCurrency=selected;savePortfolioBooks();syncSettingsControls();renderPortfolio()});
+    allPortfolioCurrencyToggle.addEventListener('click',()=>{applyPreferredCurrency(allPortfolioDisplayCurrency==='USD'?'TRY':'USD');renderPortfolio()});
     let modalScrollY=0;
     function syncModalScrollLock(){
       const hasOpenDialog=Boolean(document.querySelector('dialog[open]'));
