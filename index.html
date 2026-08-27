@@ -3053,11 +3053,16 @@
         empty.textContent=providerErrors.length?'Temettü sağlayıcısına erişilemedi: '+providerErrors.join(', '):unsupported.length?'Temettü takvimi desteklenmeyen ürünler: '+unsupported.join(', '):'Açıklanmış yaklaşan temettü bulunamadı.';
         dividendList.append(empty);return;
       }
+      const targetCurrency=activePortfolioBook().displayCurrency||'USD';
+      const currencies=[...new Set(dividends.map(item=>item.currency).concat(targetCurrency))],usdRates=new Map([['USD',1]]);
+      await Promise.all(currencies.filter(code=>code!=='USD').map(async code=>{try{usdRates.set(code,(await latestPrice(code+'USD=X')).price)}catch{usdRates.set(code,null)}}));
+      if(requestId!==portfolioDividendRequestId)return;
       dividends.forEach(item=>{
         const row=document.createElement('li');row.className='dividend-row';
         const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));
         const symbol=document.createElement('span');symbol.textContent=displaySymbol(item.symbol)+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');
-        const amount=document.createElement('strong');amount.textContent=money(item.amount,item.currency)+' · '+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(item.quantity)+' adet';amount.title='Hisse başı '+money(item.amountPerShare,item.currency)+' · tahmini brüt toplam';
+        const sourceRate=usdRates.get(item.currency),targetRate=usdRates.get(targetCurrency),factor=Number.isFinite(sourceRate)&&Number.isFinite(targetRate)&&targetRate>0?sourceRate/targetRate:null;
+        const amount=document.createElement('strong');amount.textContent=(Number.isFinite(factor)?money(item.amount*factor,targetCurrency):'Kur yok')+' · '+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(item.quantity)+' adet';amount.title=Number.isFinite(factor)?'Hisse başı '+money(item.amountPerShare*factor,targetCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi';
         row.append(date,symbol,amount);dividendList.append(row);
       });
     }

@@ -362,6 +362,7 @@ assert.match(html,/function attachPortfolioBookReorder\(tab,book\)[\s\S]*followG
 assert.match(html,/displayCurrency:\['TRY','USD'\][\s\S]*book\.displayCurrency/,'Her portföy kendi tercih edilen para birimini saklamalı');
 assert.match(html,/currentValue\.textContent=Number\.isFinite\(displayedValue\)\?money\(displayedValue,presentationCurrency\)/,'Pozisyonların güncel değerleri tercih edilen para biriminde gösterilmeli');
 assert.match(html,/renderCashBalances\(cashDisplayValues,presentationCurrency\)/,'Nakit bakiyeleri tercih edilen para birimine çevrilmeli');
+assert.match(html,/const targetCurrency=activePortfolioBook\(\)\.displayCurrency\|\|'USD'[\s\S]*item\.amount\*factor,targetCurrency/,'Temettü tutarları tercih edilen portföy para birimine çevrilmeli');
 assert.match(html,/\.settings-switches \{ display:grid; gap:11px; \}[\s\S]*\.settings-switches \.setting-switch \{ width:100%; \}/,'Bildirim anahtarları ayrı satırlarda kendi metinlerinin sağında durmalı');
 assert.doesNotMatch(html,/id="layoutDensitySelect"/,'Etkisiz yoğunluk seçimi ayarlardan kaldırılmalı');
 assert.match(html,/function mergePortfolioBooks\(current,incoming\)[\s\S]*portfolioBooks=mergePortfolioBooks\(portfolioBooks,data\.portfolios\)/,'Birleştirerek geri yükleme portföyleri kimlikleriyle ekleyip güncellemeli');
