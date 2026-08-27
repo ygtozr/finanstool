@@ -190,7 +190,7 @@ assert.match(html,/id="portfolioBookSelect"[\s\S]*id="portfolioBookAdd"[\s\S]*id
 assert.match(html,/id="portfolioBookTabs"[^>]*aria-label="Portföy kısayolları"/,'Seçim menüsünün altında tıklanabilir portföy kısayolları bulunmalı');
 assert.match(html,/portfolioBookTabs\.replaceChildren\(\)[\s\S]*className='portfolio-book-tab'[\s\S]*switchPortfolio\(book\.id\)/,'Portföy kısayolları aktif portföyü doğrudan değiştirmeli');
 assert.match(html,/const portfolioBooksKey = 'finans-grafigi-portfolios-v2'/,'Çoklu portföyler ayrı ve kalıcı bir veri modelinde saklanmalı');
-assert.match(html,/if\(!portfolioBooks\.length\)portfolioBooks=\[\{id:'portfolio-main',name:'Portföyüm',displayCurrency:baseCurrencyPreference,positions:legacyPortfolio,cashBalances:legacyCashBalances/,'Eski tek portföy ve nakit verisi kayıpsız varsayılan portföye taşınmalı');
+assert.match(html,/if\(!portfolioBooks\.length\)portfolioBooks=\[\{id:'portfolio-main',name:'Portföyüm',displayCurrency:baseCurrencyPreference==='TRY'\?'TRY':'USD',positions:legacyPortfolio,cashBalances:legacyCashBalances/,'Eski tek portföy ve nakit verisi kayıpsız varsayılan portföye taşınmalı');
 assert.match(html,/function switchPortfolio\(bookId\)[\s\S]*bindActivePortfolio\(\)[\s\S]*renderChartAssetPanels\(\)[\s\S]*renderPortfolio\(\)/,'Portföy değişiminde aktif veriler, grafik seçici ve özet birlikte yenilenmeli');
 assert.match(html,/portfolioBooks\.length===1[\s\S]*En az bir portföy bulunmalıdır/,'Son portföy yanlışlıkla silinememeli');
 assert.match(html,/portfolioBookAdd\.disabled=portfolioBooks\.length>=50[\s\S]*En fazla 50 portföy oluşturulabilir/,'Yerel veri ve seçici kullanılabilirliği için portföy sayısı 50 ile sınırlandırılmalı');
@@ -359,7 +359,10 @@ assert.match(html,/if\(!\[1,2,3\]\.includes\(payload\.schemaVersion\)\)[\s\S]*pa
 assert.match(html,/preferences:\{defaultPortfolioId:[\s\S]*backupReminderDays[\s\S]*lastBackup/,'Yedek dosyası yeni görünüm, portföy, alarm ve hatırlatma tercihlerini içermeli');
 assert.match(html,/\.portfolio-book-tabs \{[^}]*flex-wrap:wrap/,'Çok sayıdaki portföy kısayolu yeni satırlara geçebilmeli');
 assert.match(html,/function attachPortfolioBookReorder\(tab,book\)[\s\S]*followGhost[\s\S]*persistPortfolioBookOrderFromDom/,'Portföy kısayolları yumuşak takip ve yerleşme animasyonuyla sıralanabilmeli');
-assert.match(html,/displayCurrency:\['AUTO','TRY','USD'\][\s\S]*book\.displayCurrency/,'Her portföy kendi varsayılan para birimini saklamalı');
+assert.match(html,/displayCurrency:\['TRY','USD'\][\s\S]*book\.displayCurrency/,'Her portföy kendi tercih edilen para birimini saklamalı');
+assert.match(html,/currentValue\.textContent=Number\.isFinite\(displayedValue\)\?money\(displayedValue,presentationCurrency\)/,'Pozisyonların güncel değerleri tercih edilen para biriminde gösterilmeli');
+assert.match(html,/renderCashBalances\(cashDisplayValues,presentationCurrency\)/,'Nakit bakiyeleri tercih edilen para birimine çevrilmeli');
+assert.match(html,/\.settings-switches \{ display:grid; gap:11px; \}[\s\S]*\.settings-switches \.setting-switch \{ width:100%; \}/,'Bildirim anahtarları ayrı satırlarda kendi metinlerinin sağında durmalı');
 assert.doesNotMatch(html,/id="layoutDensitySelect"/,'Etkisiz yoğunluk seçimi ayarlardan kaldırılmalı');
 assert.match(html,/function mergePortfolioBooks\(current,incoming\)[\s\S]*portfolioBooks=mergePortfolioBooks\(portfolioBooks,data\.portfolios\)/,'Birleştirerek geri yükleme portföyleri kimlikleriyle ekleyip güncellemeli');
 assert.match(html,/Alım tarihi kayıtlı pozisyonlar:[\s\S]*Temettü yeniden yatırımı açık pozisyonlar:/,'Yedek önizlemesi tarih ve temettü ayarı kapsamını göstermeli');

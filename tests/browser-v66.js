@@ -31,7 +31,7 @@ const assert=require('node:assert/strict');
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('finans-grafigi-portfolios-v2')).find(item=>item.id==='book-0').displayCurrency),'TRY','İlk portföy para birimi hemen kaydedilmeli');
   await page.click('#mobilePortfolioNav');await page.waitForTimeout(220);await page.locator('[data-book-id="book-1"]').click();
   await page.click('#mobileMoreNav');
-  assert.equal(await page.locator('#baseCurrencySelect').inputValue(),'AUTO','Para birimi tercihi diğer portföye taşınmamalı');
+  assert.equal(await page.locator('#baseCurrencySelect').inputValue(),'USD','Para birimi tercihi diğer portföye taşınmamalı');
   await page.selectOption('#baseCurrencySelect','USD');
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('finans-grafigi-portfolios-v2')).find(item=>item.id==='book-1').displayCurrency),'USD','İkinci portföy para birimi hemen kaydedilmeli');
   await page.selectOption('#fontSizeSelect','large');
