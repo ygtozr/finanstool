@@ -32,6 +32,7 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v6.4](./v6.4/) | Arşivlendi | v6.4 ana dal yayını |
 | [v6.5](./v6.5/) | Arşivlendi | v6.5 siyah-beyaz marka sembolü yayını |
 | [v6.6](./v6.6/) | Arşivlendi | v6.6 portföy, ayarlar ve veri dayanıklılığı yayını |
-| [v6.7](./v6.7/) | Kalıcı onaylı sürüm | v6.7 bağımsız para birimi kapsamları yayını |
+| [v6.7](./v6.7/) | Arşivlendi | v6.7 bağımsız para birimi kapsamları yayını |
+| [v6.8](./v6.8/) | Kalıcı onaylı sürüm | v6.8 portföy gizliliği ve kâr-zarar dönemi yayını |
 
 Bir sonraki onaylı sürüm yayınlanırken mevcut sürüm aynı düzenle arşivlenecektir.
