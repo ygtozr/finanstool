@@ -379,6 +379,7 @@ assert.match(html,/id="otherAlarmShortcut"[\s\S]*id="otherAlarmCount"/,'Mobil Di
 assert.match(html,/function syncPortfolioEmptyState\(\)[\s\S]*portfolioEmptyStart\.hidden/,'Boş portföyde uzun analiz alanları tek başlangıç kartına daraltılmalı');
 assert.match(html,/allPortfolioHead\.hidden=portfolioBooks\.length<2/,'Birleşik toplam kartı yalnız birden fazla portföy varken gösterilmeli');
 assert.match(html,/function removeFavoriteWithUndo[\s\S]*function removePortfolioWithUndo[\s\S]*function removeCashWithUndo/,'Favori, pozisyon ve nakit silme işlemlerinin geri alma akışı olmalı');
+assert.match(html,/function removeActivePortfolio\(\)[\s\S]*offerUndo\('\“'\+current\.name\+'” portföyü silindi\.'[\s\S]*portfolioBooks\.splice\(Math\.min\(index,portfolioBooks\.length\),0,current\)/,'Silinen bağımsız portföy bütün içeriği ve eski sırasıyla geri alınabilmeli');
 assert.match(html,/setAttribute\('aria-pressed',String\(active\)\)/,'Seçili grafik ve karşılaştırma dönemleri erişilebilir durumda bildirilmelı');
 assert.doesNotMatch(html,/className='market-card-status'/,'Piyasa kartlarında tarih, saat ve gecikme için ek görünür satır olmamalı');
 assert.match(html,/\.settings-grid \{ display:grid; grid-template-columns:1fr;/,'Diğer ekranındaki ayar kartları yatay satırlar halinde sıralanmalı');

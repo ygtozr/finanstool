@@ -2595,7 +2595,7 @@
     function removeActivePortfolio() {
       if(portfolioBooks.length===1)return;
       const current=activePortfolioBook();
-      if(!confirm('“'+current.name+'” portföyü ve içindeki bütün pozisyonlar silinsin mi? Bu işlem yalnız bir yedekten geri alınabilir.'))return;
+      if(!confirm('“'+current.name+'” portföyü ve içindeki bütün pozisyonlar silinsin mi? İşlemi kısa süre içinde geri alabilirsiniz.'))return;
       const index=portfolioBooks.findIndex(item=>item.id===current.id);
       portfolioBooks.splice(index,1);
       activePortfolioId=portfolioBooks[Math.min(index,portfolioBooks.length-1)].id;
@@ -2607,6 +2607,14 @@
       renderPortfolioBookSelector();
       renderChartAssetPanels();
       renderPortfolio();
+      offerUndo('“'+current.name+'” portföyü silindi.',()=>{
+        if(portfolioBooks.some(item=>item.id===current.id))return;
+        portfolioBooks.splice(Math.min(index,portfolioBooks.length),0,current);
+        activePortfolioId=current.id;
+        bindActivePortfolio();
+        portfolioRenderId++;portfolioDividendRequestId++;portfolioBenchmarkRequestId++;
+        savePortfolioBooks();renderPortfolioBookSelector();renderChartAssetPanels();renderPortfolio();
+      });
     }
 
     function openCashDialog(balance=null){
