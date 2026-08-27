@@ -369,7 +369,7 @@ assert.match(html,/convertedCash=[\s\S]*historicalUsdRate\(balance\.currency,pre
 assert.match(html,/previousPresentationFactor[\s\S]*displayedPrevious=totalPreviousValue\*previousPresentationFactor/,'Dönüştürülmüş portföyün günlük değişimi önceki günün sunum kuruyla hesaplanmalı');
 assert.match(html,/Kısmi sonuç gösterilmedi\. Eksik veri/,'Eksik varlıkla performans kıyası sessizce yayınlanmamalı');
 assert.match(html,/prepareVisibleRsi\(symbol,points\)/,'Kısa dönem RSI için görünür dönem öncesi veri kullanılmalı');
-assert.match(html,/En yeni fiyat:/,'Piyasa özetinde istek zamanından ayrı gerçek fiyat zamanı gösterilmeli');
+assert.doesNotMatch(html,/En yeni fiyat:/,'Piyasa özeti başlığında en yeni fiyat etiketi gösterilmemeli');
 assert.match(html,/@media \(min-width:761px\) and \(max-width:900px\)/,'Tablet geçişi için ayrı düzen bulunmalı');
 assert.match(html,/name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/,'Uygulama görünümünde sayfa ölçeği sabitlenmeli');
 assert.match(html,/@media \(max-width:760px\)[\s\S]*input,select,textarea \{ font-size:16px !important; \}/,'iOS odak yakınlaştırmasını önlemek için mobil girişler en az 16 px olmalı');
@@ -380,7 +380,7 @@ assert.match(html,/function syncPortfolioEmptyState\(\)[\s\S]*portfolioEmptyStar
 assert.match(html,/allPortfolioHead\.hidden=portfolioBooks\.length<2/,'Birleşik toplam kartı yalnız birden fazla portföy varken gösterilmeli');
 assert.match(html,/function removeFavoriteWithUndo[\s\S]*function removePortfolioWithUndo[\s\S]*function removeCashWithUndo/,'Favori, pozisyon ve nakit silme işlemlerinin geri alma akışı olmalı');
 assert.match(html,/setAttribute\('aria-pressed',String\(active\)\)/,'Seçili grafik ve karşılaştırma dönemleri erişilebilir durumda bildirilmelı');
-assert.match(html,/className='market-card-status'[\s\S]*15 dk Gecikmeli/,'Piyasa kartında gecikme ve fiyat zamanı mobilde görünür olmalı');
+assert.doesNotMatch(html,/className='market-card-status'/,'Piyasa kartlarında tarih, saat ve gecikme için ek görünür satır olmamalı');
 assert.match(html,/\.settings-grid \{ display:grid; grid-template-columns:1fr;/,'Diğer ekranındaki ayar kartları yatay satırlar halinde sıralanmalı');
 assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:minmax\(210px,\.8fr\) minmax\(320px,1\.2fr\)/,'İlk dört ayar kartının içeriği masaüstünde yatay yerleşmeli');
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');

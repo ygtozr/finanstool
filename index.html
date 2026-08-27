@@ -317,8 +317,6 @@
     .settings-version { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line); color:var(--muted); font-size:.78rem; }
     .alarm-shortcut { width:100%; min-height:48px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; color:var(--text); background:var(--surface-control); border:1px solid var(--line); }
     .alarm-shortcut span { color:var(--muted); font-size:.75rem; }
-    .market-card-status { grid-column:1/-1; justify-self:start; min-height:14px; color:var(--muted); font-size:.62rem !important; }
-    .market-card-status.warning { color:var(--warning); }
     .undo-toast { position:fixed; z-index:160; left:50%; bottom:calc(82px + env(safe-area-inset-bottom,0px)); width:min(420px,calc(100vw - 24px)); display:flex; align-items:center; gap:12px; padding:11px 12px 11px 15px; color:var(--text); background:var(--surface-control); border:1px solid var(--border-strong); border-radius:12px; box-shadow:0 16px 36px #0008; transform:translate(-50%,140%); opacity:0; pointer-events:none; transition:.2s ease; }
     .undo-toast.visible { transform:translate(-50%,0); opacity:1; pointer-events:auto; }
     .undo-toast span { flex:1; min-width:0; font-size:.84rem; }
@@ -2055,11 +2053,8 @@
       const change=document.createElement('small');
       change.className='market-card-change positive';
       change.textContent='Canlı veri';
-      const status=document.createElement('small');
-      status.className='market-card-status';
-      status.textContent='Fiyat zamanı bekleniyor';
       card.disabled=true;
-      card.append(label,value,change,status);
+      card.append(label,value,change);
       return card;
     }
 
@@ -2067,8 +2062,7 @@
       const label=card.querySelector('.market-card-label');
       const value=card.querySelector('.market-card-value');
       const change=card.querySelector('.market-card-change');
-      const status=card.querySelector('.market-card-status');
-      if(!label||!value||!change||!status)return;
+      if(!label||!value||!change)return;
       label.textContent=item.label+' ';
       const symbol=document.createElement('small');symbol.className='market-card-symbol';symbol.textContent='· '+displaySymbol(item.symbol);label.append(symbol);
       change.classList.remove('positive','negative');
@@ -2078,11 +2072,8 @@
         change.textContent=hasChange?(data.change>=0?'+':'')+data.change.toFixed(2)+'%':'Önceki kapanış yok';
         if(hasChange)change.classList.add(data.change>=0?'positive':'negative');
         const updated=data.priceType==='official_daily'?formatQuoteDate(data.marketTimestamp):formatMarketDataTime(data.marketTimestamp);
-        const statusLabel=data.stale?'Önbellekteki Son Fiyat':data.priceType==='official_daily'?'Son Resmî':data.delayed?'15 dk Gecikmeli':'Fiyat Zamanı';
-        status.textContent=statusLabel+' · '+updated;
-        status.classList.toggle('warning',Boolean(data.stale||data.delayed));
         card.title=(data.stale?'Önbellekteki son fiyat · ':'')+(data.priceType==='official_daily'?'Son resmî fon fiyatı ':data.delayed?'15 dk gecikmeli · ':'Fiyat zamanı ')+updated+(data.provider?' · '+data.provider:'')+' · '+item.label+' grafiğini aç';
-        card.setAttribute('aria-label',item.label+', '+value.textContent+', '+change.textContent+', '+status.textContent+(data.provider?', kaynak '+data.provider:''));
+        card.setAttribute('aria-label',item.label+', '+value.textContent+', '+change.textContent);
         card.disabled=false;
         if(!card.dataset.bound){
           card.addEventListener('click',()=>{chartTab.click();symbolInput.value=item.symbol;updateFavoriteButton();loadPrice(item.symbol)});
@@ -2092,7 +2083,6 @@
         value.textContent='Veri alınamadı';
         change.textContent='Tekrar yenileyin';
         change.classList.add('negative');
-        status.textContent='Fiyat kaynağına ulaşılamadı';status.classList.add('warning');
         card.title='';
         card.disabled=true;
       }
@@ -2127,8 +2117,7 @@
       });
       if(requestId!==marketSummaryRequest)return;
       items.forEach((item,index)=>updateMarketCard(cards[index],item,results[index]));
-      const newest=Math.max(...results.filter(item=>item.ok&&Number.isFinite(item.marketTimestamp)).map(item=>item.marketTimestamp));
-      marketUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date())+(Number.isFinite(newest)?' · En yeni fiyat: '+formatMarketDataTime(newest):'');
+      marketUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
     }
 
     function formatUpdateTime(date) {
