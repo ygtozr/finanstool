@@ -166,10 +166,12 @@
     .portfolio-summary-card { margin-bottom:16px; }
     .portfolio-summary-card > .portfolio-head { margin-bottom:0; }
     .portfolio-summary-actions { display:flex; align-items:center; gap:7px; }
-    .portfolio-analysis-toggle { display:grid; place-items:center; width:40px; min-height:40px; padding:0; border-radius:10px; color:var(--text); background:var(--surface-control); }
-    .portfolio-analysis-toggle svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:2; transition:transform .2s ease; }
-    .portfolio-summary-card.is-open > .portfolio-head { border-radius:14px 14px 0 0; border-bottom-color:transparent; }
+    .portfolio-summary-card > .portfolio-head { border-radius:14px 14px 0 0; border-bottom-color:transparent; }
+    .portfolio-analysis-toggle { display:grid; place-items:center; width:100%; min-height:25px; padding:2px 0; border:1px solid var(--line); border-top-color:var(--border-strong); border-radius:0 0 14px 14px; color:var(--muted); background:var(--surface-control); }
+    .portfolio-analysis-toggle svg { width:22px; height:19px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.9; transition:transform .2s ease; }
+    .portfolio-analysis-toggle:hover,.portfolio-analysis-toggle:focus-visible { color:var(--text); background:var(--surface-soft); }
     .portfolio-summary-card.is-open .portfolio-analysis-toggle svg { transform:rotate(180deg); }
+    .portfolio-summary-card.is-open .portfolio-analysis-toggle { border-radius:0; border-bottom-color:transparent; }
     .portfolio-summary-card > .portfolio-analysis { display:none !important; margin:0; padding:15px 16px 16px; border:1px solid var(--line); border-top:1px solid var(--line); border-radius:0 0 14px 14px; background:var(--surface-section); }
     .portfolio-summary-card.is-open > .portfolio-analysis { display:block !important; }
     .portfolio-overall-head { display:block; margin-bottom:12px; padding:14px 16px; background:linear-gradient(135deg,#14253a,#111a2b); }
@@ -678,6 +680,8 @@
       .portfolio-cash-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
     .market-summary-head h2,.favorites-panel h2,.chart-page > h2,.portfolio-head h2 { font-size:1.17rem; }
+    .portfolio-page .portfolio-summary-card > .portfolio-head { margin-bottom:0; border-radius:14px 14px 0 0; border-bottom-color:transparent; }
+    .portfolio-page .portfolio-summary-card > .portfolio-analysis { margin:0; padding:15px 16px 16px; border:1px solid var(--line); border-top:1px solid var(--line); border-radius:0 0 14px 14px; }
 
     /* v6.8 semantik renk sistemi */
 
@@ -763,7 +767,7 @@
       <div id="allPortfolioHead" class="portfolio-head portfolio-overall-head"><div class="portfolio-overall-heading"><h2>Toplam Portföy</h2><div class="portfolio-view-toolbar"><div class="portfolio-metric-mode" role="group" aria-label="Portföy kâr zarar dönemi"><button id="portfolioTodayMode" class="is-active" type="button" aria-pressed="true">Bugün</button><button id="portfolioTotalMode" type="button" aria-pressed="false">Toplam</button></div><button id="portfolioPrivacyToggle" class="portfolio-privacy-toggle" type="button" aria-label="Portföy rakamlarını gizle" aria-pressed="false" title="Portföy rakamlarını gizle"><svg class="privacy-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></svg><svg class="privacy-off" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.3 3M6.4 6.5C3.9 8.2 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6M9.8 9.8a3 3 0 0 0 4.4 4.4"/></svg></button></div></div><div class="portfolio-overall-body"><div class="portfolio-head-metrics"><strong id="allPortfolioTotalValue" class="portfolio-head-value">—</strong><p id="allPortfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="allPortfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Toplam portföyü TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div></div>
       <div class="portfolio-switcher"><label class="portfolio-switcher-field" for="portfolioBookSelect">Aktif Portföy<select id="portfolioBookSelect" aria-label="Aktif portföyü seç"></select></label><div class="portfolio-switcher-actions"><button id="portfolioBookAdd" type="button" aria-label="Yeni portföy oluştur" title="Yeni portföy">+</button><button id="portfolioBookRename" type="button" aria-label="Aktif portföyün adını değiştir" title="Adını değiştir">✎</button><button id="portfolioBookDelete" type="button" aria-label="Aktif portföyü sil" title="Portföyü sil">×</button></div></div>
       <div id="portfolioBookTabs" class="portfolio-book-tabs" role="group" aria-label="Portföy kısayolları"></div>
-      <section id="portfolioSummaryCard" class="portfolio-summary-card"><div class="portfolio-head"><div class="portfolio-head-metrics"><h2 id="portfolioHeading">Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><div class="portfolio-summary-actions"><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button><button id="portfolioAnalysisToggle" class="portfolio-analysis-toggle" type="button" aria-expanded="false" aria-controls="portfolioAnalysisSection" aria-label="Portföy Özet Analizini aç" title="Portföy Özet Analizi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div></div><section id="portfolioAnalysisSection" class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section></section>
+      <section id="portfolioSummaryCard" class="portfolio-summary-card"><div class="portfolio-head"><div class="portfolio-head-metrics"><h2 id="portfolioHeading">Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><div class="portfolio-summary-actions"><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div></div><button id="portfolioAnalysisToggle" class="portfolio-analysis-toggle" type="button" aria-expanded="false" aria-controls="portfolioAnalysisSection" aria-label="Portföy Özet Analizini aç" title="Portföy Özet Analizi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6 4 4 4-4M8 12l4 4 4-4"/></svg></button><section id="portfolioAnalysisSection" class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section></section>
       <section id="portfolioEmptyStart" class="portfolio-empty-start" hidden><h3>Portföyünüzü Oluşturmaya Başlayın</h3><p>İlk varlığınızı veya nakit bakiyenizi ekleyin; isterseniz mevcut yedeğinizi geri yükleyin.</p><div class="portfolio-empty-actions"><button id="emptyAddAsset" type="button">Hisse Veya Fon Ekle</button><button id="emptyAddCash" type="button">Nakit Ekle</button><button id="emptyRestoreBackup" type="button">Yedekten Yükle</button></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
       <div id="portfolioList" class="portfolio-list"></div>
@@ -3742,15 +3746,12 @@
         portfolioDailyChange.textContent=selectedLabel+money(selectedProfit,presentationCurrency)+' · '+percentText(selectedPercent);
         portfolioDailyChange.classList.add(selectedProfit>=0?'positive':'negative');
         const table=document.createElement('table');table.className='analysis-table';
+        addAnalysisRow(table,'Toplam maliyet',money(totalCost*presentationFactor,presentationCurrency));
         addAnalysisRow(table,'Güncel toplam değer',money(totalValue*presentationFactor,presentationCurrency));
-        if(portfolioMetricsMode==='today'){
-          addAnalysisRow(table,'Bugünkü net kâr / zarar',money(dailyProfit,presentationCurrency),dailyProfit>=0?'positive':'negative');
-          addAnalysisRow(table,'Bugünkü kâr / zarar (%)',percentText(dailyPercent),dailyPercent>=0?'positive':'negative');
-        }else{
-          addAnalysisRow(table,'Toplam maliyet',money(totalCost*presentationFactor,presentationCurrency));
-          addAnalysisRow(table,'Toplam net kâr / zarar',money(netProfit*presentationFactor,presentationCurrency),netProfit>=0?'positive':'negative');
-          addAnalysisRow(table,'Toplam kâr / zarar (%)',percentText(profitPercent),profitPercent>=0?'positive':'negative');
-        }
+        addAnalysisRow(table,'Toplam net kâr / zarar',money(netProfit*presentationFactor,presentationCurrency),netProfit>=0?'positive':'negative');
+        addAnalysisRow(table,'Toplam kâr / zarar (%)',percentText(profitPercent),profitPercent>=0?'positive':'negative');
+        addAnalysisRow(table,'Hafta başından net kâr / zarar',money(weekProfit*presentationFactor,presentationCurrency),weekProfit>=0?'positive':'negative');
+        addAnalysisRow(table,'Hafta başından kâr / zarar (%)',percentText(weekPercent),weekPercent>=0?'positive':'negative');
         portfolioSummary.append(table);
         renderPortfolioDistribution(allocationValues.map(item=>({...item,value:item.value*presentationFactor})),new Map([...currencyValues].map(([code,value])=>[code,value*presentationFactor])),presentationCurrency);
         savePortfolioSnapshot({mode:portfolioMetricsMode,totalValue:portfolioTotalValue.textContent,dailyChange:portfolioDailyChange.textContent,dailyTone:selectedProfit>=0?'positive':'negative',rows:snapshotRows});

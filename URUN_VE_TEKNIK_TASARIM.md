@@ -870,9 +870,9 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 ### 17.17 v6.9 Açılır Portföy Özet Analizi
 
 - Aktif portföyün üst özet kutusu ve Portföy Özet Analizi tek, bağlı bir kart bileşeni olarak sunulur.
-- Özet kutusundaki ok düğmesi analiz alanını aşağı doğru açıp kapatır; ilk açılışta alan kapalıdır ve dikey alan kazanılır.
-- Analiz tablosunun satırları, hesaplama yöntemi, para birimi açıklaması ve gizlilik maskelemesi v6.8 ile aynı kalır.
-- Para birimi dönüşüm düğmesi analiz açma düğmesinden bağımsız çalışır. Açma düğmesi erişilebilir ad, `aria-controls` ve güncel `aria-expanded` durumu taşır.
+- Özet kutusunun alt kenarındaki ince ve tam genişlikteki çift şevronlu bar analiz alanını aşağı doğru açıp kapatır; ilk açılışta alan kapalıdır ve dikey alan kazanılır.
+- Analiz tablosu üstteki Bugün/Toplam seçimine bağlanmaz. Daima toplam maliyet, güncel toplam değer, toplam net ve yüzde kâr-zarar ile hafta başından beri net ve yüzde kâr-zarar satırlarını gösterir.
+- Para birimi dönüşüm düğmesi analiz açma barından bağımsız çalışır. Açma barı erişilebilir ad, `aria-controls` ve güncel `aria-expanded` durumu taşır.
 
 ## 18. Bilinen sınırlar ve ertelenen işler
 

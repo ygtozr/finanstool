@@ -12,9 +12,10 @@
 ## v6.9 açılır Portföy Özet Analizi
 
 - Portföy Özet Analizi tablosunun içeriği ve hesapları değiştirilmeden korunur.
-- Analiz, aktif portföyün özet kutusuna görsel olarak bağlıdır ve sağdaki ok düğmesiyle aşağı doğru açılıp kapanır.
+- Analiz, aktif portföyün özet kutusuna görsel olarak bağlıdır ve kutunun alt kenarındaki ince, uzun çift ok barıyla aşağı doğru açılıp kapanır.
+- Analiz tablosu üstteki Bugün/Toplam görünümünden bağımsız olarak daima toplam maliyet, toplam net ve yüzde kâr-zarar ile hafta başından beri net ve yüzde kâr-zararı gösterir.
 - Kapalı durumda portföy sayfasında daha az dikey alan kullanılır; para birimi dönüşüm düğmesi bağımsız çalışmaya devam eder.
-- Açma düğmesi `aria-expanded` ve `aria-controls` ile ekran okuyucuya doğru durum bilgisini verir.
+- Açma barı `aria-expanded` ve `aria-controls` ile ekran okuyucuya doğru durum bilgisini verir.
 
 ## v6.8 portföy gizliliği ve kâr-zarar dönemi
 

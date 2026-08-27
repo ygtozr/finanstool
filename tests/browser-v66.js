@@ -48,6 +48,8 @@ const assert=require('node:assert/strict');
   assert.ok(Math.abs(toolbarPosition.titleCenter-toolbarPosition.toolbarCenter)<3&&toolbarPosition.right<=17,'Üç yeni düğme Toplam Portföy başlığıyla aynı hizada sağda olmalı');
   assert.equal(toolbarPosition.currencyBelow,true,'Para birimi düğmesi üç görünüm düğmesinin altında olmalı');
   assert.ok(toolbarPosition.height<=135,'Toplam Portföy kartı kompakt yüksekliğini korumalı');
+  const analysisBar=await page.locator('#portfolioAnalysisToggle').evaluate(button=>{const card=button.closest('#portfolioSummaryCard').getBoundingClientRect(),head=button.previousElementSibling.getBoundingClientRect(),box=button.getBoundingClientRect();return{widthGap:Math.round(Math.abs(card.width-box.width)),belowHead:box.top>=head.bottom-1,height:Math.round(box.height)}});
+  assert.ok(analysisBar.widthGap<=1&&analysisBar.belowHead&&analysisBar.height<=27,'Analiz düğmesi özet kutusunun altında ince ve tam genişlikte bar olmalı');
   await page.evaluate(()=>document.getElementById('portfolioAnalysisSection').hidden=false);
   assert.equal(await page.locator('#portfolioAnalysisToggle').getAttribute('aria-expanded'),'false','Portföy Özet Analizi ilk açılışta kapalı olmalı');
   await page.click('#portfolioAnalysisToggle');await page.waitForTimeout(80);
