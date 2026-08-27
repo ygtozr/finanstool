@@ -164,8 +164,9 @@
     .portfolio-book-tabs { display:flex; flex-wrap:wrap; gap:7px; margin:-2px 0 12px; padding:2px 0 5px; overflow:visible; }
     .portfolio-book-tab { min-width:92px; max-width:220px; min-height:38px; flex:1 1 118px; padding:7px 12px; color:var(--muted); background:#182235; border:1px solid var(--line); border-radius:999px; font-size:.78rem; font-weight:700; white-space:normal; overflow-wrap:anywhere; touch-action:pan-y; user-select:none; -webkit-user-select:none; transition:transform .18s ease,opacity .18s ease,box-shadow .18s ease; }
     .portfolio-book-tab[aria-pressed="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
-    .portfolio-book-tab.drag-placeholder { visibility:hidden; }
-    .portfolio-book-drag-ghost { position:fixed; z-index:180; margin:0; pointer-events:none; opacity:.96; transform:scale(1.04); box-shadow:0 18px 42px #0008; transition:none; }
+    .portfolio-book-tab.portfolio-book-drag-placeholder { visibility:hidden; opacity:0; pointer-events:none; }
+    .portfolio-book-tab.portfolio-book-drag-ghost { position:fixed; z-index:180; margin:0; pointer-events:none; visibility:visible; opacity:.98; transform:scale(1.035); box-shadow:0 18px 42px #0008; transition:none; will-change:transform; }
+    .portfolio-book-tab.portfolio-book-drag-settling { transition:none; }
     body.portfolio-book-dragging { overflow:hidden; touch-action:none; }
     .portfolio-currency-toggle { width:44px; height:44px; min-height:44px; flex:0 0 44px; display:grid; place-items:center; padding:0; color:var(--text); background:#26344d; border:1px solid var(--line); font-size:1.25rem; line-height:1; }
     .portfolio-currency-toggle[aria-pressed="true"] { color:#062019; background:var(--accent); border-color:var(--accent); }
@@ -309,7 +310,11 @@
     .settings-options label { display:grid; gap:6px; color:var(--muted); font-size:.8rem; }
     .settings-options select { width:100%; }
     .settings-options.two-column { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    .settings-switches { display:grid; gap:10px; }
+    .settings-switches { display:flex; align-items:center; justify-content:flex-end; gap:12px; overflow-x:auto; padding:2px 0 4px; }
+    .settings-switches .setting-switch { flex:0 0 auto; gap:5px; white-space:nowrap; }
+    .settings-switches .setting-switch strong { font-size:.72rem; }
+    .settings-switches .setting-switch small { display:none; }
+    .settings-switches .setting-switch input { width:18px; height:18px; }
     .settings-inline-actions { display:flex; flex-wrap:wrap; gap:8px; }
     .settings-inline-actions button { flex:1 1 150px; min-height:42px; }
     .settings-status { margin:8px 0 0; color:var(--muted); font-size:.76rem; line-height:1.45; }
@@ -320,10 +325,6 @@
     html[data-font-size="small"] { font-size:15px; }
     html[data-font-size="standard"] { font-size:16px; }
     html[data-font-size="large"] { font-size:18px; }
-    html[data-density="compact"] main { padding-block:10px; }
-    html[data-density="compact"] .settings-grid { gap:8px; }
-    html[data-density="compact"] .settings-card { padding:11px 13px; }
-    html[data-density="compact"] .favorite-card,html[data-density="compact"] .portfolio-row,html[data-density="compact"] .market-card { padding-block:8px; }
     .theme-choices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
     .theme-choice { min-width:0; padding:9px 5px; color:var(--text); background:var(--surface-soft); font-size:.76rem; }
     .theme-choice.active { color:#07120f; border-color:var(--accent); background:var(--accent); }
@@ -776,12 +777,12 @@
               <button class="theme-choice" type="button" data-theme-choice="dark" aria-pressed="false">☾ Koyu</button>
               <button class="theme-choice" type="button" data-theme-choice="system" aria-pressed="false">◐ Sistem</button>
             </div>
-            <div class="settings-options two-column"><label>Yerleşim yoğunluğu<select id="layoutDensitySelect"><option value="comfortable">Rahat</option><option value="compact">Kompakt</option></select></label><label>Yazı boyutu<select id="fontSizeSelect"><option value="small">Küçük</option><option value="standard">Standart</option><option value="large">Büyük</option></select></label></div>
+            <label>Yazı boyutu<select id="fontSizeSelect"><option value="small">Küçük</option><option value="standard">Standart</option><option value="large">Büyük</option></select></label>
           </div>
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="portfolioDefaultsTitle">
-          <div class="settings-card-copy"><h3 id="portfolioDefaultsTitle">Portföy Ve Gösterim</h3><p>Açılışta seçilecek portföyü, ana para birimini ve varsayılan performans ölçütünü belirleyin.</p></div>
-          <div class="settings-options settings-card-controls"><label>Varsayılan portföy<select id="defaultPortfolioSelect"></select></label><div class="settings-options two-column"><label>Ana para birimi<select id="baseCurrencySelect"><option value="AUTO">Ürüne göre otomatik</option><option value="TRY">Türk lirası</option><option value="USD">ABD doları</option></select></label><label>Varsayılan kıyas<select id="defaultBenchmarkSelect"><option value="^GSPC">S&amp;P 500</option><option value="^IXIC">Nasdaq</option><option value="XU100.IS">BIST 100</option><option value="GLD">Altın</option></select></label></div></div>
+          <div class="settings-card-copy"><h3 id="portfolioDefaultsTitle">Portföy Ve Gösterim</h3><p>Açılışta seçilecek portföyü, aktif portföyün para birimini ve varsayılan performans ölçütünü belirleyin.</p></div>
+          <div class="settings-options settings-card-controls"><label>Varsayılan portföy<select id="defaultPortfolioSelect"></select></label><div class="settings-options two-column"><label>Aktif portföyün para birimi<select id="baseCurrencySelect"><option value="AUTO">Ürüne göre otomatik</option><option value="TRY">Türk lirası</option><option value="USD">ABD doları</option></select></label><label>Varsayılan kıyas<select id="defaultBenchmarkSelect"><option value="^GSPC">S&amp;P 500</option><option value="^IXIC">Nasdaq</option><option value="XU100.IS">BIST 100</option><option value="GLD">Altın</option></select></label></div></div>
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="numberFormatTitle">
           <div class="settings-card-copy"><h3 id="numberFormatTitle">Sayı Biçimi</h3><p>Fiyat ve yüzdelerde gösterilecek ondalık hassasiyetini seçin.</p></div>
@@ -796,7 +797,7 @@
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="notificationsTitle">
           <div class="settings-card-copy"><h3 id="notificationsTitle">Bildirimler</h3><p>Uygulama açıkken fiyat alarmlarının nasıl denetleneceğini ve haber verileceğini yönetin.</p></div>
-          <div class="settings-options settings-card-controls"><div class="settings-switches"><label class="setting-switch"><span><strong>Fiyat Alarmı Denetimi</strong><small id="alarmPreferenceStatus">Alarmlar düzenli olarak kontrol edilir.</small></span><input id="alarmNotificationsToggle" type="checkbox" role="switch"></label><label class="setting-switch"><span><strong>Ses</strong><small>Alarm tetiklenince kısa bir ses çal.</small></span><input id="alarmSoundToggle" type="checkbox" role="switch"></label><label class="setting-switch"><span><strong>Titreşim</strong><small>Desteklenen cihazlarda titreşim kullan.</small></span><input id="alarmVibrationToggle" type="checkbox" role="switch"></label><label class="setting-switch"><span><strong>Tetiklenince Pasifleştir</strong><small>Aynı alarmın art arda bildirim vermesini önler.</small></span><input id="alarmAutoDisableToggle" type="checkbox" role="switch"></label></div><label>Alarm kontrol sıklığı<select id="alarmCheckIntervalSelect"><option value="15000">15 saniye</option><option value="30000">30 saniye</option><option value="60000">1 dakika</option><option value="300000">5 dakika</option></select></label></div>
+          <div class="settings-options settings-card-controls"><div class="settings-switches"><label class="setting-switch"><span><strong>Denetim</strong><small id="alarmPreferenceStatus">Alarmlar düzenli olarak kontrol edilir.</small></span><input id="alarmNotificationsToggle" type="checkbox" role="switch"></label><label class="setting-switch"><span><strong>Ses</strong><small>Alarm tetiklenince kısa bir ses çal.</small></span><input id="alarmSoundToggle" type="checkbox" role="switch"></label><label class="setting-switch"><span><strong>Titreşim</strong><small>Desteklenen cihazlarda titreşim kullan.</small></span><input id="alarmVibrationToggle" type="checkbox" role="switch"></label><label class="setting-switch"><span><strong>Otomatik Kapat</strong><small>Aynı alarmın art arda bildirim vermesini önler.</small></span><input id="alarmAutoDisableToggle" type="checkbox" role="switch"></label></div><label>Alarm kontrol sıklığı<select id="alarmCheckIntervalSelect"><option value="15000">15 saniye</option><option value="30000">30 saniye</option><option value="60000">1 dakika</option><option value="300000">5 dakika</option></select></label></div>
         </section>
         <section class="settings-card settings-wide other-backup" aria-labelledby="backupTitle">
           <h3 id="backupTitle">Veri Yedekleme</h3>
@@ -1087,7 +1088,6 @@
     const themeChoiceButtons = [...document.querySelectorAll('[data-theme-choice]')];
     const refreshIntervalSelect = document.getElementById('refreshIntervalSelect');
     const defaultRangeSelect = document.getElementById('defaultRangeSelect');
-    const layoutDensitySelect = document.getElementById('layoutDensitySelect');
     const fontSizeSelect = document.getElementById('fontSizeSelect');
     const defaultPortfolioSelect = document.getElementById('defaultPortfolioSelect');
     const baseCurrencySelect = document.getElementById('baseCurrencySelect');
@@ -1124,7 +1124,6 @@
     const alarmPreferenceKey = 'finans-grafigi-alarm-checks';
     const defaultPortfolioPreferenceKey = 'finans-grafigi-default-portfolio';
     const baseCurrencyPreferenceKey = 'finans-grafigi-base-currency';
-    const layoutDensityKey = 'finans-grafigi-layout-density';
     const fontSizeKey = 'finans-grafigi-font-size';
     const priceDecimalsKey = 'finans-grafigi-price-decimals';
     const percentDecimalsKey = 'finans-grafigi-percent-decimals';
@@ -1144,7 +1143,6 @@
     let refreshInterval = savedRefreshInterval===null?15000:Number(savedRefreshInterval);
     if(!supportedRefreshIntervals.includes(refreshInterval))refreshInterval=15000;
     let alarmsEnabled = localStorage.getItem(alarmPreferenceKey)!=='false';
-    let layoutDensity=['comfortable','compact'].includes(localStorage.getItem(layoutDensityKey))?localStorage.getItem(layoutDensityKey):'comfortable';
     let fontSize=['small','standard','large'].includes(localStorage.getItem(fontSizeKey))?localStorage.getItem(fontSizeKey):'standard';
     let baseCurrencyPreference=['AUTO','TRY','USD'].includes(localStorage.getItem(baseCurrencyPreferenceKey))?localStorage.getItem(baseCurrencyPreferenceKey):'AUTO';
     let priceDecimalsPreference=['auto','2','4','6'].includes(localStorage.getItem(priceDecimalsKey))?localStorage.getItem(priceDecimalsKey):'auto';
@@ -1157,7 +1155,6 @@
     let backupReminderDays=[0,7,14,30].includes(Number(localStorage.getItem(backupReminderKey)))?Number(localStorage.getItem(backupReminderKey)):14;
     let alarmTimerId=null;
     let diagnosticsState=(()=>{try{return JSON.parse(localStorage.getItem(diagnosticsStateKey)||'{}')}catch{return{}}})();
-    document.documentElement.dataset.density=layoutDensity;
     document.documentElement.dataset.fontSize=fontSize;
     let marketRefreshTimerId = null;
     let chartRefreshTimerId = null;
@@ -1324,12 +1321,13 @@
     function normalizedPortfolioBook(item,index=0) {
       const id=String(item?.id||('portfolio-'+(index+1))).trim().slice(0,80)||createPortfolioId();
       const name=String(item?.name||('Portföy '+(index+1))).trim().slice(0,40)||('Portföy '+(index+1));
-      return{id,name,positions:validPortfolioPositions(item?.positions??item?.portfolio),cashBalances:validCashBalances(item?.cashBalances),createdAt:item?.createdAt||new Date().toISOString()};
+      const displayCurrency=['AUTO','TRY','USD'].includes(item?.displayCurrency)?item.displayCurrency:baseCurrencyPreference;
+      return{id,name,displayCurrency,positions:validPortfolioPositions(item?.positions??item?.portfolio),cashBalances:validCashBalances(item?.cashBalances),createdAt:item?.createdAt||new Date().toISOString()};
     }
     const legacyPortfolio=(()=>{try{return validPortfolioPositions(JSON.parse(localStorage.getItem(portfolioKey)||'[]'))}catch{return[]}})();
     const legacyCashBalances=(()=>{try{return validCashBalances(JSON.parse(localStorage.getItem(cashKey)||'[]'))}catch{return[]}})();
     let portfolioBooks=(()=>{try{const saved=JSON.parse(localStorage.getItem(portfolioBooksKey)||'[]');return Array.isArray(saved)?saved.slice(0,50).map(normalizedPortfolioBook):[]}catch{return[]}})();
-    if(!portfolioBooks.length)portfolioBooks=[{id:'portfolio-main',name:'Portföyüm',positions:legacyPortfolio,cashBalances:legacyCashBalances,createdAt:new Date().toISOString()}];
+    if(!portfolioBooks.length)portfolioBooks=[{id:'portfolio-main',name:'Portföyüm',displayCurrency:baseCurrencyPreference,positions:legacyPortfolio,cashBalances:legacyCashBalances,createdAt:new Date().toISOString()}];
     let defaultPortfolioPreference=localStorage.getItem(defaultPortfolioPreferenceKey)||'';
     let activePortfolioId=(portfolioBooks.some(item=>item.id===defaultPortfolioPreference)?defaultPortfolioPreference:localStorage.getItem(activePortfolioKey))||portfolioBooks[0].id;
     if(!portfolioBooks.some(item=>item.id===activePortfolioId))activePortfolioId=portfolioBooks[0].id;
@@ -1355,7 +1353,7 @@
     let cashEditCurrency = null;
     let portfolioRenderId = 0;
     let portfolioDividendRequestId = 0;
-    let portfolioDisplayCurrency = baseCurrencyPreference;
+    let portfolioDisplayCurrency = activePortfolioBook().displayCurrency||'AUTO';
     let portfolioBaseCurrency = 'USD';
     let allPortfolioDisplayCurrency = baseCurrencyPreference==='TRY'?'TRY':'USD';
     let allPortfolioSummaryRequestId = 0;
@@ -2262,9 +2260,8 @@
     function syncSettingsControls() {
       refreshIntervalSelect.value=String(refreshInterval);
       defaultRangeSelect.value=selectedRange;
-      layoutDensitySelect.value=layoutDensity;
       fontSizeSelect.value=fontSize;
-      baseCurrencySelect.value=baseCurrencyPreference;
+      baseCurrencySelect.value=activePortfolioBook().displayCurrency||'AUTO';
       defaultBenchmarkSelect.value=defaultBenchmarkPreference;
       priceDecimalsSelect.value=priceDecimalsPreference;
       percentDecimalsSelect.value=percentDecimalsPreference;
@@ -2375,7 +2372,7 @@
       const cleanPositions=value=>sourceArray(value).map(item=>normalizedPortfolioItem({...item,symbol:normalizeSymbol(item?.symbol),name:cleanText(item?.name,item?.symbol)})).filter(item=>item.symbol&&Number.isFinite(item.quantity)&&item.quantity>0&&Number.isFinite(item.unitCost)&&item.unitCost>=0);
       const cleanCash=value=>sourceArray(value).map(normalizedCashBalance).filter(item=>supportedCashCurrencies.includes(item.currency)&&Number.isFinite(item.amount)&&item.amount>0);
       const rawBooks=payload.schemaVersion>=2&&Array.isArray(raw.portfolios)?raw.portfolios:[{id:'portfolio-main',name:'Portföyüm',positions:raw.portfolio,cashBalances:raw.cashBalances}];
-      const cleanBooks=rawBooks.slice(0,50).map((item,index)=>({id:cleanText(item?.id,'yedek-portfoy-'+(index+1)).slice(0,80),name:cleanText(item?.name,'Portföy '+(index+1)).slice(0,40),positions:uniqueBy(cleanPositions(item?.positions??item?.portfolio),position=>position.symbol),cashBalances:uniqueBy(cleanCash(item?.cashBalances),balance=>balance.currency),createdAt:item?.createdAt||null}));
+      const cleanBooks=rawBooks.slice(0,50).map((item,index)=>({id:cleanText(item?.id,'yedek-portfoy-'+(index+1)).slice(0,80),name:cleanText(item?.name,'Portföy '+(index+1)).slice(0,40),displayCurrency:['AUTO','TRY','USD'].includes(item?.displayCurrency)?item.displayCurrency:(['AUTO','TRY','USD'].includes(raw.preferences?.baseCurrency)?raw.preferences.baseCurrency:'AUTO'),positions:uniqueBy(cleanPositions(item?.positions??item?.portfolio),position=>position.symbol),cashBalances:uniqueBy(cleanCash(item?.cashBalances),balance=>balance.currency),createdAt:item?.createdAt||null}));
       const portfolios=uniqueBy(cleanBooks,item=>item.id);
       if(!portfolios.length)portfolios.push({id:'portfolio-main',name:'Portföyüm',positions:[],cashBalances:[],createdAt:null});
       const cleanAlarms=sourceArray(raw.alarms).map(item=>{const symbol=normalizeSymbol(item?.symbol),target=Number(item?.target),condition=item?.condition==='below'?'below':'above';return{id:cleanText(item?.id,Date.now().toString(36)+Math.random().toString(36).slice(2)),symbol,target,condition,triggered:Boolean(item?.triggered),lastTriggeredAt:Number(item?.lastTriggeredAt)||null}}).filter(item=>item.symbol&&Number.isFinite(item.target)&&item.target>0);
@@ -2390,7 +2387,7 @@
         refreshInterval:supportedRefreshIntervals.includes(Number(raw.refreshInterval))?Number(raw.refreshInterval):15000,
         defaultRange:supportedDefaultRanges.includes(raw.defaultRange)?raw.defaultRange:'6mo',
         alarmsEnabled:raw.alarmsEnabled!==false,
-        preferences:{defaultPortfolioId:portfolios.some(item=>item.id===raw.preferences?.defaultPortfolioId)?raw.preferences.defaultPortfolioId:portfolios[0].id,baseCurrency:['AUTO','TRY','USD'].includes(raw.preferences?.baseCurrency)?raw.preferences.baseCurrency:'AUTO',layoutDensity:['comfortable','compact'].includes(raw.preferences?.layoutDensity)?raw.preferences.layoutDensity:'comfortable',fontSize:['small','standard','large'].includes(raw.preferences?.fontSize)?raw.preferences.fontSize:'standard',priceDecimals:['auto','2','4','6'].includes(String(raw.preferences?.priceDecimals))?String(raw.preferences.priceDecimals):'auto',percentDecimals:['1','2','3'].includes(String(raw.preferences?.percentDecimals))?String(raw.preferences.percentDecimals):'2',defaultBenchmark:['^GSPC','^IXIC','XU100.IS','GLD'].includes(raw.preferences?.defaultBenchmark)?raw.preferences.defaultBenchmark:'^GSPC',alarmSound:raw.preferences?.alarmSound!==false,alarmVibration:raw.preferences?.alarmVibration!==false,alarmAutoDisable:raw.preferences?.alarmAutoDisable!==false,alarmCheckInterval:[15000,30000,60000,300000].includes(Number(raw.preferences?.alarmCheckInterval))?Number(raw.preferences.alarmCheckInterval):60000,backupReminderDays:[0,7,14,30].includes(Number(raw.preferences?.backupReminderDays))?Number(raw.preferences.backupReminderDays):14,lastBackup:Number(raw.preferences?.lastBackup)||null}
+        preferences:{defaultPortfolioId:portfolios.some(item=>item.id===raw.preferences?.defaultPortfolioId)?raw.preferences.defaultPortfolioId:portfolios[0].id,baseCurrency:['AUTO','TRY','USD'].includes(raw.preferences?.baseCurrency)?raw.preferences.baseCurrency:'AUTO',fontSize:['small','standard','large'].includes(raw.preferences?.fontSize)?raw.preferences.fontSize:'standard',priceDecimals:['auto','2','4','6'].includes(String(raw.preferences?.priceDecimals))?String(raw.preferences.priceDecimals):'auto',percentDecimals:['1','2','3'].includes(String(raw.preferences?.percentDecimals))?String(raw.preferences.percentDecimals):'2',defaultBenchmark:['^GSPC','^IXIC','XU100.IS','GLD'].includes(raw.preferences?.defaultBenchmark)?raw.preferences.defaultBenchmark:'^GSPC',alarmSound:raw.preferences?.alarmSound!==false,alarmVibration:raw.preferences?.alarmVibration!==false,alarmAutoDisable:raw.preferences?.alarmAutoDisable!==false,alarmCheckInterval:[15000,30000,60000,300000].includes(Number(raw.preferences?.alarmCheckInterval))?Number(raw.preferences.alarmCheckInterval):60000,backupReminderDays:[0,7,14,30].includes(Number(raw.preferences?.backupReminderDays))?Number(raw.preferences.backupReminderDays):14,lastBackup:Number(raw.preferences?.lastBackup)||null}
       };
     }
 
@@ -2404,7 +2401,7 @@
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
-          portfolios:portfolioBooks.map(book=>({id:book.id,name:book.name,createdAt:book.createdAt||null,positions:book.positions.map(({symbol,name,quantity,baseQuantity,unitCost,costCurrency,purchaseDate,dripEnabled,dripTaxRate,dripFractional})=>({symbol,name,quantity,baseQuantity:baseQuantity??quantity,unitCost,costCurrency:costCurrency||null,purchaseDate:purchaseDate||null,dripEnabled:Boolean(dripEnabled),dripTaxRate:Number(dripTaxRate)||0,dripFractional:dripFractional!==false})),cashBalances:book.cashBalances.map(({currency,amount})=>({currency,amount}))})),
+          portfolios:portfolioBooks.map(book=>({id:book.id,name:book.name,displayCurrency:book.displayCurrency||'AUTO',createdAt:book.createdAt||null,positions:book.positions.map(({symbol,name,quantity,baseQuantity,unitCost,costCurrency,purchaseDate,dripEnabled,dripTaxRate,dripFractional})=>({symbol,name,quantity,baseQuantity:baseQuantity??quantity,unitCost,costCurrency:costCurrency||null,purchaseDate:purchaseDate||null,dripEnabled:Boolean(dripEnabled),dripTaxRate:Number(dripTaxRate)||0,dripFractional:dripFractional!==false})),cashBalances:book.cashBalances.map(({currency,amount})=>({currency,amount}))})),
           activePortfolioId,
           alarms:alarms.map(({id,symbol,target,condition,triggered,lastTriggeredAt})=>({id,symbol,target,condition,triggered:Boolean(triggered),lastTriggeredAt:lastTriggeredAt||null})),
           marketItems:marketItems.map(({symbol,label})=>({symbol,label})),
@@ -2412,7 +2409,7 @@
           refreshInterval,
           defaultRange:selectedRange,
           alarmsEnabled,
-          preferences:{defaultPortfolioId:defaultPortfolioPreference,baseCurrency:baseCurrencyPreference,layoutDensity,fontSize,priceDecimals:priceDecimalsPreference,percentDecimals:percentDecimalsPreference,defaultBenchmark:defaultBenchmarkPreference,alarmSound:alarmSoundEnabled,alarmVibration:alarmVibrationEnabled,alarmAutoDisable,alarmCheckInterval,backupReminderDays,lastBackup:Number(localStorage.getItem(lastBackupKey))||null}
+          preferences:{defaultPortfolioId:defaultPortfolioPreference,baseCurrency:baseCurrencyPreference,fontSize,priceDecimals:priceDecimalsPreference,percentDecimals:percentDecimalsPreference,defaultBenchmark:defaultBenchmarkPreference,alarmSound:alarmSoundEnabled,alarmVibration:alarmVibrationEnabled,alarmAutoDisable,alarmCheckInterval,backupReminderDays,lastBackup:Number(localStorage.getItem(lastBackupKey))||null}
         }
       };
     }
@@ -2453,14 +2450,14 @@
         alarmsEnabled=data.alarmsEnabled;
         const preferences=data.preferences||{};
         defaultPortfolioPreference=preferences.defaultPortfolioId||activePortfolioId;
-        baseCurrencyPreference=preferences.baseCurrency||'AUTO';portfolioDisplayCurrency=baseCurrencyPreference;allPortfolioDisplayCurrency=baseCurrencyPreference==='TRY'?'TRY':'USD';
-        layoutDensity=preferences.layoutDensity||'comfortable';fontSize=preferences.fontSize||'standard';priceDecimalsPreference=preferences.priceDecimals||'auto';percentDecimalsPreference=preferences.percentDecimals||'2';defaultBenchmarkPreference=preferences.defaultBenchmark||'^GSPC';
+        baseCurrencyPreference=preferences.baseCurrency||'AUTO';portfolioDisplayCurrency=activePortfolioBook().displayCurrency||baseCurrencyPreference;allPortfolioDisplayCurrency=baseCurrencyPreference==='TRY'?'TRY':'USD';
+        fontSize=preferences.fontSize||'standard';priceDecimalsPreference=preferences.priceDecimals||'auto';percentDecimalsPreference=preferences.percentDecimals||'2';defaultBenchmarkPreference=preferences.defaultBenchmark||'^GSPC';
         alarmSoundEnabled=preferences.alarmSound!==false;alarmVibrationEnabled=preferences.alarmVibration!==false;alarmAutoDisable=preferences.alarmAutoDisable!==false;alarmCheckInterval=preferences.alarmCheckInterval||60000;backupReminderDays=preferences.backupReminderDays??14;
-        document.documentElement.dataset.density=layoutDensity;document.documentElement.dataset.fontSize=fontSize;
+        document.documentElement.dataset.fontSize=fontSize;
         localStorage.setItem(refreshIntervalKey,String(refreshInterval));
         localStorage.setItem(defaultRangeKey,selectedRange);
         localStorage.setItem(alarmPreferenceKey,String(alarmsEnabled));
-        [[defaultPortfolioPreferenceKey,defaultPortfolioPreference],[baseCurrencyPreferenceKey,baseCurrencyPreference],[layoutDensityKey,layoutDensity],[fontSizeKey,fontSize],[priceDecimalsKey,priceDecimalsPreference],[percentDecimalsKey,percentDecimalsPreference],[defaultBenchmarkKey,defaultBenchmarkPreference],[alarmSoundKey,alarmSoundEnabled],[alarmVibrationKey,alarmVibrationEnabled],[alarmAutoDisableKey,alarmAutoDisable],[alarmCheckIntervalKey,alarmCheckInterval],[backupReminderKey,backupReminderDays]].forEach(([key,value])=>localStorage.setItem(key,String(value)));
+        [[defaultPortfolioPreferenceKey,defaultPortfolioPreference],[baseCurrencyPreferenceKey,baseCurrencyPreference],[fontSizeKey,fontSize],[priceDecimalsKey,priceDecimalsPreference],[percentDecimalsKey,percentDecimalsPreference],[defaultBenchmarkKey,defaultBenchmarkPreference],[alarmSoundKey,alarmSoundEnabled],[alarmVibrationKey,alarmVibrationEnabled],[alarmAutoDisableKey,alarmAutoDisable],[alarmCheckIntervalKey,alarmCheckInterval],[backupReminderKey,backupReminderDays]].forEach(([key,value])=>localStorage.setItem(key,String(value)));
         if(preferences.lastBackup)localStorage.setItem(lastBackupKey,String(preferences.lastBackup));
         syncSettingsControls();
         startRefreshTimers();
@@ -2691,46 +2688,67 @@
     }
 
     let portfolioBookDragSuppressUntil=0;
+    function persistPortfolioBookOrderFromDom(){
+      const byId=new Map(portfolioBooks.map(book=>[book.id,book]));
+      const ordered=[...portfolioBookTabs.querySelectorAll(':scope > .portfolio-book-tab')].map(item=>byId.get(item.dataset.bookId)).filter(Boolean);
+      if(ordered.length!==portfolioBooks.length)return;
+      portfolioBooks=ordered;savePortfolioBooks();
+    }
     function attachPortfolioBookReorder(tab,book){
-      let timer=null,startX=0,startY=0,active=false,ghost=null,pointerId=null,offsetX=0,offsetY=0;
-      const clear=()=>{if(timer)clearTimeout(timer);timer=null};
-      const moveGhost=(x,y)=>{if(ghost){ghost.style.left=(x-offsetX)+'px';ghost.style.top=(y-offsetY)+'px'}};
-      const activate=event=>{
-        active=true;portfolioBookDragSuppressUntil=Date.now()+700;
-        const rect=tab.getBoundingClientRect();offsetX=event.clientX-rect.left;offsetY=event.clientY-rect.top;
-        ghost=tab.cloneNode(true);ghost.classList.add('portfolio-book-drag-ghost');ghost.classList.remove('drag-placeholder');ghost.style.width=rect.width+'px';ghost.style.height=rect.height+'px';document.body.append(ghost);
-        tab.classList.add('drag-placeholder');document.body.classList.add('portfolio-book-dragging');moveGhost(event.clientX,event.clientY);
-        try{tab.setPointerCapture(pointerId)}catch{}
-        window.addEventListener('pointerup',finish,{once:true,capture:true});window.addEventListener('pointercancel',finish,{once:true,capture:true});
+      let pending=null;
+      const clearPending=()=>{
+        if(!pending)return;clearTimeout(pending.timer);cancelAnimationFrame(pending.followFrame);
+        window.removeEventListener('pointermove',onPointerMove);window.removeEventListener('pointerup',onPointerEnd);window.removeEventListener('pointercancel',onPointerEnd);
+        window.removeEventListener('touchmove',onTouchMove);window.removeEventListener('touchend',onTouchEnd);window.removeEventListener('touchcancel',onTouchCancel);pending=null;
       };
-      tab.addEventListener('pointerdown',event=>{
-        if(event.button!==0||portfolioBooks.length<2)return;
-        pointerId=event.pointerId;startX=event.clientX;startY=event.clientY;
-        timer=setTimeout(()=>activate(event),430);
-      });
-      tab.addEventListener('pointermove',event=>{
-        if(event.pointerId!==pointerId)return;
-        if(!active){if(Math.hypot(event.clientX-startX,event.clientY-startY)>10)clear();return}
-        event.preventDefault();moveGhost(event.clientX,event.clientY);
-        const siblings=[...portfolioBookTabs.querySelectorAll('.portfolio-book-tab:not(.drag-placeholder)')];
-        if(!siblings.length)return;
-        const target=siblings.reduce((best,item)=>{const rect=item.getBoundingClientRect(),distance=Math.hypot(event.clientX-(rect.left+rect.width/2),event.clientY-(rect.top+rect.height/2));return !best||distance<best.distance?{item,rect,distance}:best},null);
-        if(!target)return;
-        const before=event.clientY<target.rect.top+target.rect.height/2||(Math.abs(event.clientY-(target.rect.top+target.rect.height/2))<target.rect.height/2&&event.clientX<target.rect.left+target.rect.width/2);
-        portfolioBookTabs.insertBefore(tab,before?target.item:target.item.nextSibling);
-      },{passive:false});
-      const finish=event=>{
-        if(event.pointerId!==pointerId)return;clear();
-        window.removeEventListener('pointerup',finish,true);window.removeEventListener('pointercancel',finish,true);
-        if(active){
-          active=false;ghost?.remove();ghost=null;tab.classList.remove('drag-placeholder');document.body.classList.remove('portfolio-book-dragging');
-          const order=[...portfolioBookTabs.querySelectorAll('.portfolio-book-tab')].map(item=>item.dataset.bookId);
-          portfolioBooks.sort((left,right)=>order.indexOf(left.id)-order.indexOf(right.id));savePortfolioBooks();
-          requestAnimationFrame(()=>renderPortfolioBookSelector());
+      const activate=()=>{
+        if(!pending||!tab.isConnected)return;
+        const rect=tab.getBoundingClientRect(),placeholder=tab.cloneNode(true);
+        placeholder.classList.add('portfolio-book-drag-placeholder');placeholder.setAttribute('aria-hidden','true');placeholder.style.width=rect.width+'px';placeholder.style.height=rect.height+'px';
+        tab.replaceWith(placeholder);tab.classList.add('portfolio-book-drag-ghost');tab.style.left=rect.left+'px';tab.style.top=rect.top+'px';tab.style.width=rect.width+'px';tab.style.height=rect.height+'px';document.body.append(tab);document.body.classList.add('portfolio-book-dragging');
+        Object.assign(pending,{active:true,ghost:tab,placeholder,ghostLeft:rect.left,ghostTop:rect.top,ghostX:rect.left,ghostY:rect.top,targetX:rect.left,targetY:rect.top,width:rect.width,height:rect.height,offsetX:pending.lastX-rect.left,offsetY:pending.lastY-rect.top,lastFrame:performance.now()});
+        pending.followFrame=requestAnimationFrame(followGhost);navigator.vibrate?.(18);
+      };
+      const movePlaceholder=(clientX,clientY)=>{
+        const siblings=[...portfolioBookTabs.querySelectorAll(':scope > .portfolio-book-tab:not(.portfolio-book-drag-placeholder)')],placeholder=pending.placeholder;
+        let before=null;
+        for(const candidate of siblings){
+          const rect=candidate.getBoundingClientRect(),centerY=rect.top+rect.height/2;
+          if(clientY<centerY-rect.height*.28||(Math.abs(clientY-centerY)<=rect.height*.72&&clientX<rect.left+rect.width/2)){before=candidate;break}
         }
-        pointerId=null;
+        if(before===placeholder.nextElementSibling||(!before&&!placeholder.nextElementSibling))return;
+        const previous=new Map(siblings.map(item=>[item,item.getBoundingClientRect()]));
+        if(before)portfolioBookTabs.insertBefore(placeholder,before);else portfolioBookTabs.append(placeholder);
+        siblings.forEach(item=>{const old=previous.get(item),next=item.getBoundingClientRect(),dx=old.left-next.left,dy=old.top-next.top;if(Math.hypot(dx,dy)<.5)return;item.getAnimations?.().forEach(animation=>animation.cancel());playFavoriteMotion(item,[{transform:`translate3d(${dx}px,${dy}px,0)`},{transform:'translate3d(0,0,0)'}],{duration:380,easing:'cubic-bezier(.22,1,.36,1)'})});
       };
-      tab.addEventListener('pointerup',finish);tab.addEventListener('pointercancel',finish);
+      const followGhost=now=>{
+        if(!pending?.active)return;
+        const elapsed=Math.min(34,Math.max(1,now-pending.lastFrame));pending.lastFrame=now;const blend=1-Math.pow(.45,elapsed/16.667);
+        pending.ghostX+=(pending.targetX-pending.ghostX)*blend;pending.ghostY+=(pending.targetY-pending.ghostY)*blend;
+        pending.ghost.style.transform=`translate3d(${pending.ghostX-pending.ghostLeft}px,${pending.ghostY-pending.ghostTop}px,0) scale(1.035)`;
+        movePlaceholder(pending.ghostX+pending.width/2,pending.ghostY+pending.height/2);pending.followFrame=requestAnimationFrame(followGhost);
+      };
+      const handleMove=(x,y,event)=>{
+        if(!pending)return;const distance=Math.hypot(x-pending.startX,y-pending.startY),previousY=pending.lastY;pending.lastX=x;pending.lastY=y;
+        if(!pending.active){if(distance>10){clearTimeout(pending.timer);if(pending.pointerType==='mouse'){clearPending();return}pending.scrolling=true;event.preventDefault();window.scrollBy(0,previousY-y)}return}
+        event.preventDefault();pending.targetX=Math.max(8,Math.min(window.innerWidth-pending.width-8,x-pending.offsetX));pending.targetY=y-pending.offsetY;
+        const edge=64;if(y<edge)window.scrollBy(0,-10);else if(y>window.innerHeight-edge)window.scrollBy(0,10);
+      };
+      const finish=(event,cancelled=false)=>{
+        if(!pending)return;const active=pending.active,placeholder=pending.placeholder,ghost=pending.ghost,scrolling=pending.scrolling,inputType=pending.pointerType;
+        if(active){event.preventDefault();cancelAnimationFrame(pending.followFrame);portfolioBookDragSuppressUntil=Date.now()+600;const target=placeholder.getBoundingClientRect(),ghostRect=ghost.getBoundingClientRect(),currentX=pending.ghostX-pending.ghostLeft,currentY=pending.ghostY-pending.ghostTop,targetX=currentX+target.left-ghostRect.left,targetY=currentY+target.top-ghostRect.top;ghost.classList.add('portfolio-book-drag-settling');playFavoriteMotion(ghost,[{transform:`translate3d(${currentX}px,${currentY}px,0) scale(1.035)`,opacity:.98},{transform:`translate3d(${targetX}px,${targetY}px,0) scale(1)`,opacity:.92}],{duration:300,easing:'cubic-bezier(.16,1,.3,1)'},()=>{placeholder.replaceWith(tab);tab.classList.remove('portfolio-book-drag-ghost','portfolio-book-drag-settling');tab.removeAttribute('style');document.body.classList.remove('portfolio-book-dragging');persistPortfolioBookOrderFromDom()})}
+        const shouldOpen=!cancelled&&!active&&!scrolling&&inputType==='touch';clearPending();if(shouldOpen){portfolioBookDragSuppressUntil=Date.now()+400;switchPortfolio(book.id)}
+      };
+      const onPointerMove=event=>{if(pending&&event.pointerId===pending.pointerId)handleMove(event.clientX,event.clientY,event)};
+      const onPointerEnd=event=>{if(pending&&event.pointerId===pending.pointerId)finish(event,event.type==='pointercancel')};
+      const findTouch=list=>[...list].find(touch=>pending&&touch.identifier===pending.pointerId);
+      const onTouchMove=event=>{const touch=findTouch(event.touches);if(touch)handleMove(touch.clientX,touch.clientY,event)};
+      const onTouchEnd=event=>{if(findTouch(event.changedTouches))finish(event)};
+      const onTouchCancel=event=>{if(findTouch(event.changedTouches))finish(event,true)};
+      const begin=(pointerId,pointerType,x,y)=>{clearPending();pending={pointerId,pointerType,startX:x,startY:y,lastX:x,lastY:y,scrolling:false,active:false,timer:0,followFrame:0};pending.timer=setTimeout(activate,400);if(pointerType==='touch'){window.addEventListener('touchmove',onTouchMove,{passive:false});window.addEventListener('touchend',onTouchEnd,{passive:false});window.addEventListener('touchcancel',onTouchCancel,{passive:false})}else{window.addEventListener('pointermove',onPointerMove,{passive:false});window.addEventListener('pointerup',onPointerEnd,{passive:false});window.addEventListener('pointercancel',onPointerEnd,{passive:false})}};
+      tab.addEventListener('pointerdown',event=>{if(event.pointerType==='touch'||!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0)||portfolioBooks.length<2)return;begin(event.pointerId,event.pointerType,event.clientX,event.clientY)});
+      tab.addEventListener('touchstart',event=>{if(event.touches.length!==1||portfolioBooks.length<2)return;event.preventDefault();event.stopPropagation();document.getSelection()?.removeAllRanges();const touch=event.changedTouches[0];begin(touch.identifier,'touch',touch.clientX,touch.clientY)},{passive:false});
+      tab.addEventListener('contextmenu',event=>event.preventDefault());tab.addEventListener('dragstart',event=>event.preventDefault());
       tab.addEventListener('click',event=>{if(Date.now()<portfolioBookDragSuppressUntil){event.preventDefault();event.stopImmediatePropagation()}},true);
     }
 
@@ -2757,6 +2775,7 @@
       savePortfolioBooks();
       activePortfolioId=bookId;
       bindActivePortfolio();
+      portfolioDisplayCurrency=activePortfolioBook().displayCurrency||'AUTO';
       portfolioRenderId++;
       portfolioDividendRequestId++;
       portfolioBenchmarkRequestId++;
@@ -2793,6 +2812,7 @@
       activePortfolioId=portfolioBooks[Math.min(index,portfolioBooks.length-1)].id;
       if(wasDefault){defaultPortfolioPreference=activePortfolioId;localStorage.setItem(defaultPortfolioPreferenceKey,defaultPortfolioPreference)}
       bindActivePortfolio();
+      portfolioDisplayCurrency=activePortfolioBook().displayCurrency||'AUTO';
       portfolioRenderId++;
       portfolioDividendRequestId++;
       portfolioBenchmarkRequestId++;
@@ -2806,6 +2826,7 @@
         activePortfolioId=current.id;
         if(wasDefault){defaultPortfolioPreference=current.id;localStorage.setItem(defaultPortfolioPreferenceKey,defaultPortfolioPreference)}
         bindActivePortfolio();
+        portfolioDisplayCurrency=current.displayCurrency||'AUTO';
         portfolioRenderId++;portfolioDividendRequestId++;portfolioBenchmarkRequestId++;
         savePortfolioBooks();renderPortfolioBookSelector();renderChartAssetPanels();renderPortfolio();
       });
@@ -3438,7 +3459,6 @@
 
     function portfolioPresentationTarget(summaryCurrency) {
       portfolioBaseCurrency=summaryCurrency;
-      if(portfolioDisplayCurrency===summaryCurrency)portfolioDisplayCurrency='AUTO';
       const target=portfolioDisplayCurrency==='AUTO'?summaryCurrency:portfolioDisplayCurrency;
       const converted=target!==summaryCurrency;
       const alternate=summaryCurrency==='TRY'?'USD':'TRY';
@@ -4212,10 +4232,9 @@
     });
     themeChoiceButtons.forEach(button=>button.addEventListener('click',()=>applyTheme(button.dataset.themeChoice)));
     themeMedia.addEventListener('change',()=>{if(themePreference==='system')applyTheme('system',{persist:false})});
-    layoutDensitySelect.addEventListener('change',()=>{layoutDensity=layoutDensitySelect.value==='compact'?'compact':'comfortable';localStorage.setItem(layoutDensityKey,layoutDensity);document.documentElement.dataset.density=layoutDensity;syncSettingsControls()});
     fontSizeSelect.addEventListener('change',()=>{fontSize=['small','large'].includes(fontSizeSelect.value)?fontSizeSelect.value:'standard';localStorage.setItem(fontSizeKey,fontSize);document.documentElement.dataset.fontSize=fontSize;syncSettingsControls();window.dispatchEvent(new Event('resize'))});
     defaultPortfolioSelect.addEventListener('change',()=>{if(!portfolioBooks.some(book=>book.id===defaultPortfolioSelect.value))return;defaultPortfolioPreference=defaultPortfolioSelect.value;localStorage.setItem(defaultPortfolioPreferenceKey,defaultPortfolioPreference);switchPortfolio(defaultPortfolioPreference);syncSettingsControls()});
-    baseCurrencySelect.addEventListener('change',()=>{baseCurrencyPreference=['TRY','USD'].includes(baseCurrencySelect.value)?baseCurrencySelect.value:'AUTO';localStorage.setItem(baseCurrencyPreferenceKey,baseCurrencyPreference);portfolioDisplayCurrency=baseCurrencyPreference;allPortfolioDisplayCurrency=baseCurrencyPreference==='TRY'?'TRY':'USD';syncSettingsControls();renderPortfolio()});
+    baseCurrencySelect.addEventListener('change',()=>{const selected=['TRY','USD'].includes(baseCurrencySelect.value)?baseCurrencySelect.value:'AUTO';activePortfolioBook().displayCurrency=selected;portfolioDisplayCurrency=selected;savePortfolioBooks();syncSettingsControls();renderPortfolio()});
     defaultBenchmarkSelect.addEventListener('change',()=>{defaultBenchmarkPreference=['^GSPC','^IXIC','XU100.IS','GLD'].includes(defaultBenchmarkSelect.value)?defaultBenchmarkSelect.value:'^GSPC';localStorage.setItem(defaultBenchmarkKey,defaultBenchmarkPreference);benchmarkSettings={...benchmarkSettings,symbol:defaultBenchmarkPreference,name:benchmarkNames[defaultBenchmarkPreference]};saveBenchmarkSettings();syncSettingsControls();if(portfolioView.classList.contains('active'))renderPortfolioBenchmark()});
     priceDecimalsSelect.addEventListener('change',()=>{priceDecimalsPreference=['2','4','6'].includes(priceDecimalsSelect.value)?priceDecimalsSelect.value:'auto';localStorage.setItem(priceDecimalsKey,priceDecimalsPreference);syncSettingsControls();renderFavorites();refreshMarketAndFavorites();if(portfolioView.classList.contains('active'))renderPortfolio();if(lastLabels.length)renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,lastRsiValues)});
     percentDecimalsSelect.addEventListener('change',()=>{percentDecimalsPreference=['1','3'].includes(percentDecimalsSelect.value)?percentDecimalsSelect.value:'2';localStorage.setItem(percentDecimalsKey,percentDecimalsPreference);syncSettingsControls();renderFavorites();refreshMarketAndFavorites();if(portfolioView.classList.contains('active'))renderPortfolio();if(lastLabels.length)renderChart(lastLabels,lastPrices,currentChartName,currentCurrency,lastRsiValues)});
@@ -4395,10 +4414,11 @@
         activePortfolioBook().name=name;
       }else{
         savePortfolioBooks();
-        const created={id:createPortfolioId(),name,positions:[],cashBalances:[],createdAt:new Date().toISOString()};
+        const created={id:createPortfolioId(),name,displayCurrency:'AUTO',positions:[],cashBalances:[],createdAt:new Date().toISOString()};
         portfolioBooks.push(created);
         activePortfolioId=created.id;
         bindActivePortfolio();
+        portfolioDisplayCurrency=created.displayCurrency;
       }
       portfolioRenderId++;
       portfolioDividendRequestId++;
@@ -4411,7 +4431,9 @@
     });
     portfolioAdd.addEventListener('click', openResolvedPortfolioDialog);
     portfolioCurrencyToggle.addEventListener('click',()=>{
-      portfolioDisplayCurrency=portfolioDisplayCurrency==='AUTO'?(portfolioBaseCurrency==='TRY'?'USD':'TRY'):'AUTO';
+      const visibleCurrency=portfolioDisplayCurrency==='AUTO'?portfolioBaseCurrency:portfolioDisplayCurrency;
+      portfolioDisplayCurrency=visibleCurrency==='TRY'?'USD':'TRY';
+      activePortfolioBook().displayCurrency=portfolioDisplayCurrency;savePortfolioBooks();syncSettingsControls();
       renderPortfolio({refreshBenchmark:false,refreshDividends:false});
     });
     allPortfolioCurrencyToggle.addEventListener('click',()=>{allPortfolioDisplayCurrency=allPortfolioDisplayCurrency==='USD'?'TRY':'USD';renderAllPortfoliosSummary()});
