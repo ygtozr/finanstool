@@ -7,12 +7,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Özer Finans">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=6.8">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=6.8">
-  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=6.8">
-  <link rel="manifest" href="manifest.webmanifest?v=6.8">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=6.9">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=6.9">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=6.9">
+  <link rel="manifest" href="manifest.webmanifest?v=6.9">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com https://eodhd.com; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>Özer Finans v6.8</title>
+  <title>Özer Finans v6.9 Önizleme</title>
   <script src="assets/chart.umd.min.js?v=4.4.4"></script>
   <style>
     :root { color-scheme:dark; --surface-page:#101827; --surface-main:#192337; --surface-section:#111a2b; --surface-card:#0d1523; --surface-soft:#182235; --surface-control:#26344d; --line:#2b3a55; --border-strong:#40516e; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --on-accent:#062019; --positive:#34d399; --negative:#ff8f9c; --warning:#ffd66b; --info:#60a5fa; --focus-ring:#7dd3fc; --chart-fill:rgba(82,213,177,.14); --chart-fill-soft:rgba(82,213,177,.08); --bg:var(--surface-page); --panel:var(--surface-main); --danger:var(--negative); }
@@ -163,6 +163,15 @@
     .portfolio-privacy-toggle[aria-pressed="true"] .privacy-on { display:none; }
     .portfolio-privacy-toggle[aria-pressed="true"] .privacy-off { display:block; }
     .portfolio-head h2, .dividend-section h3 { margin:0; }
+    .portfolio-summary-card { margin-bottom:16px; }
+    .portfolio-summary-card > .portfolio-head { margin-bottom:0; }
+    .portfolio-summary-actions { display:flex; align-items:center; gap:7px; }
+    .portfolio-analysis-toggle { display:grid; place-items:center; width:40px; min-height:40px; padding:0; border-radius:10px; color:var(--text); background:var(--surface-control); }
+    .portfolio-analysis-toggle svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:2; transition:transform .2s ease; }
+    .portfolio-summary-card.is-open > .portfolio-head { border-radius:14px 14px 0 0; border-bottom-color:transparent; }
+    .portfolio-summary-card.is-open .portfolio-analysis-toggle svg { transform:rotate(180deg); }
+    .portfolio-summary-card > .portfolio-analysis { display:none !important; margin:0; padding:15px 16px 16px; border:1px solid var(--line); border-top:1px solid var(--line); border-radius:0 0 14px 14px; background:var(--surface-section); }
+    .portfolio-summary-card.is-open > .portfolio-analysis { display:block !important; }
     .portfolio-overall-head { display:block; margin-bottom:12px; padding:14px 16px; background:linear-gradient(135deg,#14253a,#111a2b); }
     .portfolio-overall-heading,.portfolio-overall-body { display:flex; align-items:center; justify-content:space-between; gap:10px; }
     .portfolio-overall-body { align-items:flex-end; margin-top:9px; }
@@ -574,7 +583,7 @@
       .portfolio-glance { max-width:760px; }
       .portfolio-page .portfolio-head { padding:18px; border:1px solid var(--line); border-radius:16px; background:#111a2b; }
       html[data-theme="light"] .desktop-sidebar { background:#f8fafc; }
-      html[data-theme="light"] .desktop-sidebar button:hover,html[data-theme="light"] .desktop-sidebar button.is-active,html[data-theme="light"] .portfolio-page .portfolio-head { background:#f1f5f9; }
+      html[data-theme="light"] .desktop-sidebar button:hover,html[data-theme="light"] .desktop-sidebar button.is-active,html[data-theme="light"] .portfolio-page .portfolio-head,html[data-theme="light"] .portfolio-summary-card > .portfolio-analysis { background:#f1f5f9; }
     }
 
     @media (max-width:1100px) and (min-width:901px) {
@@ -644,6 +653,8 @@
     .portfolio-page .portfolio-distribution,
     .portfolio-page .portfolio-benchmark,
     .portfolio-page .dividend-section { display:block !important; }
+    .portfolio-page .portfolio-summary-card:not(.is-open) > .portfolio-analysis { display:none !important; }
+    .portfolio-page .portfolio-summary-card.is-open > .portfolio-analysis { display:block !important; }
     .portfolio-positions-title { margin:22px 0 12px; padding-top:18px; border-top:1px solid var(--line); }
     .portfolio-analysis { margin-top:14px; }
     @media (min-width:901px) {
@@ -697,18 +708,18 @@
   <div id="pullRefreshIndicator" class="pull-refresh-indicator" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true">↓</span><span class="pull-refresh-label">Yenilemek için çekin</span></div>
   <main>
     <aside class="desktop-sidebar" aria-label="Masaüstü gezinme">
-      <div class="desktop-brand brand-lockup"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.6" alt=""><span class="brand-lockup-name">Özer Finans</span></div>
+      <div class="desktop-brand brand-lockup"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.9" alt=""><span class="brand-lockup-name">Özer Finans</span></div>
       <button id="desktopOverviewNav" class="is-active" type="button" aria-current="page">⌂ <span>Özet</span></button>
       <button id="desktopChartNav" type="button">⌁ <span>Grafik Ve Analiz</span></button>
       <button id="desktopPortfolioNav" type="button">▤ <span>Portföy</span></button>
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small>v6.8</small>
+      <small>v6.9 önizleme</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.8" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.8</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.9</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -718,7 +729,7 @@
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.8" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.8</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.9</span></h1>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -748,13 +759,12 @@
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.8" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.8</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.9</span></h1>
       <div id="allPortfolioHead" class="portfolio-head portfolio-overall-head"><div class="portfolio-overall-heading"><h2>Toplam Portföy</h2><div class="portfolio-view-toolbar"><div class="portfolio-metric-mode" role="group" aria-label="Portföy kâr zarar dönemi"><button id="portfolioTodayMode" class="is-active" type="button" aria-pressed="true">Bugün</button><button id="portfolioTotalMode" type="button" aria-pressed="false">Toplam</button></div><button id="portfolioPrivacyToggle" class="portfolio-privacy-toggle" type="button" aria-label="Portföy rakamlarını gizle" aria-pressed="false" title="Portföy rakamlarını gizle"><svg class="privacy-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></svg><svg class="privacy-off" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.3 3M6.4 6.5C3.9 8.2 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6M9.8 9.8a3 3 0 0 0 4.4 4.4"/></svg></button></div></div><div class="portfolio-overall-body"><div class="portfolio-head-metrics"><strong id="allPortfolioTotalValue" class="portfolio-head-value">—</strong><p id="allPortfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="allPortfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Toplam portföyü TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div></div>
       <div class="portfolio-switcher"><label class="portfolio-switcher-field" for="portfolioBookSelect">Aktif Portföy<select id="portfolioBookSelect" aria-label="Aktif portföyü seç"></select></label><div class="portfolio-switcher-actions"><button id="portfolioBookAdd" type="button" aria-label="Yeni portföy oluştur" title="Yeni portföy">+</button><button id="portfolioBookRename" type="button" aria-label="Aktif portföyün adını değiştir" title="Adını değiştir">✎</button><button id="portfolioBookDelete" type="button" aria-label="Aktif portföyü sil" title="Portföyü sil">×</button></div></div>
       <div id="portfolioBookTabs" class="portfolio-book-tabs" role="group" aria-label="Portföy kısayolları"></div>
-      <div class="portfolio-head"><div class="portfolio-head-metrics"><h2 id="portfolioHeading">Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div>
+      <section id="portfolioSummaryCard" class="portfolio-summary-card"><div class="portfolio-head"><div class="portfolio-head-metrics"><h2 id="portfolioHeading">Portföyüm</h2><strong id="portfolioTotalValue" class="portfolio-head-value">—</strong><p id="portfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><div class="portfolio-summary-actions"><button id="portfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Portföy özetini TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button><button id="portfolioAnalysisToggle" class="portfolio-analysis-toggle" type="button" aria-expanded="false" aria-controls="portfolioAnalysisSection" aria-label="Portföy Özet Analizini aç" title="Portföy Özet Analizi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div></div><section id="portfolioAnalysisSection" class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section></section>
       <section id="portfolioEmptyStart" class="portfolio-empty-start" hidden><h3>Portföyünüzü Oluşturmaya Başlayın</h3><p>İlk varlığınızı veya nakit bakiyenizi ekleyin; isterseniz mevcut yedeğinizi geri yükleyin.</p><div class="portfolio-empty-actions"><button id="emptyAddAsset" type="button">Hisse Veya Fon Ekle</button><button id="emptyAddCash" type="button">Nakit Ekle</button><button id="emptyRestoreBackup" type="button">Yedekten Yükle</button></div></section>
-      <section id="portfolioAnalysisSection" class="portfolio-analysis"><h3>Portföy Özet Analizi</h3><p id="portfolioSummaryCurrencyNote" class="dividend-note">Farklı para birimleri varsa toplamlar USD bazında gösterilir.</p><div id="portfolioSummary"></div></section>
       <h3 class="portfolio-positions-title">Portföydeki Hisseler</h3>
       <div id="portfolioList" class="portfolio-list"></div>
       <div class="portfolio-search"><label class="sr-only" for="portfolioSymbol">Portföye eklenecek hisseyi ara</label><input id="portfolioSymbol" type="search" role="combobox" aria-autocomplete="list" aria-controls="portfolioSuggestions" aria-expanded="false" maxlength="20" autocomplete="off" placeholder="Portföye hisse ara"><button id="portfolioAdd" class="portfolio-add" type="button" aria-label="Portföye ekle">+</button><ul id="portfolioSuggestions" class="search-suggestions portfolio-suggestions" role="listbox" aria-label="Portföy hisse önerileri"></ul></div>
@@ -779,7 +789,7 @@
       <section id="portfolioDividendSection" class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.8" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.8</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=6.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v6.9</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
         <section class="settings-card settings-horizontal" aria-labelledby="alarmShortcutTitle"><div class="settings-card-copy"><h3 id="alarmShortcutTitle">Fiyat Alarmları</h3><p>Kaydettiğiniz fiyat hedeflerini görüntüleyin veya yeni alarm kurun.</p></div><button id="otherAlarmShortcut" class="alarm-shortcut settings-card-controls" type="button"><strong>Alarmları Aç</strong><span id="otherAlarmCount">0 aktif alarm</span></button></section>
@@ -827,7 +837,7 @@
         <section class="settings-card settings-horizontal" aria-labelledby="diagnosticsTitle"><div class="settings-card-copy"><h3 id="diagnosticsTitle">Bağlantı Tanılama</h3><p>Veri bağlantısının ve uygulama önbelleğinin son durumunu görüntüleyin.</p></div><div class="settings-card-controls"><dl id="diagnosticsList" class="diagnostics-list"></dl><div class="settings-inline-actions"><button id="diagnosticsRefresh" type="button">Durumu Yenile</button></div></div></section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v6.8</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Favoriler, portföy ve ayarlar bu cihazda saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v6.9 önizleme</strong></div></div>
         </section>
       </div>
     </section>
@@ -1215,6 +1225,8 @@
     const portfolioList = document.getElementById('portfolioList');
     const portfolioPositionsTitle = document.querySelector('.portfolio-positions-title');
     const portfolioCurrencyToggle = document.getElementById('portfolioCurrencyToggle');
+    const portfolioSummaryCard = document.getElementById('portfolioSummaryCard');
+    const portfolioAnalysisToggle = document.getElementById('portfolioAnalysisToggle');
     const allPortfolioTotalValue = document.getElementById('allPortfolioTotalValue');
     const allPortfolioDailyChange = document.getElementById('allPortfolioDailyChange');
     const allPortfolioCurrencyToggle = document.getElementById('allPortfolioCurrencyToggle');
@@ -4503,6 +4515,12 @@
       portfolioDisplayCurrency=visibleCurrency==='TRY'?'USD':'TRY';
       activePortfolioBook().displayCurrency=portfolioDisplayCurrency;savePortfolioBooks();
       renderPortfolio({refreshBenchmark:false,refreshDividends:false});
+    });
+    portfolioAnalysisToggle.addEventListener('click',()=>{
+      const open=!portfolioSummaryCard.classList.contains('is-open');
+      portfolioSummaryCard.classList.toggle('is-open',open);
+      portfolioAnalysisToggle.setAttribute('aria-expanded',String(open));
+      portfolioAnalysisToggle.setAttribute('aria-label',open?'Portföy Özet Analizini kapat':'Portföy Özet Analizini aç');
     });
     allPortfolioCurrencyToggle.addEventListener('click',()=>{allPortfolioDisplayCurrency=allPortfolioDisplayCurrency==='USD'?'TRY':'USD';localStorage.setItem(allPortfolioCurrencyKey,allPortfolioDisplayCurrency);renderAllPortfoliosSummary();});
     portfolioTodayMode.addEventListener('click',()=>setPortfolioMetricsMode('today'));

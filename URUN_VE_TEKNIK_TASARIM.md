@@ -1,8 +1,8 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 6.8
-**Uygulama sürümü:** v6.8
-**Durum:** Kullanıcı tarafından onaylandı
+**Belge sürümü:** 6.9 önizleme
+**Uygulama sürümü:** v6.9 önizleme
+**Durum:** Kullanıcı onayı bekleniyor
 **Canlı adres:** https://finanstool.vercel.app
 **Kaynak depo:** https://github.com/ygtozr/finanstool
 **Son güncelleme:** 27 Ağustos 2026
@@ -43,7 +43,7 @@ Kullanıcı tarafından belirlenen ve sonraki geliştirmelerde korunması gereke
 ### 2.1 Sürümleme ve arşiv standardı
 
 - Güncel onaylı sürüm: **v6.8**.
-- İncelenen sürüm: **v6.8**.
+- İncelenen sürüm: **v6.9 önizleme**.
 - Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v6.9** olur.
 - Depo kökü her zaman canlı sürümü temsil eder.
 - Arşiv yolu: `archive/vX/` veya `archive/vX.Y/`.
@@ -866,6 +866,13 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 - Toplam modunda maliyetler pozisyonun maliyet para birimi ve varsa alış tarihindeki kurla ortak USD tabanına alınır; nakit bakiyeler toplam kâr-zarara sıfır maliyet farkıyla katılır. Gösterim para birimi daha sonra seçilen TRY/USD görünümüne çevrilir.
 - `portfolioPrivacy` etkin olduğunda finansal değerler beş yıldızla maskelenir; dağılım ve performans grafiklerinin tuvalleri gizlenir. Portföy adları ve gezinme kontrolleri kullanılabilir kalır.
 - Dönem ve gizlilik tercihleri yerel depoda tutulur, yedek tercihlerine eklenir ve geri yüklemede korunur. Hızlı açılış portföy anlık görüntüleri yalnız kaydedildikleri dönem modu eşleştiğinde kullanılır.
+
+### 17.17 v6.9 Açılır Portföy Özet Analizi
+
+- Aktif portföyün üst özet kutusu ve Portföy Özet Analizi tek, bağlı bir kart bileşeni olarak sunulur.
+- Özet kutusundaki ok düğmesi analiz alanını aşağı doğru açıp kapatır; ilk açılışta alan kapalıdır ve dikey alan kazanılır.
+- Analiz tablosunun satırları, hesaplama yöntemi, para birimi açıklaması ve gizlilik maskelemesi v6.8 ile aynı kalır.
+- Para birimi dönüşüm düğmesi analiz açma düğmesinden bağımsız çalışır. Açma düğmesi erişilebilir ad, `aria-controls` ve güncel `aria-expanded` durumu taşır.
 
 ## 18. Bilinen sınırlar ve ertelenen işler
 

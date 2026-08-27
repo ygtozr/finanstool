@@ -166,9 +166,9 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v6\.8<\/title>/,'Tarayıcı başlığı kalıcı marka ve sürüm adını kullanmalı');
-assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=6\.8[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
-assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=6\.8[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
+assert.match(html,/<title>Özer Finans v6\.9 Önizleme<\/title>/,'Tarayıcı başlığı önizleme marka ve sürüm adını kullanmalı');
+assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=6\.9[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
+assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=6\.9[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
 assert.match(html,/\.page-brand \{[^}]*justify-content:center;/,'Sayfa marka kilidi yatay olarak ortalanmalı');
 assert.match(html,/\.version-badge \{[^}]*border:0;[^}]*opacity:\.62;/,'Sürüm bilgisi rozetsiz, küçük ve silik gösterilmeli');
@@ -185,6 +185,8 @@ assert.match(html,/\.search-suggestions\.open-up\{top:auto;bottom:calc\(100% \+ 
 assert.match(html,/\.portfolio-head \{[^}]*padding:16px;[^}]*border:1px solid var\(--line\);[^}]*border-radius:14px;/,'Portföy üst özeti tüm ekranlarda çerçeveli kart olmalı');
 assert.match(html,/\.portfolio-head-value \{[^}]*font-size:1\.5rem;/,'Portföy toplam değeri hafifçe büyütülmeli');
 assert.match(html,/id="portfolioCurrencyToggle"[^>]*aria-pressed="false"[^>]*>⇄<\/button>/,'Portföy üst özetinde dönüşüm düğmesi bulunmalı');
+assert.match(html,/id="portfolioSummaryCard"[^>]*>[\s\S]*id="portfolioHeading">Portföyüm<[\s\S]*id="portfolioAnalysisToggle"[^>]*aria-expanded="false"[^>]*aria-controls="portfolioAnalysisSection"[\s\S]*id="portfolioAnalysisSection"[^>]*>[\s\S]*Portföy Özet Analizi[\s\S]*id="portfolioSummaryCurrencyNote"[\s\S]*id="portfolioSummary"/,'Portföy Özet Analizi içeriği korunarak aktif portföy özet kartına bağlanmalı');
+assert.match(html,/\.portfolio-page \.portfolio-summary-card:not\(\.is-open\) > \.portfolio-analysis \{ display:none !important; \}[\s\S]*portfolioAnalysisToggle\.addEventListener\('click',[\s\S]*classList\.toggle\('is-open',open\)[\s\S]*setAttribute\('aria-expanded',String\(open\)\)/,'Özet analizi ok düğmesiyle erişilebilir biçimde aşağı açılıp kapanmalı');
 assert.match(html,/id="portfolioTodayMode"[^>]*>Bugün<\/button>[\s\S]*id="portfolioTotalMode"[^>]*>Toplam<\/button>[\s\S]*id="portfolioPrivacyToggle"/,'Portföy sayfasında Bugün, Toplam ve gizlilik kontrolleri bulunmalı');
 assert.match(html,/id="allPortfolioHead"[^>]*>[\s\S]*class="portfolio-view-toolbar"[\s\S]*id="portfolioTodayMode"[\s\S]*id="portfolioTotalMode"[\s\S]*id="portfolioPrivacyToggle"[\s\S]*id="allPortfolioTotalValue"/,'Üç yeni kontrol Toplam Portföy kartının sağ üstünde bulunmalı');
 assert.match(html,/\.portfolio-view-toolbar \{ display:flex;[^}]*gap:4px;[\s\S]*\.portfolio-metric-mode button \{ min-height:27px;[\s\S]*\.portfolio-overall-heading,\.portfolio-overall-body \{ display:flex; align-items:center; justify-content:space-between;[\s\S]*content:"\*\*\*\*\*"/,'Küçük gizlilik kontrolleri başlık hizasında sağda olmalı ve değerler beş yıldızla maskelenmeli');
@@ -334,8 +336,8 @@ assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#eef3f8':'#10182
 assert.match(html,/src="assets\/chart\.umd\.min\.js\?v=4\.4\.4"/,'Chart.js uygulamanın kendi dosyasından yüklenmeli');
 assert.doesNotMatch(html,/cdn\.jsdelivr\.net\/npm\/chart\.js/,'Grafikler çalışma anında harici CDN’ye bağlı olmamalı');
 assert.ok(chartVendor.length>150000&&/Chart/.test(chartVendor),'Yerel Chart.js paketi eksiksiz görünmeli');
-assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=6\.8"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
-assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=6\.8"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
+assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=6\.9"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
+assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=6\.9"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
 assert.equal(manifest.name,'Özer Finans','Manifest uygulamanın tam adını taşımalı');
 assert.equal(manifest.display,'standalone','PWA bağımsız uygulama görünümünde açılmalı');
 assert.deepEqual(manifest.icons.map(icon=>icon.sizes),['192x192','512x512'],'Manifest standart PWA ikon boyutlarını içermeli');
@@ -407,4 +409,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v6.8 regresyon testleri başarılı.');
+console.log('Özer Finans v6.9 önizleme regresyon testleri başarılı.');
