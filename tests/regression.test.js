@@ -166,9 +166,9 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v6\.6<\/title>/,'Tarayıcı başlığı kalıcı marka ve sürüm adını kullanmalı');
-assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=6\.6[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
-assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=6\.6[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
+assert.match(html,/<title>Özer Finans v6\.7 Önizleme<\/title>/,'Tarayıcı başlığı önizleme marka ve sürüm adını kullanmalı');
+assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=6\.7[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
+assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=6\.7[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
 assert.match(html,/\.page-brand \{[^}]*justify-content:center;/,'Sayfa marka kilidi yatay olarak ortalanmalı');
 assert.match(html,/\.version-badge \{[^}]*border:0;[^}]*opacity:\.62;/,'Sürüm bilgisi rozetsiz, küçük ve silik gösterilmeli');
@@ -196,7 +196,8 @@ assert.match(html,/portfolioBooks\.length===1[\s\S]*En az bir portföy bulunmal�
 assert.match(html,/portfolioBookAdd\.disabled=portfolioBooks\.length>=50[\s\S]*En fazla 50 portföy oluşturulabilir/,'Yerel veri ve seçici kullanılabilirliği için portföy sayısı 50 ile sınırlandırılmalı');
 assert.match(html,/function portfolioPresentationTarget\(summaryCurrency\)[\s\S]*summaryCurrency==='TRY'\?'USD':'TRY'/,'Aktif portföy dönüşüm hedefi TL portföyde USD, diğerlerinde TL olmalı');
 assert.match(html,/portfolioConversionFactor\(summaryToUsd,targetToUsd\)/,'Portföy özeti bütün para birimi yönlerinde çapraz kurla hesaplanmalı');
-assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*visibleCurrency==='TRY'\?'USD':'TRY'[\s\S]*applyPreferredCurrency\(portfolioDisplayCurrency\)[\s\S]*renderPortfolio\(\{refreshBenchmark:false,refreshDividends:false\}\)/,'Dönüşüm düğmesi genel tercihi bütün portföyler için TL veya USD yapmalı');
+assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*visibleCurrency==='TRY'\?'USD':'TRY'[\s\S]*activePortfolioBook\(\)\.displayCurrency=portfolioDisplayCurrency;savePortfolioBooks\(\)[\s\S]*renderPortfolio\(\{refreshBenchmark:false,refreshDividends:false\}\)/,'Aktif portföy dönüşüm düğmesi yalnız o portföyün para birimini değiştirmeli');
+assert.match(html,/allPortfolioCurrencyToggle\.addEventListener\('click',[\s\S]*localStorage\.setItem\(allPortfolioCurrencyKey,allPortfolioDisplayCurrency\);renderAllPortfoliosSummary\(\)/,'Toplam Portföy dönüşüm düğmesi yalnız birleşik toplam alanını değiştirmeli');
 assert.match(html,/async function renderAllPortfoliosSummary\(priceWarmup=null\)[\s\S]*portfolioBooks\.flatMap\(book=>book\.positions\)[\s\S]*totalUsd[\s\S]*allPortfolioTotalValue\.textContent/,'Toplam Portföy kartı bütün portföyleri USD bazında birleştirmeli');
 assert.match(html,/portfolioSummaryCurrencyNote\.textContent=nativeMode\?[\s\S]*'Portföydeki bütün değerler TL bazında gösteriliyor\.'[\s\S]*'Portföydeki bütün değerler USD bazında gösteriliyor\.'/,'Özet açıklaması ürünün kendi para birimi, TL veya USD tercihini doğru anlatmalı');
 assert.match(html,/\.market-summary-head #marketRefresh,\.favorites-panel-head #favoriteRefresh \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
@@ -326,8 +327,8 @@ assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#eef3f8':'#10182
 assert.match(html,/src="assets\/chart\.umd\.min\.js\?v=4\.4\.4"/,'Chart.js uygulamanın kendi dosyasından yüklenmeli');
 assert.doesNotMatch(html,/cdn\.jsdelivr\.net\/npm\/chart\.js/,'Grafikler çalışma anında harici CDN’ye bağlı olmamalı');
 assert.ok(chartVendor.length>150000&&/Chart/.test(chartVendor),'Yerel Chart.js paketi eksiksiz görünmeli');
-assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=6\.6"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
-assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=6\.6"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
+assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=6\.7"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
+assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=6\.7"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
 assert.equal(manifest.name,'Özer Finans','Manifest uygulamanın tam adını taşımalı');
 assert.equal(manifest.display,'standalone','PWA bağımsız uygulama görünümünde açılmalı');
 assert.deepEqual(manifest.icons.map(icon=>icon.sizes),['192x192','512x512'],'Manifest standart PWA ikon boyutlarını içermeli');
@@ -360,9 +361,10 @@ assert.match(html,/preferences:\{defaultPortfolioId:[\s\S]*backupReminderDays[\s
 assert.match(html,/\.portfolio-book-tabs \{[^}]*flex-wrap:wrap/,'Çok sayıdaki portföy kısayolu yeni satırlara geçebilmeli');
 assert.match(html,/function attachPortfolioBookReorder\(tab,book\)[\s\S]*followGhost[\s\S]*persistPortfolioBookOrderFromDom/,'Portföy kısayolları yumuşak takip ve yerleşme animasyonuyla sıralanabilmeli');
 assert.match(html,/function applyPreferredCurrency\(value\)[\s\S]*portfolioBooks\.forEach\(book=>\{book\.displayCurrency=baseCurrencyPreference\}\)/,'Tercih edilen para birimi bütün portföylere uygulanmalı');
+assert.match(html,/applyPreferredCurrency\(value\)[\s\S]*allPortfolioDisplayCurrency=baseCurrencyPreference==='TRY'\?'TRY':'USD'[\s\S]*localStorage\.setItem\(allPortfolioCurrencyKey,allPortfolioDisplayCurrency\)/,'Tercih menüsü portföy ve toplam alanındaki önceki yerel seçimlerin üzerine yazmalı');
 assert.match(html,/valueCurrency=nativeMode\?position\.currency:presentationCurrency/,'Ürünün kendi para birimi seçeneği pozisyon değerlerini dönüştürmemeli');
-assert.match(html,/renderCashBalances\(baseCurrencyPreference==='NATIVE'\?null:cashDisplayValues,presentationCurrency\)/,'Nakit bakiyeleri ürün para birimi modunda dönüştürülmemeli, diğer tercihlerde çevrilmeli');
-assert.match(html,/const targetCurrency=baseCurrencyPreference==='NATIVE'\?null:baseCurrencyPreference[\s\S]*shownCurrency=targetCurrency\|\|item\.currency/,'Temettü tutarları kendi para birimi veya genel tercih ile gösterilmeli');
+assert.match(html,/renderCashBalances\(portfolioDisplayCurrency==='NATIVE'\?null:cashDisplayValues,presentationCurrency\)/,'Nakit bakiyeleri aktif portföyün ürün para birimi modunda dönüştürülmemeli');
+assert.match(html,/const targetCurrency=portfolioDisplayCurrency==='NATIVE'\?null:portfolioDisplayCurrency[\s\S]*shownCurrency=targetCurrency\|\|item\.currency/,'Temettü tutarları aktif portföyün yerel para birimi seçimine göre gösterilmeli');
 assert.match(html,/range=2y&interval=1d&events=div[\s\S]*Yaklaşan temettü bulunamadı; en son geçmiş temettüler gösteriliyor/,'Yaklaşan temettü yoksa geçmiş temettüler gösterilmeli');
 assert.match(html,/\.settings-switches \{ display:grid; gap:11px; \}[\s\S]*\.settings-switches \.setting-switch \{ width:100%; display:flex; align-items:center; justify-content:space-between;/,'Bildirim anahtarlarının özel kuralı genel etiket ızgarasını geçersiz kılıp metnin sağında durmalı');
 assert.match(html,/\.setting-switch \{ display:flex; align-items:center; justify-content:space-between;[\s\S]*\.setting-switch input \{ flex:0 0 auto;[^}]*margin:0;/,'Bildirim anahtarları açıklamanın doğrudan sağında ve sağ kenara tam yaslı durmalı');
@@ -398,4 +400,4 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v6.6 regresyon testleri başarılı.');
+console.log('Özer Finans v6.7 para birimi kapsamı önizleme testleri başarılı.');
