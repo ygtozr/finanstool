@@ -354,8 +354,11 @@ assert.match(html,/for="benchmarkSearch">Karşılaştırma ölçütü ara/,'Öl�
 assert.match(html,/dialog\.addEventListener\('cancel',event=>\{event\.preventDefault\(\);dialog\.close\(\)\}\)/,'Tüm paneller Escape ile kapanmalı');
 assert.match(html,/document\.addEventListener\('keydown',event=>\{[\s\S]*event\.key!=='Escape'[\s\S]*dialog\.close\(\)/,'Native cancel üretmeyen tarayıcılarda Escape yedeği bulunmalı');
 assert.match(html,/id="backupFileName"/,'Özel Türkçe dosya seçici seçilen dosya adını göstermeli');
-assert.match(html,/schemaVersion:2[\s\S]*portfolios:portfolioBooks\.map\(book=>[\s\S]*purchaseDate,dripEnabled,dripTaxRate,dripFractional/,'Yedek dosyası bütün portföyleri, alış tarihlerini ve temettü ayarlarını içermeli');
-assert.match(html,/if\(!\[1,2\]\.includes\(payload\.schemaVersion\)\)[\s\S]*payload\.schemaVersion===2[\s\S]*raw\.portfolio/,'Yeni yedek şeması eski tek portföylü yedekleri de kabul etmeli');
+assert.match(html,/schemaVersion:3[\s\S]*portfolios:portfolioBooks\.map\(book=>[\s\S]*purchaseDate,dripEnabled,dripTaxRate,dripFractional/,'Yedek dosyası bütün portföyleri, alış tarihlerini ve temettü ayarlarını içermeli');
+assert.match(html,/if\(!\[1,2,3\]\.includes\(payload\.schemaVersion\)\)[\s\S]*payload\.schemaVersion>=2[\s\S]*raw\.portfolio/,'Yeni yedek şeması eski tek portföylü yedekleri de kabul etmeli');
+assert.match(html,/preferences:\{defaultPortfolioId:[\s\S]*backupReminderDays[\s\S]*lastBackup/,'Yedek dosyası yeni görünüm, portföy, alarm ve hatırlatma tercihlerini içermeli');
+assert.match(html,/\.portfolio-book-tabs \{[^}]*flex-wrap:wrap/,'Çok sayıdaki portföy kısayolu yeni satırlara geçebilmeli');
+assert.match(html,/function attachPortfolioBookReorder\(tab,book\)[\s\S]*pointerdown[\s\S]*portfolioBooks\.sort/,'Portföy kısayolları uzun basıp sürükleyerek sıralanabilmeli');
 assert.match(html,/function mergePortfolioBooks\(current,incoming\)[\s\S]*portfolioBooks=mergePortfolioBooks\(portfolioBooks,data\.portfolios\)/,'Birleştirerek geri yükleme portföyleri kimlikleriyle ekleyip güncellemeli');
 assert.match(html,/Alım tarihi kayıtlı pozisyonlar:[\s\S]*Temettü yeniden yatırımı açık pozisyonlar:/,'Yedek önizlemesi tarih ve temettü ayarı kapsamını göstermeli');
 assert.match(html,/id="portfolioCostCurrency"[\s\S]*id="portfolioPurchaseDate"/,'Portföy maliyet para birimi ve alım tarihi kaydedilebilmeli');
