@@ -864,6 +864,7 @@
   <dialog id="portfolioDialog" class="portfolio-dialog">
     <h3 id="portfolioDialogTitle">Portföye Ekle</h3><p id="portfolioDialogSymbol" class="portfolio-dialog-symbol"></p>
     <form id="portfolioForm" class="portfolio-form" method="dialog">
+      <label id="portfolioTargetField" hidden>Hedef portföy<select id="portfolioTargetBook" aria-label="Hissenin ekleneceği portföy"></select></label>
       <label>Adet<input id="portfolioQuantity" type="number" min="0.000001" step="any" required></label>
       <label>Birim maliyet<input id="portfolioCost" type="number" min="0" step="any" required></label>
       <label>Maliyet para birimi<select id="portfolioCostCurrency"><option value="AUTO">Ürünün işlem para birimi</option><option value="TRY">TRY · Türk Lirası</option><option value="USD">USD · ABD Doları</option><option value="EUR">EUR · Euro</option><option value="GBP">GBP · İngiliz Sterlini</option></select></label>
@@ -1273,6 +1274,8 @@
     const portfolioDialog = document.getElementById('portfolioDialog');
     const portfolioDialogSymbol = document.getElementById('portfolioDialogSymbol');
     const portfolioForm = document.getElementById('portfolioForm');
+    const portfolioTargetField = document.getElementById('portfolioTargetField');
+    const portfolioTargetBook = document.getElementById('portfolioTargetBook');
     const portfolioQuantity = document.getElementById('portfolioQuantity');
     const portfolioCost = document.getElementById('portfolioCost');
     const portfolioCostCurrency = document.getElementById('portfolioCostCurrency');
@@ -1456,7 +1459,7 @@
       closeFavoriteMenus();
       portfolioSelection={symbol:item.symbol,name:item.name||item.symbol};
       portfolioSymbol.value=item.symbol;
-      openPortfolioDialog();
+      openPortfolioDialog(null,{choosePortfolio:true});
     }
     function detailValue(value,formatter=value=>String(value),fallback='Veri yok') { return Number.isFinite(value)?formatter(value):fallback; }
     function compactNumber(value) { return new Intl.NumberFormat('tr-TR',{notation:'compact',maximumFractionDigits:2}).format(value); }
@@ -2998,7 +3001,13 @@
       }).catch(()=>{failed++}).finally(finish));
     }
 
-    function openPortfolioDialog(position=null) {
+    function syncPortfolioTargetChoices(selectedId=activePortfolioId) {
+      portfolioTargetBook.replaceChildren();
+      portfolioBooks.forEach(book=>{const option=document.createElement('option');option.value=book.id;option.textContent=book.name;portfolioTargetBook.append(option)});
+      portfolioTargetBook.value=portfolioBooks.some(book=>book.id===selectedId)?selectedId:activePortfolioId;
+    }
+
+    function openPortfolioDialog(position=null,{choosePortfolio=false}={}) {
       const editing=position&&position.symbol;
       const symbol = String(editing?position.symbol:(portfolioSelection?.symbol || portfolioSymbol.value)).trim().toUpperCase();
       if (!symbol) return portfolioSymbol.focus();
@@ -3006,6 +3015,8 @@
       portfolioSelection = { symbol, name:editing?(position.name||symbol):(portfolioSelection?.name || symbol) };
       portfolioDialogTitle.textContent=editing?'Pozisyonu Düzenle':'Portföye Ekle';
       portfolioSave.textContent=editing?'Değişiklikleri Kaydet':'Kaydet';
+      syncPortfolioTargetChoices(activePortfolioId);
+      portfolioTargetField.hidden=Boolean(editing)||!choosePortfolio||portfolioBooks.length<2;
       portfolioDialogSymbol.textContent = displaySymbol(portfolioSelection.symbol) + (portfolioSelection.name !== portfolioSelection.symbol ? ' · ' + portfolioSelection.name : '');
       portfolioQuantity.value = editing?String(position.baseQuantity??position.quantity):'';
       portfolioCost.value = editing?String(position.unitCost):'';
@@ -4558,7 +4569,7 @@
     favoriteDetailAlarm.addEventListener('click',()=>{const item=favoriteDetailItem;if(!item)return;favoriteDetailDialog.close();openFavoriteAlarm(item)});
     favoriteDetailPortfolio.addEventListener('click',()=>{const item=favoriteDetailItem;if(!item)return;favoriteDetailDialog.close();openFavoritePortfolio(item)});
     portfolioCancel.addEventListener('click', () => portfolioDialog.close());
-    portfolioDialog.addEventListener('close',()=>{portfolioEditSymbol=null;portfolioDialogTitle.textContent='Portföye Ekle';portfolioSave.textContent='Kaydet';portfolioPurchaseDate.setCustomValidity('')});
+    portfolioDialog.addEventListener('close',()=>{portfolioEditSymbol=null;portfolioTargetField.hidden=true;portfolioDialogTitle.textContent='Portföye Ekle';portfolioSave.textContent='Kaydet';portfolioPurchaseDate.setCustomValidity('')});
     cashAddButton.addEventListener('click',()=>openCashDialog());
     cashCancel.addEventListener('click',()=>cashDialog.close());
     cashDialog.addEventListener('close',()=>{cashEditCurrency=null;cashCurrency.setCustomValidity('')});
@@ -4603,8 +4614,10 @@
       const dripFractional=portfolioDripFractional.value!=='whole';
       if(dripEnabled&&!purchaseDate){portfolioPurchaseDate.setCustomValidity('Otomatik temettü geri yatırımı için alım tarihi gereklidir.');portfolioPurchaseDate.reportValidity();return}
       portfolioPurchaseDate.setCustomValidity('');
+      const targetBook=!portfolioEditSymbol&&!portfolioTargetField.hidden?(portfolioBooks.find(book=>book.id===portfolioTargetBook.value)||activePortfolioBook()):activePortfolioBook();
+      const targetPositions=targetBook.positions;
       const edited = portfolioEditSymbol?portfolio.find(item=>item.symbol===portfolioEditSymbol):null;
-      const existing = portfolio.find(item => item.symbol === portfolioSelection.symbol);
+      const existing = targetPositions.find(item => item.symbol === portfolioSelection.symbol);
       if(edited){
         edited.quantity=quantity;edited.baseQuantity=quantity;edited.unitCost=unitCost;edited.costCurrency=costCurrency;edited.purchaseDate=purchaseDate;
         edited.name=portfolioSelection.name||edited.name;edited.dripEnabled=dripEnabled;edited.dripTaxRate=dripTaxRate;edited.dripFractional=dripFractional;
@@ -4620,14 +4633,15 @@
         existing.purchaseDate=[existing.purchaseDate,purchaseDate].filter(Boolean).sort()[0]||null;
         if(dripEnabled){existing.dripEnabled=true;existing.dripTaxRate=dripTaxRate;existing.dripFractional=dripFractional}
       } else {
-        portfolio.push({ symbol:portfolioSelection.symbol, name:portfolioSelection.name, quantity, baseQuantity:quantity, unitCost, costCurrency, purchaseDate, dripEnabled, dripTaxRate, dripFractional });
+        targetPositions.push({ symbol:portfolioSelection.symbol, name:portfolioSelection.name, quantity, baseQuantity:quantity, unitCost, costCurrency, purchaseDate, dripEnabled, dripTaxRate, dripFractional });
       }
-      savePortfolio();
+      savePortfolioBooks();
       portfolioDialog.close();
       portfolioSymbol.value = '';
       portfolioSelection = null;
       portfolioEditSymbol = null;
       showPortfolioSuggestions([]);
+      renderChartAssetPanels();
       renderPortfolio();
     });
     applyTheme(themePreference,{persist:false});

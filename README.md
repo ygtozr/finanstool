@@ -16,6 +16,7 @@
 - Analiz tablosu üstteki Bugün/Toplam görünümünden bağımsız olarak daima toplam maliyet, toplam net ve yüzde kâr-zarar ile hafta başından beri net ve yüzde kâr-zararı gösterir.
 - Kapalı durumda portföy sayfasında daha az dikey alan kullanılır; para birimi dönüşüm düğmesi bağımsız çalışmaya devam eder.
 - Açma barı `aria-expanded` ve `aria-controls` ile ekran okuyucuya doğru durum bilgisini verir.
+- Favori bilgi kartındaki “Portföye Ekle” işlemi birden fazla portföy varsa hedef portföy seçimini gösterir; tek portföyde ek adım oluşturmadan devam eder.
 
 ## v6.8 portföy gizliliği ve kâr-zarar dönemi
 

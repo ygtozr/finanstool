@@ -873,6 +873,7 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 - Özet kutusunun alt kenarındaki ince ve tam genişlikteki çift şevronlu bar analiz alanını aşağı doğru açıp kapatır; ilk açılışta alan kapalıdır ve dikey alan kazanılır.
 - Analiz tablosu üstteki Bugün/Toplam seçimine bağlanmaz. Daima toplam maliyet, güncel toplam değer, toplam net ve yüzde kâr-zarar ile hafta başından beri net ve yüzde kâr-zarar satırlarını gösterir.
 - Para birimi dönüşüm düğmesi analiz açma barından bağımsız çalışır. Açma barı erişilebilir ad, `aria-controls` ve güncel `aria-expanded` durumu taşır.
+- Favori hızlı bilgi kartından “Portföye Ekle” seçildiğinde, birden fazla bağımsız portföy varsa mevcut portföy adlarını içeren hedef seçici açılır. Kayıt yalnız seçilen portföyün `positions` dizisine yazılır; tek portföy varsa hedef seçimi gizlenir.
 
 ## 18. Bilinen sınırlar ve ertelenen işler
 
