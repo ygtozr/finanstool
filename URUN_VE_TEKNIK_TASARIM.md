@@ -1,8 +1,8 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 7.0
-**Uygulama sürümü:** v7.0
-**Durum:** Kullanıcı tarafından onaylandı
+**Belge sürümü:** 7.1 önizleme
+**Uygulama sürümü:** v7.1 Önizleme
+**Durum:** İnceleme adayı; v7.0 kalıcı sürüm korunuyor
 **Canlı adres:** https://finanstool.vercel.app
 **Kaynak depo:** https://github.com/ygtozr/finanstool
 **Son güncelleme:** 27 Ağustos 2026
@@ -43,7 +43,7 @@ Kullanıcı tarafından belirlenen ve sonraki geliştirmelerde korunması gereke
 ### 2.1 Sürümleme ve arşiv standardı
 
 - Güncel onaylı sürüm: **v7.0**.
-- İncelenen sürüm: **v7.0**.
+- İncelenen sürüm: **v7.1 Önizleme**.
 - Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v7.1** olur.
 - Depo kökü her zaman canlı sürümü temsil eder.
 - Arşiv yolu: `archive/vX/` veya `archive/vX.Y/`.
@@ -966,7 +966,49 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 - [ ] Tarayıcı konsolunda tanımsız değişken veya işlenmemiş Promise hatası yok.
 - [ ] Mobil arama ve form alanlarına dokunmak sayfayı yakınlaştırmıyor; iki parmak hareketi uygulama ölçeğini değiştirmiyor.
 
-## 20. Sıfırdan yeniden geliştirme için tamamlanma tanımı
+## 20. v7.1 Önizleme — Üyelik ve Bulut Eşitleme
+
+### 20.1 Kullanıcı akışı
+
+- Uygulama ilk açılışta Clerk tabanlı giriş ekranı gösterir.
+- “Giriş Yapmadan Yerel Devam Et” seçeneği üyelik zorunluluğunu kaldırır; bu modda kişisel veri sunucuya gönderilmez.
+- Geçerli Clerk oturumu bulunan cihaz uygulamayı yeniden açtığında oturum hatırlanır ve ilgili bulut kaydı yüklenir.
+- İlk bulut girişinde, cihazdaki mevcut verinin hesaba aktarılması için açık onay istenir. Kullanıcı aktarmazsa boş bir hesap verisi oluşturulur.
+- Yerel misafir kopyası ile bulut hesabı birbirine karıştırılmaz. Çıkış yapıldığında misafir kopyası geri yüklenir.
+- Diğer sayfasındaki Hesap kartı; giriş, hesap yönetimi, çıkış ve son eşitleme durumunu gösterir.
+
+### 20.2 Sunucu mimarisi ve güvenlik
+
+- Kimlik sağlayıcı Clerk’tir. Tarayıcı yalnız yayımlanabilir anahtarı alır; `CLERK_SECRET_KEY` hiçbir istemci yanıtına eklenmez.
+- `/api/user-state` istekleri Clerk oturum tokenını `Authorization: Bearer` başlığında taşır ve sunucuda doğrular.
+- Veri sağlayıcı Neon Postgres’tir. `DATABASE_URL` yalnız Vercel sunucu ortamında bulunur.
+- `user_app_states` tablosu `user_id`, JSONB `state`, artan `version` ve `updated_at` alanlarından oluşur. Her hesap yalnız doğrulanmış Clerk kullanıcı kimliğiyle erişilen tek kayda sahiptir.
+- PUT işlemi beklenen sürümü denetler. Başka cihaz daha yeni bir sürüm kaydetmişse HTTP 409 döner ve eski cihaz sessizce yeni veriyi ezmez.
+- İstemci değişiklikleri kısa süre birleştirilerek kaydedilir; sayfa arka plana geçerken bekleyen kayıt tamamlanmaya çalışılır. Ağ kesintisinde tarayıcı kopyası korunur.
+- Uygulama durumu için 1 MB istek sınırı uygulanır. API yalnız GET, PUT ve DELETE yöntemlerini kabul eder.
+
+### 20.3 Kalıcılık kapsamı
+
+Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır: Favoriler ve sıraları, bütün bağımsız portföyler, pozisyonlar, nakit bakiyeleri, temettü yeniden yatırım ayarları, alarmlar, Piyasa Özeti ve kullanıcı tercihleri. Clerk parolaları uygulama veya Neon veritabanında tutulmaz.
+
+### 20.4 Telefon üzerinden yönetim
+
+- Kullanıcılar, oturum yöntemleri ve davetler Clerk Dashboard üzerinden yönetilir: `https://dashboard.clerk.com/`
+- Veritabanı, sorgular, kullanım ve yedek dalları Neon Console üzerinden yönetilir: `https://console.neon.tech/`
+- Bağlı servisler Vercel Integrations sayfasından; ortam değişkenleri finanstool projesinin Environment Variables sayfasından yönetilir.
+- Telefon yönetiminde gizli anahtarlar mesaj veya ekran görüntüsüyle paylaşılmaz; erişim kaldırma işlemi ilgili sağlayıcının bağlantı/entegrasyon ekranından yapılır.
+
+### 20.5 v7.1 önizleme kabul ölçütleri
+
+- Yerel devam seçeneği Clerk veya Neon erişilemiyorken de uygulamayı açar.
+- Yeni kullanıcı mevcut yerel verisini aktarabilir veya boş hesapla başlayabilir.
+- Oturum yeniden açılışta hatırlanır ve yalnız o kullanıcının kaydı yüklenir.
+- Bir cihazdaki değişiklik Neon’a kaydedilir; sürüm çatışması sessiz veri kaybına yol açmaz.
+- Çıkış, bulut verisini başka yerel kullanıcıya göstermeden misafir kopyasını geri getirir.
+- Gizli anahtarlar Git deposunda, istemci JavaScript’inde veya API yanıtlarında bulunmaz.
+- v7.0 ana yayın kullanıcı onayına kadar değişmez.
+
+## 21. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 
 Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında mevcut Özer Finans ile eşdeğer kabul edilir:
 
@@ -981,7 +1023,7 @@ Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında me
 9. Güncel belge depo kökünde bulunur ve aynı belge `archive/v7.0/` altında saklanır.
 10. Kullanıcı canlı sürümü kontrol edip onaylamıştır.
 
-## 21. Belge bakım kuralı
+## 22. Belge bakım kuralı
 
 Her onaylı sürüm için şu işlem zorunludur:
 

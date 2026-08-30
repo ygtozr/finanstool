@@ -14,6 +14,10 @@ const searchApi=fs.readFileSync(path.join(root,'api','search.js'),'utf8');
 const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
 const tefasApi=fs.readFileSync(path.join(root,'api','tefas.js'),'utf8');
 const quoteApi=fs.readFileSync(path.join(root,'api','quote.js'),'utf8');
+const authConfigApi=fs.readFileSync(path.join(root,'api','auth-config.js'),'utf8');
+const userStateApi=fs.readFileSync(path.join(root,'api','user-state.js'),'utf8');
+const authCloud=fs.readFileSync(path.join(root,'assets','auth-cloud.js'),'utf8');
+const storageEvents=fs.readFileSync(path.join(root,'assets','storage-events.js'),'utf8');
 const brandPng=fs.readFileSync(path.join(root,'assets','brand-symbol-a.png'));
 const chartVendor=fs.readFileSync(path.join(root,'assets','chart.umd.min.js'),'utf8');
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));
@@ -42,6 +46,10 @@ const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].ma
 scripts.forEach((script,index)=>assert.doesNotThrow(()=>new Function(script),'İstemci betiği '+(index+1)+' sözdizimi'));
 assert.doesNotThrow(()=>new Function('module','exports','require',priceApi),'Fiyat API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',quoteApi),'Güncel fiyat API sözdizimi');
+assert.doesNotThrow(()=>new Function('module','exports','require',authConfigApi),'Clerk yapılandırma API sözdizimi');
+assert.doesNotThrow(()=>new Function('module','exports','require',userStateApi),'Kullanıcı bulut verisi API sözdizimi');
+assert.doesNotThrow(()=>new Function(authCloud),'Bulut oturum istemcisi sözdizimi');
+assert.doesNotThrow(()=>new Function(storageEvents),'Yerel değişiklik gözlemcisi sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',fundamentalsApi),'Temel veri API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',dividendsApi),'Temettü API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',dividendHistoryApi),'Temettü geçmişi API sözdizimi');
@@ -169,9 +177,9 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v7\.0<\/title>/,'Tarayıcı başlığı kalıcı marka ve sürüm adını kullanmalı');
-assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.0[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
-assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.0[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
+assert.match(html,/<title>Özer Finans v7\.1 Önizleme<\/title>/,'Tarayıcı başlığı aday sürüm adını kullanmalı');
+assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.1[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
+assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.1[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
 assert.match(html,/\.page-brand \{[^}]*justify-content:center;/,'Sayfa marka kilidi yatay olarak ortalanmalı');
 assert.match(html,/\.version-badge \{[^}]*border:0;[^}]*opacity:\.62;/,'Sürüm bilgisi rozetsiz, küçük ve silik gösterilmeli');
@@ -341,8 +349,8 @@ assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#eef3f8':'#10182
 assert.match(html,/src="assets\/chart\.umd\.min\.js\?v=4\.4\.4"/,'Chart.js uygulamanın kendi dosyasından yüklenmeli');
 assert.doesNotMatch(html,/cdn\.jsdelivr\.net\/npm\/chart\.js/,'Grafikler çalışma anında harici CDN’ye bağlı olmamalı');
 assert.ok(chartVendor.length>150000&&/Chart/.test(chartVendor),'Yerel Chart.js paketi eksiksiz görünmeli');
-assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=7\.0"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
-assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=7\.0"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
+assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=7\.1"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
+assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=7\.1"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
 assert.equal(manifest.name,'Özer Finans','Manifest uygulamanın tam adını taşımalı');
 assert.equal(manifest.display,'standalone','PWA bağımsız uygulama görünümünde açılmalı');
 assert.deepEqual(manifest.icons.map(icon=>icon.sizes),['192x192','512x512'],'Manifest standart PWA ikon boyutlarını içermeli');
@@ -414,4 +422,15 @@ assert.match(html,/\.settings-horizontal \{ display:grid; grid-template-columns:
 assert.match(html,/\.setting-switch \{[^}]*padding:0; border:0;/,'Fiyat alarmı anahtarı ikinci bir kutu içine alınmamalı');
 assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yardım ve uygulama bilgileri Veri Yedekleme bölümünden sonra gelmeli');
 
-console.log('Özer Finans v7.0 regresyon testleri başarılı.');
+assert.match(html,/id="authGate"[\s\S]*id="authSignIn"[\s\S]*id="authLocalContinue"/,'Açılış ekranında giriş ve yerel devam seçenekleri bulunmalı');
+assert.match(html,/id="accountTitle"[\s\S]*id="accountManage"[\s\S]*id="accountSignOut"/,'Diğer ekranında hesap ve oturum yönetimi bulunmalı');
+assert.match(html,/assets\/storage-events\.js\?v=7\.1[\s\S]*assets\/auth-cloud\.js\?v=7\.1/,'Yerel değişiklik gözlemi bulut istemcisinden önce yüklenmeli');
+assert.match(authCloud,/localStorage\.setItem\(GUEST_BACKUP_KEY[\s\S]*function restoreGuestSnapshot/,'Misafir verisi bulut hesabından ayrı korunmalı');
+assert.match(authCloud,/session\.getToken\(\)[\s\S]*Authorization: `Bearer/,'Bulut API istekleri Clerk oturum anahtarıyla doğrulanmalı');
+assert.match(authCloud,/expectedVersion: state\.version[\s\S]*error\.status === 409/,'Bulut senkronizasyonu sürüm çakışmalarını sessizce ezmemeli');
+assert.match(userStateApi,/verifyToken\(token,[\s\S]*authorizedParties/,'Sunucu Clerk oturumunu ve istek kaynağını doğrulamalı');
+assert.match(userStateApi,/CREATE TABLE IF NOT EXISTS user_app_states[\s\S]*user_id TEXT PRIMARY KEY[\s\S]*state JSONB/,'Neon verisi kullanıcı kimliğiyle ayrılmalı');
+assert.match(userStateApi,/WHERE user_app_states\.version = \$\{expectedVersion\}/,'Neon güncellemesi iyimser sürüm kontrolü kullanmalı');
+assert.doesNotMatch(html,/CLERK_SECRET_KEY|DATABASE_URL=/,'Sunucu sırları HTML içine gömülmemeli');
+
+console.log('Özer Finans v7.1 önizleme regresyon testleri başarılı.');
