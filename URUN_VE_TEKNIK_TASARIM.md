@@ -1,7 +1,7 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
 **Belge sürümü:** 7.1 önizleme
-**Uygulama sürümü:** v7.1 Önizleme
+**Uygulama sürümü:** v7.2 Önizleme
 **Durum:** İnceleme adayı; v7.0 kalıcı sürüm korunuyor
 **Canlı adres:** https://finanstool.vercel.app
 **Kaynak depo:** https://github.com/ygtozr/finanstool
@@ -43,8 +43,8 @@ Kullanıcı tarafından belirlenen ve sonraki geliştirmelerde korunması gereke
 ### 2.1 Sürümleme ve arşiv standardı
 
 - Güncel onaylı sürüm: **v7.0**.
-- İncelenen sürüm: **v7.1 Önizleme**.
-- Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v7.1** olur.
+- İncelenen sürüm: **v7.2 Önizleme**.
+- Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v7.2** olur.
 - Depo kökü her zaman canlı sürümü temsil eder.
 - Arşiv yolu: `archive/vX/` veya `archive/vX.Y/`.
 - Bir sürüm onaylandığında en az şu dosyalar arşivlenir:
@@ -966,44 +966,45 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 - [ ] Tarayıcı konsolunda tanımsız değişken veya işlenmemiş Promise hatası yok.
 - [ ] Mobil arama ve form alanlarına dokunmak sayfayı yakınlaştırmıyor; iki parmak hareketi uygulama ölçeğini değiştirmiyor.
 
-## 20. v7.1 Önizleme — Üyelik ve Bulut Eşitleme
+## 20. v7.2 Önizleme — Davetli Üyelik ve Şifreli Bulut Eşitleme
 
 ### 20.1 Kullanıcı akışı
 
-- Uygulama ilk açılışta Clerk tabanlı giriş ekranı gösterir.
+- Uygulama ilk açılışta Özer Finans e-posta/şifre giriş ekranını gösterir.
 - “Giriş Yapmadan Yerel Devam Et” seçeneği üyelik zorunluluğunu kaldırır; bu modda kişisel veri sunucuya gönderilmez.
-- Geçerli Clerk oturumu bulunan cihaz uygulamayı yeniden açtığında oturum hatırlanır ve ilgili bulut kaydı yüklenir.
+- Geçerli güvenli oturum çerezi bulunan cihaz uygulamayı yeniden açtığında oturum hatırlanır ve ilgili şifreli bulut kaydı yüklenir.
 - İlk bulut girişinde, cihazdaki mevcut verinin hesaba aktarılması için açık onay istenir. Kullanıcı aktarmazsa boş bir hesap verisi oluşturulur.
 - Yerel misafir kopyası ile bulut hesabı birbirine karıştırılmaz. Çıkış yapıldığında misafir kopyası geri yüklenir.
-- Diğer sayfasındaki Hesap kartı; giriş, hesap yönetimi, çıkış ve son eşitleme durumunu gösterir.
+- Diğer sayfasındaki Hesap kartı; giriş, çıkış ve son eşitleme durumunu gösterir. Yönetici ayrıca kullanıcı listesini ve davet aracını görür.
 
 ### 20.2 Sunucu mimarisi ve güvenlik
 
-- Kimlik sağlayıcı Clerk’tir. Tarayıcı yalnız yayımlanabilir anahtarı alır; `CLERK_SECRET_KEY` hiçbir istemci yanıtına eklenmez.
-- `/api/user-state` istekleri Clerk oturum tokenını `Authorization: Bearer` başlığında taşır ve sunucuda doğrular.
-- Veri sağlayıcı Neon Postgres’tir. `DATABASE_URL` yalnız Vercel sunucu ortamında bulunur.
-- `user_app_states` tablosu `user_id`, JSONB `state`, artan `version` ve `updated_at` alanlarından oluşur. Her hesap yalnız doğrulanmış Clerk kullanıcı kimliğiyle erişilen tek kayda sahiptir.
+- Üyelik API’si Vercel Functions üzerinde uygulamaya özeldir; Clerk kullanılmaz. Şifreler `scrypt` ile özetlenir ve düz metin olarak hiçbir zaman saklanmaz.
+- Kalıcı veri sağlayıcı Upstash Redis’tir; Neon kullanılmaz. `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `DATA_ENCRYPTION_KEY` ve ilk kurulum kodu yalnız Vercel ortam değişkenlerinde bulunur.
+- Kullanıcı, davet, oturum ve uygulama kayıtları ayrı anahtar alanlarında tutulur. E-posta araması SHA-256 indeksiyle yapılır; kayıt içerikleri AES-256-GCM ile şifrelenir.
+- Oturum anahtarı tarayıcıda `HttpOnly`, `Secure`, `SameSite=Lax` çerez olarak tutulur; sunucuda yalnız SHA-256 özeti anahtar olarak kullanılır.
+- Kayıt yalnız 24 saat geçerli tek kullanımlık davetle yapılır. İlk yönetici, veritabanı boşken `AUTH_BOOTSTRAP_TOKEN` ile bir kez oluşturulabilir.
 - PUT işlemi beklenen sürümü denetler. Başka cihaz daha yeni bir sürüm kaydetmişse HTTP 409 döner ve eski cihaz sessizce yeni veriyi ezmez.
 - İstemci değişiklikleri kısa süre birleştirilerek kaydedilir; sayfa arka plana geçerken bekleyen kayıt tamamlanmaya çalışılır. Ağ kesintisinde tarayıcı kopyası korunur.
 - Uygulama durumu için 1 MB istek sınırı uygulanır. API yalnız GET, PUT ve DELETE yöntemlerini kabul eder.
 
 ### 20.3 Kalıcılık kapsamı
 
-Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır: Favoriler ve sıraları, bütün bağımsız portföyler, pozisyonlar, nakit bakiyeleri, temettü yeniden yatırım ayarları, alarmlar, Piyasa Özeti ve kullanıcı tercihleri. Clerk parolaları uygulama veya Neon veritabanında tutulmaz.
+Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır: Favoriler ve sıraları, bütün bağımsız portföyler, pozisyonlar, nakit bakiyeleri, temettü yeniden yatırım ayarları, alarmlar, Piyasa Özeti ve kullanıcı tercihleri. Belge Upstash’e gönderilmeden önce sunucuda AES-256-GCM ile şifrelenir.
 
 ### 20.4 Telefon üzerinden yönetim
 
-- Kullanıcılar, oturum yöntemleri ve davetler Clerk Dashboard üzerinden yönetilir: `https://dashboard.clerk.com/`
-- Veritabanı, sorgular, kullanım ve yedek dalları Neon Console üzerinden yönetilir: `https://console.neon.tech/`
+- Yönetici, uygulamanın Diğer sayfasında e-posta yazarak 24 saatlik davet bağlantısı üretir ve bağlantıyı kullanıcıyla paylaşır.
+- Upstash kullanım ve veritabanı bağlantısı Vercel Marketplace/Storage ekranından yönetilir.
 - Bağlı servisler Vercel Integrations sayfasından; ortam değişkenleri finanstool projesinin Environment Variables sayfasından yönetilir.
 - Telefon yönetiminde gizli anahtarlar mesaj veya ekran görüntüsüyle paylaşılmaz; erişim kaldırma işlemi ilgili sağlayıcının bağlantı/entegrasyon ekranından yapılır.
 
-### 20.5 v7.1 önizleme kabul ölçütleri
+### 20.5 v7.2 önizleme kabul ölçütleri
 
-- Yerel devam seçeneği Clerk veya Neon erişilemiyorken de uygulamayı açar.
+- Yerel devam seçeneği üyelik veya Upstash erişilemiyorken de uygulamayı açar.
 - Yeni kullanıcı mevcut yerel verisini aktarabilir veya boş hesapla başlayabilir.
 - Oturum yeniden açılışta hatırlanır ve yalnız o kullanıcının kaydı yüklenir.
-- Bir cihazdaki değişiklik Neon’a kaydedilir; sürüm çatışması sessiz veri kaybına yol açmaz.
+- Bir cihazdaki değişiklik şifrelenerek Upstash’e kaydedilir; sürüm çatışması sessiz veri kaybına yol açmaz.
 - Çıkış, bulut verisini başka yerel kullanıcıya göstermeden misafir kopyasını geri getirir.
 - Gizli anahtarlar Git deposunda, istemci JavaScript’inde veya API yanıtlarında bulunmaz.
 - v7.0 ana yayın kullanıcı onayına kadar değişmez.

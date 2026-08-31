@@ -96,5 +96,5 @@ const assert=require('node:assert/strict');
   assert.ok((await page.locator('#diagnosticsList dd').count())>=6,'Tanılama kartı temel bağlantı bilgilerini göstermeli');
   assert.deepEqual(pageErrors,[],'Sayfada yakalanmamış JavaScript hatası olmamalı');
   await browser.close();
-  console.log('v7.1 önizleme üyelik, portföy özeti ve hedef seçimi mobil tarayıcı testi başarılı.');
+  console.log('v7.2 önizleme üyelik, portföy özeti ve hedef seçimi mobil tarayıcı testi başarılı.');
 })().catch(error=>{console.error(error);process.exit(1)});
