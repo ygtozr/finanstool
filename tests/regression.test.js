@@ -424,7 +424,10 @@ assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yard�
 
 assert.match(html,/id="authGate"[\s\S]*id="authSignIn"[\s\S]*id="authLocalContinue"/,'Açılış ekranında giriş ve yerel devam seçenekleri bulunmalı');
 assert.match(html,/id="accountTitle"[\s\S]*id="accountManage"[\s\S]*id="accountSignOut"/,'Diğer ekranında hesap ve oturum yönetimi bulunmalı');
-assert.match(html,/assets\/storage-events\.js\?v=7\.1[\s\S]*assets\/auth-cloud\.js\?v=7\.1/,'Yerel değişiklik gözlemi bulut istemcisinden önce yüklenmeli');
+assert.match(html,/id="authSignIn"[^>]*disabled[^>]*>Giriş Hazırlanıyor…/,'Clerk hazır olmadan giriş düğmesi etkin olmamalı');
+assert.match(html,/assets\/storage-events\.js\?v=7\.1[\s\S]*assets\/auth-cloud\.js\?v=7\.1\.1/,'Yerel değişiklik gözlemi bulut istemcisinden önce, yeni bulut istemcisi önbellekten bağımsız yüklenmeli');
+assert.match(authCloud,/await state\.clerk\.load[\s\S]*signInButton\.disabled = false/,'Giriş düğmesi yalnız Clerk tamamen yüklendikten sonra açılmalı');
+assert.match(authCloud,/function requestSignIn\(\)[\s\S]*if \(state\.clerk\)[\s\S]*boot\(\)/,'Hazır olmayan veya kesilen giriş bağlantısı güvenli biçimde yeniden denenmeli');
 assert.match(authCloud,/localStorage\.setItem\(GUEST_BACKUP_KEY[\s\S]*function restoreGuestSnapshot/,'Misafir verisi bulut hesabından ayrı korunmalı');
 assert.match(authCloud,/session\.getToken\(\)[\s\S]*Authorization: `Bearer/,'Bulut API istekleri Clerk oturum anahtarıyla doğrulanmalı');
 assert.match(authCloud,/expectedVersion: state\.version[\s\S]*error\.status === 409/,'Bulut senkronizasyonu sürüm çakışmalarını sessizce ezmemeli');

@@ -27,7 +27,12 @@
     syncTimer: null,
     syncInFlight: null,
     config: null,
+    booting: false,
+    signInMounted: false,
   };
+
+  signInButton.disabled = true;
+  accountAction.disabled = true;
 
   function setGateStatus(message, isError) {
     gateStatus.textContent = message || '';
@@ -137,6 +142,10 @@
   }
 
   function showGate({ signIn = false } = {}) {
+    if (signIn && !state.clerk) {
+      signIn = false;
+      setGateStatus('Giriş sistemi hazırlanıyor…');
+    }
     document.body.classList.add('auth-locked');
     gate.hidden = false;
     document.getElementById('appMain').setAttribute('inert', '');
@@ -144,13 +153,27 @@
     gateHome.hidden = signIn;
     signInHost.hidden = !signIn;
     authBack.hidden = !signIn;
-    if (signIn && state.clerk) {
+    if (!signIn && state.signInMounted) {
+      try { state.clerk?.unmountSignIn(signInHost); } catch {}
       signInHost.innerHTML = '';
-      state.clerk.mountSignIn(signInHost, {
-        appearance: {
-          variables: { colorPrimary: '#18a987', borderRadius: '0.75rem' },
-        },
-      });
+      state.signInMounted = false;
+    }
+    if (signIn && state.clerk) {
+      try {
+        if (state.signInMounted) state.clerk.unmountSignIn(signInHost);
+        signInHost.innerHTML = '';
+        state.clerk.mountSignIn(signInHost, {
+          appearance: {
+            variables: { colorPrimary: '#18a987', borderRadius: '0.75rem' },
+          },
+        });
+        state.signInMounted = true;
+      } catch (error) {
+        signInHost.hidden = true;
+        authBack.hidden = true;
+        gateHome.hidden = false;
+        setGateStatus(error?.message || 'Giriş ekranı açılamadı. Tekrar deneyin.', true);
+      }
     }
   }
 
@@ -268,6 +291,11 @@
   }
 
   async function boot() {
+    if (state.booting) return;
+    state.booting = true;
+    signInButton.disabled = true;
+    accountAction.disabled = true;
+    signInButton.textContent = 'Giriş Hazırlanıyor…';
     showGate();
     setGateStatus('Güvenli oturum kontrol ediliyor…');
     try {
@@ -279,6 +307,9 @@
       await loadScript(`${base}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`, { 'data-clerk-publishable-key': state.config.publishableKey });
       state.clerk = window.Clerk;
       await state.clerk.load({ ui: { ClerkUI: window.__internal_ClerkUICtor } });
+      signInButton.disabled = false;
+      accountAction.disabled = false;
+      signInButton.textContent = 'Giriş Yap';
       state.clerk.addListener(resources => {
         if (resources?.user && resources?.session) activateCloud();
       });
@@ -290,14 +321,28 @@
       }
     } catch (error) {
       setGateStatus(`${error.message || 'Üyelik servisine bağlanılamadı.'} Yerel kullanım kullanılabilir.`, true);
+      signInButton.disabled = false;
+      accountAction.disabled = false;
+      signInButton.textContent = 'Girişi Yeniden Dene';
       localButton.disabled = false;
+    } finally {
+      state.booting = false;
     }
   }
 
-  signInButton.addEventListener('click', () => showGate({ signIn: true }));
+  function requestSignIn() {
+    if (state.clerk) {
+      showGate({ signIn: true });
+      return;
+    }
+    setGateStatus('Giriş bağlantısı yeniden hazırlanıyor…');
+    boot();
+  }
+
+  signInButton.addEventListener('click', requestSignIn);
   localButton.addEventListener('click', chooseLocal);
   authBack.addEventListener('click', () => showGate());
-  accountAction.addEventListener('click', () => showGate({ signIn: true }));
+  accountAction.addEventListener('click', requestSignIn);
   accountManage.addEventListener('click', () => state.clerk?.openUserProfile());
   accountSignOut.addEventListener('click', signOut);
   window.addEventListener('ozer:local-data-change', event => {
