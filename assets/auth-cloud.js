@@ -311,7 +311,9 @@
       accountAction.disabled = false;
       signInButton.textContent = 'Giriş Yap';
       state.clerk.addListener(resources => {
-        if (resources?.user && resources?.session) activateCloud();
+        const user = resources?.user || state.clerk?.user;
+        const session = resources?.session || state.clerk?.session;
+        if (user && session) activateCloud();
       });
       if (state.clerk.isSignedIn) {
         await activateCloud();
@@ -332,7 +334,14 @@
 
   function requestSignIn() {
     if (state.clerk) {
-      showGate({ signIn: true });
+      try {
+        const returnUrl = window.location.href;
+        const signInUrl = state.clerk.buildSignInUrl({ redirectUrl: returnUrl });
+        setGateStatus('Güvenli giriş sayfasına yönlendiriliyorsunuz…');
+        window.location.assign(signInUrl);
+      } catch (error) {
+        setGateStatus(error?.message || 'Giriş bağlantısı açılamadı. Tekrar deneyin.', true);
+      }
       return;
     }
     setGateStatus('Giriş bağlantısı yeniden hazırlanıyor…');
