@@ -34,6 +34,7 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v6.6](./v6.6/) | Arşivlendi | v6.6 portföy, ayarlar ve veri dayanıklılığı yayını |
 | [v6.7](./v6.7/) | Arşivlendi | v6.7 bağımsız para birimi kapsamları yayını |
 | [v6.8](./v6.8/) | Arşivlendi | v6.8 portföy gizliliği ve kâr-zarar dönemi yayını |
-| [v7.0](./v7.0/) | Kalıcı onaylı sürüm | v7.0 açılır portföy analizi ve hedef portföy seçimi yayını |
+| [v7.0](./v7.0/) | Arşivlendi | v7.0 açılır portföy analizi ve hedef portföy seçimi yayını |
+| [v7.1](./v7.1/) | Kalıcı onaylı sürüm | v7.1 davetli üyelik, özel oturum ve şifreli Upstash eşitleme yayını |
 
 Bir sonraki onaylı sürüm yayınlanırken mevcut sürüm aynı düzenle arşivlenecektir.
