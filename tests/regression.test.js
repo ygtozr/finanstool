@@ -22,6 +22,7 @@ const authStore=fs.readFileSync(path.join(root,'lib','auth-store.js'),'utf8');
 const authLoginApi=fs.readFileSync(path.join(root,'lib','account-routes','auth-login.js'),'utf8');
 const authRegisterApi=fs.readFileSync(path.join(root,'lib','account-routes','auth-register.js'),'utf8');
 const adminInvitesApi=fs.readFileSync(path.join(root,'lib','account-routes','admin-invites.js'),'utf8');
+const authBootstrapApi=fs.readFileSync(path.join(root,'lib','account-routes','auth-bootstrap.js'),'utf8');
 const storageEvents=fs.readFileSync(path.join(root,'assets','storage-events.js'),'utf8');
 const brandPng=fs.readFileSync(path.join(root,'assets','brand-symbol-a.png'));
 const chartVendor=fs.readFileSync(path.join(root,'assets','chart.umd.min.js'),'utf8');
@@ -59,6 +60,7 @@ assert.doesNotThrow(()=>new Function('module','exports','require',authStore),'Ş
 assert.doesNotThrow(()=>new Function('module','exports','require',authLoginApi),'Giriş API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',authRegisterApi),'Davetli kayıt API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',adminInvitesApi),'Yönetici davet API sözdizimi');
+assert.match(authBootstrapApi,/trim\(\)\.toLowerCase\(\)/,'Kurulum kodu dil bağımsız biçimde küçük/büyük harf duyarsız olmalı');
 assert.doesNotThrow(()=>new Function(storageEvents),'Yerel değişiklik gözlemcisi sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',fundamentalsApi),'Temel veri API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',dividendsApi),'Temettü API sözdizimi');
