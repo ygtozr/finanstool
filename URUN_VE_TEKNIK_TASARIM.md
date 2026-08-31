@@ -980,7 +980,7 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 ### 20.2 Sunucu mimarisi ve güvenlik
 
 - Üyelik API’si Vercel Functions üzerinde uygulamaya özeldir; Clerk kullanılmaz. Şifreler `scrypt` ile özetlenir ve düz metin olarak hiçbir zaman saklanmaz.
-- Kalıcı veri sağlayıcı Upstash Redis’tir; Neon kullanılmaz. `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `DATA_ENCRYPTION_KEY` ve ilk kurulum kodu yalnız Vercel ortam değişkenlerinde bulunur.
+- Kalıcı veri sağlayıcı Upstash Redis’tir; Neon kullanılmaz. Vercel Marketplace’in ürettiği `UPSTASH_REDIS_REST_KV_REST_API_URL`, `UPSTASH_REDIS_REST_KV_REST_API_TOKEN`, `DATA_ENCRYPTION_KEY` ve ilk kurulum kodu yalnız Vercel ortam değişkenlerinde bulunur. Kod, Upstash’ın kısa `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` adlarını da destekler.
 - Kullanıcı, davet, oturum ve uygulama kayıtları ayrı anahtar alanlarında tutulur. E-posta araması SHA-256 indeksiyle yapılır; kayıt içerikleri AES-256-GCM ile şifrelenir.
 - Oturum anahtarı tarayıcıda `HttpOnly`, `Secure`, `SameSite=Lax` çerez olarak tutulur; sunucuda yalnız SHA-256 özeti anahtar olarak kullanılır.
 - Kayıt yalnız 24 saat geçerli tek kullanımlık davetle yapılır. İlk yönetici, veritabanı boşken `AUTH_BOOTSTRAP_TOKEN` ile bir kez oluşturulabilir.
