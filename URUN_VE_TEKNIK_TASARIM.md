@@ -980,13 +980,14 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 ### 20.2 Sunucu mimarisi ve güvenlik
 
 - Üyelik API’si Vercel Functions üzerinde uygulamaya özeldir; Clerk kullanılmaz. Şifreler `scrypt` ile özetlenir ve düz metin olarak hiçbir zaman saklanmaz.
+- Giriş, oturum, davet, yönetici ve eşitleme işlemleri ücretsiz Hobby planının fonksiyon sınırını korumak için tek `/api/account?action=…` Vercel Function altında yönlendirilir. Uygulamanın toplam sunucu fonksiyonu sayısı 10’dur.
 - Kalıcı veri sağlayıcı Upstash Redis’tir; Neon kullanılmaz. Vercel Marketplace’in ürettiği `UPSTASH_REDIS_REST_KV_REST_API_URL`, `UPSTASH_REDIS_REST_KV_REST_API_TOKEN`, `DATA_ENCRYPTION_KEY` ve ilk kurulum kodu yalnız Vercel ortam değişkenlerinde bulunur. Kod, Upstash’ın kısa `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` adlarını da destekler.
 - Kullanıcı, davet, oturum ve uygulama kayıtları ayrı anahtar alanlarında tutulur. E-posta araması SHA-256 indeksiyle yapılır; kayıt içerikleri AES-256-GCM ile şifrelenir.
 - Oturum anahtarı tarayıcıda `HttpOnly`, `Secure`, `SameSite=Lax` çerez olarak tutulur; sunucuda yalnız SHA-256 özeti anahtar olarak kullanılır.
 - Kayıt yalnız 24 saat geçerli tek kullanımlık davetle yapılır. İlk yönetici, veritabanı boşken `AUTH_BOOTSTRAP_TOKEN` ile bir kez oluşturulabilir.
 - PUT işlemi beklenen sürümü denetler. Başka cihaz daha yeni bir sürüm kaydetmişse HTTP 409 döner ve eski cihaz sessizce yeni veriyi ezmez.
 - İstemci değişiklikleri kısa süre birleştirilerek kaydedilir; sayfa arka plana geçerken bekleyen kayıt tamamlanmaya çalışılır. Ağ kesintisinde tarayıcı kopyası korunur.
-- Uygulama durumu için 1 MB istek sınırı uygulanır. API yalnız GET, PUT ve DELETE yöntemlerini kabul eder.
+- Uygulama durumu için 1 MB istek sınırı uygulanır. Durum işlemi yalnız GET, PUT ve DELETE; hesap oluşturma ve giriş işlemleri POST kabul eder.
 
 ### 20.3 Kalıcılık kapsamı
 

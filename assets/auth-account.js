@@ -115,7 +115,7 @@
   }
 
   async function cloudRequest(method, body) {
-    return api('/api/user-state', {
+    return api('/api/account?action=state', {
       method,
       headers: body ? { 'Content-Type': 'application/json' } : {},
       body: body ? JSON.stringify(body) : undefined,
@@ -189,7 +189,7 @@
   async function loadAdminUsers() {
     if (state.user?.role !== 'admin') return;
     try {
-      const payload = await api('/api/admin-users');
+      const payload = await api('/api/account?action=users');
       adminUsersList.innerHTML = '';
       payload.users.forEach(user => {
         const row = document.createElement('div');
@@ -227,7 +227,7 @@
     accountSignOut.disabled = true;
     try {
       await syncNow({ force: true }).catch(() => {});
-      await api('/api/auth-session', { method: 'DELETE' });
+      await api('/api/account?action=session', { method: 'DELETE' });
       restoreGuestSnapshot();
       localStorage.setItem(LAST_MODE_KEY, 'local');
       localStorage.removeItem(ACTIVE_USER_KEY);
@@ -243,7 +243,7 @@
     submit.disabled = true;
     setGateStatus('Giriş yapılıyor…');
     try {
-      const payload = await jsonPost('/api/auth-login', { email: document.getElementById('authEmail').value, password: document.getElementById('authPassword').value });
+      const payload = await jsonPost('/api/account?action=login', { email: document.getElementById('authEmail').value, password: document.getElementById('authPassword').value });
       await activateCloud(payload.user);
     } catch (error) { setGateStatus(error.message, true); }
     finally { submit.disabled = false; }
@@ -257,7 +257,7 @@
     submit.disabled = true;
     try {
       const code = new URLSearchParams(location.search).get('invite') || '';
-      const payload = await jsonPost('/api/auth-register', { inviteCode: code, email: document.getElementById('registerEmail').value, password });
+      const payload = await jsonPost('/api/account?action=register', { inviteCode: code, email: document.getElementById('registerEmail').value, password });
       history.replaceState(null, '', location.pathname);
       await activateCloud(payload.user);
     } catch (error) { setGateStatus(error.message, true); }
@@ -271,7 +271,7 @@
     const submit = bootstrapForm.querySelector('button[type="submit"]');
     submit.disabled = true;
     try {
-      const payload = await jsonPost('/api/auth-bootstrap', { setupCode: document.getElementById('bootstrapCode').value, email: document.getElementById('bootstrapEmail').value, password });
+      const payload = await jsonPost('/api/account?action=bootstrap', { setupCode: document.getElementById('bootstrapCode').value, email: document.getElementById('bootstrapEmail').value, password });
       await activateCloud(payload.user);
     } catch (error) { setGateStatus(error.message, true); }
     finally { submit.disabled = false; }
@@ -281,7 +281,7 @@
     createInviteButton.disabled = true;
     inviteResult.hidden = true;
     try {
-      const payload = await jsonPost('/api/admin-invites', { email: inviteEmail.value });
+      const payload = await jsonPost('/api/account?action=invite', { email: inviteEmail.value });
       inviteLink.href = payload.inviteUrl;
       inviteLink.textContent = payload.inviteUrl;
       inviteResult.hidden = false;
@@ -309,9 +309,9 @@
   (async function boot() {
     document.body.classList.add('auth-locked');
     try {
-      state.config = await api('/api/auth-config');
+      state.config = await api('/api/account?action=config');
       if (!state.config.configured) throw new Error('Üyelik veritabanı henüz yapılandırılmamış.');
-      const session = await api('/api/auth-session');
+      const session = await api('/api/account?action=session');
       if (session.authenticated) return activateCloud(session.user);
       const inviteCode = new URLSearchParams(location.search).get('invite');
       showGate(inviteCode ? 'register' : 'login');
