@@ -1027,6 +1027,7 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - BIST anlık görüntüsü, TEFAS ve altın gibi özel veri yolları doğruluk davranışlarını korumak için kendi uç noktalarında kalır; istemci bunları sınırlı eşzamanlılıkla çağırır.
 - Açık piyasalarda kullanıcının seçtiği yenileme aralığı uygulanır. Kapalı piyasa ve altın en az 60 saniye, TEFAS günlük fiyatları en az 5 dakika bekler.
 - Elle yenileme uyarlanabilir beklemeyi aşabilir fakat hâlihazırda devam eden aynı isteği çoğaltmaz.
+- Alarm denetimi aktif sembolleri tekilleştirir ve aynı toplu fiyat katmanını, alarmın seçili denetim aralığıyla kullanır. Bir alarm turu tamamlanmadan yenisi başlamaz; normal otomatik yenileme ve alarm turu birbirini kesmez.
 
 ### 21.3 Kabul ölçütleri
 
@@ -1036,6 +1037,7 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - Arka plana geçişte zamanlayıcı durur; dönüşte yakın aralıklı iki tur oluşmaz.
 - 15 saniyelik ayarda kapalı BIST/ABD ürünleri her turda yeniden sorgulanmaz.
 - Çekerek ve düğmeyle elle yenileme çalışmaya devam eder.
+- Çok sayıda alarm aynı anda açıkken sembol başına ayrı `/api/price` çağrıları oluşmaz; uygun semboller tek `/api/quotes` çağrısına girer.
 - v7.1 ana yayın kullanıcı onayına kadar değişmez.
 
 ## 22. Sıfırdan yeniden geliştirme için tamamlanma tanımı

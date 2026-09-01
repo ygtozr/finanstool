@@ -17,6 +17,7 @@
 - Tek, kendini istek tamamlandıktan sonra yeniden kuran zamanlayıcı kullanılır. Yavaş yanıt sürerken ikinci yenileme başlamaz.
 - Aynı cihazda birden fazla Safari/PWA sekmesi açıksa yalnız lider sekme otomatik sorgu yapar. Sekme arka plana geçince liderlik bırakılır.
 - Kapalı piyasalar en az 60 saniye, TEFAS günlük verileri en az 5 dakika aralıkla sorgulanır; açık piyasa ve kripto kullanıcının seçtiği aralığı izler.
+- Aktif alarmların sembolleri tekilleştirilip aynı toplu fiyat katmanından alınır; bir alarm denetimi bitmeden ikincisi başlamaz ve normal otomatik yenilemeyle çakışmaz.
 - Bu çalışma kullanıcı onayına kadar v7.1 ana yayını değiştirmeyen ayrı önizlemedir.
 
 ## v7.1: davetli üyelik ve şifreli eşitleme

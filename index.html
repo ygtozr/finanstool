@@ -1170,11 +1170,12 @@
       return bist?(clock.minutes>=600&&clock.minutes<=1090):(clock.minutes>=570&&clock.minutes<=975);
     }
 
-    function compactQuoteInterval(symbol) {
+    function compactQuoteInterval(symbol,baseInterval=refreshInterval) {
       const safe=normalizeSymbol(symbol);
+      const interval=Math.max(0,Number(baseInterval)||0);
       if(safe.startsWith('TEFAS-'))return 300000;
-      if(safe.startsWith('ALTIN-'))return Math.max(refreshInterval,60000);
-      return isLikelyMarketOpen(safe)?refreshInterval:Math.max(refreshInterval,60000);
+      if(safe.startsWith('ALTIN-'))return Math.max(interval,60000);
+      return isLikelyMarketOpen(safe)?interval:Math.max(interval,60000);
     }
 
     function batchQuoteEligible(symbol) {
@@ -1182,15 +1183,15 @@
       return !usesSnapshotQuote(safe)&&!safe.startsWith('ALTIN-')&&!safe.startsWith('TEFAS-');
     }
 
-    async function fetchCompactQuotes(items,{force=false}={}) {
+    async function fetchCompactQuotes(items,{force=false,baseInterval=refreshInterval}={}) {
       const unique=[...new Map((items||[]).filter(item=>item?.symbol).map(item=>[normalizeSymbol(item.symbol),{...item,symbol:normalizeSymbol(item.symbol)}])).values()];
-      const now=Date.now(),due=unique.filter(item=>force||!compactQuoteCache.has(item.symbol)||now-Number(compactQuoteFetchedAt.get(item.symbol)||0)>=compactQuoteInterval(item.symbol));
+      const now=Date.now(),due=unique.filter(item=>force||!compactQuoteCache.has(item.symbol)||now-Number(compactQuoteFetchedAt.get(item.symbol)||0)>=compactQuoteInterval(item.symbol,baseInterval));
       const batchItems=due.filter(item=>batchQuoteEligible(item.symbol)),individualItems=due.filter(item=>!batchQuoteEligible(item.symbol));
       const chunks=[];for(let index=0;index<batchItems.length;index+=20)chunks.push(batchItems.slice(index,index+20));
       await Promise.all(chunks.map(async chunk=>{
         const url='/api/quotes?symbols='+encodeURIComponent(chunk.map(item=>item.symbol).join(','));
         try{
-          const payload=await cachedApiJson(url,{ttl:Math.max(10000,Math.min(refreshInterval||15000,60000)-1000),force});
+          const payload=await cachedApiJson(url,{ttl:Math.max(10000,Math.min(baseInterval||refreshInterval||15000,60000)-1000),force});
           (payload.quotes||[]).forEach(quote=>{
             if(!quote?.ok)return;
             const item=chunk.find(entry=>entry.symbol===quote.symbol),data={...quote,name:quote.name||item?.name||quote.symbol};
@@ -1291,6 +1292,7 @@
     let alarmCheckInterval=[15000,30000,60000,300000].includes(Number(localStorage.getItem(alarmCheckIntervalKey)))?Number(localStorage.getItem(alarmCheckIntervalKey)):60000;
     let backupReminderDays=[0,7,14,30].includes(Number(localStorage.getItem(backupReminderKey)))?Number(localStorage.getItem(backupReminderKey)):14;
     let alarmTimerId=null;
+    let alarmCheckInProgress=false;
     let diagnosticsState=(()=>{try{return JSON.parse(localStorage.getItem(diagnosticsStateKey)||'{}')}catch{return{}}})();
     document.documentElement.dataset.fontSize=fontSize;
     let activeRefreshTimerId = null;
@@ -2482,7 +2484,7 @@
 
     async function runActiveRefresh({force=false,leaderRequired=true,bypassGap=false}={}) {
       if(document.hidden||(!force&&refreshInterval<=0)||(leaderRequired&&!claimPollingLeadership()))return;
-      if(activeRefreshInProgress)return;
+      if(activeRefreshInProgress||alarmCheckInProgress)return;
       const now=Date.now();
       if(!force&&!bypassGap&&now-lastActiveRefreshAt<Math.max(1000,refreshInterval*.7))return;
       activeRefreshInProgress=true;
@@ -2802,24 +2804,31 @@
     }
 
     async function checkAlarms() {
-      if(!alarmsEnabled)return;
+      if(!alarmsEnabled||alarmCheckInProgress||activeRefreshInProgress)return;
       const active=alarms.filter(alarm=>!alarm.triggered&&(!alarm.lastTriggeredAt||Date.now()-alarm.lastTriggeredAt>15*60000));
-      await Promise.all(active.map(async alarm=>{
-        try{
-          const quote=await latestPrice(alarm.symbol);
+      if(!active.length){renderAlarms();return}
+      alarmCheckInProgress=true;
+      try{
+        const items=[...new Set(active.map(alarm=>normalizeSymbol(alarm.symbol)))].map(symbol=>({symbol,name:symbol}));
+        const quotes=await fetchCompactQuotes(items,{baseInterval:alarmCheckInterval});
+        let changed=false;
+        active.forEach(alarm=>{
+          const quote=quotes.get(normalizeSymbol(alarm.symbol));
+          if(!quote||quote.stale)return;
           const hit=alarm.condition==='above' ? quote.price>=alarm.target : quote.price<=alarm.target;
           if(!hit)return;
           alarm.triggered=alarmAutoDisable;
           alarm.lastTriggeredAt=Date.now();
           alarm.lastPrice=quote.price;
-          saveAlarms();
+          changed=true;
           const message=alarm.symbol+' hedefe ulaştı: '+money(quote.price,quote.currency);
           playAlarmFeedback();
           if('Notification' in window && Notification.permission==='granted') new Notification('Finans Tool fiyat alarmı',{body:message});
           else alert(message);
-        }catch{}
-      }));
-      renderAlarms();
+        });
+        if(changed)saveAlarms();
+      }catch{}
+      finally{alarmCheckInProgress=false;renderAlarms()}
     }
 
     function renderAdvancedResults(items) {
