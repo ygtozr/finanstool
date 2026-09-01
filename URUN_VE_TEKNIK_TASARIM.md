@@ -1,7 +1,7 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 7.1 önizleme
-**Uygulama sürümü:** v7.1
+**Belge sürümü:** 7.2 önizleme
+**Uygulama sürümü:** v7.2 Önizleme
 **Durum:** İnceleme adayı; v7.0 kalıcı sürüm korunuyor
 **Canlı adres:** https://finanstool.vercel.app
 **Kaynak depo:** https://github.com/ygtozr/finanstool
@@ -43,8 +43,8 @@ Kullanıcı tarafından belirlenen ve sonraki geliştirmelerde korunması gereke
 ### 2.1 Sürümleme ve arşiv standardı
 
 - Güncel onaylı sürüm: **v7.0**.
-- İncelenen sürüm: **v7.1**.
-- Sonraki özellik sürümü, kullanıcı farklı bir ad vermedikçe **v7.2** olur.
+- İncelenen sürüm: **v7.2 Önizleme**.
+- Güncel kalıcı sürüm **v7.1** olarak korunur.
 - Depo kökü her zaman canlı sürümü temsil eder.
 - Arşiv yolu: `archive/vX/` veya `archive/vX.Y/`.
 - Bir sürüm onaylandığında en az şu dosyalar arşivlenir:
@@ -1010,7 +1010,35 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - Gizli anahtarlar Git deposunda, istemci JavaScript’inde veya API yanıtlarında bulunmaz.
 - v7.0 ana yayın kullanıcı onayına kadar değişmez.
 
-## 21. Sıfırdan yeniden geliştirme için tamamlanma tanımı
+## 21. v7.2 Önizleme — İstek ve Yenileme Optimizasyonu
+
+### 21.1 Yenileme davranışı
+
+- Uygulama tek bir otomatik zamanlayıcı kullanır. Yeni tur, önceki turun tamamlanmasından sonra planlanır; yavaş ağda sorgular üst üste birikmez.
+- Yalnız görünür sayfa yenilenir: Özet açıkken Piyasa Özeti ve Favoriler, Grafik açıkken seçili grafik, Portföy açıkken hafif portföy özeti güncellenir.
+- Otomatik, elle ve çekerek yenileme aynı URL için ortak istek kilidinden geçer. Zorunlu yenileme devam eden eşdeğer isteği çoğaltmaz.
+- Görünürlük dönüşü en son başarılı turun zamanını dikkate alır ve zamanlayıcıyla yakın aralıklı ikinci bir tur başlatmaz.
+- Aynı tarayıcı profilindeki sekmeler/PWA pencereleri kısa süreli `localStorage` liderlik kaydı kullanır. Yalnız lider görünür pencere otomatik sorgular; arka plana geçiş ve sayfa kapanışı liderliği bırakır.
+
+### 21.2 Toplu ve uyarlanabilir fiyat katmanı
+
+- Piyasa Özeti ile Favorilerin sembolleri birleştirilip tekilleştirilir. Yahoo/Nasdaq geçmişi kullanan en fazla 20 ürün tek `/api/quotes` istemci çağrısıyla alınır.
+- Sunucu toplu uç noktası sağlayıcı sorgularını en fazla dört eşzamanlı iş ile sınırlar ve mevcut `/api/price` sağlayıcı zinciri, istek birleştirme ve son başarılı veri yedeğini yeniden kullanır.
+- BIST anlık görüntüsü, TEFAS ve altın gibi özel veri yolları doğruluk davranışlarını korumak için kendi uç noktalarında kalır; istemci bunları sınırlı eşzamanlılıkla çağırır.
+- Açık piyasalarda kullanıcının seçtiği yenileme aralığı uygulanır. Kapalı piyasa ve altın en az 60 saniye, TEFAS günlük fiyatları en az 5 dakika bekler.
+- Elle yenileme uyarlanabilir beklemeyi aşabilir fakat hâlihazırda devam eden aynı isteği çoğaltmaz.
+
+### 21.3 Kabul ölçütleri
+
+- Özet ekranında normal ABD/kripto sembolleri için çok sayıda ayrı `/api/price` yerine tek `/api/quotes` istemci çağrısı görülür.
+- Başka bir sayfa açıkken Özet, Grafik veya Portföy arka planda sorgu üretmez.
+- İki sekme aynı anda açık bırakıldığında yalnız bir sekme periyodik sorgu gönderir.
+- Arka plana geçişte zamanlayıcı durur; dönüşte yakın aralıklı iki tur oluşmaz.
+- 15 saniyelik ayarda kapalı BIST/ABD ürünleri her turda yeniden sorgulanmaz.
+- Çekerek ve düğmeyle elle yenileme çalışmaya devam eder.
+- v7.1 ana yayın kullanıcı onayına kadar değişmez.
+
+## 22. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 
 Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında mevcut Özer Finans ile eşdeğer kabul edilir:
 
@@ -1025,7 +1053,7 @@ Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında me
 9. Güncel belge depo kökünde bulunur ve aynı belge `archive/v7.0/` altında saklanır.
 10. Kullanıcı canlı sürümü kontrol edip onaylamıştır.
 
-## 22. Belge bakım kuralı
+## 23. Belge bakım kuralı
 
 Her onaylı sürüm için şu işlem zorunludur:
 

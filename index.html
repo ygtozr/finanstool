@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=7.1">
   <link rel="manifest" href="manifest.webmanifest?v=7.1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com https://eodhd.com; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>Özer Finans v7.1</title>
+  <title>Özer Finans v7.2 Önizleme</title>
   <script src="assets/chart.umd.min.js?v=4.4.4"></script>
   <style>
     :root { color-scheme:dark; --surface-page:#101827; --surface-main:#192337; --surface-section:#111a2b; --surface-card:#0d1523; --surface-soft:#182235; --surface-control:#26344d; --line:#2b3a55; --border-strong:#40516e; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --on-accent:#062019; --positive:#34d399; --negative:#ff8f9c; --warning:#ffd66b; --info:#60a5fa; --focus-ring:#7dd3fc; --chart-fill:rgba(82,213,177,.14); --chart-fill-soft:rgba(82,213,177,.08); --bg:var(--surface-page); --panel:var(--surface-main); --danger:var(--negative); }
@@ -762,11 +762,11 @@
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small>v7.1</small>
+      <small>v7.2 Önizleme</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.1" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.1</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.1" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.2 Önizleme</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -776,7 +776,7 @@
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.1" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.1</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.1" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.2 Önizleme</span></h1>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -806,7 +806,7 @@
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.1" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.1</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.1" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.2 Önizleme</span></h1>
       <div id="allPortfolioHead" class="portfolio-head portfolio-overall-head"><div class="portfolio-overall-heading"><h2>Toplam Portföy</h2><div class="portfolio-view-toolbar"><div class="portfolio-metric-mode" role="group" aria-label="Portföy kâr zarar dönemi"><button id="portfolioTodayMode" class="is-active" type="button" aria-pressed="true">Bugün</button><button id="portfolioTotalMode" type="button" aria-pressed="false">Toplam</button></div><button id="portfolioPrivacyToggle" class="portfolio-privacy-toggle" type="button" aria-label="Portföy rakamlarını gizle" aria-pressed="false" title="Portföy rakamlarını gizle"><svg class="privacy-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></svg><svg class="privacy-off" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.3 3M6.4 6.5C3.9 8.2 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6M9.8 9.8a3 3 0 0 0 4.4 4.4"/></svg></button></div></div><div class="portfolio-overall-body"><div class="portfolio-head-metrics"><strong id="allPortfolioTotalValue" class="portfolio-head-value">—</strong><p id="allPortfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="allPortfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Toplam portföyü TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div></div>
       <div class="portfolio-switcher"><label class="portfolio-switcher-field" for="portfolioBookSelect">Aktif Portföy<select id="portfolioBookSelect" aria-label="Aktif portföyü seç"></select></label><div class="portfolio-switcher-actions"><button id="portfolioBookAdd" type="button" aria-label="Yeni portföy oluştur" title="Yeni portföy">+</button><button id="portfolioBookRename" type="button" aria-label="Aktif portföyün adını değiştir" title="Adını değiştir">✎</button><button id="portfolioBookDelete" type="button" aria-label="Aktif portföyü sil" title="Portföyü sil">×</button></div></div>
       <div id="portfolioBookTabs" class="portfolio-book-tabs" role="group" aria-label="Portföy kısayolları"></div>
@@ -836,7 +836,7 @@
       <section id="portfolioDividendSection" class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.1" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.1</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.1" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.2 Önizleme</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
         <section class="settings-card settings-horizontal" aria-labelledby="accountTitle"><div class="settings-card-copy"><h3 id="accountTitle">Hesap</h3><p id="accountDescription">Oturum durumu hazırlanıyor…</p><p id="cloudSyncStatus" class="settings-status cloud-sync-status" aria-live="polite"></p></div><div class="settings-card-controls account-controls"><button id="accountAction" type="button">Giriş Yap</button><button id="accountSignOut" class="account-secondary" type="button" hidden>Çıkış Yap</button></div></section>
@@ -886,7 +886,7 @@
         <section class="settings-card settings-horizontal" aria-labelledby="diagnosticsTitle"><div class="settings-card-copy"><h3 id="diagnosticsTitle">Bağlantı Tanılama</h3><p>Veri bağlantısının ve uygulama önbelleğinin son durumunu görüntüleyin.</p></div><div class="settings-card-controls"><dl id="diagnosticsList" class="diagnostics-list"></dl><div class="settings-inline-actions"><button id="diagnosticsRefresh" type="button">Durumu Yenile</button></div></div></section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Yerel modda veriler yalnız cihazda; giriş yapıldığında kullanıcıya bağlı ve şifreli Upstash kaydında saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v7.1</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Yerel modda veriler yalnız cihazda; giriş yapıldığında kullanıcıya bağlı ve şifreli Upstash kaydında saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v7.2 Önizleme</strong></div></div>
         </section>
       </div>
     </section>
@@ -1061,12 +1061,15 @@
     let portfolioSearchRequestId = 0;
     const apiCache = new Map();
     const apiInFlight = new Map();
+    const compactQuoteCache = new Map();
+    const compactQuoteFetchedAt = new Map();
+    let marketFavoritesPromise = null;
 
     async function cachedApiJson(url,{ttl=12000,force=false}={}) {
       const now=Date.now();
       const cached=apiCache.get(url);
       if(!force&&cached&&now-cached.time<ttl)return cached.data;
-      const inFlightKey=force?url+'|force':url;
+      const inFlightKey=url;
       if(apiInFlight.has(inFlightKey))return apiInFlight.get(inFlightKey);
       const requestUrl=force?url+(url.includes('?')?'&':'?')+'_reload='+now:url;
       const request=fetch(requestUrl,{cache:'no-store'}).then(async response=>{
@@ -1145,6 +1148,60 @@
         updatedAt:Date.now(),stale:Boolean(payload._finansTool?.stale),provider:result.meta?.dataProvider||payload._finansTool?.provider||null,
         priceType:'chart',delayed:false,sourceMismatch:false,incompletePreviousClose:false
       };
+    }
+
+    function marketClock(timeZone,date=new Date()) {
+      const values={};
+      new Intl.DateTimeFormat('en-US',{timeZone,weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date).forEach(part=>{values[part.type]=part.value});
+      return{weekday:values.weekday,minutes:Number(values.hour)*60+Number(values.minute)};
+    }
+
+    function isLikelyMarketOpen(symbol,date=new Date()) {
+      const safe=normalizeSymbol(symbol);
+      if(/^(BTC|ETH|SOL|XRP|DOGE)-[A-Z]{3}$/.test(safe))return true;
+      if(safe.startsWith('TEFAS-'))return false;
+      if(safe.endsWith('=X')){
+        const utc=date.getUTCDay(),hour=date.getUTCHours();
+        return !(utc===6||(utc===0&&hour<22)||(utc===5&&hour>=22));
+      }
+      const bist=safe.endsWith('.IS')||safe==='XU100'||safe==='XU100.IS';
+      const clock=marketClock(bist?'Europe/Istanbul':'America/New_York',date);
+      if(['Sat','Sun'].includes(clock.weekday))return false;
+      return bist?(clock.minutes>=600&&clock.minutes<=1090):(clock.minutes>=570&&clock.minutes<=975);
+    }
+
+    function compactQuoteInterval(symbol) {
+      const safe=normalizeSymbol(symbol);
+      if(safe.startsWith('TEFAS-'))return 300000;
+      if(safe.startsWith('ALTIN-'))return Math.max(refreshInterval,60000);
+      return isLikelyMarketOpen(safe)?refreshInterval:Math.max(refreshInterval,60000);
+    }
+
+    function batchQuoteEligible(symbol) {
+      const safe=normalizeSymbol(symbol);
+      return !usesSnapshotQuote(safe)&&!safe.startsWith('ALTIN-')&&!safe.startsWith('TEFAS-');
+    }
+
+    async function fetchCompactQuotes(items,{force=false}={}) {
+      const unique=[...new Map((items||[]).filter(item=>item?.symbol).map(item=>[normalizeSymbol(item.symbol),{...item,symbol:normalizeSymbol(item.symbol)}])).values()];
+      const now=Date.now(),due=unique.filter(item=>force||!compactQuoteCache.has(item.symbol)||now-Number(compactQuoteFetchedAt.get(item.symbol)||0)>=compactQuoteInterval(item.symbol));
+      const batchItems=due.filter(item=>batchQuoteEligible(item.symbol)),individualItems=due.filter(item=>!batchQuoteEligible(item.symbol));
+      const chunks=[];for(let index=0;index<batchItems.length;index+=20)chunks.push(batchItems.slice(index,index+20));
+      await Promise.all(chunks.map(async chunk=>{
+        const url='/api/quotes?symbols='+encodeURIComponent(chunk.map(item=>item.symbol).join(','));
+        try{
+          const payload=await cachedApiJson(url,{ttl:Math.max(10000,Math.min(refreshInterval||15000,60000)-1000),force});
+          (payload.quotes||[]).forEach(quote=>{
+            if(!quote?.ok)return;
+            const item=chunk.find(entry=>entry.symbol===quote.symbol),data={...quote,name:quote.name||item?.name||quote.symbol};
+            delete data.ok;compactQuoteCache.set(quote.symbol,data);compactQuoteFetchedAt.set(quote.symbol,Date.now());
+          });
+        }catch{}
+      }));
+      await mapWithLimit(individualItems,4,async item=>{
+        try{const quote=await fetchCompactQuote(item,{force});compactQuoteCache.set(item.symbol,quote);compactQuoteFetchedAt.set(item.symbol,Date.now())}catch{}
+      });
+      return new Map(unique.map(item=>[item.symbol,compactQuoteCache.get(item.symbol)]).filter(([,quote])=>quote));
     }
 
     async function prefetchPortfolioPrices(positions) {
@@ -1236,9 +1293,11 @@
     let alarmTimerId=null;
     let diagnosticsState=(()=>{try{return JSON.parse(localStorage.getItem(diagnosticsStateKey)||'{}')}catch{return{}}})();
     document.documentElement.dataset.fontSize=fontSize;
-    let marketRefreshTimerId = null;
-    let chartRefreshTimerId = null;
-    let portfolioRefreshTimerId = null;
+    let activeRefreshTimerId = null;
+    let activeRefreshInProgress = false;
+    let lastActiveRefreshAt = 0;
+    const refreshLeaderKey='finans-grafigi-refresh-leader';
+    const refreshInstanceId=(crypto.randomUUID?.()||Date.now()+'-'+Math.random()).toString();
     const periodButtons = [...document.querySelectorAll('[data-range]')];
     const customPeriod = document.getElementById('customPeriod');
     const datePicker = document.getElementById('datePicker');
@@ -2049,7 +2108,7 @@
       favoriteUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
     }
 
-    async function refreshFavoriteQuotes({force=false}={}) {
+    async function refreshFavoriteQuotes({force=false,quotes=null}={}) {
       if(favoriteRefreshInProgress){favoriteRefreshQueued=force||favoriteRefreshQueued;return}
       if(!favorites.length){
         favoriteQuotes.clear();
@@ -2060,7 +2119,8 @@
       favoriteRefreshInProgress=true;
       const items=favorites.map(item=>({...item}));
       try{
-        const results=await mapWithLimit(items,4,async item=>{try{return{ok:true,data:await fetchFavoriteQuote(item,{force})}}catch{return{ok:false,item}}});
+        const sharedQuotes=quotes||await fetchCompactQuotes(items,{force});
+        const results=items.map(item=>{const data=sharedQuotes.get(normalizeSymbol(item.symbol));return data?{ok:true,data}:{ok:false,item}});
         let namesChanged=false;
         results.forEach(result=>{
           const symbol=result.ok?result.data.symbol:result.item.symbol;
@@ -2269,7 +2329,7 @@
       return [...marketCards.children];
     }
 
-    async function loadMarketSummary({force=false}={}) {
+    async function loadMarketSummary({force=false,quotes=null}={}) {
       const requestId=++marketSummaryRequest;
       const items=marketItems.map(item=>({...item}));
       if(!items.length){
@@ -2283,11 +2343,8 @@
         return;
       }
       const cards=ensureMarketCards(items);
-      const results=await mapWithLimit(items,4,async item=>{
-        try{
-          return{ok:true,...await fetchCompactQuote(item,{force})};
-        }catch{return{ok:false}}
-      });
+      const sharedQuotes=quotes||await fetchCompactQuotes(items,{force});
+      const results=items.map(item=>{const quote=sharedQuotes.get(normalizeSymbol(item.symbol));return quote?{ok:true,...quote}:{ok:false}});
       if(requestId!==marketSummaryRequest)return;
       items.forEach((item,index)=>updateMarketCard(cards[index],item,results[index]));
       marketUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
@@ -2312,15 +2369,20 @@
     }
 
     async function refreshMarketAndFavorites({force=false}={}) {
+      if(marketFavoritesPromise)return marketFavoritesPromise;
       marketRefresh.disabled=true;
       favoriteRefresh.disabled=true;
-      try{
-        await Promise.all([loadMarketSummary({force}),refreshFavoriteQuotes({force})]);
-        updateFavoriteRefreshTimestamp();
-      }finally{
-        marketRefresh.disabled=false;
-        favoriteRefresh.disabled=false;
-      }
+      marketFavoritesPromise=(async()=>{
+        try{
+          const quotes=await fetchCompactQuotes([...marketItems,...favorites],{force});
+          await Promise.all([loadMarketSummary({force,quotes}),refreshFavoriteQuotes({force,quotes})]);
+          updateFavoriteRefreshTimestamp();
+        }finally{
+          marketRefresh.disabled=false;
+          favoriteRefresh.disabled=false;
+        }
+      })().finally(()=>{marketFavoritesPromise=null});
+      return marketFavoritesPromise;
     }
 
     function applyTheme(preference,{persist=true}={}) {
@@ -2388,7 +2450,7 @@
 
     function startAlarmTimer() {
       if(alarmTimerId)clearInterval(alarmTimerId);
-      alarmTimerId=alarmsEnabled?setInterval(checkAlarms,alarmCheckInterval):null;
+      alarmTimerId=alarmsEnabled?setInterval(()=>{if(!document.hidden&&claimPollingLeadership())checkAlarms()},alarmCheckInterval):null;
     }
 
     function playAlarmFeedback() {
@@ -2397,13 +2459,46 @@
       try{const Context=window.AudioContext||window.webkitAudioContext;if(!Context)return;const context=new Context(),oscillator=context.createOscillator(),gain=context.createGain();oscillator.frequency.value=740;gain.gain.setValueAtTime(.0001,context.currentTime);gain.gain.exponentialRampToValueAtTime(.15,context.currentTime+.02);gain.gain.exponentialRampToValueAtTime(.0001,context.currentTime+.25);oscillator.connect(gain).connect(context.destination);oscillator.start();oscillator.stop(context.currentTime+.27);oscillator.addEventListener('ended',()=>context.close())}catch{}
     }
 
-    function startRefreshTimers() {
-      [marketRefreshTimerId,chartRefreshTimerId,portfolioRefreshTimerId].forEach(timer=>{if(timer)clearInterval(timer)});
-      marketRefreshTimerId=chartRefreshTimerId=portfolioRefreshTimerId=null;
+    function claimPollingLeadership() {
+      if(document.hidden)return false;
+      const now=Date.now(),expiresAt=now+Math.max(20000,(refreshInterval||15000)*2);
+      try{
+        const current=JSON.parse(localStorage.getItem(refreshLeaderKey)||'null');
+        if(current?.owner&&current.owner!==refreshInstanceId&&Number(current.expiresAt)>now)return false;
+        localStorage.setItem(refreshLeaderKey,JSON.stringify({owner:refreshInstanceId,expiresAt}));
+        return JSON.parse(localStorage.getItem(refreshLeaderKey)||'null')?.owner===refreshInstanceId;
+      }catch{return true}
+    }
+
+    function releasePollingLeadership() {
+      try{const current=JSON.parse(localStorage.getItem(refreshLeaderKey)||'null');if(current?.owner===refreshInstanceId)localStorage.removeItem(refreshLeaderKey)}catch{}
+    }
+
+    async function refreshActiveView({force=false}={}) {
+      if(mainView.classList.contains('active'))return refreshMarketAndFavorites({force});
+      if(chartView.classList.contains('active'))return primarySymbol?refreshCurrentChart():loadPrice(currentSymbol()||'AAPL',{silent:true});
+      if(portfolioView.classList.contains('active'))return renderPortfolio({refreshBenchmark:false,refreshDividends:false});
+    }
+
+    async function runActiveRefresh({force=false,leaderRequired=true,bypassGap=false}={}) {
+      if(document.hidden||(!force&&refreshInterval<=0)||(leaderRequired&&!claimPollingLeadership()))return;
+      if(activeRefreshInProgress)return;
+      const now=Date.now();
+      if(!force&&!bypassGap&&now-lastActiveRefreshAt<Math.max(1000,refreshInterval*.7))return;
+      activeRefreshInProgress=true;
+      try{await refreshActiveView({force});lastActiveRefreshAt=Date.now()}
+      finally{activeRefreshInProgress=false}
+    }
+
+    function startRefreshTimers({immediate=false,bypassGap=false}={}) {
+      if(activeRefreshTimerId)clearTimeout(activeRefreshTimerId);
+      activeRefreshTimerId=null;
       if(refreshInterval<=0)return;
-      marketRefreshTimerId=setInterval(()=>{if(!document.hidden)refreshMarketAndFavorites()},refreshInterval);
-      chartRefreshTimerId=setInterval(refreshCurrentChart,refreshInterval);
-      portfolioRefreshTimerId=setInterval(()=>{if(!document.hidden&&portfolioView.classList.contains('active'))renderPortfolio({refreshBenchmark:false,refreshDividends:false})},refreshInterval);
+      const schedule=()=>{
+        if(activeRefreshTimerId)clearTimeout(activeRefreshTimerId);
+        activeRefreshTimerId=setTimeout(async()=>{try{await runActiveRefresh()}finally{schedule()}},refreshInterval);
+      };
+      if(immediate)runActiveRefresh({leaderRequired:true,bypassGap}).finally(schedule);else schedule();
     }
 
     function safeFileName(value) {
@@ -2485,7 +2580,7 @@
       activeBook.cashBalances=cashBalances;
       return {
         schemaVersion:3,
-        appVersion:'7.1-preview',
+        appVersion:'7.2-preview',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
@@ -2979,8 +3074,8 @@
         tab.setAttribute('aria-selected',String(active));
         tab.tabIndex=active?0:-1;
       });
-      if(states.portfolio)renderPortfolio();
       if(states.chart)requestAnimationFrame(()=>{if(chart)chart.resize();if(rsiChart)rsiChart.resize()});
+      startRefreshTimers({immediate:true,bypassGap:true});
     }
 
     function showPortfolioSuggestions(items,message='') {
@@ -4148,7 +4243,7 @@
     }
 
     async function refreshCurrentChart(){
-      if(chartRefreshInProgress||!primarySymbol||document.hidden||button.disabled)return;
+      if(chartRefreshInProgress||!chartView.classList.contains('active')||!primarySymbol||document.hidden||button.disabled)return;
       chartRefreshInProgress=true;
       try{await loadPrice(primarySymbol,{silent:true})}
       finally{chartRefreshInProgress=false}
@@ -4318,10 +4413,8 @@
     }
     async function refreshActiveViewFromPull() {
       apiCache.clear();
-      if(mainView.classList.contains('active'))return refreshMarketAndFavorites({force:true});
-      if(chartView.classList.contains('active'))return loadPrice(currentSymbol()||'AAPL',{silent:true});
-      if(portfolioView.classList.contains('active'))return renderPortfolio();
-      return refreshMarketAndFavorites({force:true});
+      compactQuoteFetchedAt.clear();
+      return runActiveRefresh({force:true,leaderRequired:false});
     }
     async function runPullRefresh() {
       if(pullRefreshRunning)return;
@@ -4380,7 +4473,7 @@
       const next=Number(refreshIntervalSelect.value);
       refreshInterval=supportedRefreshIntervals.includes(next)?next:15000;
       localStorage.setItem(refreshIntervalKey,String(refreshInterval));
-      startRefreshTimers();
+      startRefreshTimers({immediate:true});
       syncSettingsControls();
     });
     defaultRangeSelect.addEventListener('change',()=>{
@@ -4697,17 +4790,14 @@
     renderChartAssetPanels();
     renderFavorites();
     updateFavoriteButton();
-    loadPrice('AAPL');
-    refreshMarketAndFavorites();
     renderAlarms();
     startAlarmTimer();
-    startRefreshTimers();
+    startRefreshTimers({immediate:true,bypassGap:true});
     document.addEventListener('visibilitychange',()=>{
-      if(document.hidden)return;
-      if(mainView.classList.contains('active'))refreshMarketAndFavorites();
-      if(chartView.classList.contains('active'))refreshCurrentChart();
-      if(portfolioView.classList.contains('active'))renderPortfolio();
+      if(document.hidden){if(activeRefreshTimerId)clearTimeout(activeRefreshTimerId);activeRefreshTimerId=null;releasePollingLeadership();return}
+      startRefreshTimers({immediate:true});
     });
+    window.addEventListener('pagehide',releasePollingLeadership);
   </script>
 
   <script>

@@ -194,7 +194,27 @@ function annotate(data,{stale=false,servedAt=Date.now()}={}) {
   return data;
 }
 
-module.exports=async(req,res)=>{
+async function resolvePriceData(symbol,rawQuery='range=1mo&interval=1d') {
+  const normalized=String(symbol||'').trim().toUpperCase();
+  if(!/^[A-Z0-9.^=-]{1,30}$/.test(normalized))throw new Error('Geçersiz hisse kodu.');
+  const params=cleanQuery(rawQuery),key=normalized+'?'+params.toString();
+  let request=inFlight.get(key);
+  if(!request){
+    request=resolvePrice(normalized,params,false,false).finally(()=>inFlight.delete(key));
+    inFlight.set(key,request);
+  }
+  try{
+    const data=annotate(await request);
+    lastKnownGood.set(key,{time:Date.now(),data});
+    return data;
+  }catch(error){
+    const saved=lastKnownGood.get(key);
+    if(saved&&Date.now()-saved.time<LAST_GOOD_TTL_MS)return annotate(saved.data,{stale:true});
+    throw error;
+  }
+}
+
+const handler=async(req,res)=>{
   res.setHeader('Allow','GET');
   if(req.method!=='GET')return res.status(405).json({error:'Yalnız GET yöntemi desteklenir.'});
   if(!allowRequest(req))return res.status(429).json({error:'Çok fazla istek gönderildi. Kısa süre sonra yeniden deneyin.'});
@@ -226,3 +246,6 @@ module.exports=async(req,res)=>{
     return res.status(502).json({error:'Birincil ve ikincil veri sağlayıcılarına ulaşılamadı.'});
   }
 };
+
+handler.resolvePriceData=resolvePriceData;
+module.exports=handler;
