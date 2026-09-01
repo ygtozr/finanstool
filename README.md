@@ -1,4 +1,4 @@
-# Özer Finans v7.1
+# Özer Finans v7.2
 
 Özer Finans; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
@@ -6,8 +6,16 @@
 
 - Vercel: https://finanstool.vercel.app
 - Arayüz dili: Türkçe
-- Güncel kalıcı sürüm: **v7.0**
-- İncelenen sürüm: **v7.1**
+- Güncel kalıcı sürüm: **v7.2**
+- İncelenen sürüm: **v7.2**
+
+## v7.2: düşük istek tüketimli otomatik yenileme
+
+- Piyasa, favoriler ve portföy fiyatları sembol başına ayrı Vercel isteği yerine tek toplu `/api/prices` isteğiyle alınır.
+- Üç bağımsız otomatik yenileme döngüsü kaldırılmış; yalnız görünür olan aktif ekranı yenileyen tek zamanlayıcıya geçilmiştir.
+- Kullanıcının Ayarlar ekranında seçtiği 5, 15, 30 veya 60 saniyelik sıklık aynen uygulanır; “Kapalı” seçeneğinde otomatik istek gönderilmez.
+- Uygulama arka plandayken otomatik fiyat isteği yapılmaz. Uygulama yeniden görünür olduğunda seçili yenileme ayarı açıksa aktif ekran bir kez güncellenir.
+- Eşzamanlı aynı fiyat istekleri istemci önbelleğini paylaşır; manuel yenileme ve aşağı çekerek yenileme davranışları korunur.
 
 ## v7.1: davetli üyelik ve şifreli eşitleme
 
@@ -19,7 +27,7 @@
 - İlk girişte mevcut cihaz verisinin hesaba aktarılıp aktarılmayacağı kullanıcıya sorulur. Yerel misafir verisi ayrı tutulur ve çıkışta geri yüklenir.
 - Bulut kayıtları iyimser sürüm denetimi kullanır; başka cihazdaki daha yeni kayıt sessizce ezilmez. Bağlantı kesilirse yerel kopya korunur.
 - Hesap açma zorunlu değildir. Yönetici, Diğer sayfasındaki Kullanıcı Yönetimi kartından davet bağlantısı oluşturabilir.
-- Bu çalışma yalnız önizlemedir; kullanıcı onayı gelene kadar ana v7.0 yayını değiştirilmez.
+- Bu özellikler kullanıcı onayıyla v7.1 kalıcı sürümünde yayımlanmıştır.
 
 ## v7.0 açılır Portföy Özet Analizi ve hedef portföy seçimi
 
