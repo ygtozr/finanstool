@@ -1021,7 +1021,7 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 
 ### 21.2 Toplu ve uyarlanabilir fiyat katmanı
 
-- Piyasa Özeti ile Favorilerin sembolleri birleştirilip tekilleştirilir. Yahoo/Nasdaq geçmişi kullanan en fazla 20 ürün tek `/api/quotes` istemci çağrısıyla alınır.
+- Piyasa Özeti, Favoriler, Portföy ve Alarmların ihtiyaç duyduğu semboller tekilleştirilir; en fazla 40 ürün tek `/api/prices` istemci çağrısıyla alınır.
 - Sunucu toplu uç noktası sağlayıcı sorgularını en fazla dört eşzamanlı iş ile sınırlar ve mevcut `/api/price` sağlayıcı zinciri, istek birleştirme ve son başarılı veri yedeğini yeniden kullanır.
 - BIST anlık görüntüsü, TEFAS ve altın gibi özel veri yolları doğruluk davranışlarını korumak için kendi uç noktalarında kalır; istemci bunları sınırlı eşzamanlılıkla çağırır.
 - Açık piyasalarda kullanıcının seçtiği yenileme aralığı uygulanır. Kapalı piyasa ve altın en az 60 saniye, TEFAS günlük fiyatları en az 5 dakika bekler.
@@ -1030,13 +1030,13 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 
 ### 21.3 Kabul ölçütleri
 
-- Özet ekranında normal ABD/kripto sembolleri için çok sayıda ayrı `/api/price` yerine tek `/api/quotes` istemci çağrısı görülür.
+- Özet ekranında çok sayıda ayrı fiyat isteği yerine tek `/api/prices` istemci çağrısı görülür.
 - Başka bir sayfa açıkken Özet, Grafik veya Portföy arka planda sorgu üretmez.
 - İki sekme aynı anda açık bırakıldığında yalnız bir sekme periyodik sorgu gönderir.
 - Arka plana geçişte zamanlayıcı durur; dönüşte yakın aralıklı iki tur oluşmaz.
 - 15 saniyelik ayarda kapalı BIST/ABD ürünleri her turda yeniden sorgulanmaz.
 - Çekerek ve düğmeyle elle yenileme çalışmaya devam eder.
-- Çok sayıda alarm aynı anda açıkken sembol başına ayrı `/api/price` çağrıları oluşmaz; uygun semboller tek `/api/quotes` çağrısına girer.
+- Çok sayıda alarm aynı anda açıkken sembol başına ayrı fiyat çağrıları oluşmaz; uygun semboller tek `/api/prices` çağrısına girer.
 - v7.2 kullanıcı onayıyla kalıcı ana yayın olarak sabitlenmiştir.
 
 ## 22. Sıfırdan yeniden geliştirme için tamamlanma tanımı

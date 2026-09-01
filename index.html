@@ -1101,6 +1101,19 @@
       return priceApiUrl(safeSymbol,query);
     }
 
+    async function prefetchPricePayloads(items,{query='range=1mo&interval=1d',force=false}={}) {
+      const symbols=[...new Set((items||[]).map(item=>normalizeSymbol(item?.symbol||item)).filter(Boolean))];
+      if(!symbols.length)return;
+      const chunks=[];
+      for(let index=0;index<symbols.length;index+=25)chunks.push(symbols.slice(index,index+25));
+      const payloads=await Promise.all(chunks.map(chunk=>cachedApiJson('/api/prices?symbols='+encodeURIComponent(chunk.join(','))+'&query='+encodeURIComponent(query),{ttl:Math.max(5000,refreshInterval||15000),force}).catch(()=>null)));
+      const cachedAt=Date.now();
+      payloads.forEach(payload=>Object.entries(payload?.results||{}).forEach(([symbol,result])=>{
+        if(result?.price?.ok&&result.price.data)apiCache.set(priceApiUrl(symbol,query),{time:cachedAt,data:result.price.data});
+        if(result?.quote?.ok&&result.quote.data)apiCache.set('/api/quote?symbol='+encodeURIComponent(symbol),{time:cachedAt,data:result.quote.data});
+      }));
+    }
+
     function usesSnapshotQuote(symbol) {
       const safeSymbol=normalizeSymbol(symbol);
       return safeSymbol.startsWith('TEFAS-')||safeSymbol.endsWith('.IS');
@@ -1178,43 +1191,19 @@
       return isLikelyMarketOpen(safe)?interval:Math.max(interval,60000);
     }
 
-    function batchQuoteEligible(symbol) {
-      const safe=normalizeSymbol(symbol);
-      return !usesSnapshotQuote(safe)&&!safe.startsWith('ALTIN-')&&!safe.startsWith('TEFAS-');
-    }
-
     async function fetchCompactQuotes(items,{force=false,baseInterval=refreshInterval}={}) {
       const unique=[...new Map((items||[]).filter(item=>item?.symbol).map(item=>[normalizeSymbol(item.symbol),{...item,symbol:normalizeSymbol(item.symbol)}])).values()];
       const now=Date.now(),due=unique.filter(item=>force||!compactQuoteCache.has(item.symbol)||now-Number(compactQuoteFetchedAt.get(item.symbol)||0)>=compactQuoteInterval(item.symbol,baseInterval));
-      const batchItems=due.filter(item=>batchQuoteEligible(item.symbol)),individualItems=due.filter(item=>!batchQuoteEligible(item.symbol));
-      const chunks=[];for(let index=0;index<batchItems.length;index+=20)chunks.push(batchItems.slice(index,index+20));
-      await Promise.all(chunks.map(async chunk=>{
-        const url='/api/quotes?symbols='+encodeURIComponent(chunk.map(item=>item.symbol).join(','));
-        try{
-          const payload=await cachedApiJson(url,{ttl:Math.max(10000,Math.min(baseInterval||refreshInterval||15000,60000)-1000),force});
-          (payload.quotes||[]).forEach(quote=>{
-            if(!quote?.ok)return;
-            const item=chunk.find(entry=>entry.symbol===quote.symbol),data={...quote,name:quote.name||item?.name||quote.symbol};
-            delete data.ok;compactQuoteCache.set(quote.symbol,data);compactQuoteFetchedAt.set(quote.symbol,Date.now());
-          });
-        }catch{}
-      }));
-      await mapWithLimit(individualItems,4,async item=>{
-        try{const quote=await fetchCompactQuote(item,{force});compactQuoteCache.set(item.symbol,quote);compactQuoteFetchedAt.set(item.symbol,Date.now())}catch{}
+      if(due.length)await prefetchPricePayloads(due,{query:'range=1mo&interval=1d',force});
+      await mapWithLimit(due,4,async item=>{
+        try{const quote=await fetchCompactQuote(item,{force:false});compactQuoteCache.set(item.symbol,quote);compactQuoteFetchedAt.set(item.symbol,Date.now())}catch{}
       });
       return new Map(unique.map(item=>[item.symbol,compactQuoteCache.get(item.symbol)]).filter(([,quote])=>quote));
     }
 
     async function prefetchPortfolioPrices(positions) {
       const query='range=1mo&interval=1d';
-      const codes=[...new Set((positions||[]).map(item=>String(item.symbol||'')).filter(symbol=>symbol.startsWith('TEFAS-')).map(symbol=>symbol.slice(6)))].sort();
-      if(!codes.length)return;
-      const chunks=[];for(let index=0;index<codes.length;index+=25)chunks.push(codes.slice(index,index+25));
-      const payloads=await Promise.all(chunks.map(chunk=>cachedApiJson('/api/tefas?action=batch-price&symbols='+encodeURIComponent(chunk.join(','))+'&query='+encodeURIComponent(query),{ttl:600000}).catch(()=>null)));
-      payloads.forEach(payload=>Object.entries(payload?.results||{}).forEach(([code,result])=>{
-        if(!result?.ok||!result.data)return;
-        apiCache.set(priceApiUrl('TEFAS-'+code,query),{time:Date.now(),data:result.data});
-      }));
+      await prefetchPricePayloads(positions,{query});
     }
 
     const saveMarketItems = () => localStorage.setItem(marketItemsKey,JSON.stringify(marketItems));

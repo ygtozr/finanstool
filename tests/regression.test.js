@@ -14,7 +14,7 @@ const searchApi=fs.readFileSync(path.join(root,'api','search.js'),'utf8');
 const logoApi=fs.readFileSync(path.join(root,'api','logo.js'),'utf8');
 const tefasApi=fs.readFileSync(path.join(root,'api','tefas.js'),'utf8');
 const quoteApi=fs.readFileSync(path.join(root,'api','quote.js'),'utf8');
-const quotesApi=fs.readFileSync(path.join(root,'api','quotes.js'),'utf8');
+const pricesApi=fs.readFileSync(path.join(root,'api','prices.js'),'utf8');
 const accountApi=fs.readFileSync(path.join(root,'api','account.js'),'utf8');
 const authConfigApi=fs.readFileSync(path.join(root,'lib','account-routes','auth-config.js'),'utf8');
 const userStateApi=fs.readFileSync(path.join(root,'lib','account-routes','user-state.js'),'utf8');
@@ -53,7 +53,7 @@ const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].ma
 scripts.forEach((script,index)=>assert.doesNotThrow(()=>new Function(script),'İstemci betiği '+(index+1)+' sözdizimi'));
 assert.doesNotThrow(()=>new Function('module','exports','require',priceApi),'Fiyat API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',quoteApi),'Güncel fiyat API sözdizimi');
-assert.doesNotThrow(()=>new Function('module','exports','require',quotesApi),'Toplu fiyat API sözdizimi');
+assert.doesNotThrow(()=>new Function('module','exports','require',pricesApi),'Toplu fiyat API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',accountApi),'Birleşik hesap API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',authConfigApi),'Üyelik yapılandırma API sözdizimi');
 assert.doesNotThrow(()=>new Function('module','exports','require',userStateApi),'Kullanıcı bulut verisi API sözdizimi');
@@ -349,7 +349,9 @@ assert.match(html,/knownTefasFunds=[\s\S]*TEFAS-YLB[\s\S]*TEFAS-YVD[\s\S]*TEFAS-
 assert.match(html,/async function fetchPortfolioItem\(position\)[\s\S]*const dripPromise=[\s\S]*const snapshotPromise=[\s\S]*Promise\.all\(\[cachedApiJson[\s\S]*const dripResult=await dripPromise/,'Portföy geçmişi, güncel fiyatı ve temettü hesabı paralel başlamalı');
 assert.match(html,/const quickFundQuotes=knownTefasMatches\(query\)[\s\S]*showPortfolioSuggestions\(quickFundQuotes,/,'Portföy araması bilinen TEFAS fonlarını anında göstermeli');
 assert.ok((html.match(/const quickFundQuotes=knownTefasMatches\(query\)/g)||[]).length>=5,'Grafik, Favoriler, Piyasa, Kıyaslama ve Portföy aramaları aynı hızlı TEFAS eşleşmesini kullanmalı');
-assert.match(html,/async function prefetchPortfolioPrices\(positions\)[\s\S]*action=batch-price[\s\S]*apiCache\.set/,'Portföydeki TEFAS fiyatları tek toplu istekle istemci önbelleğine yerleştirilmeli');
+assert.match(html,/async function prefetchPortfolioPrices\(positions\)[\s\S]*prefetchPricePayloads\(positions,\{query\}\)/,'Portföy fiyatları tek toplu istekle istemci önbelleğine yerleştirilmeli');
+assert.match(pricesApi,/MAX_SYMBOLS=40[\s\S]*Promise\.all\(symbols\.map[\s\S]*results:Object\.fromEntries/,'Toplu fiyat servisi doğrulanmış sembolleri tek yanıtta birleştirmeli');
+assert.match(pricesApi,/priceHandler[\s\S]*quoteHandler[\s\S]*goldHandler[\s\S]*tefasHandler/,'Toplu fiyat servisi mevcut sağlayıcı yollarını yeniden kullanmalı');
 assert.match(html,/portfolioSnapshotsKey[\s\S]*function renderCachedPortfolioSnapshot\(\)[\s\S]*Son kayıt gösteriliyor; güncel veriler arka planda alınıyor/,'Son başarılı portföy değerleri ekran açılır açılmaz cihazdan gösterilmeli');
 assert.match(html,/savePortfolioSnapshot\(\{mode:portfolioMetricsMode,totalValue:[\s\S]*rows:snapshotRows\}\)/,'Başarılı portföy hesaplaması seçili dönemle sonraki hızlı açılış için saklanmalı');
 assert.match(html,/id="otherView"[\s\S]*data-theme-choice="light"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="system"/,'Diğer ekranı Açık, Koyu ve Sistem tema seçeneklerini içermeli');
@@ -357,6 +359,8 @@ assert.doesNotMatch(html,/data-theme-choice="(?:ocean|plum|sand|contrast|oled)"/
 assert.match(html,/const themeOptions = \['light','dark','system'\]/,'Tema tercihleri yalnız standart üç seçenekle doğrulanmalı');
 assert.match(html,/id="otherView"[\s\S]*id="backupDownload"[\s\S]*id="restoreBackup"/,'Veri yedekleme araçları Diğer ekranında korunmalı');
 assert.match(html,/function startRefreshTimers\(\{immediate=false,bypassGap=false\}=\{\}\)[\s\S]*setTimeout\([\s\S]*refreshInterval/,'Otomatik yenileme tek ve çakışmayan zamanlayıcıyla kullanıcı tercihine göre yeniden başlatılmalı');
+assert.match(html,/\/api\/prices\?symbols=[\s\S]*prefetchPricePayloads/,'Fiyatlar tek toplu API isteğiyle önceden alınmalı');
+assert.doesNotMatch(html,/chartRefreshTimerId|portfolioRefreshTimerId|marketRefreshTimerId/,'Aynı anda çalışan eski çoklu yenileme zamanlayıcıları kaldırılmalı');
 assert.match(html,/savedRefreshInterval===null\?15000:Number\(savedRefreshInterval\)/,'Yeni kullanıcılar için otomatik yenileme varsayılan olarak 15 saniye olmalı');
 assert.match(html,/themeMedia\.addEventListener\('change'[\s\S]*themePreference==='system'/,'Sistem teması cihaz görünümü değiştiğinde otomatik uygulanmalı');
 assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#eef3f8':'#101827'/,'PWA üst çubuğu açık veya koyu temayla eşleşmeli');
@@ -383,8 +387,8 @@ assert.match(html,/priceType==='official_daily'\?'Son resmî · '/,'Fon fiyatın
 assert.match(html,/\.favorite-card \{[^}]*position:relative;[^}]*padding:8px 11px 15px;/,'Favori kartı ölçülü biçimde aşağı taşınan fiyat zamanı için yer ayırmalı');
 assert.match(html,/\.favorite-market-time \{[^}]*position:absolute;[^}]*right:11px;[^}]*bottom:7px;/,'Fiyat zamanı şirket adı sütununu daraltmadan karta daha yakın konumlanmalı');
 assert.match(html,/const inFlightKey=url;[\s\S]*apiInFlight\.has\(inFlightKey\)/,'Zorunlu ve otomatik yenilemede aynı fiyat istekleri birleştirilmeli');
-assert.match(html,/function compactQuoteInterval\(symbol,baseInterval=refreshInterval\)[\s\S]*async function fetchCompactQuotes\(items,\{force=false,baseInterval=refreshInterval\}=\{\}\)[\s\S]*\/api\/quotes\?symbols=/,'Piyasa, Favoriler ve Alarmlar uygun ürünleri tek toplu istek ve uyarlanabilir aralıkla yenilemeli');
-assert.match(quotesApi,/MAX_SYMBOLS=20[\s\S]*mapWithLimit\(symbols,4[\s\S]*resolvePriceData/,'Toplu fiyat API en fazla yirmi sembolü sınırlı eşzamanlılıkla işlemeli');
+assert.match(html,/function compactQuoteInterval\(symbol,baseInterval=refreshInterval\)[\s\S]*async function fetchCompactQuotes\(items,\{force=false,baseInterval=refreshInterval\}=\{\}\)[\s\S]*prefetchPricePayloads\(due,\{query:'range=1mo&interval=1d',force\}\)/,'Piyasa, Favoriler ve Alarmlar ürünleri tek toplu istek ve uyarlanabilir aralıkla yenilemeli');
+assert.match(pricesApi,/MAX_SYMBOLS=40[\s\S]*Promise\.all\(symbols\.map[\s\S]*results:Object\.fromEntries/,'Toplu fiyat API en fazla kırk sembolü tek yanıtta işlemeli');
 assert.match(html,/function refreshActiveView\([\s\S]*mainView\.classList\.contains\('active'\)[\s\S]*chartView\.classList\.contains\('active'\)[\s\S]*portfolioView\.classList\.contains\('active'\)/,'Yalnız görünür uygulama sayfası otomatik yenilenmeli');
 assert.match(html,/function claimPollingLeadership\([\s\S]*refreshLeaderKey[\s\S]*refreshInstanceId/,'Aynı cihazdaki sekmelerden yalnız biri otomatik fiyat sorgulamalı');
 assert.match(html,/document\.addEventListener\('visibilitychange'[\s\S]*releasePollingLeadership\(\)[\s\S]*startRefreshTimers\(\{immediate:true\}\)/,'Arka plandaki sayfa sorgulamayı bırakmalı ve dönüşte zamanlayıcı çakışmamalı');

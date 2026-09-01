@@ -7,16 +7,16 @@
 - Vercel: https://finanstool.vercel.app
 - Arayüz dili: Türkçe
 - Güncel kalıcı sürüm: **v7.2**
-
 ## v7.2: istek, yenileme ve alarm optimizasyonu
 
 - Otomatik yenileme yalnız ekranda açık olan Özet, Grafik veya Portföy sayfasını günceller.
-- Piyasa Özeti ve Favorilerdeki uygun ürünler tek `/api/quotes` çağrısında toplanır; aynı sembol iki bölümdeyse yalnız bir kez istenir.
+- Piyasa Özeti, Favoriler, Portföy ve alarm fiyatları sembol başına ayrı Vercel isteği yerine tek `/api/prices` çağrısında toplanır; aynı sembol birden fazla bölümdeyse yalnız bir kez istenir.
 - Otomatik yenileme, elle yenileme ve görünürlük dönüşü aynı istek kilidini kullanır; üst üste binen aynı URL çağrıları birleştirilir.
 - Tek, kendini istek tamamlandıktan sonra yeniden kuran zamanlayıcı kullanılır. Yavaş yanıt sürerken ikinci yenileme başlamaz.
 - Aynı cihazda birden fazla Safari/PWA sekmesi açıksa yalnız lider sekme otomatik sorgu yapar. Sekme arka plana geçince liderlik bırakılır.
 - Kapalı piyasalar en az 60 saniye, TEFAS günlük verileri en az 5 dakika aralıkla sorgulanır; açık piyasa ve kripto kullanıcının seçtiği aralığı izler.
 - Aktif alarmların sembolleri tekilleştirilip aynı toplu fiyat katmanından alınır; bir alarm denetimi bitmeden ikincisi başlamaz ve normal otomatik yenilemeyle çakışmaz.
+- “Kapalı” yenileme seçeneğinde otomatik istek gönderilmez; manuel ve aşağı çekerek yenileme kullanılabilir.
 - v7.2 kullanıcı tarafından onaylanmış kalıcı ana sürümdür.
 
 ## v7.1: davetli üyelik ve şifreli eşitleme
