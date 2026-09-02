@@ -1,4 +1,4 @@
-# Özer Finans v7.3 Önizleme
+# Özer Finans v7.3
 
 Özer Finans; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
@@ -8,7 +8,7 @@
 - Arayüz dili: Türkçe
 - Güncel kalıcı sürüm: **v7.2**
 
-## v7.3 önizleme: temettü takvimi
+## v7.3: hızlı portföy ve temettü takvimi
 
 - Temettü satırının solundaki tarih öncelikle ödeme tarihidir; ödeme tarihi sağlanmıyorsa hak kullanım tarihi yedek olarak kullanılır. Hisse kodunun yanında yinelenen “Ödeme tarihi” metni gösterilmez.
 - Temettü toplamı ve adet bilgisi, Ayarlar bölümündeki fiyat basamak sayısı tercihine göre biçimlendirilir.

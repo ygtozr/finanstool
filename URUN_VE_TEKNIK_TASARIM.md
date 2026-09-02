@@ -1039,7 +1039,7 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - Çok sayıda alarm aynı anda açıkken sembol başına ayrı fiyat çağrıları oluşmaz; uygun semboller tek `/api/prices` çağrısına girer.
 - v7.2 kullanıcı onayıyla kalıcı ana yayın olarak sabitlenmiştir.
 
-### 21.4 v7.3 temettü takvimi önizlemesi
+### 21.4 v7.3 hızlı portföy ve temettü takvimi
 
 - Takvim yaklaşan temettüleri tarih sırasıyla önceliklendirir ve görünür veri listesini beş kayıtla sınırlar.
 - Yaklaşan kayıt sayısı beşten azsa eksik satırlar beş yıllık geçmişten en yeni gerçek temettülerle tamamlanır; yeni kayıt geldiğinde listedeki en eski kayıt çıkar.
@@ -1054,7 +1054,7 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - Oturum ve arama alanları kullanıcının girdiği harf biçimini korur; yer tutucu metinler cümle düzenindedir. Arama eşleştirmesi Türkçe karakterleri normalize ederek büyük-küçük harf duyarsız çalışır.
 - Tutar ve adet değerleri aynı `Fiyat hassasiyeti` tercihini kullanır. Otomatik, 2, 4 ve 6 basamak seçenekleri iki değere de uygulanır.
 - Ödeme tarihi dar mobil görünümde ayrı satır düzeni ve çok satırlı etiketle görünür kalır.
-- Bu bölüm önizleme statüsündedir; kullanıcı canlı önizlemeyi onayladığında kalıcı sürüm ve arşiv bilgileri güncellenecektir.
+- v7.3 kalıcı sürümü; hızlı portföy ilk çizimi, toplu temettü isteği, cihazda takvim önbelleği ve arka plan DRIP hesaplamasıyla onaylanmıştır.
 
 ## 22. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 
