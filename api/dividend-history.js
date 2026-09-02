@@ -15,7 +15,8 @@ module.exports=async(req,res)=>{
   res.setHeader('Allow','GET');if(req.method!=='GET')return res.status(405).json({error:'Yalnız GET yöntemi desteklenir.'});
   const symbol=String(req.query.symbol||'').trim().toUpperCase(),from=String(req.query.from||'');
   if(!/^[A-Z][A-Z0-9-]{0,14}$/.test(symbol)||!/^\d{4}-\d{2}-\d{2}$/.test(from))return res.status(400).json({error:'Geçersiz sembol veya başlangıç tarihi.'});
-  res.setHeader('Cache-Control','public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
+  res.setHeader('Cache-Control','public, max-age=0, s-maxage=86400, stale-while-revalidate=604800');
+  res.setHeader('Vercel-CDN-Cache-Control','public, s-maxage=86400, stale-while-revalidate=604800');
   try{
     const [rows,price]=await Promise.all([nasdaqRows(symbol),priceHistory(symbol,from)]),fromTime=Math.floor(new Date(from+'T00:00:00Z').getTime()/1000);
     const nasdaqEvents=rows.map(row=>({id:[row.exOrEffDate,row.paymentDate,row.amount].join('|'),exDate:parseDate(row.exOrEffDate),paymentDate:parseDate(row.paymentDate)||parseDate(row.exOrEffDate),amount:parseAmount(row.amount),currency:String(row.currency||price.meta?.currency||'USD').toUpperCase(),dateBasis:parseDate(row.paymentDate)?'payment_date':'ex_date_fallback'}));
@@ -23,9 +24,11 @@ module.exports=async(req,res)=>{
     const providerEvents=nasdaqEvents.length?nasdaqEvents:yahooEvents;
     const events=providerEvents.filter(event=>event.paymentDate>=fromTime&&event.paymentDate<=Date.now()/1000&&Number.isFinite(event.amount)&&event.amount>0).sort((a,b)=>a.paymentDate-b.paymentDate);
     const closes=(price.timestamp||[]).map((time,index)=>({time,close:price.indicators?.quote?.[0]?.close?.[index]})).filter(point=>Number.isFinite(point.close)&&point.close>0);
+    let closeIndex=0;const compactPrices=[];
+    for(const event of events){while(closeIndex<closes.length&&closes[closeIndex].time<event.paymentDate)closeIndex++;const point=closes[closeIndex];if(point&&!compactPrices.some(item=>item.time===point.time))compactPrices.push(point)}
     const splits=Object.values(price.events?.splits||{}).map(item=>({id:String(item.date)+'|'+String(item.splitRatio||''),date:Number(item.date),numerator:Number(item.numerator),denominator:Number(item.denominator)})).filter(item=>Number.isFinite(item.date)&&Number.isFinite(item.numerator)&&Number.isFinite(item.denominator)&&item.denominator>0&&item.date>=fromTime).sort((a,b)=>a.date-b.date);
     const source=nasdaqEvents.length?'Nasdaq ödeme tarihleri + Yahoo Finance kapanış/split':'Yahoo Finance dağıtım tarihleri ve kapanış/split (ödeme tarihi bulunmadığında hak kullanım tarihi)';
-    return res.status(200).json({status:events.length?'ok':'no_events',symbol,currency:String(price.meta?.currency||'USD').toUpperCase(),events,splits,prices:closes,source});
+    return res.status(200).json({status:events.length?'ok':'no_events',symbol,currency:String(price.meta?.currency||'USD').toUpperCase(),events,splits,prices:compactPrices,source});
   }catch(error){return res.status(502).json({status:'provider_error',events:[],error:error.message||'Temettü geçmişi alınamadı.'})}
 };
 module.exports._test={parseDate,parseAmount};

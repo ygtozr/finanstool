@@ -34,11 +34,21 @@ async function fetchClass(symbol,assetClass){
   const payload=await response.json();
   const rows=payload?.data?.dividends?.rows;
   if(!Array.isArray(rows))return[];
-  const today=new Date();today.setUTCHours(0,0,0,0);
   return rows.map(row=>{
     const exDate=parseDate(row.exOrEffDate),paymentDate=parseDate(row.paymentDate),amount=parseAmount(row.amount);
     return{exDate,paymentDate,amount,currency:String(row.currency||'USD').toUpperCase(),type:String(row.type||'Cash')};
-  }).filter(item=>item.amount!==null&&((item.exDate&&item.exDate>=today.getTime())||(item.paymentDate&&item.paymentDate>=today.getTime())));
+  }).filter(item=>item.amount!==null&&(item.exDate||item.paymentDate));
+}
+
+async function fetchYahooPast(symbol){
+  for(const host of ['query1.finance.yahoo.com','query2.finance.yahoo.com'])try{
+    const response=await fetch('https://'+host+'/v8/finance/chart/'+encodeURIComponent(symbol)+'?range=5y&interval=1d&events=div',{headers:{'User-Agent':HEADERS['User-Agent'],'Accept':'application/json'},signal:AbortSignal.timeout(4500)});
+    if(!response.ok)continue;
+    const result=(await response.json())?.chart?.result?.[0],currency=String(result?.meta?.currency||'USD').toUpperCase();
+    const events=Object.values(result?.events?.dividends||{}).map(item=>({exDate:Number(item.date)*1000,paymentDate:null,amount:Number(item.amount),currency,type:'Cash'})).filter(item=>Number.isFinite(item.exDate)&&Number.isFinite(item.amount)&&item.amount>0).sort((a,b)=>b.exDate-a.exDate).slice(0,5);
+    if(events.length)return events;
+  }catch{}
+  return[];
 }
 
 async function fetchBist(symbol){
@@ -57,10 +67,14 @@ async function resolve(symbol){
   if(symbol.includes('.'))return{symbol,events:[],provider:null,supported:false,status:'unsupported'};
   const attempts=await Promise.allSettled(['stocks','etf'].map(assetClass=>fetchClass(symbol,assetClass)));
   if(!attempts.some(result=>result.status==='fulfilled'))throw new Error('Temettü sağlayıcısına ulaşılamadı.');
-  const events=attempts.flatMap(result=>result.status==='fulfilled'?result.value:[]);
+  const allEvents=attempts.flatMap(result=>result.status==='fulfilled'?result.value:[]);
   const seen=new Set();
-  const unique=events.filter(item=>{const key=[item.exDate,item.paymentDate,item.amount,item.currency].join('|');if(seen.has(key))return false;seen.add(key);return true}).sort((a,b)=>(a.exDate||a.paymentDate)-(b.exDate||b.paymentDate)).slice(0,5);
-  return{symbol,events:unique,provider:'Nasdaq',supported:true,status:unique.length?'ok':'no_events'};
+  const unique=allEvents.filter(item=>{const key=[item.exDate,item.paymentDate,item.amount,item.currency].join('|');if(seen.has(key))return false;seen.add(key);return true});
+  const today=new Date();today.setUTCHours(0,0,0,0);const todayTime=today.getTime();
+  const events=unique.filter(item=>(item.paymentDate||item.exDate)>=todayTime).sort((a,b)=>(a.paymentDate||a.exDate)-(b.paymentDate||b.exDate)).slice(0,5);
+  let pastEvents=unique.filter(item=>(item.paymentDate||item.exDate)<todayTime).sort((a,b)=>(b.paymentDate||b.exDate)-(a.paymentDate||a.exDate)).slice(0,5);
+  if(!pastEvents.length)pastEvents=await fetchYahooPast(symbol);
+  return{symbol,events,pastEvents,provider:'Nasdaq',supported:true,status:events.length?'ok':'no_events'};
 }
 
 module.exports=async(req,res)=>{

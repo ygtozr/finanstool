@@ -50,15 +50,33 @@ async function resolveSymbol(symbol,query,req){
   return{price,quote};
 }
 
+function number(value){const parsed=Number(value);return Number.isFinite(parsed)?parsed:null}
+async function resolveCompact(symbol,req){
+  if(symbol.startsWith('TEFAS-')||symbol.endsWith('.IS')){
+    const result=await invoke(quoteHandler,req,{symbol});
+    if(!result.ok)throw new Error(result.error||'Fiyat alınamadı.');
+    return result.data;
+  }
+  const handler=symbol.startsWith('ALTIN-')?goldHandler:priceHandler,result=await invoke(handler,req,{symbol,query:'range=5d&interval=1d'});
+  if(!result.ok)throw new Error(result.error||'Fiyat alınamadı.');
+  const chart=result.data?.chart?.result?.[0],closes=chart?.indicators?.quote?.[0]?.close||[],points=(chart?.timestamp||[]).map((time,index)=>({time:Number(time),price:number(closes[index])})).filter(item=>Number.isFinite(item.time)&&Number.isFinite(item.price)&&item.price>0);
+  if(!points.length)throw new Error('Fiyat bulunamadı.');
+  const last=points.at(-1),previous=points.at(-2)||last,meta=chart.meta||{};
+  return{symbol,name:meta.longName||meta.shortName||symbol,currency:String(meta.currency||'USD').toUpperCase(),price:last.price,previousClose:previous.price,delta:last.price-previous.price,change:previous.price?(last.price/previous.price-1)*100:null,asOf:number(meta.regularMarketTime)||last.time,provider:meta.dataProvider||result.data?._finansTool?.provider||'',priceType:'compact_chart',delayed:false,stale:Boolean(result.data?._finansTool?.stale)};
+}
+
+async function mapWithLimit(items,limit,worker){const output=new Array(items.length);let cursor=0;async function run(){while(cursor<items.length){const index=cursor++;output[index]=await worker(items[index],index)}}await Promise.all(Array.from({length:Math.min(limit,items.length)},run));return output}
+
 module.exports=async(req,res)=>{
   res.setHeader('Allow','GET');
   if(req.method!=='GET')return res.status(405).json({error:'Yalnız GET yöntemi desteklenir.'});
   if(!allow(req))return res.status(429).json({error:'Çok fazla toplu fiyat isteği gönderildi.'});
   const symbols=[...new Set(String(req.query.symbols||'').split(',').map(value=>value.trim().toUpperCase()).filter(Boolean))];
   if(!symbols.length||symbols.length>MAX_SYMBOLS||symbols.some(symbol=>!SYMBOL.test(symbol)))return res.status(400).json({error:'Geçersiz veya çok uzun sembol listesi.'});
-  const query=String(req.query.query||'range=1mo&interval=1d');
+  const compact=String(req.query.mode||'')==='compact',query=String(req.query.query||'range=1mo&interval=1d');
   res.setHeader('Cache-Control','public, max-age=0, s-maxage=10, stale-while-revalidate=20');
-  const entries=await Promise.all(symbols.map(async symbol=>[symbol,await resolveSymbol(symbol,query,req)]));
+  res.setHeader('Vercel-CDN-Cache-Control','public, s-maxage=10, stale-while-revalidate=20');
+  const entries=await mapWithLimit(symbols,6,async symbol=>{if(!compact)return[symbol,await resolveSymbol(symbol,query,req)];try{return[symbol,{ok:true,data:await resolveCompact(symbol,req)}]}catch(error){return[symbol,{ok:false,error:error.message||'Fiyat alınamadı.'}]}});
   return res.status(200).json({results:Object.fromEntries(entries),servedAt:Date.now()});
 };
 

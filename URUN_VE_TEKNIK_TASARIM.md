@@ -1056,6 +1056,21 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - Ödeme tarihi dar mobil görünümde ayrı satır düzeni ve çok satırlı etiketle görünür kalır.
 - v7.3 kalıcı sürümü; hızlı portföy ilk çizimi, toplu temettü isteği, cihazda takvim önbelleği ve arka plan DRIP hesaplamasıyla onaylanmıştır.
 
+### 21.5 v7.4 performans ve kaynak verimliliği önizlemesi
+
+- Kullanıcının isteği doğrultusunda otomatik yenileme süreleri ve piyasa türüne göre mevcut zamanlama davranışı değiştirilmemiştir.
+- Özet, Favoriler ve Alarm anlık değerleri `/api/prices?mode=compact` üzerinden ortak alınır. Kompakt yanıt yalnız son fiyat, önceki kapanış, değişim, para birimi ve veri zamanını taşır; tam fiyat geçmişi Grafik ve performans işlevlerine ayrılmıştır.
+- Yeni bir Vercel Function eklemek yerine kompakt akış mevcut `/api/prices` fonksiyonuna eklenmiştir. Böylece Hobby planı için fonksiyon sayısı artmaz.
+- Toplu fiyat işlemleri en fazla altı, toplu temettü işlemleri en fazla beş eşzamanlı sağlayıcı işi yürütür. Vercel CDN başlıkları istemci ve sunucu yollarında tutarlı uygulanır.
+- Temettü batch yanıtı yaklaşan olaylarla birlikte son beş geçmiş olayı da taşır. İstemci, takvimi tamamlamak için beş yıllık OHLC fiyat dizisi indirmez. Nasdaq geçmişi bulunmadığında Yahoo olay verisi yalnız sunucuda yedek olarak kullanılır.
+- DRIP geçmişi yıl başına sabitlenmiş anahtarla 24 saat istemci/CDN önbelleğinde tutulur. Yanıt yalnız yeniden yatırım günlerinde gerekli kapanış noktalarını taşır; istemci en fazla dört DRIP hesabını paralel çalıştırır.
+- Aktif portföy otomatik yenilemesi, bütün portföyleri tekrar hesaplamaz. Toplam Portföy hesabı bağımsızdır; aynı sembolün normalize edilmiş piyasa sonucu aktif ve toplam hesaplarda paylaşılır.
+- Portföy satırları sembol kimliğiyle kalıcı DOM düğümleridir. Fiyat yenilemesinde kart, logo ve olay dinleyicileri yeniden kurulmaz; yalnız fiyat, kâr/zarar, adet ve ayrıntı metinleri güncellenir.
+- Dağılım grafiklerinde veri imzası değişmediyse Chart.js güncellemesi atlanır. Chart.js ilk Özet ekranında yüklenmez; Grafik veya Portföy görünümü açıldığında yerel dosyadan dinamik yüklenir.
+- Ana fiyat grafiği fiyat yanıtından hemen sonra çizilir. RSI ve MA hazırlıkları paralel yürür ve tamamlandığında aynı grafiğe ikinci, animasyonsuz güncelleme uygulanır.
+- SMA hesaplaması kayan toplam ile O(n) çalışır. Sık kullanılan tarih ve sayı biçimleyicileri yeniden kullanılır; API belleği 150 kayıtla sınırlandırılır ve arama bekleme süresi gereksiz istekleri azaltmak için 400 ms'dir.
+- Mobil Safari'de daha önce yaşanan görünmeyen logo regresyonu nedeniyle logo yükleme davranışı eager olarak korunmuştur.
+
 ## 22. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 
 Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında mevcut Özer Finans ile eşdeğer kabul edilir:

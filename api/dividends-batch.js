@@ -17,13 +17,20 @@ function invoke(symbol,req){
   });
 }
 
+async function mapWithLimit(items,limit,worker){
+  const output=new Array(items.length);let cursor=0;
+  async function run(){while(cursor<items.length){const index=cursor++;output[index]=await worker(items[index],index)}}
+  await Promise.all(Array.from({length:Math.min(limit,items.length)},run));return output;
+}
+
 module.exports=async(req,res)=>{
   res.setHeader('Allow','GET');
   if(req.method!=='GET')return res.status(405).json({error:'Yalnız GET yöntemi desteklenir.'});
   if(!allow(req))return res.status(429).json({error:'Çok fazla toplu temettü isteği gönderildi.'});
   const symbols=[...new Set(String(req.query.symbols||'').split(',').map(value=>value.trim().toUpperCase()).filter(Boolean))];
   if(!symbols.length||symbols.length>MAX_SYMBOLS||symbols.some(symbol=>!SYMBOL.test(symbol)))return res.status(400).json({error:'Geçersiz veya çok uzun sembol listesi.'});
-  res.setHeader('Cache-Control','public, max-age=0, s-maxage=900, stale-while-revalidate=3600');
-  const entries=await Promise.all(symbols.map(async symbol=>[symbol,await invoke(symbol,req)]));
+  res.setHeader('Cache-Control','public, max-age=0, s-maxage=3600, stale-while-revalidate=21600');
+  res.setHeader('Vercel-CDN-Cache-Control','public, s-maxage=3600, stale-while-revalidate=21600');
+  const entries=await mapWithLimit(symbols,5,async symbol=>[symbol,await invoke(symbol,req)]);
   return res.status(200).json({results:Object.fromEntries(entries),servedAt:Date.now()});
 };
