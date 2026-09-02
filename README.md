@@ -10,6 +10,10 @@
 
 ## v7.3 önizleme: temettü takvimi
 
+- Temettü satırının solundaki tarih öncelikle ödeme tarihidir; ödeme tarihi sağlanmıyorsa hak kullanım tarihi yedek olarak kullanılır. Hisse kodunun yanında yinelenen “Ödeme tarihi” metni gösterilmez.
+- Temettü toplamı ve adet bilgisi, Ayarlar bölümündeki fiyat basamak sayısı tercihine göre biçimlendirilir.
+- E-posta, şifre ve bütün arama alanları yazılan küçük-büyük harf biçimini olduğu gibi gösterir. Sembol ve ürün eşleştirmesi büyük-küçük harf duyarsız çalışmaya devam eder.
+
 - Temettü takvimi yaklaşan kayıtları önceliklendirir; beş satır dolmazsa en yeni geçmiş kayıtlarla tamamlar.
 - Liste beş gerçek kayıtla sınırlıdır; yeni kayıt geldiğinde en eski kayıt listeden çıkar.
 - Temettü tutarı ve adet bilgisi Ayarlar bölümündeki fiyat hassasiyetini kullanır.

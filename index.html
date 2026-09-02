@@ -94,7 +94,7 @@
     .favorite-toggle.is-favorite { background:#5b4817; border-color:#d7aa38; }
     .search-field { position:relative; }
     .search-suggestions {display:none;position:absolute;z-index:70;top:calc(100% + 5px);left:0;right:54px;max-height:var(--suggestion-space,280px);overflow-y:auto;overscroll-behavior:contain;margin:0;padding:5px;list-style:none;border:1px solid var(--line);border-radius:10px;background:#101827;box-shadow:0 12px 25px #0008}.search-suggestions.visible{display:grid;gap:3px}.search-suggestions.open-up{top:auto;bottom:calc(100% + 5px);box-shadow:0 -12px 25px #0008}.suggestion{width:100%;padding:8px 10px;text-align:left;color:var(--text);background:transparent;border-radius:7px;font-size:.88rem}.suggestion:hover{background:#26344d}.suggestion-empty{padding:10px;color:var(--muted);font-size:.84rem;text-align:left}
-    input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:uppercase; }
+    input { min-width:0; flex:1; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; text-transform:none; }
     input:focus { outline:3px solid #52d5b166; border-color:var(--accent); }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     button { border:0; border-radius:10px; padding:12px 20px; background:var(--accent); color:#062019; font:600 16px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif; cursor:pointer; }
@@ -3246,7 +3246,8 @@
         const events=(upcoming.events||[]).map(event=>{
           const exDate=Number(event.exDate),paymentDate=Number(event.paymentDate),amountPerShare=Number(event.amount);
           const quantity=position.effectiveQuantity??position.quantity;
-          return{symbol:position.symbol,name:position.name,date:Number.isFinite(exDate)&&exDate>=today?exDate:paymentDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency:String(event.currency||position.currency||'USD').toUpperCase(),past:false};
+          const calendarDate=Number.isFinite(paymentDate)?paymentDate:exDate;
+          return{symbol:position.symbol,name:position.name,date:calendarDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency:String(event.currency||position.currency||'USD').toUpperCase(),past:false};
         }).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
         return{symbol:position.symbol,status:upcoming.status||'ok',events};
       }catch{return{symbol:position.symbol,status:'provider_error',events:[]}}
@@ -3296,7 +3297,7 @@
       dividends.forEach(item=>{
         const row=document.createElement('li');row.className='dividend-row';
         const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));
-        const symbol=document.createElement('span');symbol.className='dividend-event-label';symbol.textContent=displaySymbol(item.symbol)+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');symbol.title=symbol.textContent;
+        const symbol=document.createElement('span');symbol.className='dividend-event-label';symbol.textContent=displaySymbol(item.symbol);symbol.title=symbol.textContent;
         const sourceRate=usdRates.get(item.currency),targetRate=targetCurrency?usdRates.get(targetCurrency):sourceRate,factor=targetCurrency?(Number.isFinite(sourceRate)&&Number.isFinite(targetRate)&&targetRate>0?sourceRate/targetRate:null):1,shownCurrency=targetCurrency||item.currency;
         const amount=document.createElement('strong');amount.textContent=(Number.isFinite(factor)?money(item.amount*factor,shownCurrency):'Kur yok')+' · '+pricePrecisionNumber(item.quantity)+' adet';amount.title=Number.isFinite(factor)?'Hisse başı '+money(item.amountPerShare*factor,shownCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi';
         row.append(date,symbol,amount);dividendList.append(row);

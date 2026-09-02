@@ -307,7 +307,12 @@ assert.match(dividendsApi,/exOrEffDate[\s\S]*paymentDate[\s\S]*sort\(\(a,b\)=>\(
 assert.match(html,/const upcomingDividends=results\.flatMap\(item=>item\.events\)\.sort\(\(a,b\)=>a\.date-b\.date\)[\s\S]*if\(upcomingDividends\.length<5\)[\s\S]*pastDividends=\(await Promise\.all\(eligible\.map\(fetchPortfolioPastDividends\)\)\)\.flat\(\)\.sort\(\(a,b\)=>b\.date-a\.date\)[\s\S]*dividends=\[\.\.\.upcomingDividends,\.\.\.pastDividends\]\.slice\(0,5\)/,'Takvim yaklaşan kayıtları beşe tamamlamak için en yeni geçmiş kayıtları kullanmalı ve eski kayıtları listeden düşürmeli');
 assert.match(html,/prefetchPricePayloads\(eligible,\{query:historyQuery\}\)/,'Eksik temettü satırları için geçmiş veriler tek toplu fiyat çağrısıyla önbelleğe alınmalı');
 assert.match(html,/amount\.textContent=[\s\S]*pricePrecisionNumber\(item\.quantity\)\+' adet'/,'Temettü tutarı ve adet değeri aynı fiyat hassasiyeti tercihini kullanmalı');
-assert.match(html,/\.dividend-row \.dividend-event-label \{[^}]*white-space:normal[\s\S]*symbol\.className='dividend-event-label'[\s\S]*Ödeme /,'Temettü ödeme tarihi dar ekranda kesilmeden gösterilmeli');
+assert.match(html,/const calendarDate=Number\.isFinite\(paymentDate\)\?paymentDate:exDate;[\s\S]*date:calendarDate/,'Temettü satırının sol tarihi ödeme tarihini, yoksa hak kullanım tarihini kullanmalı');
+assert.match(html,/symbol\.className='dividend-event-label';symbol\.textContent=displaySymbol\(item\.symbol\);symbol\.title=symbol\.textContent/,'Temettü satırında sembol yanında ödeme tarihi tekrarlanmamalı');
+assert.match(html,/amount\.textContent=\(Number\.isFinite\(factor\)\?money\(item\.amount\*factor,shownCurrency\)/,'Temettü para tutarı ayarlardaki fiyat basamağını kullanan money ile biçimlenmeli');
+assert.match(html,/input \{[^}]*text-transform:none;/,'Giriş ve arama alanları kullanıcının küçük-büyük harf biçimini korumalı');
+assert.doesNotMatch(html,/input \{[^}]*text-transform:uppercase/,'Giriş alanlarına genel büyük harf dönüşümü uygulanmamalı');
+assert.match(html,/function foldSearchText\(value\)[\s\S]*\.toUpperCase\(\)/,'Arama görünümü harf biçimini korurken eşleşme büyük-küçük harf duyarsız kalmalı');
 const portfolioPriceLoader=extractFunction(scripts[0],'fetchPortfolioItem');
 assert.match(portfolioPriceLoader,/range=1mo&interval=1d/,'Portföy özeti için yalnız gerekli kısa fiyat geçmişi alınmalı');
 assert.doesNotMatch(portfolioPriceLoader,/\/api\/dividends/,'Yavaş temettü isteği portföy fiyat özetini engellememeli');
