@@ -3298,7 +3298,7 @@
         const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));
         const symbol=document.createElement('span');symbol.className='dividend-event-label';symbol.textContent=displaySymbol(item.symbol);symbol.title=symbol.textContent;
         const sourceRate=usdRates.get(item.currency),targetRate=targetCurrency?usdRates.get(targetCurrency):sourceRate,factor=targetCurrency?(Number.isFinite(sourceRate)&&Number.isFinite(targetRate)&&targetRate>0?sourceRate/targetRate:null):1,shownCurrency=targetCurrency||item.currency;
-        const amount=document.createElement('strong');amount.textContent=(Number.isFinite(factor)?money(item.amount*factor,shownCurrency):'Kur yok')+' · '+pricePrecisionNumber(item.quantity)+' adet';amount.title=Number.isFinite(factor)?'Hisse başı '+money(item.amountPerShare*factor,shownCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi';
+        const amount=document.createElement('strong');amount.textContent=(Number.isFinite(factor)?dividendMoney(item.amount*factor,shownCurrency):'Kur yok')+' · '+pricePrecisionNumber(item.quantity)+' adet';amount.title=Number.isFinite(factor)?'Hisse başı '+dividendMoney(item.amountPerShare*factor,shownCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi';
         row.append(date,symbol,amount);dividendList.append(row);
       });
     }
@@ -3937,6 +3937,11 @@
       const automatic=absolute>0&&absolute<0.01?6:(absolute>0&&absolute<1?4:2);
       const preference=activePriceDecimalsPreference(),digits=preference==='auto'?automatic:Number(preference);
       return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: currency || 'USD', minimumFractionDigits:preference==='auto'?Math.min(2,digits):digits, maximumFractionDigits:digits }).format(value);
+    }
+
+    function dividendMoney(value, currency) {
+      const preference=activePriceDecimalsPreference(),digits=preference==='auto'?2:Number(preference);
+      return new Intl.NumberFormat('tr-TR',{style:'currency',currency:currency||'USD',minimumFractionDigits:digits,maximumFractionDigits:digits}).format(value);
     }
 
     function pricePrecisionNumber(value) {

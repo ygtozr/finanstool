@@ -1047,6 +1047,7 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - Satırın sol tarihi, sağlayıcı sunduğunda ödeme tarihidir; ödeme tarihi yoksa hak kullanım tarihi kullanılır. Ürün kodunun yanında tarih ikinci kez yazılmaz.
 - Temettü toplamı ve adet, kullanıcının fiyat basamak sayısı tercihiyle gösterilir.
 - Mobil takvim satırı tarih, sembol ve tutarı tek satırda tutar. Para ve adet biçimleyicileri, tarayıcının form durumunu geri yüklediği durumlarda dahi Ayarlar alanında görünen hassasiyet seçimini esas alır.
+- Temettü para miktarı fiyatlardan ayrı biçimlendirilir: Otomatik tercih para biriminin standart iki basamağını kullanır; açık 4/6 basamak seçimi korunur.
 - Oturum ve arama alanları kullanıcının girdiği harf biçimini korur; yer tutucu metinler cümle düzenindedir. Arama eşleştirmesi Türkçe karakterleri normalize ederek büyük-küçük harf duyarsız çalışır.
 - Tutar ve adet değerleri aynı `Fiyat hassasiyeti` tercihini kullanır. Otomatik, 2, 4 ve 6 basamak seçenekleri iki değere de uygulanır.
 - Ödeme tarihi dar mobil görünümde ayrı satır düzeni ve çok satırlı etiketle görünür kalır.
