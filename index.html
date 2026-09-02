@@ -254,8 +254,8 @@
     .dividend-list { list-style:none; display:grid; gap:7px; padding:0; margin:0; }
     .dividend-row { display:grid; grid-template-columns:90px minmax(130px,1fr) auto; gap:8px; align-items:center; padding:9px 10px; border-radius:9px; background:#0d1523; font-size:.85rem; }
     .dividend-row span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .dividend-row .dividend-event-label { overflow:visible; text-overflow:clip; white-space:normal; line-height:1.25; }
-    .dividend-row strong { text-align:right; }
+    .dividend-row .dividend-event-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.25; }
+    .dividend-row strong { text-align:right; white-space:nowrap; }
 
     select { width:100%; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; }
     .advanced-results { display:grid; gap:7px; max-height:300px; overflow:auto; margin-top:4px; }
@@ -633,8 +633,7 @@
       .portfolio-detail-controls button { min-height:46px; }
       .chart-wrap { height:340px; }
       .favorites-list { display:grid; }
-      .dividend-row { grid-template-columns:86px minmax(0,1fr); }
-      .dividend-row strong { grid-column:1 / -1; }
+      .dividend-row { grid-template-columns:76px minmax(42px,1fr) auto; gap:6px; padding-inline:8px; font-size:.78rem; }
       html[data-theme="light"] .mobile-bottom-nav { background:#fffffff2; }
       html[data-theme="light"] .mobile-bottom-nav button.is-active { background:#e2e8f0; }
     }
@@ -3928,18 +3927,23 @@
       if(keepExistingPortfolio&&portfolioView.classList.contains('active'))requestAnimationFrame(()=>window.scrollTo({top:scrollBeforeCommit,behavior:'auto'}));
     }
 
+    function activePriceDecimalsPreference() {
+      const selected=String(priceDecimalsSelect?.value||'');
+      return ['auto','2','4','6'].includes(selected)?selected:priceDecimalsPreference;
+    }
+
     function money(value, currency) {
       const absolute=Math.abs(Number(value));
       const automatic=absolute>0&&absolute<0.01?6:(absolute>0&&absolute<1?4:2);
-      const digits=priceDecimalsPreference==='auto'?automatic:Number(priceDecimalsPreference);
-      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: currency || 'USD', minimumFractionDigits:priceDecimalsPreference==='auto'?Math.min(2,digits):digits, maximumFractionDigits:digits }).format(value);
+      const preference=activePriceDecimalsPreference(),digits=preference==='auto'?automatic:Number(preference);
+      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: currency || 'USD', minimumFractionDigits:preference==='auto'?Math.min(2,digits):digits, maximumFractionDigits:digits }).format(value);
     }
 
     function pricePrecisionNumber(value) {
       const absolute=Math.abs(Number(value));
       const automatic=absolute>0&&absolute<0.01?6:(absolute>0&&absolute<1?4:2);
-      const digits=priceDecimalsPreference==='auto'?automatic:Number(priceDecimalsPreference);
-      return new Intl.NumberFormat('tr-TR',{minimumFractionDigits:priceDecimalsPreference==='auto'?0:digits,maximumFractionDigits:digits}).format(value);
+      const preference=activePriceDecimalsPreference(),digits=preference==='auto'?automatic:Number(preference);
+      return new Intl.NumberFormat('tr-TR',{minimumFractionDigits:preference==='auto'?0:digits,maximumFractionDigits:digits}).format(value);
     }
 
     function percentText(value,{sign=true}={}) {

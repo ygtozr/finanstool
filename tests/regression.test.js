@@ -310,6 +310,9 @@ assert.match(html,/amount\.textContent=[\s\S]*pricePrecisionNumber\(item\.quanti
 assert.match(html,/const calendarDate=Number\.isFinite\(paymentDate\)\?paymentDate:exDate;[\s\S]*date:calendarDate/,'Temettü satırının sol tarihi ödeme tarihini, yoksa hak kullanım tarihini kullanmalı');
 assert.match(html,/symbol\.className='dividend-event-label';symbol\.textContent=displaySymbol\(item\.symbol\);symbol\.title=symbol\.textContent/,'Temettü satırında sembol yanında ödeme tarihi tekrarlanmamalı');
 assert.match(html,/amount\.textContent=\(Number\.isFinite\(factor\)\?money\(item\.amount\*factor,shownCurrency\)/,'Temettü para tutarı ayarlardaki fiyat basamağını kullanan money ile biçimlenmeli');
+assert.match(html,/function activePriceDecimalsPreference\(\)[\s\S]*priceDecimalsSelect\?\.value[\s\S]*function money\(value, currency\)[\s\S]*const preference=activePriceDecimalsPreference\(\)/,'Para biçimleme ekranda seçili fiyat hassasiyetini doğrudan kullanmalı');
+assert.match(html,/\.dividend-row strong \{ text-align:right; white-space:nowrap;/,'Temettü tutarı tek satırda kalmalı');
+assert.match(html,/@media \(max-width:760px\)[\s\S]*\.dividend-row \{ grid-template-columns:76px minmax\(42px,1fr\) auto;/,'Temettü takvimi mobilde tarih, sembol ve tutar için üç sütunu korumalı');
 assert.match(html,/input \{[^}]*text-transform:none;/,'Giriş ve arama alanları kullanıcının küçük-büyük harf biçimini korumalı');
 assert.doesNotMatch(html,/input \{[^}]*text-transform:uppercase/,'Giriş alanlarına genel büyük harf dönüşümü uygulanmamalı');
 assert.match(html,/function foldSearchText\(value\)[\s\S]*\.toUpperCase\(\)/,'Arama görünümü harf biçimini korurken eşleşme büyük-küçük harf duyarsız kalmalı');
