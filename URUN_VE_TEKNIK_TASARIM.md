@@ -1039,6 +1039,15 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - Çok sayıda alarm aynı anda açıkken sembol başına ayrı fiyat çağrıları oluşmaz; uygun semboller tek `/api/prices` çağrısına girer.
 - v7.2 kullanıcı onayıyla kalıcı ana yayın olarak sabitlenmiştir.
 
+### 21.4 v7.3 temettü takvimi önizlemesi
+
+- Takvim yaklaşan temettüleri tarih sırasıyla önceliklendirir ve görünür veri listesini beş kayıtla sınırlar.
+- Yaklaşan kayıt sayısı beşten azsa eksik satırlar beş yıllık geçmişten en yeni gerçek temettülerle tamamlanır; yeni kayıt geldiğinde listedeki en eski kayıt çıkar.
+- Geçmiş temettü fiyat verileri sembol başına ayrı istemci çağrısı yerine `/api/prices` üzerinden toplu önbelleğe alınır.
+- Tutar ve adet değerleri aynı `Fiyat hassasiyeti` tercihini kullanır. Otomatik, 2, 4 ve 6 basamak seçenekleri iki değere de uygulanır.
+- Ödeme tarihi dar mobil görünümde ayrı satır düzeni ve çok satırlı etiketle görünür kalır.
+- Bu bölüm önizleme statüsündedir; kullanıcı canlı önizlemeyi onayladığında kalıcı sürüm ve arşiv bilgileri güncellenecektir.
+
 ## 22. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 
 Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında mevcut Özer Finans ile eşdeğer kabul edilir:

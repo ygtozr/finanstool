@@ -7,12 +7,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Özer Finans">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=7.2">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=7.2">
-  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=7.2">
-  <link rel="manifest" href="manifest.webmanifest?v=7.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=7.3">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=7.3">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=7.3">
+  <link rel="manifest" href="manifest.webmanifest?v=7.3">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com https://eodhd.com; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>Özer Finans v7.2</title>
+  <title>Özer Finans v7.3 Önizleme</title>
   <script src="assets/chart.umd.min.js?v=4.4.4"></script>
   <style>
     :root { color-scheme:dark; --surface-page:#101827; --surface-main:#192337; --surface-section:#111a2b; --surface-card:#0d1523; --surface-soft:#182235; --surface-control:#26344d; --line:#2b3a55; --border-strong:#40516e; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --on-accent:#062019; --positive:#34d399; --negative:#ff8f9c; --warning:#ffd66b; --info:#60a5fa; --focus-ring:#7dd3fc; --chart-fill:rgba(82,213,177,.14); --chart-fill-soft:rgba(82,213,177,.08); --bg:var(--surface-page); --panel:var(--surface-main); --danger:var(--negative); }
@@ -252,8 +252,10 @@
     .dividend-section { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
     .dividend-note { margin:4px 0 12px; color:var(--muted); font-size:.82rem; }
     .dividend-list { list-style:none; display:grid; gap:7px; padding:0; margin:0; }
-    .dividend-row { display:grid; grid-template-columns:90px 1fr auto; gap:8px; align-items:center; padding:9px 10px; border-radius:9px; background:#0d1523; font-size:.85rem; }
+    .dividend-row { display:grid; grid-template-columns:90px minmax(130px,1fr) auto; gap:8px; align-items:center; padding:9px 10px; border-radius:9px; background:#0d1523; font-size:.85rem; }
     .dividend-row span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .dividend-row .dividend-event-label { overflow:visible; text-overflow:clip; white-space:normal; line-height:1.25; }
+    .dividend-row strong { text-align:right; }
 
     select { width:100%; border:1px solid #40516e; border-radius:10px; padding:12px 14px; color:var(--text); background:#0d1523; font:inherit; }
     .advanced-results { display:grid; gap:7px; max-height:300px; overflow:auto; margin-top:4px; }
@@ -631,6 +633,8 @@
       .portfolio-detail-controls button { min-height:46px; }
       .chart-wrap { height:340px; }
       .favorites-list { display:grid; }
+      .dividend-row { grid-template-columns:86px minmax(0,1fr); }
+      .dividend-row strong { grid-column:1 / -1; }
       html[data-theme="light"] .mobile-bottom-nav { background:#fffffff2; }
       html[data-theme="light"] .mobile-bottom-nav button.is-active { background:#e2e8f0; }
     }
@@ -755,18 +759,18 @@
   <div id="pullRefreshIndicator" class="pull-refresh-indicator" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true">↓</span><span class="pull-refresh-label">Yenilemek için çekin</span></div>
   <main id="appMain" inert>
     <aside class="desktop-sidebar" aria-label="Masaüstü gezinme">
-      <div class="desktop-brand brand-lockup"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.2" alt=""><span class="brand-lockup-name">Özer Finans</span></div>
+      <div class="desktop-brand brand-lockup"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.3" alt=""><span class="brand-lockup-name">Özer Finans</span></div>
       <button id="desktopOverviewNav" class="is-active" type="button" aria-current="page">⌂ <span>Özet</span></button>
       <button id="desktopChartNav" type="button">⌁ <span>Grafik Ve Analiz</span></button>
       <button id="desktopPortfolioNav" type="button">▤ <span>Portföy</span></button>
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small>v7.2</small>
+      <small>v7.3</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.2" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.2</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.3" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.3</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -776,7 +780,7 @@
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.2" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.2</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.3" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.3</span></h1>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -806,7 +810,7 @@
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.2" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.2</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.3" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.3</span></h1>
       <div id="allPortfolioHead" class="portfolio-head portfolio-overall-head"><div class="portfolio-overall-heading"><h2>Toplam Portföy</h2><div class="portfolio-view-toolbar"><div class="portfolio-metric-mode" role="group" aria-label="Portföy kâr zarar dönemi"><button id="portfolioTodayMode" class="is-active" type="button" aria-pressed="true">Bugün</button><button id="portfolioTotalMode" type="button" aria-pressed="false">Toplam</button></div><button id="portfolioPrivacyToggle" class="portfolio-privacy-toggle" type="button" aria-label="Portföy rakamlarını gizle" aria-pressed="false" title="Portföy rakamlarını gizle"><svg class="privacy-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></svg><svg class="privacy-off" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.3 3M6.4 6.5C3.9 8.2 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6M9.8 9.8a3 3 0 0 0 4.4 4.4"/></svg></button></div></div><div class="portfolio-overall-body"><div class="portfolio-head-metrics"><strong id="allPortfolioTotalValue" class="portfolio-head-value">—</strong><p id="allPortfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="allPortfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Toplam portföyü TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div></div>
       <div class="portfolio-switcher"><label class="portfolio-switcher-field" for="portfolioBookSelect">Aktif Portföy<select id="portfolioBookSelect" aria-label="Aktif portföyü seç"></select></label><div class="portfolio-switcher-actions"><button id="portfolioBookAdd" type="button" aria-label="Yeni portföy oluştur" title="Yeni portföy">+</button><button id="portfolioBookRename" type="button" aria-label="Aktif portföyün adını değiştir" title="Adını değiştir">✎</button><button id="portfolioBookDelete" type="button" aria-label="Aktif portföyü sil" title="Portföyü sil">×</button></div></div>
       <div id="portfolioBookTabs" class="portfolio-book-tabs" role="group" aria-label="Portföy kısayolları"></div>
@@ -836,7 +840,7 @@
       <section id="portfolioDividendSection" class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.2" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.2</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.3" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.3</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
         <section class="settings-card settings-horizontal" aria-labelledby="accountTitle"><div class="settings-card-copy"><h3 id="accountTitle">Hesap</h3><p id="accountDescription">Oturum durumu hazırlanıyor…</p><p id="cloudSyncStatus" class="settings-status cloud-sync-status" aria-live="polite"></p></div><div class="settings-card-controls account-controls"><button id="accountAction" type="button">Giriş Yap</button><button id="accountSignOut" class="account-secondary" type="button" hidden>Çıkış Yap</button></div></section>
@@ -886,7 +890,7 @@
         <section class="settings-card settings-horizontal" aria-labelledby="diagnosticsTitle"><div class="settings-card-copy"><h3 id="diagnosticsTitle">Bağlantı Tanılama</h3><p>Veri bağlantısının ve uygulama önbelleğinin son durumunu görüntüleyin.</p></div><div class="settings-card-controls"><dl id="diagnosticsList" class="diagnostics-list"></dl><div class="settings-inline-actions"><button id="diagnosticsRefresh" type="button">Durumu Yenile</button></div></div></section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Yerel modda veriler yalnız cihazda; giriş yapıldığında kullanıcıya bağlı ve şifreli Upstash kaydında saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v7.2</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Yerel modda veriler yalnız cihazda; giriş yapıldığında kullanıcıya bağlı ve şifreli Upstash kaydında saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v7.3</strong></div></div>
         </section>
       </div>
     </section>
@@ -977,7 +981,7 @@
     </form>
     <div class="dialog-actions"><button id="marketSettingsClose" class="dialog-cancel" type="button">Kapat</button></div>
   </dialog>
-  <script src="assets/storage-events.js?v=7.2"></script>
+  <script src="assets/storage-events.js?v=7.3"></script>
   <script>
     let chart;
     let rsiChart;
@@ -3244,15 +3248,17 @@
           const quantity=position.effectiveQuantity??position.quantity;
           return{symbol:position.symbol,name:position.name,date:Number.isFinite(exDate)&&exDate>=today?exDate:paymentDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency:String(event.currency||position.currency||'USD').toUpperCase(),past:false};
         }).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
-        if(events.length)return{symbol:position.symbol,status:upcoming.status||'ok',events};
-        if(position.symbol.startsWith('TEFAS-')||position.symbol.startsWith('ALTIN-'))return{symbol:position.symbol,status:upcoming.status||'no_events',events:[]};
-        try{
-          const history=await cachedApiJson(priceApiUrl(position.symbol,'range=2y&interval=1d&events=div'),{ttl:3600000});
-          const result=history.chart?.result?.[0],currency=String(result?.meta?.currency||position.currency||'USD').toUpperCase(),quantity=position.effectiveQuantity??position.quantity;
-          const past=Object.values(result?.events?.dividends||{}).map(event=>{const seconds=Number(event.date),amountPerShare=Number(event.amount),date=seconds*1000;return{symbol:position.symbol,name:position.name,date,paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency,past:true}}).filter(item=>Number.isFinite(item.date)&&item.date<today&&Number.isFinite(item.amount)&&item.amount>0).sort((a,b)=>b.date-a.date).slice(0,5);
-          return{symbol:position.symbol,status:past.length?'past':'no_events',events:past};
-        }catch{return{symbol:position.symbol,status:upcoming.status||'no_events',events:[]}}
+        return{symbol:position.symbol,status:upcoming.status||'ok',events};
       }catch{return{symbol:position.symbol,status:'provider_error',events:[]}}
+    }
+
+    async function fetchPortfolioPastDividends(position) {
+      if(position.symbol.startsWith('TEFAS-')||position.symbol.startsWith('ALTIN-'))return[];
+      try{
+        const history=await cachedApiJson(priceApiUrl(position.symbol,'range=5y&interval=1d&events=div'),{ttl:3600000});
+        const result=history.chart?.result?.[0],currency=String(result?.meta?.currency||position.currency||'USD').toUpperCase(),quantity=position.effectiveQuantity??position.quantity,today=new Date().setHours(0,0,0,0);
+        return Object.values(result?.events?.dividends||{}).map(event=>{const seconds=Number(event.date),amountPerShare=Number(event.amount),date=seconds*1000;return{symbol:position.symbol,name:position.name,date,paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency,past:true}}).filter(item=>Number.isFinite(item.date)&&item.date<today&&Number.isFinite(item.amount)&&item.amount>0).sort((a,b)=>b.date-a.date).slice(0,5);
+      }catch{return[]}
     }
 
     async function renderPortfolioDividends(positions) {
@@ -3265,7 +3271,16 @@
       const results=await Promise.all(positions.map(fetchPortfolioDividends));
       if(requestId!==portfolioDividendRequestId)return;
       dividendList.replaceChildren();
-      const allEvents=results.flatMap(item=>item.events),upcomingDividends=allEvents.filter(item=>!item.past).sort((a,b)=>a.date-b.date),pastDividends=allEvents.filter(item=>item.past).sort((a,b)=>b.date-a.date),showingPast=!upcomingDividends.length&&pastDividends.length>0,dividends=(showingPast?pastDividends:upcomingDividends).slice(0,5);
+      const upcomingDividends=results.flatMap(item=>item.events).sort((a,b)=>a.date-b.date);
+      let pastDividends=[];
+      if(upcomingDividends.length<5){
+        const eligible=positions.filter(position=>!position.symbol.startsWith('TEFAS-')&&!position.symbol.startsWith('ALTIN-'));
+        const historyQuery='range=5y&interval=1d&events=div';
+        await prefetchPricePayloads(eligible,{query:historyQuery});
+        if(requestId!==portfolioDividendRequestId)return;
+        pastDividends=(await Promise.all(eligible.map(fetchPortfolioPastDividends))).flat().sort((a,b)=>b.date-a.date);
+      }
+      const showingPast=!upcomingDividends.length&&pastDividends.length>0,dividends=[...upcomingDividends,...pastDividends].slice(0,5);
       if(!dividends.length){
         const empty=document.createElement('li');empty.className='favorites-note';
         const providerErrors=results.filter(item=>item.status==='provider_error').map(item=>item.symbol),unsupported=results.filter(item=>item.status==='unsupported').map(item=>item.symbol);
@@ -3273,6 +3288,7 @@
         dividendList.append(empty);return;
       }
       if(showingPast){const note=document.createElement('li');note.className='favorites-note';note.textContent='Yaklaşan temettü bulunamadı; en son geçmiş temettüler gösteriliyor.';dividendList.append(note)}
+      else if(pastDividends.length&&upcomingDividends.length<5){const note=document.createElement('li');note.className='favorites-note';note.textContent='Yaklaşan temettüler en son geçmiş kayıtlarla tamamlandı.';dividendList.append(note)}
       const targetCurrency=portfolioDisplayCurrency==='NATIVE'?null:portfolioDisplayCurrency;
       const currencies=[...new Set(dividends.map(item=>item.currency).concat(targetCurrency||[]))],usdRates=new Map([['USD',1]]);
       await Promise.all(currencies.filter(code=>code!=='USD').map(async code=>{try{usdRates.set(code,(await latestPrice(code+'USD=X')).price)}catch{usdRates.set(code,null)}}));
@@ -3280,9 +3296,9 @@
       dividends.forEach(item=>{
         const row=document.createElement('li');row.className='dividend-row';
         const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));
-        const symbol=document.createElement('span');symbol.textContent=displaySymbol(item.symbol)+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');
+        const symbol=document.createElement('span');symbol.className='dividend-event-label';symbol.textContent=displaySymbol(item.symbol)+(item.paymentDate?' · Ödeme '+new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short'}).format(new Date(item.paymentDate)):'');symbol.title=symbol.textContent;
         const sourceRate=usdRates.get(item.currency),targetRate=targetCurrency?usdRates.get(targetCurrency):sourceRate,factor=targetCurrency?(Number.isFinite(sourceRate)&&Number.isFinite(targetRate)&&targetRate>0?sourceRate/targetRate:null):1,shownCurrency=targetCurrency||item.currency;
-        const amount=document.createElement('strong');amount.textContent=(Number.isFinite(factor)?money(item.amount*factor,shownCurrency):'Kur yok')+' · '+new Intl.NumberFormat('tr-TR',{maximumFractionDigits:6}).format(item.quantity)+' adet';amount.title=Number.isFinite(factor)?'Hisse başı '+money(item.amountPerShare*factor,shownCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi';
+        const amount=document.createElement('strong');amount.textContent=(Number.isFinite(factor)?money(item.amount*factor,shownCurrency):'Kur yok')+' · '+pricePrecisionNumber(item.quantity)+' adet';amount.title=Number.isFinite(factor)?'Hisse başı '+money(item.amountPerShare*factor,shownCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi';
         row.append(date,symbol,amount);dividendList.append(row);
       });
     }
@@ -3916,6 +3932,13 @@
       const automatic=absolute>0&&absolute<0.01?6:(absolute>0&&absolute<1?4:2);
       const digits=priceDecimalsPreference==='auto'?automatic:Number(priceDecimalsPreference);
       return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: currency || 'USD', minimumFractionDigits:priceDecimalsPreference==='auto'?Math.min(2,digits):digits, maximumFractionDigits:digits }).format(value);
+    }
+
+    function pricePrecisionNumber(value) {
+      const absolute=Math.abs(Number(value));
+      const automatic=absolute>0&&absolute<0.01?6:(absolute>0&&absolute<1?4:2);
+      const digits=priceDecimalsPreference==='auto'?automatic:Number(priceDecimalsPreference);
+      return new Intl.NumberFormat('tr-TR',{minimumFractionDigits:priceDecimalsPreference==='auto'?0:digits,maximumFractionDigits:digits}).format(value);
     }
 
     function percentText(value,{sign=true}={}) {
@@ -4842,6 +4865,6 @@
       document.getElementById('symbolForm').addEventListener('submit',function(){setTimeout(resizeVisibleCharts,40)});
     })();
   </script>
-  <script src="assets/auth-account.js?v=7.2.0"></script>
+  <script src="assets/auth-account.js?v=7.3.0"></script>
 </body>
 </html>

@@ -191,9 +191,9 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v7\.2<\/title>/,'Tarayıcı başlığı kalıcı sürüm adını kullanmalı');
-assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.2[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
-assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.2[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
+assert.match(html,/<title>Özer Finans v7\.3 Önizleme<\/title>/,'Tarayıcı başlığı önizleme sürüm adını kullanmalı');
+assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.3[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
+assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.3[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
 assert.match(html,/\.page-brand \{[^}]*justify-content:center;/,'Sayfa marka kilidi yatay olarak ortalanmalı');
 assert.match(html,/\.version-badge \{[^}]*border:0;[^}]*opacity:\.62;/,'Sürüm bilgisi rozetsiz, küçük ve silik gösterilmeli');
@@ -304,7 +304,10 @@ assert.match(html,/data-benchmark-range="5d">1 Hafta<[\s\S]*data-benchmark-range
 assert.match(html,/function benchmarkQuery\(\)[\s\S]*period1=[\s\S]*period2=/,'Özel başlangıç tarihi karşılaştırma sorgusuna dönüştürülmeli');
 assert.match(html,/\/api\/dividends\?symbol=/,'Portföy yaklaşan temettü uç noktasını kullanmalı');
 assert.match(dividendsApi,/exOrEffDate[\s\S]*paymentDate[\s\S]*sort\(\(a,b\)=>\(a\.exDate\|\|a\.paymentDate\)-\(b\.exDate\|\|b\.paymentDate\)\)/,'Temettü API hak kullanım ve ödeme tarihlerini yakından uzağa sıralamalı');
-assert.match(html,/upcomingDividends=allEvents\.filter\(item=>!item\.past\)\.sort\(\(a,b\)=>a\.date-b\.date\)[\s\S]*dividends=\(showingPast\?pastDividends:upcomingDividends\)\.slice\(0,5\)/,'Takvim yaklaşan en yakın beş temettüyü, yaklaşan yoksa son geçmiş temettüleri göstermeli');
+assert.match(html,/const upcomingDividends=results\.flatMap\(item=>item\.events\)\.sort\(\(a,b\)=>a\.date-b\.date\)[\s\S]*if\(upcomingDividends\.length<5\)[\s\S]*pastDividends=\(await Promise\.all\(eligible\.map\(fetchPortfolioPastDividends\)\)\)\.flat\(\)\.sort\(\(a,b\)=>b\.date-a\.date\)[\s\S]*dividends=\[\.\.\.upcomingDividends,\.\.\.pastDividends\]\.slice\(0,5\)/,'Takvim yaklaşan kayıtları beşe tamamlamak için en yeni geçmiş kayıtları kullanmalı ve eski kayıtları listeden düşürmeli');
+assert.match(html,/prefetchPricePayloads\(eligible,\{query:historyQuery\}\)/,'Eksik temettü satırları için geçmiş veriler tek toplu fiyat çağrısıyla önbelleğe alınmalı');
+assert.match(html,/amount\.textContent=[\s\S]*pricePrecisionNumber\(item\.quantity\)\+' adet'/,'Temettü tutarı ve adet değeri aynı fiyat hassasiyeti tercihini kullanmalı');
+assert.match(html,/\.dividend-row \.dividend-event-label \{[^}]*white-space:normal[\s\S]*symbol\.className='dividend-event-label'[\s\S]*Ödeme /,'Temettü ödeme tarihi dar ekranda kesilmeden gösterilmeli');
 const portfolioPriceLoader=extractFunction(scripts[0],'fetchPortfolioItem');
 assert.match(portfolioPriceLoader,/range=1mo&interval=1d/,'Portföy özeti için yalnız gerekli kısa fiyat geçmişi alınmalı');
 assert.doesNotMatch(portfolioPriceLoader,/\/api\/dividends/,'Yavaş temettü isteği portföy fiyat özetini engellememeli');
@@ -367,8 +370,8 @@ assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#eef3f8':'#10182
 assert.match(html,/src="assets\/chart\.umd\.min\.js\?v=4\.4\.4"/,'Chart.js uygulamanın kendi dosyasından yüklenmeli');
 assert.doesNotMatch(html,/cdn\.jsdelivr\.net\/npm\/chart\.js/,'Grafikler çalışma anında harici CDN’ye bağlı olmamalı');
 assert.ok(chartVendor.length>150000&&/Chart/.test(chartVendor),'Yerel Chart.js paketi eksiksiz görünmeli');
-assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=7\.2"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
-assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=7\.2"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
+assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=7\.3"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
+assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=7\.3"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
 assert.equal(manifest.name,'Özer Finans','Manifest uygulamanın tam adını taşımalı');
 assert.equal(manifest.display,'standalone','PWA bağımsız uygulama görünümünde açılmalı');
 assert.deepEqual(manifest.icons.map(icon=>icon.sizes),['192x192','512x512'],'Manifest standart PWA ikon boyutlarını içermeli');
@@ -411,7 +414,7 @@ assert.match(html,/applyPreferredCurrency\(value\)[\s\S]*allPortfolioDisplayCurr
 assert.match(html,/valueCurrency=nativeMode\?position\.currency:presentationCurrency/,'Ürünün kendi para birimi seçeneği pozisyon değerlerini dönüştürmemeli');
 assert.match(html,/renderCashBalances\(portfolioDisplayCurrency==='NATIVE'\?null:cashDisplayValues,presentationCurrency\)/,'Nakit bakiyeleri aktif portföyün ürün para birimi modunda dönüştürülmemeli');
 assert.match(html,/const targetCurrency=portfolioDisplayCurrency==='NATIVE'\?null:portfolioDisplayCurrency[\s\S]*shownCurrency=targetCurrency\|\|item\.currency/,'Temettü tutarları aktif portföyün yerel para birimi seçimine göre gösterilmeli');
-assert.match(html,/range=2y&interval=1d&events=div[\s\S]*Yaklaşan temettü bulunamadı; en son geçmiş temettüler gösteriliyor/,'Yaklaşan temettü yoksa geçmiş temettüler gösterilmeli');
+assert.match(html,/range=5y&interval=1d&events=div[\s\S]*Yaklaşan temettü bulunamadı; en son geçmiş temettüler gösteriliyor/,'Yaklaşan temettü yoksa beş yıllık geçmişten en yeni temettüler gösterilmeli');
 assert.match(html,/\.settings-switches \{ display:grid; gap:11px; \}[\s\S]*\.settings-switches \.setting-switch \{ width:100%; display:flex; align-items:center; justify-content:space-between;/,'Bildirim anahtarlarının özel kuralı genel etiket ızgarasını geçersiz kılıp metnin sağında durmalı');
 assert.match(html,/\.setting-switch \{ display:flex; align-items:center; justify-content:space-between;[\s\S]*\.setting-switch input \{ flex:0 0 auto;[^}]*margin:0;/,'Bildirim anahtarları açıklamanın doğrudan sağında ve sağ kenara tam yaslı durmalı');
 assert.doesNotMatch(html,/id="layoutDensitySelect"/,'Etkisiz yoğunluk seçimi ayarlardan kaldırılmalı');
@@ -449,7 +452,7 @@ assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yard�
 assert.match(html,/id="authGate"[\s\S]*id="authLoginForm"[\s\S]*id="authLocalContinue"/,'Açılış ekranında e-posta girişi ve yerel devam seçenekleri bulunmalı');
 assert.match(html,/id="authRegisterForm"[\s\S]*id="authBootstrapForm"/,'Davetli kayıt ve ilk yönetici kurulum formları bulunmalı');
 assert.match(html,/id="adminUsersCard"[\s\S]*id="createInvite"[\s\S]*id="inviteResult"/,'Yönetici için kullanıcı davet ekranı bulunmalı');
-assert.match(html,/assets\/storage-events\.js\?v=7\.2[\s\S]*assets\/auth-account\.js\?v=7\.2\.0/,'Yerel değişiklik gözlemi yeni hesap istemcisinden önce yüklenmeli');
+assert.match(html,/assets\/storage-events\.js\?v=7\.3[\s\S]*assets\/auth-account\.js\?v=7\.3\.0/,'Yerel değişiklik gözlemi yeni hesap istemcisinden önce yüklenmeli');
 assert.match(authAccount,/credentials: 'same-origin'[\s\S]*\/api\/account\?action=login[\s\S]*\/api\/account\?action=register/,'İstemci güvenli çerezle birleşik giriş ve davetli kayıt API’sini kullanmalı');
 assert.ok(fs.readdirSync(path.join(root,'api')).filter(name=>name.endsWith('.js')).length<=12,'Hobby planı için sunucu fonksiyonu sayısı 12’yi aşmamalı');
 assert.match(authAccount,/localStorage\.setItem\(GUEST_BACKUP_KEY[\s\S]*function restoreGuestSnapshot/,'Misafir verisi hesap verisinden ayrı korunmalı');
@@ -463,4 +466,4 @@ assert.match(adminInvitesApi,/requireUser\(req, res, 'admin'\)[\s\S]*EX', 86400/
 assert.match(userStateApi,/requireUser\(req, res\)[\s\S]*encryptJson\(record\)/,'Kullanıcı verisi oturumla ayrılmalı ve şifrelenmeli');
 assert.doesNotMatch(html,/CLERK_SECRET_KEY|DATABASE_URL=|NEXT_PUBLIC_CLERK/,'Sunucu sırları HTML içine gömülmemeli');
 
-console.log('Özer Finans v7.2 kalıcı sürüm regresyon testleri başarılı.');
+console.log('Özer Finans v7.3 önizleme regresyon testleri başarılı.');
