@@ -14,6 +14,9 @@
 - Temettü toplamı ve adet bilgisi, Ayarlar bölümündeki fiyat basamak sayısı tercihine göre biçimlendirilir.
 - Temettü satırları dar mobil ekranda da tarih, sembol ve tutarı tek satırda gösterir; uzun semboller tutar alanını aşağı itmeden kısaltılır.
 - Temettü para tutarlarında Otomatik hassasiyet standart iki basamak kullanır; 4 veya 6 basamak ancak kullanıcı açıkça seçerse uygulanır.
+- Portföy fiyatları temettü geri yatırım hesabını beklemeden çizilir; DRIP sonuçları hazır olduğunda adetler arka planda güncellenir.
+- Portföydeki yaklaşan temettüler ürün başına tarayıcı isteği yerine tek `/api/dividends-batch` çağrısıyla alınır.
+- Son başarılı temettü takvimi cihazda saklanıp sayfa açılır açılmaz gösterilir; yaklaşan olaylar, geçmiş tamamlama ve kur dönüşümü arka planda yenilenir.
 - E-posta, şifre ve bütün arama alanları yazılan küçük-büyük harf biçimini olduğu gibi gösterir. Sembol ve ürün eşleştirmesi büyük-küçük harf duyarsız çalışmaya devam eder.
 
 - Temettü takvimi yaklaşan kayıtları önceliklendirir; beş satır dolmazsa en yeni geçmiş kayıtlarla tamamlar.

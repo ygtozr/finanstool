@@ -1440,6 +1440,7 @@
     const portfolioBooksKey = 'finans-grafigi-portfolios-v2';
     const activePortfolioKey = 'finans-grafigi-active-portfolio';
     const portfolioSnapshotsKey = 'finans-grafigi-portfolio-snapshots-v1';
+    const portfolioDividendSnapshotsKey = 'finans-grafigi-dividend-snapshots-v1';
     const supportedCashCurrencies = ['TRY','USD','EUR','GBP'];
     function normalizedPortfolioItem(item) {
       const quantity=Number(item?.baseQuantity??item?.quantity),unitCost=Number(item?.unitCost),symbol=String(item?.symbol||'').toUpperCase(),costCurrency=['TRY','USD','EUR','GBP'].includes(String(item?.costCurrency||'').toUpperCase())?String(item.costCurrency).toUpperCase():null,purchaseDate=/^\d{4}-\d{2}-\d{2}$/.test(item?.purchaseDate||'')?item.purchaseDate:null;
@@ -1472,6 +1473,7 @@
     let activePortfolioId=(portfolioBooks.some(item=>item.id===defaultPortfolioPreference)?defaultPortfolioPreference:localStorage.getItem(activePortfolioKey))||portfolioBooks[0].id;
     if(!portfolioBooks.some(item=>item.id===activePortfolioId))activePortfolioId=portfolioBooks[0].id;
     let portfolioSnapshots=(()=>{try{const saved=JSON.parse(localStorage.getItem(portfolioSnapshotsKey)||'{}');return saved&&typeof saved==='object'?saved:{}}catch{return{}}})();
+    let portfolioDividendSnapshots=(()=>{try{const saved=JSON.parse(localStorage.getItem(portfolioDividendSnapshotsKey)||'{}');return saved&&typeof saved==='object'?saved:{}}catch{return{}}})();
     let portfolio=[];
     let cashBalances=[];
     let portfolioBookEditMode='create';
@@ -1484,6 +1486,11 @@
       portfolioSnapshots[activePortfolioId]={...snapshot,fingerprint:portfolioSnapshotFingerprint(),savedAt:Date.now()};
       try{localStorage.setItem(portfolioSnapshotsKey,JSON.stringify(portfolioSnapshots))}catch{}
     }
+    function dividendSnapshotFingerprint(){return portfolioSnapshotFingerprint()+'|'+portfolioDisplayCurrency+'|'+activePriceDecimalsPreference()}
+    function savePortfolioDividendSnapshot(snapshot){
+      portfolioDividendSnapshots[activePortfolioId]={...snapshot,fingerprint:dividendSnapshotFingerprint(),savedAt:Date.now()};
+      try{localStorage.setItem(portfolioDividendSnapshotsKey,JSON.stringify(portfolioDividendSnapshots))}catch{}
+    }
     bindActivePortfolio();
     localStorage.setItem(portfolioBooksKey,JSON.stringify(portfolioBooks));
     localStorage.setItem(activePortfolioKey,activePortfolioId);
@@ -1493,6 +1500,8 @@
     let cashEditCurrency = null;
     let portfolioRenderId = 0;
     let portfolioDividendRequestId = 0;
+    const dripResultCache=new Map();
+    const dripInFlight=new Map();
     let portfolioDisplayCurrency = activePortfolioBook().displayCurrency||baseCurrencyPreference;
     let portfolioBaseCurrency = 'USD';
     let allPortfolioDisplayCurrency = ['TRY','USD'].includes(localStorage.getItem(allPortfolioCurrencyKey))?localStorage.getItem(allPortfolioCurrencyKey):(baseCurrencyPreference==='TRY'?'TRY':'USD');
@@ -3213,9 +3222,24 @@
       return calculateDrip(position.baseQuantity??position.quantity,payload,position.dripTaxRate||0,position.dripFractional!==false);
     }
 
+    function dripCacheKey(position){return [position.symbol,position.baseQuantity??position.quantity,position.purchaseDate||'',position.dripTaxRate||0,position.dripFractional!==false].join('|')}
+    function cachedDripResult(position){return position.dripEnabled?dripResultCache.get(dripCacheKey(position))||null:{value:null,error:null}}
+    async function loadDripResult(position){
+      if(!position.dripEnabled)return{value:null,error:null};
+      const key=dripCacheKey(position),cached=dripResultCache.get(key);
+      if(cached)return cached;
+      if(dripInFlight.has(key))return dripInFlight.get(key);
+      const request=fetchDrip(position).then(value=>({value,error:null})).catch(error=>({value:null,error:error.message||'Temettü hesabı yapılamadı'})).then(result=>{dripResultCache.set(key,result);return result}).finally(()=>dripInFlight.delete(key));
+      dripInFlight.set(key,request);return request;
+    }
+    async function refreshDripResults(positions){
+      const pending=positions.filter(position=>position.dripEnabled&&!cachedDripResult(position));
+      if(!pending.length)return false;
+      await Promise.all(pending.map(loadDripResult));return true;
+    }
+
     async function fetchPortfolioItem(position) {
       const query='range=1mo&interval=1d';
-      const dripPromise=position.dripEnabled?fetchDrip(position).then(value=>({value,error:null})).catch(error=>({value:null,error:error.message||'Temettü hesabı yapılamadı'})):Promise.resolve({value:null,error:null});
       const snapshotPromise=usesSnapshotQuote(position.symbol)?fetchSnapshotQuote(position.symbol).catch(()=>null):Promise.resolve(null);
       const [payload,snapshot]=await Promise.all([cachedApiJson(priceApiUrl(position.symbol,query)),snapshotPromise]);
       const result=payload.chart?.result?.[0];
@@ -3231,25 +3255,36 @@
       const currency=String(result.meta?.currency||'USD').toUpperCase();
       const name=result.meta?.longName||result.meta?.shortName||position.name||position.symbol;
       const previousPoint=points.length>1?points.at(-2):points.at(-1);
-      const dripResult=await dripPromise;
+      const dripResult=cachedDripResult(position)||{value:null,error:null};
       const drip=dripResult.value,dripError=dripResult.error;
       const effectiveQuantity=drip?.quantity??position.quantity;
       const snapshotPrice=Number(snapshot?.price),snapshotPrevious=Number(snapshot?.previousClose);
       return {...position,name:snapshot?.name||name,currency:String(snapshot?.currency||currency).toUpperCase(),effectiveQuantity,drip,dripError,price:Number.isFinite(snapshotPrice)&&snapshotPrice>0?snapshotPrice:points.at(-1).close,previousPrice:Number.isFinite(snapshotPrevious)&&snapshotPrevious>0?snapshotPrevious:previousPoint.close,previousTime:previousPoint.time,weekStartPrice:weekBase.close,weekStartTime:weekBase.time,provider:snapshot?.provider||payload._finansTool?.provider||result.meta?.dataProvider||'',asOf:Number(snapshot?.asOf)||Number(payload._finansTool?.asOf)||Number(result.meta?.regularMarketTime)||points.at(-1).time,priceType:snapshot?.priceType||'chart',delayed:Boolean(snapshot?.delayed),goldProduct:Boolean(result.meta?.goldProduct),goldBuyPrice:Number(result.meta?.goldBuyPrice),goldSellPrice:Number(result.meta?.goldSellPrice),result};
     }
 
+    function portfolioDividendResult(position,upcoming={}) {
+      const today=new Date().setHours(0,0,0,0);
+      const events=(upcoming.events||[]).map(event=>{
+        const exDate=Number(event.exDate),paymentDate=Number(event.paymentDate),amountPerShare=Number(event.amount);
+        const quantity=position.effectiveQuantity??position.quantity;
+        const calendarDate=Number.isFinite(paymentDate)?paymentDate:exDate;
+        return{symbol:position.symbol,name:position.name,date:calendarDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency:String(event.currency||position.currency||'USD').toUpperCase(),past:false};
+      }).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
+      return{symbol:position.symbol,status:upcoming.status||'ok',events};
+    }
+
     async function fetchPortfolioDividends(position) {
+      try{return portfolioDividendResult(position,await cachedApiJson('/api/dividends?symbol='+encodeURIComponent(position.symbol),{ttl:900000}))}
+      catch{return{symbol:position.symbol,status:'provider_error',events:[]}}
+    }
+
+    async function fetchPortfolioDividendsBatch(positions) {
+      const chunks=[];for(let index=0;index<positions.length;index+=40)chunks.push(positions.slice(index,index+40));
       try{
-        const upcoming=await cachedApiJson('/api/dividends?symbol='+encodeURIComponent(position.symbol),{ttl:900000});
-        const today=new Date().setHours(0,0,0,0);
-        const events=(upcoming.events||[]).map(event=>{
-          const exDate=Number(event.exDate),paymentDate=Number(event.paymentDate),amountPerShare=Number(event.amount);
-          const quantity=position.effectiveQuantity??position.quantity;
-          const calendarDate=Number.isFinite(paymentDate)?paymentDate:exDate;
-          return{symbol:position.symbol,name:position.name,date:calendarDate,paymentDate:Number.isFinite(paymentDate)?paymentDate:null,amountPerShare,amount:amountPerShare*quantity,quantity,currency:String(event.currency||position.currency||'USD').toUpperCase(),past:false};
-        }).filter(item=>Number.isFinite(item.date)&&item.date>=today&&Number.isFinite(item.amount));
-        return{symbol:position.symbol,status:upcoming.status||'ok',events};
-      }catch{return{symbol:position.symbol,status:'provider_error',events:[]}}
+        const payloads=await Promise.all(chunks.map(chunk=>cachedApiJson('/api/dividends-batch?symbols='+encodeURIComponent(chunk.map(item=>item.symbol).join(',')),{ttl:900000})));
+        const merged=Object.assign({},...payloads.map(payload=>payload.results||{}));
+        return positions.map(position=>{const result=merged[position.symbol];return result?.ok?portfolioDividendResult(position,result.data):{symbol:position.symbol,status:result?.data?.status||'provider_error',events:[]}});
+      }catch{return mapWithLimit(positions,4,fetchPortfolioDividends)}
     }
 
     async function fetchPortfolioPastDividends(position) {
@@ -3261,46 +3296,65 @@
       }catch{return[]}
     }
 
-    async function renderPortfolioDividends(positions) {
-      const requestId=++portfolioDividendRequestId;
+    function appendPortfolioDividendRow(item) {
+      const row=document.createElement('li');row.className='dividend-row';
+      const date=document.createElement('time');date.dateTime=item.dateTime;date.textContent=item.dateText;
+      const symbol=document.createElement('span');symbol.className='dividend-event-label';symbol.textContent=item.symbol;symbol.title=item.symbol;
+      const amount=document.createElement('strong');amount.textContent=item.amountText;amount.title=item.amountTitle||'';
+      row.append(date,symbol,amount);dividendList.append(row);
+    }
+
+    function renderCachedPortfolioDividendSnapshot() {
+      const snapshot=portfolioDividendSnapshots[activePortfolioId];
+      if(!snapshot||snapshot.fingerprint!==dividendSnapshotFingerprint()||!Array.isArray(snapshot.rows)||!snapshot.rows.length||Date.now()-Number(snapshot.savedAt)>30*86400000)return false;
       dividendList.replaceChildren();
-      if(!positions.length){
-        const empty=document.createElement('li');empty.className='favorites-note';empty.textContent='Temettü takvimi için portföyde hisse bulunmuyor.';dividendList.append(empty);return;
-      }
-      const loading=document.createElement('li');loading.className='favorites-note';loading.textContent='Temettü takvimi güncelleniyor…';dividendList.append(loading);
-      const results=await Promise.all(positions.map(fetchPortfolioDividends));
-      if(requestId!==portfolioDividendRequestId)return;
-      dividendList.replaceChildren();
-      const upcomingDividends=results.flatMap(item=>item.events).sort((a,b)=>a.date-b.date);
-      let pastDividends=[];
-      if(upcomingDividends.length<5){
-        const eligible=positions.filter(position=>!position.symbol.startsWith('TEFAS-')&&!position.symbol.startsWith('ALTIN-'));
-        const historyQuery='range=5y&interval=1d&events=div';
-        await prefetchPricePayloads(eligible,{query:historyQuery});
-        if(requestId!==portfolioDividendRequestId)return;
-        pastDividends=(await Promise.all(eligible.map(fetchPortfolioPastDividends))).flat().sort((a,b)=>b.date-a.date);
-      }
-      const showingPast=!upcomingDividends.length&&pastDividends.length>0,dividends=[...upcomingDividends,...pastDividends].slice(0,5);
-      if(!dividends.length){
-        const empty=document.createElement('li');empty.className='favorites-note';
-        const providerErrors=results.filter(item=>item.status==='provider_error').map(item=>item.symbol),unsupported=results.filter(item=>item.status==='unsupported').map(item=>item.symbol);
-        empty.textContent=providerErrors.length?'Temettü sağlayıcısına erişilemedi: '+providerErrors.join(', '):unsupported.length?'Temettü takvimi desteklenmeyen ürünler: '+unsupported.join(', '):'Açıklanmış yaklaşan temettü bulunamadı.';
-        dividendList.append(empty);return;
-      }
-      if(showingPast){const note=document.createElement('li');note.className='favorites-note';note.textContent='Yaklaşan temettü bulunamadı; en son geçmiş temettüler gösteriliyor.';dividendList.append(note)}
-      else if(pastDividends.length&&upcomingDividends.length<5){const note=document.createElement('li');note.className='favorites-note';note.textContent='Yaklaşan temettüler en son geçmiş kayıtlarla tamamlandı.';dividendList.append(note)}
+      const note=document.createElement('li');note.className='favorites-note';note.textContent='Son takvim kaydı gösteriliyor; güncel veriler arka planda alınıyor…';dividendList.append(note);
+      snapshot.rows.forEach(appendPortfolioDividendRow);return true;
+    }
+
+    async function renderPortfolioDividendItems(dividends,noteText,requestId,{save=true}={}) {
       const targetCurrency=portfolioDisplayCurrency==='NATIVE'?null:portfolioDisplayCurrency;
       const currencies=[...new Set(dividends.map(item=>item.currency).concat(targetCurrency||[]))],usdRates=new Map([['USD',1]]);
       await Promise.all(currencies.filter(code=>code!=='USD').map(async code=>{try{usdRates.set(code,(await latestPrice(code+'USD=X')).price)}catch{usdRates.set(code,null)}}));
-      if(requestId!==portfolioDividendRequestId)return;
-      dividends.forEach(item=>{
-        const row=document.createElement('li');row.className='dividend-row';
-        const date=document.createElement('time');date.dateTime=new Date(item.date).toISOString().slice(0,10);date.textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date));
-        const symbol=document.createElement('span');symbol.className='dividend-event-label';symbol.textContent=displaySymbol(item.symbol);symbol.title=symbol.textContent;
+      if(requestId!==portfolioDividendRequestId)return false;
+      dividendList.replaceChildren();
+      if(noteText){const note=document.createElement('li');note.className='favorites-note';note.textContent=noteText;dividendList.append(note)}
+      const snapshotRows=dividends.map(item=>{
         const sourceRate=usdRates.get(item.currency),targetRate=targetCurrency?usdRates.get(targetCurrency):sourceRate,factor=targetCurrency?(Number.isFinite(sourceRate)&&Number.isFinite(targetRate)&&targetRate>0?sourceRate/targetRate:null):1,shownCurrency=targetCurrency||item.currency;
-        const amount=document.createElement('strong');amount.textContent=(Number.isFinite(factor)?dividendMoney(item.amount*factor,shownCurrency):'Kur yok')+' · '+pricePrecisionNumber(item.quantity)+' adet';amount.title=Number.isFinite(factor)?'Hisse başı '+dividendMoney(item.amountPerShare*factor,shownCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi';
-        row.append(date,symbol,amount);dividendList.append(row);
+        return{dateTime:new Date(item.date).toISOString().slice(0,10),dateText:new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(item.date)),symbol:displaySymbol(item.symbol),amountText:(Number.isFinite(factor)?dividendMoney(item.amount*factor,shownCurrency):'Kur yok')+' · '+pricePrecisionNumber(item.quantity)+' adet',amountTitle:Number.isFinite(factor)?'Hisse başı '+dividendMoney(item.amountPerShare*factor,shownCurrency)+' · tahmini brüt toplam':'Temettü para birimi dönüştürülemedi'};
       });
+      snapshotRows.forEach(appendPortfolioDividendRow);
+      if(save)savePortfolioDividendSnapshot({rows:snapshotRows,noteText});
+      return true;
+    }
+
+    async function renderPortfolioDividends(positions) {
+      const requestId=++portfolioDividendRequestId;
+      if(!positions.length){
+        dividendList.replaceChildren();const empty=document.createElement('li');empty.className='favorites-note';empty.textContent='Temettü takvimi için portföyde hisse bulunmuyor.';dividendList.append(empty);return;
+      }
+      const cachedShown=renderCachedPortfolioDividendSnapshot();
+      if(!cachedShown){dividendList.replaceChildren();const loading=document.createElement('li');loading.className='favorites-note';loading.textContent='Temettü takvimi güncelleniyor…';dividendList.append(loading)}
+      const results=await fetchPortfolioDividendsBatch(positions);
+      if(requestId!==portfolioDividendRequestId)return;
+      const upcomingDividends=results.flatMap(item=>item.events).sort((a,b)=>a.date-b.date);
+      if(upcomingDividends.length>=5){await renderPortfolioDividendItems(upcomingDividends.slice(0,5),'',requestId);return}
+      if(upcomingDividends.length)await renderPortfolioDividendItems(upcomingDividends,'Geçmiş kayıtlar arka planda tamamlanıyor…',requestId,{save:false});
+      const eligible=positions.filter(position=>!position.symbol.startsWith('TEFAS-')&&!position.symbol.startsWith('ALTIN-'));
+      const historyQuery='range=5y&interval=1d&events=div';
+      await prefetchPricePayloads(eligible,{query:historyQuery});
+      if(requestId!==portfolioDividendRequestId)return;
+      const pastDividends=(await Promise.all(eligible.map(fetchPortfolioPastDividends))).flat().sort((a,b)=>b.date-a.date);
+      const showingPast=!upcomingDividends.length&&pastDividends.length>0,dividends=[...upcomingDividends,...pastDividends].slice(0,5);
+      if(dividends.length){
+        const noteText=showingPast?'Yaklaşan temettü bulunamadı; en son geçmiş temettüler gösteriliyor.':pastDividends.length&&upcomingDividends.length<5?'Yaklaşan temettüler en son geçmiş kayıtlarla tamamlandı.':'';
+        await renderPortfolioDividendItems(dividends,noteText,requestId);return;
+      }
+      if(cachedShown)return;
+      dividendList.replaceChildren();const empty=document.createElement('li');empty.className='favorites-note';
+      const providerErrors=results.filter(item=>item.status==='provider_error').map(item=>item.symbol),unsupported=results.filter(item=>item.status==='unsupported').map(item=>item.symbol);
+      empty.textContent=providerErrors.length?'Temettü sağlayıcısına erişilemedi: '+providerErrors.join(', '):unsupported.length?'Temettü takvimi desteklenmeyen ürünler: '+unsupported.join(', '):'Açıklanmış yaklaşan temettü bulunamadı.';
+      dividendList.append(empty);
     }
 
     function addPortfolioStat(parent, label, value, className='') {
@@ -3737,9 +3791,11 @@
 
     async function renderPortfolio({refreshBenchmark=true,refreshDividends=true}={}) {
       const renderId=++portfolioRenderId;
+      const portfolioIdAtStart=activePortfolioId;
       const emptyState=syncPortfolioEmptyState();
       const allPortfolioPositions=portfolioBooks.flatMap(book=>book.positions);
       const priceWarmup=prefetchPortfolioPrices(allPortfolioPositions);
+      const dripRefreshPromise=refreshDripResults(portfolio);
       renderAllPortfoliosSummary(priceWarmup);
       if(refreshDividends)portfolioDividendRequestId++;
       if(!portfolioList.querySelector('.portfolio-row'))renderCachedPortfolioSnapshot();
@@ -3769,6 +3825,7 @@
       const results=await Promise.all(portfolio.map(async position=>{try{return{ok:true,value:await fetchPortfolioItem(position)}}catch(error){return{ok:false,position,error}}}));
       if(renderId!==portfolioRenderId)return;
       const valid=results.filter(result=>result.ok).map(result=>result.value);
+      if(refreshDividends)renderPortfolioDividends(valid);
       const previousReferenceTime=Math.max(0,...valid.map(item=>Number(item.previousTime)||0));
       const previousDate=previousReferenceTime?new Date(previousReferenceTime*1000).toISOString().slice(0,10):previousBusinessDate();
       const failedPositions=results.filter(result=>!result.ok).map(result=>result.position.symbol);
@@ -3922,8 +3979,8 @@
         renderPortfolioDistribution(allocationValues.map(item=>({...item,value:item.value*presentationFactor})),new Map([...currencyValues].map(([code,value])=>[code,value*presentationFactor])),presentationCurrency);
         savePortfolioSnapshot({mode:portfolioMetricsMode,totalValue:portfolioTotalValue.textContent,dailyChange:portfolioDailyChange.textContent,dailyTone:selectedProfit>=0?'positive':'negative',rows:snapshotRows});
       }
-      if(refreshDividends)renderPortfolioDividends(valid);
       if(refreshBenchmark)renderPortfolioBenchmark(valid);
+      dripRefreshPromise.then(changed=>{if(changed&&renderId===portfolioRenderId&&portfolioIdAtStart===activePortfolioId)renderPortfolio({refreshBenchmark:false,refreshDividends:true})});
       if(keepExistingPortfolio&&portfolioView.classList.contains('active'))requestAnimationFrame(()=>window.scrollTo({top:scrollBeforeCommit,behavior:'auto'}));
     }
 
