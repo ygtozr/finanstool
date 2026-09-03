@@ -1,8 +1,11 @@
 {
 	"name": "ozer-finans",
 	"private": true,
-	"version": "7.4.0",
+	"version": "7.5.0",
 	"scripts": {
 		"test": "node tests/regression.test.js"
+	},
+	"dependencies": {
+		"@vercel/functions": "^3.9.5"
 	}
 }

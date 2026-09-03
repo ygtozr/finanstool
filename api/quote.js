@@ -74,6 +74,22 @@ async function tradingViewBist(symbol){
   return{symbol,name:String(row[1]||code),currency:String(row[6]||'TRY').toUpperCase(),price,previousClose:price-delta,delta,change,asOf,provider:'TradingView BIST',priceType:'delayed_quote',delayed:String(row[5]||'').includes('delayed'),stale:false};
 }
 
+async function tradingViewBistBatch(symbols){
+  const normalized=[...new Set((symbols||[]).map(value=>String(value||'').trim().toUpperCase()).filter(value=>value.endsWith('.IS')))];
+  if(!normalized.length)return new Map();
+  const columns=['name','description','close','change','change_abs','update_mode','currency','last_bar_update_time'];
+  const tickers=normalized.map(symbol=>'BIST:'+symbol.slice(0,-3));
+  const payload=await fetchJson('https://scanner.tradingview.com/turkey/scan',{method:'POST',headers:{'Content-Type':'application/json',Origin:'https://www.tradingview.com',Referer:'https://www.tradingview.com/'},body:JSON.stringify({symbols:{tickers,query:{types:[]}},columns})},5000);
+  const byTicker=new Map((payload?.data||[]).map(item=>[String(item?.s||'').toUpperCase(),item?.d]));
+  const results=new Map();
+  normalized.forEach(symbol=>{
+    const code=symbol.slice(0,-3),row=byTicker.get('BIST:'+code),price=Number(row?.[2]),change=Number(row?.[3]),delta=Number(row?.[4]),asOf=Number(row?.[7]);
+    if(!Number.isFinite(price)||price<=0||!Number.isFinite(change)||!Number.isFinite(delta)||!Number.isFinite(asOf)||asOf<=0)return;
+    results.set(symbol,{symbol,name:String(row?.[1]||code),currency:String(row?.[6]||'TRY').toUpperCase(),price,previousClose:price-delta,delta,change,asOf,provider:'TradingView BIST toplu',priceType:'delayed_quote',delayed:String(row?.[5]||'').includes('delayed'),stale:false});
+  });
+  return results;
+}
+
 function previousWeekday(time){
   const date=new Date(time*1000);date.setUTCDate(date.getUTCDate()-1);
   while([0,6].includes(date.getUTCDay()))date.setUTCDate(date.getUTCDate()-1);
@@ -92,6 +108,22 @@ async function bistQuote(symbol){
   try{return await tradingViewBist(symbol)}catch{return yahooSafeFallback(symbol)}
 }
 
+async function mapWithLimit(items,limit,worker){
+  const output=new Array(items.length);let cursor=0;
+  async function run(){while(cursor<items.length){const index=cursor++;output[index]=await worker(items[index],index)}}
+  await Promise.all(Array.from({length:Math.min(limit,items.length)},run));return output;
+}
+
+async function quoteBatch(symbols){
+  const normalized=[...new Set((symbols||[]).map(value=>String(value||'').trim().toUpperCase()).filter(value=>SYMBOL.test(value)))],results=new Map();
+  const bist=normalized.filter(symbol=>symbol.endsWith('.IS')),funds=normalized.filter(symbol=>symbol.startsWith('TEFAS-'));
+  await Promise.all([
+    (async()=>{if(!bist.length)return;try{const batch=await tradingViewBistBatch(bist);batch.forEach((value,key)=>results.set(key,value))}catch{}const missing=bist.filter(symbol=>!results.has(symbol));const fallbacks=await mapWithLimit(missing,4,async symbol=>{try{return[symbol,await yahooSafeFallback(symbol)]}catch(error){return[symbol,{error:error.message||'Fiyat alınamadı.'}]}});fallbacks.forEach(([symbol,value])=>results.set(symbol,value))})(),
+    mapWithLimit(funds,4,async symbol=>{try{return[symbol,await tefasQuote(symbol)]}catch(error){return[symbol,{error:error.message||'Fiyat alınamadı.'}]}}).then(entries=>entries.forEach(([symbol,value])=>results.set(symbol,value)))
+  ]);
+  return results;
+}
+
 const rateBuckets=new Map();
 function allow(req){
   const now=Date.now(),key=String(req.headers?.['x-forwarded-for']||req.socket?.remoteAddress||'unknown').split(',')[0],current=rateBuckets.get(key);
@@ -99,7 +131,7 @@ function allow(req){
   return++current.count<=120;
 }
 
-module.exports=async(req,res)=>{
+const handler=async(req,res)=>{
   res.setHeader('Allow','GET');
   if(req.method!=='GET')return res.status(405).json({error:'Yalnız GET yöntemi desteklenir.'});
   if(!allow(req))return res.status(429).json({error:'Çok fazla fiyat isteği gönderildi.'});
@@ -110,4 +142,7 @@ module.exports=async(req,res)=>{
   catch(error){return res.status(502).json({error:error.message||'Güncel fiyat alınamadı.'})}
 };
 
-module.exports._test={unixDate,normalizeFundPoints,latestBusinessDate,previousWeekday};
+handler.resolveQuote=async symbol=>String(symbol||'').toUpperCase().startsWith('TEFAS-')?tefasQuote(String(symbol).toUpperCase()):bistQuote(String(symbol).toUpperCase());
+handler.resolveQuotes=quoteBatch;
+handler._test={unixDate,normalizeFundPoints,latestBusinessDate,previousWeekday,tradingViewBistBatch};
+module.exports=handler;

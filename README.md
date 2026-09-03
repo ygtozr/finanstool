@@ -1,4 +1,4 @@
-# Özer Finans v7.4
+# Özer Finans v7.5 Önizleme
 
 Özer Finans; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
@@ -7,6 +7,19 @@
 - Vercel: https://finanstool.vercel.app
 - Arayüz dili: Türkçe
 - Güncel kalıcı sürüm: **v7.4**
+- İnceleme adayı: **v7.5 Önizleme**
+
+## v7.5 Önizleme: soğuk batch gecikmesi ve ortak sembol önbelleği
+
+- Tarayıcı, Piyasa Özeti, Favoriler ve Alarmlar için tek `/api/prices` isteği göndermeye devam eder.
+- Kompakt fiyatlar yalnız istek listesinin tamamına göre değil, her sembol için ayrı Vercel Runtime Cache kaydında tutulur. Favori listesi değişse bile daha önce alınmış semboller yeniden kullanılabilir.
+- Her sembolün tek önbellek kaydı son başarılı cevabı 24 saat korur; tazelik veri türüne göre denetlenir ve sağlayıcı geçici olarak yanıt vermezse zaman damgalı eski veri açıkça `stale` olarak döner. Tek kayıt kullanımı gereksiz ikinci önbellek yazımını önler.
+- BIST sembolleri tek TradingView Türkiye taramasında, döviz çiftleri tek TradingView Forex taramasında gruplanır. TEFAS ve diğer sağlayıcılar kontrollü eşzamanlılıkla çalışmaya devam eder.
+- Önbellek süreleri veri türüne göre ayrılmıştır: standart/BIST/döviz 15 saniye, altın 60 saniye, TEFAS 5 dakika.
+- Elle yenileme, her alt istek için benzersiz zaman damgası üretmez; sabit `refresh=1` yolu ile sembol önbelleğini kontrollü olarak tazeler.
+- Grafik sayfasındaki ilk istekte CDN’yi zorla atlayan `reload` kaldırılmıştır. Grafik kütüphanesi Grafik düğmesine ilk dokunuş veya klavye odağında da hazırlanır.
+- GitHub’daki bütün onaylı sürüm arşivleri korunur; `archive/` klasörü `.vercelignore` ile çalışma dağıtımından çıkarılarak yaklaşık 50 MB geçmiş dosyanın her önizlemeye taşınması önlenir.
+- Bu dal önizlemedir; v7.4 kalıcı ana sürümü kullanıcı onayına kadar değiştirilmez.
 
 ## v7.4: istemci ve Vercel verimliliği
 
