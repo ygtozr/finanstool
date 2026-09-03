@@ -145,7 +145,7 @@ assert.equal(goldTest.turkishNumber('11.253,14'),11253.14,'Fiziki altın alış 
 assert.match(goldApi,/Truncgil serbest piyasa alış[\s\S]*GenelPara serbest piyasa alış/,'Fiziki altın için Vercel uyumlu birincil ve yedek sağlayıcı bulunmalı');
 assert.match(searchApi,/ALTIN-GRAM[\s\S]*ALTIN-CEYREK[\s\S]*ALTIN-YARIM[\s\S]*ALTIN-TAM[\s\S]*ALTIN-CUMHURIYET[\s\S]*ALTIN-ATA/,'Altın ürünleri arama kataloğunda bulunmalı');
 
-assert.equal((html.match(/fresh=/g)||[]).length,0,'Önbelleği bozan fresh parametresi kalmamalı');
+assert.equal((html.match(/[?&]fresh=/g)||[]).length,0,'Önbelleği bozan fresh sorgu parametresi kalmamalı');
 assert.match(html,/let priceRequestId = 0;/,'Ana grafik yarış koruması bulunmalı');
 assert.doesNotMatch(html,/function compareStock\s*\(/,'Ana grafik karşılaştırma işlevi kaldırılmalı');
 assert.doesNotMatch(html,/let compareData\s*=/,'Ana grafik karşılaştırma durumu kaldırılmalı');
@@ -316,7 +316,7 @@ assert.match(html,/amountText:\(Number\.isFinite\(factor\)\?dividendMoney\(item\
 assert.match(html,/function dividendMoney\(value, currency\) \{[\s\S]*preference==='auto'\?2:Number\(preference\)[\s\S]*minimumFractionDigits:digits,maximumFractionDigits:digits/,'Temettü tutarı otomatik modda standart iki basamak kullanmalı, açık basamak tercihini korumalı');
 assert.match(html,/function activePriceDecimalsPreference\(\)[\s\S]*priceDecimalsSelect\?\.value[\s\S]*function money\(value, currency\)[\s\S]*const preference=activePriceDecimalsPreference\(\)/,'Para biçimleme ekranda seçili fiyat hassasiyetini doğrudan kullanmalı');
 assert.match(html,/\.dividend-row strong \{ text-align:right; white-space:nowrap;/,'Temettü tutarı tek satırda kalmalı');
-assert.match(html,/@media \(max-width:760px\)[\s\S]*\.dividend-row \{ grid-template-columns:76px minmax\(42px,1fr\) auto;/,'Temettü takvimi mobilde tarih, sembol ve tutar için üç sütunu korumalı');
+assert.match(html,/@media \(max-width:760px\)[\s\S]*\.dividend-row \{ grid-template-columns:94px minmax\(42px,1fr\) auto;/,'Temettü takvimi mobilde geniş tarih sütunu ile sembol ve tutar için üç sütunu korumalı');
 assert.match(html,/input \{[^}]*text-transform:none;/,'Giriş ve arama alanları kullanıcının küçük-büyük harf biçimini korumalı');
 assert.doesNotMatch(html,/input \{[^}]*text-transform:uppercase/,'Giriş alanlarına genel büyük harf dönüşümü uygulanmamalı');
 assert.match(html,/function foldSearchText\(value\)[\s\S]*\.toUpperCase\(\)/,'Arama görünümü harf biçimini korurken eşleşme büyük-küçük harf duyarsız kalmalı');
@@ -386,6 +386,8 @@ assert.match(html,/savedRefreshInterval===null\?15000:Number\(savedRefreshInterv
 assert.match(html,/themeMedia\.addEventListener\('change'[\s\S]*themePreference==='system'/,'Sistem teması cihaz görünümü değiştiğinde otomatik uygulanmalı');
 assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#eef3f8':'#101827'/,'PWA üst çubuğu açık veya koyu temayla eşleşmeli');
 assert.match(html,/function ensureChartLibrary\(\)[\s\S]*script\.src='assets\/chart\.umd\.min\.js\?v=4\.4\.4'/,'Chart.js ihtiyaç anında uygulamanın kendi dosyasından yüklenmeli');
+assert.match(html,/requestIdleCallback\(prewarmCharts,\{timeout:2500\}\)/,'Chart.js ilk Grafik geçişini hızlandırmak için ana ekran boşta kaldığında hazırlanmalı');
+assert.match(html,/let pendingActiveRefresh = false;[\s\S]*if\(bypassGap\)pendingActiveRefresh=true;[\s\S]*queueMicrotask\(\(\)=>runActiveRefresh\(\{leaderRequired:false,bypassGap:true\}\)\)/,'Sekme değişimindeki yenileme, devam eden istekten sonra beklemeden çalıştırılmalı');
 assert.doesNotMatch(html,/cdn\.jsdelivr\.net\/npm\/chart\.js/,'Grafikler çalışma anında harici CDN’ye bağlı olmamalı');
 assert.ok(chartVendor.length>150000&&/Chart/.test(chartVendor),'Yerel Chart.js paketi eksiksiz görünmeli');
 assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=7\.4"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
@@ -413,7 +415,7 @@ assert.match(pricesApi,/MAX_SYMBOLS=40[\s\S]*mapWithLimit\(symbols,6[\s\S]*resul
 assert.match(html,/function refreshActiveView\([\s\S]*mainView\.classList\.contains\('active'\)[\s\S]*chartView\.classList\.contains\('active'\)[\s\S]*portfolioView\.classList\.contains\('active'\)/,'Yalnız görünür uygulama sayfası otomatik yenilenmeli');
 assert.match(html,/function claimPollingLeadership\([\s\S]*refreshLeaderKey[\s\S]*refreshInstanceId/,'Aynı cihazdaki sekmelerden yalnız biri otomatik fiyat sorgulamalı');
 assert.match(html,/document\.addEventListener\('visibilitychange'[\s\S]*releasePollingLeadership\(\)[\s\S]*startRefreshTimers\(\{immediate:true\}\)/,'Arka plandaki sayfa sorgulamayı bırakmalı ve dönüşte zamanlayıcı çakışmamalı');
-assert.match(html,/let alarmCheckInProgress=false;[\s\S]*async function checkAlarms\(\)[\s\S]*alarmCheckInProgress\|\|activeRefreshInProgress[\s\S]*new Set\(active\.map[\s\S]*fetchCompactQuotes\(items,\{baseInterval:alarmCheckInterval\}\)[\s\S]*finally\{alarmCheckInProgress=false/,'Alarmlar sembolleri tekilleştirerek toplu alınmalı ve aynı anda ikinci denetim başlamamalı');
+assert.match(html,/let alarmCheckInProgress=false;[\s\S]*async function checkAlarms\(\)[\s\S]*alarmCheckInProgress\|\|activeRefreshInProgress[\s\S]*new Set\(active\.map[\s\S]*fetchCompactQuotes\(items,\{baseInterval:alarmCheckInterval\}\)[\s\S]*finally\s*\{\s*alarmCheckInProgress=false/,'Alarmlar sembolleri tekilleştirerek toplu alınmalı ve aynı anda ikinci denetim başlamamalı');
 assert.match(html,/function displaySymbol\(value\)[\s\S]*endsWith\('\.IS'\)\?symbol\.slice\(0,-3\):symbol/,'BIST kodları kullanıcıya .IS eki olmadan gösterilmeli');
 assert.match(html,/async function resolveAssetInput\(value\)[\s\S]*symbol\+'\.IS'[\s\S]*exact\|\|bist/,'Ek içermeyen BIST kodu arama sonucundan otomatik çözülmeli');
 assert.match(html,/for="favoriteSearch">Favorilere eklenecek hisseyi ara/,'Favori aramasının kalıcı erişilebilir adı olmalı');

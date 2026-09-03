@@ -15,7 +15,8 @@
 - Temettü ve fiyat batch işlemleri sağlayıcılara kontrollü eşzamanlılıkla erişir; DRIP sonuçları 24 saat cihazda ve CDN'de saklanır.
 - Otomatik portföy yenilemesi yalnız aktif portföyü işler. Toplam Portföy ayrı hesaplanır ve aynı sembolün normalize edilmiş piyasa verisi paylaşılır.
 - Portföy kartları fiyat yenilemesinde yeniden oluşturulmaz; logo ve etkileşimler korunup yalnız değer metinleri güncellenir.
-- Ana fiyat grafiği RSI ve MA tamamlanmadan gösterilir; göstergeler paralel hazırlanıp sonradan eklenir. Chart.js yalnız Grafik veya Portföy ekranında gerektiğinde yüklenir.
+- Ana fiyat grafiği RSI ve MA tamamlanmadan gösterilir; göstergeler paralel hazırlanıp sonradan eklenir. Chart.js ilk ekran boşta kaldığında arka planda hazırlanır; Grafik sekmesine geçiş, devam eden başka bir yenileme yüzünden bir sonraki tura ertelenmez.
+- Temettü takviminin tarih sütunu masaüstünde ve mobilde genişletilmiştir; yıl bilgisi dar ekranda kesilmeden korunur.
 - Tarih/para biçimleyicileri önbelleğe alınmış, SMA kayan toplamla O(n) hesaplanmış ve istemci API önbelleğine boyut sınırı eklenmiştir.
 - Otomatik yenileme aralıkları ve piyasa türüne göre zamanlama davranışı bu pakette değiştirilmemiştir.
 

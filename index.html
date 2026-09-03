@@ -251,7 +251,7 @@
     .dividend-section { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
     .dividend-note { margin:4px 0 12px; color:var(--muted); font-size:.82rem; }
     .dividend-list { list-style:none; display:grid; gap:7px; padding:0; margin:0; }
-    .dividend-row { display:grid; grid-template-columns:90px minmax(130px,1fr) auto; gap:8px; align-items:center; padding:9px 10px; border-radius:9px; background:#0d1523; font-size:.85rem; }
+    .dividend-row { display:grid; grid-template-columns:104px minmax(116px,1fr) auto; gap:8px; align-items:center; padding:9px 10px; border-radius:9px; background:#0d1523; font-size:.85rem; }
     .dividend-row span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .dividend-row .dividend-event-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.25; }
     .dividend-row strong { text-align:right; white-space:nowrap; }
@@ -632,7 +632,7 @@
       .portfolio-detail-controls button { min-height:46px; }
       .chart-wrap { height:340px; }
       .favorites-list { display:grid; }
-      .dividend-row { grid-template-columns:76px minmax(42px,1fr) auto; gap:6px; padding-inline:8px; font-size:.78rem; }
+      .dividend-row { grid-template-columns:94px minmax(42px,1fr) auto; gap:6px; padding-inline:8px; font-size:.78rem; }
       html[data-theme="light"] .mobile-bottom-nav { background:#fffffff2; }
       html[data-theme="light"] .mobile-bottom-nav button.is-active { background:#e2e8f0; }
     }
@@ -1306,6 +1306,7 @@
     document.documentElement.dataset.fontSize=fontSize;
     let activeRefreshTimerId = null;
     let activeRefreshInProgress = false;
+    let pendingActiveRefresh = false;
     let lastActiveRefreshAt = 0;
     const refreshLeaderKey='finans-grafigi-refresh-leader';
     const refreshInstanceId=(crypto.randomUUID?.()||Date.now()+'-'+Math.random()).toString();
@@ -2499,18 +2500,27 @@
 
     async function refreshActiveView({force=false}={}) {
       if(mainView.classList.contains('active'))return refreshMarketAndFavorites({force});
-      if(chartView.classList.contains('active'))return primarySymbol?refreshCurrentChart():loadPrice(currentSymbol()||'AAPL',{silent:true});
+      if(chartView.classList.contains('active'))return primarySymbol?refreshCurrentChart():loadPrice(currentSymbol()||'AAPL');
       if(portfolioView.classList.contains('active'))return renderPortfolio({refreshBenchmark:false,refreshDividends:false,refreshAll:false});
     }
 
     async function runActiveRefresh({force=false,leaderRequired=true,bypassGap=false}={}) {
       if(document.hidden||(!force&&refreshInterval<=0)||(leaderRequired&&!claimPollingLeadership()))return;
-      if(activeRefreshInProgress||alarmCheckInProgress)return;
+      if(activeRefreshInProgress||alarmCheckInProgress){
+        if(bypassGap)pendingActiveRefresh=true;
+        return;
+      }
       const now=Date.now();
       if(!force&&!bypassGap&&now-lastActiveRefreshAt<Math.max(1000,refreshInterval*.7))return;
       activeRefreshInProgress=true;
       try{await refreshActiveView({force});lastActiveRefreshAt=Date.now()}
-      finally{activeRefreshInProgress=false}
+      finally{
+        activeRefreshInProgress=false;
+        if(pendingActiveRefresh){
+          pendingActiveRefresh=false;
+          queueMicrotask(()=>runActiveRefresh({leaderRequired:false,bypassGap:true}));
+        }
+      }
     }
 
     function startRefreshTimers({immediate=false,bypassGap=false}={}) {
@@ -2849,7 +2859,14 @@
         });
         if(changed)saveAlarms();
       }catch{}
-      finally{alarmCheckInProgress=false;renderAlarms()}
+      finally{
+        alarmCheckInProgress=false;
+        renderAlarms();
+        if(pendingActiveRefresh){
+          pendingActiveRefresh=false;
+          queueMicrotask(()=>runActiveRefresh({leaderRequired:false,bypassGap:true}));
+        }
+      }
     }
 
     function renderAdvancedResults(items) {
@@ -4908,6 +4925,9 @@
     renderAlarms();
     startAlarmTimer();
     startRefreshTimers({immediate:true,bypassGap:true});
+    const prewarmCharts=()=>ensureChartLibrary().catch(()=>{});
+    if('requestIdleCallback' in window)requestIdleCallback(prewarmCharts,{timeout:2500});
+    else setTimeout(prewarmCharts,1500);
     document.addEventListener('visibilitychange',()=>{
       if(document.hidden){if(activeRefreshTimerId)clearTimeout(activeRefreshTimerId);activeRefreshTimerId=null;releasePollingLeadership();return}
       startRefreshTimers({immediate:true});

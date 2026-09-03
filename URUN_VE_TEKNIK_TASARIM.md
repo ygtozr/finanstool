@@ -1066,7 +1066,8 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - DRIP geçmişi yıl başına sabitlenmiş anahtarla 24 saat istemci/CDN önbelleğinde tutulur. Yanıt yalnız yeniden yatırım günlerinde gerekli kapanış noktalarını taşır; istemci en fazla dört DRIP hesabını paralel çalıştırır.
 - Aktif portföy otomatik yenilemesi, bütün portföyleri tekrar hesaplamaz. Toplam Portföy hesabı bağımsızdır; aynı sembolün normalize edilmiş piyasa sonucu aktif ve toplam hesaplarda paylaşılır.
 - Portföy satırları sembol kimliğiyle kalıcı DOM düğümleridir. Fiyat yenilemesinde kart, logo ve olay dinleyicileri yeniden kurulmaz; yalnız fiyat, kâr/zarar, adet ve ayrıntı metinleri güncellenir.
-- Dağılım grafiklerinde veri imzası değişmediyse Chart.js güncellemesi atlanır. Chart.js ilk Özet ekranında yüklenmez; Grafik veya Portföy görünümü açıldığında yerel dosyadan dinamik yüklenir.
+- Dağılım grafiklerinde veri imzası değişmediyse Chart.js güncellemesi atlanır. Chart.js Özet ekranının ilk çizimini engellemez; tarayıcı boşta kaldığında yerel dosyadan arka planda hazırlanır. Grafik sekmesine geçiş sırasında başka bir görünümün yenilemesi sürüyorsa grafik isteği atlanmaz, devam eden tur biter bitmez çalışır.
+- Temettü takviminin tarih sütunu, tam gün-ay-yıl bilgisini mobilde de tek satırda koruyacak şekilde genişletilmiştir.
 - Ana fiyat grafiği fiyat yanıtından hemen sonra çizilir. RSI ve MA hazırlıkları paralel yürür ve tamamlandığında aynı grafiğe ikinci, animasyonsuz güncelleme uygulanır.
 - SMA hesaplaması kayan toplam ile O(n) çalışır. Sık kullanılan tarih ve sayı biçimleyicileri yeniden kullanılır; API belleği 150 kayıtla sınırlandırılır ve arama bekleme süresi gereksiz istekleri azaltmak için 400 ms'dir.
 - Mobil Safari'de daha önce yaşanan görünmeyen logo regresyonu nedeniyle logo yükleme davranışı eager olarak korunmuştur.
