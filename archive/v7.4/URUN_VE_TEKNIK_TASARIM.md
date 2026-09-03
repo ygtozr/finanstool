@@ -1,11 +1,11 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 7.5
-**Uygulama sürümü:** v7.5
-**Durum:** Kullanıcı onaylı kalıcı sürüm
+**Belge sürümü:** 7.2
+**Uygulama sürümü:** v7.2
+**Durum:** İnceleme adayı; v7.0 kalıcı sürüm korunuyor
 **Canlı adres:** https://finanstool.vercel.app
 **Kaynak depo:** https://github.com/ygtozr/finanstool
-**Son güncelleme:** 3 Eylül 2026
+**Son güncelleme:** 27 Ağustos 2026
 
 Bu belge Özer Finans uygulamasının amacını, kullanıcı tercihlerini, mevcut işlevlerini, görsel tasarımını, veri modelini ve teknik mimarisini tek yerde tanımlar. Hedefi, mevcut kaynak kod görülmeden uygulama sıfırdan geliştirilse bile aynı davranışın ve mümkün olduğunca aynı görünümün yeniden üretilebilmesidir.
 
@@ -1072,20 +1072,6 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - SMA hesaplaması kayan toplam ile O(n) çalışır. Sık kullanılan tarih ve sayı biçimleyicileri yeniden kullanılır; API belleği 150 kayıtla sınırlandırılır ve arama bekleme süresi gereksiz istekleri azaltmak için 400 ms'dir.
 - Mobil Safari'de daha önce yaşanan görünmeyen logo regresyonu nedeniyle logo yükleme davranışı eager olarak korunmuştur.
 
-### 21.6 v7.5 soğuk batch gecikmesi ve sembol önbelleği
-
-- İstemcinin tek `/api/prices?mode=compact` isteği korunur; Vercel fonksiyonu sonuçları istek listesinin tamamı yerine sembol başına önbellekler.
-- Sembol önbelleği `@vercel/functions` Runtime Cache üzerinde proje ve ortam kapsamında paylaşılır. Yerel geliştirmede aynı arayüz bellek önbelleğine güvenli biçimde döner.
-- Standart fiyat, BIST ve döviz kayıtları 15 saniye; altın 60 saniye; TEFAS 300 saniye taze kabul edilir. Her sembolün tek kaydı 24 saat saklanır; kayıt içindeki zaman tazeliği belirler ve aynı kayıt hata anında son başarılı veri olarak kullanılır. Böylece sembol başına ikinci Runtime Cache yazımı oluşmaz.
-- Farklı kullanıcıların veya farklı Favori listelerinin ortak sembolleri aynı sıcak kaydı kullanabilir. Liste sırasının ya da içeriğinin değişmesi bütün batch önbelleğini geçersiz kılmaz.
-- BIST sembolleri tek TradingView Türkiye taramasında; desteklenen döviz çiftleri tek TradingView Forex taramasında alınır. Eksik BIST satırları Yahoo’nun son gerçek fiyat noktasıyla sınırlı eşzamanlılıkta tamamlanır.
-- TEFAS sorguları en fazla dört, standart/diğer fiyat sorguları en fazla sekiz eşzamanlı iş olarak yürür. Bir sağlayıcı grubu diğer grubun başlamasını beklemez.
-- Elle yenileme, her seferinde farklı URL üreten zaman damgası kullanmaz. Sabit `refresh=1` varyantı Vercel CDN’in istek birleştirme davranışını korurken sembol önbelleğini tazeler.
-- Ana grafik isteği `cache: reload` ile CDN’yi zorla atlamaz. Grafik kütüphanesi boşta yüklemeye ek olarak Grafik düğmesindeki `pointerdown` ve klavye odağında hazırlanır.
-- GitHub sürüm arşivleri korunur fakat `archive/` klasörü `.vercelignore` ile Vercel çalışma dağıtımına dahil edilmez. Arşivleme kuralı değişmeden dağıtım aktarımı ve dosya taraması azaltılır.
-- Kabul ölçütü: aynı sıcak Vercel bölgesinde farklı batch birleşimleri ortak sembolleri sağlayıcıya yeniden sormamalı; BIST ve döviz grupları sembol sayısından bağımsız tek tarama kullanmalı; hata durumunda varsa son başarılı değer `stale` işaretiyle dönmelidir.
-- v7.5 kullanıcı onayıyla kalıcı ana sürüm olarak yayımlanmıştır; kaynak anı `v7.5` Git etiketiyle korunur.
-
 ## 22. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 
 Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında mevcut Özer Finans ile eşdeğer kabul edilir:
@@ -1098,7 +1084,7 @@ Bir yeniden yapım, ancak aşağıdaki koşulların tamamı sağlandığında me
 6. Yahoo/Nasdaq yedek sağlayıcı zinciri sunucu tarafında çalışır.
 7. Otomatik yenileme yalnız gerekli sayısal alanları değiştirir; görünür yerleşim hareket etmez.
 8. v7.2 kabul testi kontrol listesi geçer.
-9. Güncel belge depo kökünde bulunur; her onaylı sürümün değişmez kopyası kendi `archive/vX.Y/` klasöründe saklanır.
+9. Güncel belge depo kökünde bulunur ve aynı belge `archive/v7.2/` altında saklanır.
 10. Kullanıcı canlı sürümü kontrol edip onaylamıştır.
 
 ## 23. Belge bakım kuralı

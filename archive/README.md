@@ -37,5 +37,7 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v7.0](./v7.0/) | Arşivlendi | v7.0 açılır portföy analizi ve hedef portföy seçimi yayını |
 | [v7.1](./v7.1/) | Arşivlendi | v7.1 davetli üyelik, özel oturum ve şifreli Upstash eşitleme yayını |
 | [v7.2](./v7.2/) | Arşivlendi | v7.2 toplu fiyat, görünür sayfa yenilemesi ve alarm optimizasyonu yayını |
+| v7.3 | Git etiketiyle korundu | [v7.3](https://github.com/ygtozr/finanstool/releases/tag/v7.3) |
+| [v7.4](./v7.4/) | Arşivlendi | [v7.4](https://github.com/ygtozr/finanstool/releases/tag/v7.4) |
 
-Güncel kalıcı sürüm v7.3'tür. Bir sonraki onaylı sürüm yayınlanırken v7.3 aynı düzenle arşivlenecektir.
+Güncel kalıcı sürüm v7.5'tir. Bir sonraki onaylı sürüm yayınlanırken v7.5 aynı düzenle arşivlenecektir.

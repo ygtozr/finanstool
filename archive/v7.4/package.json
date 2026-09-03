@@ -1,0 +1,8 @@
+{
+	"name": "ozer-finans",
+	"private": true,
+	"version": "7.4.0",
+	"scripts": {
+		"test": "node tests/regression.test.js"
+	}
+}
