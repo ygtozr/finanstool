@@ -1,4 +1,4 @@
-# Özer Finans v7.4 Önizleme
+# Özer Finans v7.4
 
 Özer Finans; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
@@ -6,9 +6,9 @@
 
 - Vercel: https://finanstool.vercel.app
 - Arayüz dili: Türkçe
-- Güncel kalıcı sürüm: **v7.3**
+- Güncel kalıcı sürüm: **v7.4**
 
-## v7.4 önizleme: istemci ve Vercel verimliliği
+## v7.4: istemci ve Vercel verimliliği
 
 - Piyasa, Favoriler ve Alarmlar tam fiyat geçmişi yerine mevcut `/api/prices` servisinin kompakt toplu modunu paylaşır.
 - Temettü takvimi beş satırı tamamlamak için 5 yıllık OHLC dizilerini tarayıcıya indirmez; batch yanıtı yaklaşan ve son geçmiş olayları birlikte taşır.

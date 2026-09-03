@@ -1056,7 +1056,7 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - Ödeme tarihi dar mobil görünümde ayrı satır düzeni ve çok satırlı etiketle görünür kalır.
 - v7.3 kalıcı sürümü; hızlı portföy ilk çizimi, toplu temettü isteği, cihazda takvim önbelleği ve arka plan DRIP hesaplamasıyla onaylanmıştır.
 
-### 21.5 v7.4 performans ve kaynak verimliliği önizlemesi
+### 21.5 v7.4 performans ve kaynak verimliliği
 
 - Kullanıcının isteği doğrultusunda otomatik yenileme süreleri ve piyasa türüne göre mevcut zamanlama davranışı değiştirilmemiştir.
 - Özet, Favoriler ve Alarm anlık değerleri `/api/prices?mode=compact` üzerinden ortak alınır. Kompakt yanıt yalnız son fiyat, önceki kapanış, değişim, para birimi ve veri zamanını taşır; tam fiyat geçmişi Grafik ve performans işlevlerine ayrılmıştır.
