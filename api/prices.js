@@ -56,6 +56,10 @@ async function resolveSymbol(symbol,query,req){
 }
 
 function number(value){const parsed=Number(value);return Number.isFinite(parsed)?parsed:null}
+function normalizeCompactData(data){
+  const timestamp=number(data?.marketTimestamp??data?.asOf),marketTimestamp=Number.isFinite(timestamp)&&timestamp>0?timestamp:null;
+  return{...data,asOf:marketTimestamp,marketTimestamp};
+}
 function forexPair(symbol){
   const aliases={'TRY=X':'USDTRY','EURTRY=X':'EURTRY','GBPTRY=X':'GBPTRY','EURUSD=X':'EURUSD','TRYUSD=X':'TRYUSD'};
   return aliases[symbol]||(/^([A-Z]{3})([A-Z]{3})=X$/.test(symbol)?symbol.replace('=X',''):null);
@@ -64,7 +68,7 @@ function forexPair(symbol){
 async function resolveForexBatch(symbols){
   const descriptors=(symbols||[]).map(symbol=>({symbol,pair:forexPair(symbol)})).filter(item=>item.pair);
   if(!descriptors.length)return new Map();
-  const response=await fetch('https://scanner.tradingview.com/forex/scan',{method:'POST',headers:{'User-Agent':'Mozilla/5.0 (compatible; OzerFinans/7.5)','Accept':'application/json','Content-Type':'application/json','Origin':'https://www.tradingview.com','Referer':'https://www.tradingview.com/'},body:JSON.stringify({symbols:{tickers:descriptors.map(item=>'FX_IDC:'+item.pair),query:{types:[]}},columns:['name','description','close','change','change_abs','currency','last_bar_update_time']}),signal:AbortSignal.timeout(4500)});
+  const response=await fetch('https://scanner.tradingview.com/forex/scan',{method:'POST',headers:{'User-Agent':'Mozilla/5.0 (compatible; OzerFinans/7.6)','Accept':'application/json','Content-Type':'application/json','Origin':'https://www.tradingview.com','Referer':'https://www.tradingview.com/'},body:JSON.stringify({symbols:{tickers:descriptors.map(item=>'FX_IDC:'+item.pair),query:{types:[]}},columns:['name','description','close','change','change_abs','currency','last_bar_update_time']}),signal:AbortSignal.timeout(4500)});
   if(!response.ok)throw new Error('Döviz sağlayıcısı '+response.status+' durumunu döndürdü.');
   const payload=await response.json(),rows=new Map((payload?.data||[]).map(item=>[String(item?.s||'').toUpperCase(),item?.d])),results=new Map();
   descriptors.forEach(({symbol,pair})=>{
@@ -102,22 +106,22 @@ async function safeRuntimeSet(key,value,options){try{await compactRuntimeCache.s
 async function readCompactCache(symbol,force=false){
   if(force)return null;
   const ttl=compactTtlSeconds(symbol)*1000,memory=compactMemoryCache.get(symbol);
-  if(memory){compactLastGood.set(symbol,memory);return Date.now()-memory.cachedAt<ttl?{...memory.data,cacheStatus:'memory'}:null}
+  if(memory){compactLastGood.set(symbol,memory);return Date.now()-memory.cachedAt<ttl?{...normalizeCompactData(memory.data),cacheStatus:'memory'}:null}
   const stored=await safeRuntimeGet(compactCacheKey('quote',symbol));
-  if(stored?.data){compactMemoryCache.set(symbol,stored);compactLastGood.set(symbol,stored);return Date.now()-stored.cachedAt<ttl?{...stored.data,cacheStatus:'runtime'}:null}
+  if(stored?.data){compactMemoryCache.set(symbol,stored);compactLastGood.set(symbol,stored);return Date.now()-stored.cachedAt<ttl?{...normalizeCompactData(stored.data),cacheStatus:'runtime'}:null}
   return null;
 }
 
 async function storeCompact(symbol,data){
-  const entry={cachedAt:Date.now(),data:{...data,cacheStatus:undefined}};
+  const normalized=normalizeCompactData(data),entry={cachedAt:Date.now(),data:{...normalized,cacheStatus:undefined}};
   compactMemoryCache.set(symbol,entry);compactLastGood.set(symbol,entry);
   await safeRuntimeSet(compactCacheKey('quote',symbol),entry,{ttl:86400,tags:['compact-quotes','compact:'+symbol],name:'compact '+symbol});
-  return{...data,cacheStatus:'provider'};
+  return{...normalized,cacheStatus:'provider'};
 }
 
 async function staleCompact(symbol){
   const saved=compactLastGood.get(symbol)||await safeRuntimeGet(compactCacheKey('quote',symbol));
-  return saved?.data?{...saved.data,stale:true,cacheStatus:'stale'}:null;
+  return saved?.data?{...normalizeCompactData(saved.data),stale:true,cacheStatus:'stale'}:null;
 }
 
 function compactRequest(symbol,resolver){
@@ -169,5 +173,5 @@ module.exports=async(req,res)=>{
   return res.status(200).json({results:Object.fromEntries(entries),servedAt:Date.now(),cacheMode:compact?'per-symbol-runtime':'response'});
 };
 
-module.exports._test={compactTtlSeconds,forexPair,resolveCompactBatch};
+module.exports._test={compactTtlSeconds,forexPair,normalizeCompactData,resolveCompactBatch};
 
