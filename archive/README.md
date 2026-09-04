@@ -39,5 +39,6 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v7.2](./v7.2/) | Arşivlendi | v7.2 toplu fiyat, görünür sayfa yenilemesi ve alarm optimizasyonu yayını |
 | v7.3 | Git etiketiyle korundu | [v7.3](https://github.com/ygtozr/finanstool/releases/tag/v7.3) |
 | [v7.4](./v7.4/) | Arşivlendi | [v7.4](https://github.com/ygtozr/finanstool/releases/tag/v7.4) |
+| [v7.5](./v7.5/) | Arşivlendi | [v7.5](https://github.com/ygtozr/finanstool/releases/tag/v7.5) |
 
-Güncel kalıcı sürüm v7.5'tir. Bir sonraki onaylı sürüm yayınlanırken v7.5 aynı düzenle arşivlenecektir.
+Güncel kalıcı sürüm v7.6'dır. Bir sonraki onaylı sürüm yayınlanırken v7.6 aynı düzenle arşivlenecektir.

@@ -1,11 +1,11 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 7.6
-**Uygulama sürümü:** v7.6
+**Belge sürümü:** 7.5
+**Uygulama sürümü:** v7.5
 **Durum:** Kullanıcı onaylı kalıcı sürüm
 **Canlı adres:** https://finanstool.vercel.app
 **Kaynak depo:** https://github.com/ygtozr/finanstool
-**Son güncelleme:** 4 Eylül 2026
+**Son güncelleme:** 3 Eylül 2026
 
 Bu belge Özer Finans uygulamasının amacını, kullanıcı tercihlerini, mevcut işlevlerini, görsel tasarımını, veri modelini ve teknik mimarisini tek yerde tanımlar. Hedefi, mevcut kaynak kod görülmeden uygulama sıfırdan geliştirilse bile aynı davranışın ve mümkün olduğunca aynı görünümün yeniden üretilebilmesidir.
 
@@ -1085,15 +1085,6 @@ Buluta gönderilen belge, mevcut JSON yedeğiyle aynı veri kapsamını taşır:
 - GitHub sürüm arşivleri korunur fakat `archive/` klasörü `.vercelignore` ile Vercel çalışma dağıtımına dahil edilmez. Arşivleme kuralı değişmeden dağıtım aktarımı ve dosya taraması azaltılır.
 - Kabul ölçütü: aynı sıcak Vercel bölgesinde farklı batch birleşimleri ortak sembolleri sağlayıcıya yeniden sormamalı; BIST ve döviz grupları sembol sayısından bağımsız tek tarama kullanmalı; hata durumunda varsa son başarılı değer `stale` işaretiyle dönmelidir.
 - v7.5 kullanıcı onayıyla kalıcı ana sürüm olarak yayımlanmıştır; kaynak anı `v7.5` Git etiketiyle korunur.
-
-### 21.7 v7.6 fiyat zamanı alanı uyumluluğu
-
-- Kompakt toplu fiyat yanıtında zamanın kanonik alanı `marketTimestamp` olarak sunulur; sağlayıcı uyumluluğu için `asOf` aynı Unix saniyesini taşımaya devam eder.
-- Runtime Cache içindeki önceki biçimli kayıtlarda yalnız `asOf` bulunsa bile okuma katmanı iki alanı da tamamlar. Son başarılı eski veri yolu da aynı normalizasyondan geçer.
-- İstemci toplu yanıtı belleğe almadan önce `marketTimestamp ?? asOf` sırasıyla zamanı çözer. Böylece Piyasa Özeti ve Favoriler aynı zaman semantiğini kullanır.
-- Geçersiz, sıfır veya eksik zaman gerçek bir tarih gibi gösterilmez; yalnız sağlayıcı gerçekten zaman döndürmediğinde “bilinmiyor” yedeği korunur.
-- Kabul ölçütü: ABD hissesi, BIST hissesi, döviz, altın ve TEFAS fonu için toplu API zaman alanı Unix saniyesi olmalı; kartlarda geçerli tarih/saat görünmeli; v7.5 Runtime Cache kayıtları temizlenmeden uyumlu okunmalıdır.
-- v7.6 kullanıcı onayıyla kalıcı ana sürüm olarak yayımlanmıştır; kaynak anı `v7.6` Git etiketiyle korunur.
 
 ## 22. Sıfırdan yeniden geliştirme için tamamlanma tanımı
 

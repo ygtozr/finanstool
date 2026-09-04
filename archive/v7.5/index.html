@@ -7,12 +7,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Özer Finans">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=7.6">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=7.6">
-  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=7.6">
-  <link rel="manifest" href="manifest.webmanifest?v=7.6">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=7.5">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=7.5">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=7.5">
+  <link rel="manifest" href="manifest.webmanifest?v=7.5">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com https://eodhd.com; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>Özer Finans v7.6</title>
+  <title>Özer Finans v7.5</title>
   <style>
     :root { color-scheme:dark; --surface-page:#101827; --surface-main:#192337; --surface-section:#111a2b; --surface-card:#0d1523; --surface-soft:#182235; --surface-control:#26344d; --line:#2b3a55; --border-strong:#40516e; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --on-accent:#062019; --positive:#34d399; --negative:#ff8f9c; --warning:#ffd66b; --info:#60a5fa; --focus-ring:#7dd3fc; --chart-fill:rgba(82,213,177,.14); --chart-fill-soft:rgba(82,213,177,.08); --bg:var(--surface-page); --panel:var(--surface-main); --danger:var(--negative); }
     * { box-sizing:border-box; }
@@ -757,18 +757,18 @@
   <div id="pullRefreshIndicator" class="pull-refresh-indicator" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true">↓</span><span class="pull-refresh-label">Yenilemek için çekin</span></div>
   <main id="appMain" inert>
     <aside class="desktop-sidebar" aria-label="Masaüstü gezinme">
-      <div class="desktop-brand brand-lockup"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.6" alt=""><span class="brand-lockup-name">Özer Finans</span></div>
+      <div class="desktop-brand brand-lockup"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.5" alt=""><span class="brand-lockup-name">Özer Finans</span></div>
       <button id="desktopOverviewNav" class="is-active" type="button" aria-current="page">⌂ <span>Özet</span></button>
       <button id="desktopChartNav" type="button">⌁ <span>Grafik Ve Analiz</span></button>
       <button id="desktopPortfolioNav" type="button">▤ <span>Portföy</span></button>
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small>v7.6</small>
+      <small>v7.5</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.6" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.6</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.5" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.5</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -778,7 +778,7 @@
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.6" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.6</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.5" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.5</span></h1>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -808,7 +808,7 @@
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.6" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.6</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.5" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.5</span></h1>
       <div id="allPortfolioHead" class="portfolio-head portfolio-overall-head"><div class="portfolio-overall-heading"><h2>Toplam Portföy</h2><div class="portfolio-view-toolbar"><div class="portfolio-metric-mode" role="group" aria-label="Portföy kâr zarar dönemi"><button id="portfolioTodayMode" class="is-active" type="button" aria-pressed="true">Bugün</button><button id="portfolioTotalMode" type="button" aria-pressed="false">Toplam</button></div><button id="portfolioPrivacyToggle" class="portfolio-privacy-toggle" type="button" aria-label="Portföy rakamlarını gizle" aria-pressed="false" title="Portföy rakamlarını gizle"><svg class="privacy-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></svg><svg class="privacy-off" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.3 3M6.4 6.5C3.9 8.2 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6M9.8 9.8a3 3 0 0 0 4.4 4.4"/></svg></button></div></div><div class="portfolio-overall-body"><div class="portfolio-head-metrics"><strong id="allPortfolioTotalValue" class="portfolio-head-value">—</strong><p id="allPortfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="allPortfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Toplam portföyü TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div></div>
       <div class="portfolio-switcher"><label class="portfolio-switcher-field" for="portfolioBookSelect">Aktif Portföy<select id="portfolioBookSelect" aria-label="Aktif portföyü seç"></select></label><div class="portfolio-switcher-actions"><button id="portfolioBookAdd" type="button" aria-label="Yeni portföy oluştur" title="Yeni portföy">+</button><button id="portfolioBookRename" type="button" aria-label="Aktif portföyün adını değiştir" title="Adını değiştir">✎</button><button id="portfolioBookDelete" type="button" aria-label="Aktif portföyü sil" title="Portföyü sil">×</button></div></div>
       <div id="portfolioBookTabs" class="portfolio-book-tabs" role="group" aria-label="Portföy kısayolları"></div>
@@ -838,7 +838,7 @@
       <section id="portfolioDividendSection" class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.6" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.6</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.5" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v7.5</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
         <section class="settings-card settings-horizontal" aria-labelledby="accountTitle"><div class="settings-card-copy"><h3 id="accountTitle">Hesap</h3><p id="accountDescription">Oturum durumu hazırlanıyor…</p><p id="cloudSyncStatus" class="settings-status cloud-sync-status" aria-live="polite"></p></div><div class="settings-card-controls account-controls"><button id="accountAction" type="button">Giriş Yap</button><button id="accountSignOut" class="account-secondary" type="button" hidden>Çıkış Yap</button></div></section>
@@ -888,7 +888,7 @@
         <section class="settings-card settings-horizontal" aria-labelledby="diagnosticsTitle"><div class="settings-card-copy"><h3 id="diagnosticsTitle">Bağlantı Tanılama</h3><p>Veri bağlantısının ve uygulama önbelleğinin son durumunu görüntüleyin.</p></div><div class="settings-card-controls"><dl id="diagnosticsList" class="diagnostics-list"></dl><div class="settings-inline-actions"><button id="diagnosticsRefresh" type="button">Durumu Yenile</button></div></div></section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Yerel modda veriler yalnız cihazda; giriş yapıldığında kullanıcıya bağlı ve şifreli Upstash kaydında saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v7.6</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Yerel modda veriler yalnız cihazda; giriş yapıldığında kullanıcıya bağlı ve şifreli Upstash kaydında saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v7.5</strong></div></div>
         </section>
       </div>
     </section>
@@ -979,7 +979,7 @@
     </form>
     <div class="dialog-actions"><button id="marketSettingsClose" class="dialog-cancel" type="button">Kapat</button></div>
   </dialog>
-  <script src="assets/storage-events.js?v=7.6"></script>
+  <script src="assets/storage-events.js?v=7.5"></script>
   <script>
     let chart;
     let rsiChart;
@@ -1150,12 +1150,6 @@
       return Number.isFinite(number)?number:null;
     }
 
-    function normalizeCompactQuotePayload(quote) {
-      if(!quote||typeof quote!=='object')return quote;
-      const marketTimestamp=optionalQuoteNumber(quote.marketTimestamp??quote.asOf);
-      return {...quote,asOf:marketTimestamp,marketTimestamp,updatedAt:Date.now()};
-    }
-
     async function fetchCompactQuote(item,{force=false}={}) {
       if(usesSnapshotQuote(item.symbol)){
         try{
@@ -1223,7 +1217,7 @@
       await Promise.all(chunks.map(async chunk=>{try{
         const compactUrl='/api/prices?mode=compact&symbols='+encodeURIComponent(chunk.map(item=>item.symbol).join(','))+(force?'&refresh=1':'');
         const payload=await cachedApiJson(compactUrl,{ttl:Math.max(5000,refreshInterval||15000)});
-        Object.entries(payload.results||{}).forEach(([symbol,result])=>{if(result?.ok&&result.data){compactQuoteCache.set(symbol,normalizeCompactQuotePayload(result.data));compactQuoteFetchedAt.set(symbol,Date.now())}});
+        Object.entries(payload.results||{}).forEach(([symbol,result])=>{if(result?.ok&&result.data){compactQuoteCache.set(symbol,result.data);compactQuoteFetchedAt.set(symbol,Date.now())}});
       }catch{await mapWithLimit(chunk,4,async item=>{try{const quote=await fetchCompactQuote(item,{force:false});compactQuoteCache.set(item.symbol,quote);compactQuoteFetchedAt.set(item.symbol,Date.now())}catch{}})}}));
       return new Map(unique.map(item=>[item.symbol,compactQuoteCache.get(item.symbol)]).filter(([,quote])=>quote));
     }
@@ -4987,6 +4981,6 @@
       document.getElementById('symbolForm').addEventListener('submit',function(){setTimeout(resizeVisibleCharts,40)});
     })();
   </script>
-  <script src="assets/auth-account.js?v=7.6.0"></script>
+  <script src="assets/auth-account.js?v=7.5.0"></script>
 </body>
 </html>
