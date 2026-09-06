@@ -1,3 +1,13 @@
+## v7.7 Önizleme — İlave Renk Temaları
+
+Görünüm ayarlarına mevcut Açık, Koyu ve Sistem seçeneklerinin yanında Grafit (buz mavisi), Lavanta (gece moru) ve Petrol (kırık beyaz/petrol yeşili) eklendi. Butonların mevcut boyutu, şekli, fontu ve üç sütunlu düzeni korunur; ilave seçenekler ikinci satırda gösterilir. Diğer sayfaların bilgi ve yerleşimi değişmez.
+
+Tema tercihi mevcut finans-grafigi-theme kaydıyla korunur; JSON yedekleme ve geri yükleme aynı altı seçenek listesini kullanır. Grafit ve Lavanta koyu, Petrol açık renk şemasına dayanır. Sistem tercihi cihaz görünümünü izlemeye devam eder. Grafik renkleri ve PWA tema rengi seçilen semantik renk değişkenlerinden güncellenir. Getiri/kayıp renkleri yeşil/kırmızı kalır.
+
+Bu değişiklik önizleme dalındadır; kalıcı yayın ve arşiv için kullanıcı onayı beklenir.
+
+---
+
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
 **Belge sürümü:** 7.6
