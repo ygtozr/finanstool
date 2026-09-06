@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#181322"><title>Özer Finans · Gece Moru – Lavanta</title>
+<style>
+:root{--bg:#07101d;--surface:#0d1727;--card:#111d30;--card2:#16243a;--line:#253650;--text:#f4f7fb;--muted:#91a0b7;--mint:#52d5b1;--green:#37d59a;--red:#ff8999;--gold:#f2c45c;--blue:#77a7ff;--radius:20px}
+*{box-sizing:border-box}html{background:#030811}body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 50% -10%,#162641 0,#07101d 38%);color:var(--text);min-height:100dvh;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit}.app{width:min(100%,430px);margin:auto;min-height:100dvh;padding:env(safe-area-inset-top) 14px calc(96px + env(safe-area-inset-bottom))}
+.top{height:70px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;position:sticky;top:0;z-index:8;background:linear-gradient(180deg,#08111f 78%,transparent)}
+.brand{display:flex;align-items:center;justify-content:center;gap:9px;font-weight:760;letter-spacing:-.03em;font-size:19px}.logo{width:31px;height:31px;border-radius:10px;background:#fff;display:grid;place-items:center;box-shadow:0 8px 24px #0008}.logo svg{width:23px}.version{font-size:10px;color:#77869d;align-self:end;margin-bottom:20px;margin-left:-4px}
+.icon{border:1px solid var(--line);background:#101b2d;color:var(--text);width:40px;height:40px;border-radius:13px;display:grid;place-items:center}.avatar{background:linear-gradient(135deg,#52d5b1,#77a7ff);color:#08111f;font-weight:800}
+.view{display:none}.view.active{display:block;animation:fade .25s ease}@keyframes fade{from{opacity:.3;transform:translateY(4px)}}
+.hero{padding:4px 2px 18px}.eyebrow{font-size:12px;color:var(--mint);font-weight:700;text-transform:uppercase;letter-spacing:.12em}.hero h1{font-size:28px;line-height:1.1;margin:8px 0 6px;letter-spacing:-.045em}.hero p{margin:0;color:var(--muted);font-size:14px}
+.section{margin:14px 0 22px}.section-head{display:flex;align-items:end;justify-content:space-between;margin:0 2px 11px}.section-head h2{font-size:19px;margin:0;letter-spacing:-.03em}.section-head small{color:var(--muted);font-size:11px}.refresh{border:0;background:#1b3a39;color:var(--mint);font-weight:700;border-radius:999px;padding:8px 12px}
+.market-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.market{min-height:88px;padding:13px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#111d30,#0c1625)}.market .name{font-size:12px;color:var(--muted);white-space:nowrap}.market strong{display:block;font-size:17px;margin:7px 0 3px}.change{font-size:12px;font-weight:750}.up{color:var(--green)}.down{color:var(--red)}
+.list{display:grid;gap:9px}.asset{display:grid;grid-template-columns:43px minmax(0,1fr) auto 32px;align-items:center;gap:11px;padding:11px;border:1px solid var(--line);border-radius:17px;background:var(--card)}.badge{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;background:#192b43;border:1px solid #354967}.badge.nv{background:#71c800;color:#10190b}.badge.gld{background:linear-gradient(135deg,#f8d66c,#ad7313);color:#241400}.asset-name{min-width:0}.asset-name b{display:block;font-size:15px}.asset-name span{display:block;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:3px}.quote{text-align:right}.quote b{display:block;font-size:16px}.quote span{font-size:11px}.more{border:0;background:var(--card2);color:#c5cede;border-radius:10px;height:32px}
+.search{display:flex;gap:8px;margin-top:11px}.search input{width:100%;border:1px solid var(--line);background:#0a1423;color:white;border-radius:15px;padding:13px 14px;outline:none}.search input:focus{border-color:var(--mint);box-shadow:0 0 0 3px #52d5b11c}.add{width:48px;border:0;border-radius:15px;background:var(--mint);color:#07101d;font-size:22px;font-weight:800}
+.panel{border:1px solid var(--line);background:linear-gradient(145deg,#111d30,#0b1524);border-radius:var(--radius);padding:15px}.chart-card{padding:15px 11px 12px}.chart-title{display:flex;justify-content:space-between;align-items:center;padding:0 5px 12px}.chart-title h3{font-size:18px;margin:0}.chart-title small{color:var(--muted)}.chart-price{font-size:25px;font-weight:800;letter-spacing:-.04em}
+.chart{width:100%;height:225px;display:block}.rsi{width:100%;height:88px;display:block;margin-top:0;border-top:1px solid var(--line)}
+.pills{display:flex;gap:7px;overflow:auto;padding:12px 0 4px;scrollbar-width:none}.pill{white-space:nowrap;border:1px solid var(--line);background:#111d30;color:#aab6c9;border-radius:999px;padding:8px 13px;font-size:12px}.pill.active{background:var(--mint);color:#07101d;border-color:var(--mint);font-weight:800}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.stat{background:#0a1423;border-radius:15px;padding:12px}.stat span{display:block;color:var(--muted);font-size:11px}.stat b{display:block;margin-top:4px;font-size:16px}.range{height:7px;border-radius:99px;background:linear-gradient(90deg,#f5b83c,#52d5b1,#77a7ff);margin:16px 2px 7px;position:relative}.range:after{content:"";position:absolute;width:12px;height:12px;border:3px solid white;background:#0c1625;border-radius:50%;left:68%;top:50%;transform:translate(-50%,-50%)}
+.portfolio-total{padding:17px;background:linear-gradient(145deg,#173044,#112338);border-color:#31556b}.total-top{display:flex;justify-content:space-between;align-items:start}.total-top small{color:#b4c2d4}.big{font-size:30px;font-weight:820;letter-spacing:-.05em;margin:7px 0}.seg{display:flex;background:#0b1727;border:1px solid #2b4059;border-radius:12px;padding:3px}.seg button{border:0;color:#93a3b9;background:transparent;border-radius:9px;padding:7px 9px;font-size:11px}.seg .on{background:#243650;color:#fff}
+.port-pills{display:flex;gap:8px;overflow:auto;padding:12px 0}.port-pills .pill{padding:9px 14px}.allocation{display:grid;grid-template-columns:120px 1fr;gap:17px;align-items:center}.donut{width:112px;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--mint) 0 38%,var(--blue) 38% 66%,var(--gold) 66% 84%,#788ba8 84%);position:relative}.donut:after{content:"VOO";position:absolute;inset:22px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:800;font-size:13px}.legend{display:grid;gap:9px}.legend div{display:flex;justify-content:space-between;font-size:12px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:7px}
+.dividend{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;padding:11px 1px;border-bottom:1px solid #213149}.dividend:last-child{border:0}.date{font-size:11px;color:var(--muted)}.dividend b{font-size:13px}.dividend span{font-size:11px;color:var(--muted)}
+.settings{display:grid;gap:10px}.setting{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:17px;background:var(--card)}.setting .glyph{width:40px;height:40px;border-radius:12px;background:#1a2a42;display:grid;place-items:center;font-size:19px}.setting b{display:block;font-size:14px}.setting span{display:block;color:var(--muted);font-size:11px;margin-top:3px}.chev{color:#73839b}
+.note{font-size:11px;line-height:1.5;color:#718098;padding:8px 3px 0}
+.nav{position:fixed;z-index:20;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(calc(100% - 24px),406px);height:72px;padding:7px;display:grid;grid-template-columns:repeat(4,1fr);background:#0d1727ed;border:1px solid #2b3b55;border-radius:22px;box-shadow:0 18px 50px #000a;backdrop-filter:blur(18px)}.nav button{border:0;border-radius:15px;color:#8492a8;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px}.nav button span{font-size:18px}.nav button.active{background:#22314a;color:white}.nav button.active span{color:var(--mint)}
+@media(min-width:700px){body:before{content:"Mobil önizleme · 390 px";position:fixed;left:32px;top:32px;color:#687891;font-size:12px}.app{border-left:1px solid #26344d;border-right:1px solid #26344d;box-shadow:0 0 90px #000}}
+</style><style>:root{--bg:#181322;--surface:#221b30;--card:#2a213a;--card2:#382d4b;--line:#4d4061;--text:#f7f2fc;--muted:#bfb1d0;--mint:#c6adf4;--green:#37d59a;--red:#ff8999;--gold:#f2c45c;--blue:#a9bdff}
+html{background:#110d19}body{background:radial-gradient(circle at 50% -10%,#382749 0,var(--bg) 38%)}.top{background:linear-gradient(180deg,var(--bg) 78%,transparent)}
+.icon{background:var(--card);color:var(--text)}.avatar{background:var(--mint);color:#21152e}.market,.panel{background:linear-gradient(145deg,var(--card),var(--surface))}.refresh{background:var(--card2);color:var(--mint)}.badge{background:var(--card2);border-color:var(--line);color:var(--text)}.more{color:var(--text)}
+.search input,.stat{background:var(--surface);color:var(--text)}.search input:focus{box-shadow:0 0 0 3px #c6adf430}
+.add,.pill.active{color:#21152e}.pill{background:var(--card);color:var(--muted)}.pill.active{background:var(--mint)}
+.portfolio-total{background:linear-gradient(145deg,var(--card2),var(--surface));border-color:var(--line)}
+.total-top small{color:var(--muted)}.seg{background:var(--surface);border-color:var(--line)}.seg button{color:var(--muted)}.seg .on{background:var(--card2);color:var(--text)}
+.range:after{border-color:var(--text);background:var(--surface)}.dividend{border-color:var(--line)}.setting .glyph{background:var(--card2)}.chev,.note,.version{color:var(--muted)}
+.nav{background:#221b30ed;border-color:var(--line);box-shadow:0 18px 50px #0008}.nav button{color:var(--muted)}.nav button.active{background:var(--card2);color:var(--text)}
+.chart g,.rsi g{stroke:var(--line)}.rsi text{fill:var(--muted)}.chart path[stroke="#52d5b1"]{stroke:var(--mint)}.chart stop{stop-color:var(--mint)}
+[style*="color:white"]{color:var(--text)!important}
+@media(min-width:700px){body:before{color:var(--muted)}.app{border-color:var(--line)}}</style></head>
+<body><main class="app">
+<header class="top"><button class="icon">⌁</button><div class="brand"><span class="logo"><svg viewBox="0 0 40 40" fill="none"><path d="M9 29V19l11-8 11 8v10l-11 6-11-6Z" stroke="#07101d" stroke-width="3"/><path d="m12 25 7-7 5 5 6-9" stroke="#07101d" stroke-width="3" stroke-linecap="round"/></svg></span>Özer Finans <small class="version">UI</small></div><button class="icon avatar">YÖ</button></header>
+
+<section class="view active" id="overview">
+<div class="hero"><div class="eyebrow">Günaydın, Yiğit</div><h1>Piyasaya tek bakış.</h1><p>Önemli fiyatlar ve favorileriniz sade bir akışta.</p></div>
+<div class="section"><div class="section-head"><div><h2>Piyasa özeti</h2><small>Son güncelleme 14:32:18</small></div><button class="refresh">Yenile</button></div>
+<div class="market-grid">
+<div class="market"><span class="name">USD / TRY</span><strong>₺41,27</strong><span class="change up">+0,18%</span></div>
+<div class="market"><span class="name">EUR / TRY</span><strong>₺48,11</strong><span class="change up">+0,07%</span></div>
+<div class="market"><span class="name">S&P 500</span><strong>6.502,08</strong><span class="change down">−0,21%</span></div>
+<div class="market"><span class="name">Nasdaq</span><strong>22.148,72</strong><span class="change up">+0,44%</span></div>
+<div class="market"><span class="name">BIST 100</span><strong>11.172,31</strong><span class="change up">+1,12%</span></div>
+<div class="market"><span class="name">Gram altın</span><strong>₺5.284,90</strong><span class="change up">+0,62%</span></div>
+</div></div>
+<div class="section"><div class="section-head"><div><h2>Favoriler</h2><small>6 ürün</small></div><small>Tümünü gör →</small></div><div class="list">
+<div class="asset"><div class="badge nv">NV</div><div class="asset-name"><b>NVDA</b><span>NVIDIA Corporation</span></div><div class="quote"><b>$179,86</b><span class="up">+2,14%</span></div><button class="more">•••</button></div>
+<div class="asset"><div class="badge">V</div><div class="asset-name"><b>VOO</b><span>Vanguard S&P 500 ETF</span></div><div class="quote"><b>$599,12</b><span class="down">−0,18%</span></div><button class="more">•••</button></div>
+<div class="asset"><div class="badge gld">Au</div><div class="asset-name"><b>GLD</b><span>SPDR Gold Shares</span></div><div class="quote"><b>$331,47</b><span class="up">+0,78%</span></div><button class="more">•••</button></div>
+</div><div class="search"><input placeholder="Hisse, fon veya altın ara"><button class="add">+</button></div></div>
+</section>
+
+<section class="view" id="chart">
+<div class="hero"><div class="eyebrow">Teknik görünüm</div><h1>Grafik ve analiz</h1><p>Fiyat, hareketli ortalamalar ve RSI tek bakışta.</p></div>
+<div class="pills"><button class="pill">1 hafta</button><button class="pill">1 ay</button><button class="pill">3 ay</button><button class="pill active">6 ay</button><button class="pill">1 yıl</button><button class="pill">5 yıl</button><button class="pill">Tarih</button></div>
+<div class="panel chart-card"><div class="chart-title"><div><h3>NVDA</h3><small>NASDAQ · USD</small></div><div style="text-align:right"><div class="chart-price">$179,86</div><small class="up">+18,98%</small></div></div>
+<svg class="chart" viewBox="0 0 360 225" preserveAspectRatio="none"><defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#52d5b1" stop-opacity=".35"/><stop offset="1" stop-color="#52d5b1" stop-opacity="0"/></linearGradient></defs><g stroke="#263751" stroke-width="1"><path d="M25 20H350M25 70H350M25 120H350M25 170H350M25 215H350"/></g><path d="M25 176 C45 164 53 188 72 157 S101 150 118 125 S141 138 158 93 S185 84 204 91 S225 48 246 67 S275 42 292 58 S315 29 350 38 L350 215 L25 215Z" fill="url(#area)"/><path d="M25 176 C45 164 53 188 72 157 S101 150 118 125 S141 138 158 93 S185 84 204 91 S225 48 246 67 S275 42 292 58 S315 29 350 38" fill="none" stroke="#52d5b1" stroke-width="3" stroke-linecap="round"/><path d="M25 188 C90 173 130 155 180 127 S275 85 350 64" fill="none" stroke="#f2c45c" stroke-width="1.6" stroke-dasharray="5 4"/></svg>
+<svg class="rsi" viewBox="0 0 360 88" preserveAspectRatio="none"><g stroke="#273951"><path d="M25 22H350M25 66H350"/></g><text x="4" y="15" fill="#91a0b7" font-size="9">RSI</text><path d="M25 55 C45 30 65 48 88 37 S130 58 154 42 S190 26 214 48 S255 65 280 39 S320 25 350 34" fill="none" stroke="#77a7ff" stroke-width="2"/></svg></div>
+<div class="panel" style="margin-top:12px"><div class="section-head"><h2>Dönem özeti</h2><small>6 ay</small></div><div class="stats"><div class="stat"><span>Son kapanış</span><b>$179,86</b></div><div class="stat"><span>Dönem getirisi</span><b class="up">+18,98%</b></div><div class="stat"><span>Dönem düşük</span><b>$134,21</b></div><div class="stat"><span>Dönem yüksek</span><b>$184,76</b></div></div><div class="range"></div><div style="display:flex;justify-content:space-between;color:var(--muted);font-size:10px"><span>Düşük</span><b style="color:white">Güncel: %68</b><span>Yüksek</span></div></div>
+</section>
+
+<section class="view" id="portfolio">
+<div class="hero"><div class="eyebrow">Varlıklarım</div><h1>Portföy</h1><p>Değer, performans ve dağılım birlikte.</p></div>
+<div class="panel portfolio-total"><div class="total-top"><div><small>Toplam portföy</small><div class="big">$12.480,67</div><span class="up" style="font-size:13px">Bugün +$84,12 · +0,68%</span></div><div class="seg"><button class="on">Bugün</button><button>Toplam</button><button>◉</button></div></div></div>
+<div class="port-pills"><button class="pill active">Ana portföy</button><button class="pill">TL portföyü</button><button class="pill">Emeklilik</button><button class="pill">+</button></div>
+<div class="section"><div class="section-head"><h2>Portföydeki ürünler</h2><small>9 varlık</small></div><div class="list">
+<div class="asset"><div class="badge nv">NV</div><div class="asset-name"><b>NVDA</b><span>4,762 adet · Maliyet $210,00</span></div><div class="quote"><b>$856,47</b><span class="down">−$143,65</span></div><button class="more">×</button></div>
+<div class="asset"><div class="badge">V</div><div class="asset-name"><b>VOO</b><span>3,511 adet · Maliyet $683,56</span></div><div class="quote"><b>$2.103,51</b><span class="down">−$296,58</span></div><button class="more">×</button></div>
+<div class="asset"><div class="badge gld">Au</div><div class="asset-name"><b>GLD</b><span>1,552 adet · Maliyet $386,52</span></div><div class="quote"><b>$514,44</b><span class="down">−$85,42</span></div><button class="more">×</button></div>
+</div></div>
+<div class="section panel"><div class="section-head"><h2>Dağılım</h2><small>Varlık türü</small></div><div class="allocation"><div class="donut"></div><div class="legend"><div><span><i class="dot" style="background:var(--mint)"></i>Hisse</span><b>%38</b></div><div><span><i class="dot" style="background:var(--blue)"></i>ETF</span><b>%28</b></div><div><span><i class="dot" style="background:var(--gold)"></i>Altın</span><b>%18</b></div><div><span><i class="dot" style="background:#788ba8"></i>Nakit</span><b>%16</b></div></div></div></div>
+<div class="section panel"><div class="section-head"><h2>Temettü takvimi</h2><small>Yaklaşan</small></div><div class="dividend"><div class="date">18 Eyl</div><div><b>VOO</b><span> · 3,511 adet</span></div><b>$6,42</b></div><div class="dividend"><div class="date">03 Eki</div><div><b>NVDA</b><span> · 4,762 adet</span></div><b>$0,19</b></div><div class="dividend"><div class="date">21 Eki</div><div><b>BSV</b><span> · 3,854 adet</span></div><b>$3,96</b></div></div>
+</section>
+
+<section class="view" id="more">
+<div class="hero"><div class="eyebrow">Tercihler</div><h1>Diğer</h1><p>Uygulama görünümü, veriler ve bildirimler.</p></div>
+<div class="settings">
+<div class="setting"><div class="glyph">◐</div><div><b>Tema</b><span>Sistem ayarı · Karanlık</span></div><span class="chev">›</span></div>
+<div class="setting"><div class="glyph">₺</div><div><b>Tercih edilen para birimi</b><span>Ürünün kendi para birimi</span></div><span class="chev">›</span></div>
+<div class="setting"><div class="glyph">↻</div><div><b>Otomatik yenileme</b><span>15 saniye · yalnızca açık ekran</span></div><span class="chev">›</span></div>
+<div class="setting"><div class="glyph">◉</div><div><b>Bildirimler</b><span>Alarm, ses ve titreşim</span></div><span class="chev">›</span></div>
+<div class="setting"><div class="glyph">⇩</div><div><b>Veri yedekleme</b><span>Portföy ve tercihleri dışa aktar</span></div><span class="chev">›</span></div>
+<div class="setting"><div class="glyph">?</div><div><b>Yardım ve uygulama bilgileri</b><span>Özer Finans · Tasarım önizlemesi</span></div><span class="chev">›</span></div>
+</div><p class="note">Bu ekran yalnızca yeni arayüz yönünü değerlendirmek içindir. Kalıcı uygulamaya henüz uygulanmamıştır.</p>
+</section>
+</main>
+<nav class="nav"><button class="active" data-view="overview"><span>⌂</span>Özet</button><button data-view="chart"><span>⌁</span>Grafik</button><button data-view="portfolio"><span>▤</span>Portföy</button><button data-view="more"><span>•••</span>Diğer</button></nav>
+<script>
+const tabs=[...document.querySelectorAll('.nav button')],views=[...document.querySelectorAll('.view')];
+tabs.forEach(b=>b.onclick=()=>{tabs.forEach(x=>x.classList.remove('active'));views.forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.view).classList.add('active');scrollTo({top:0,behavior:'smooth'})});
+document.querySelectorAll('.pills .pill').forEach(p=>p.onclick=()=>{if(p.parentElement.classList.contains('pills')){p.parentElement.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));p.classList.add('active')}});
+document.querySelectorAll('.refresh').forEach(b=>b.onclick=()=>{const old=b.textContent;b.textContent='Güncel';setTimeout(()=>b.textContent=old,900)});
+</script></body></html>
