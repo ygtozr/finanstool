@@ -194,7 +194,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v7\.6<\/title>/,'Tarayıcı başlığı kalıcı sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v7\.7 Önizleme<\/title>/,'Tarayıcı başlığı kalıcı sürüm adını kullanmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.6[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.6[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -386,14 +386,14 @@ assert.match(html,/portfolioSnapshotsKey[\s\S]*function renderCachedPortfolioSna
 assert.match(html,/savePortfolioSnapshot\(\{mode:portfolioMetricsMode,totalValue:[\s\S]*rows:snapshotRows\}\)/,'Başarılı portföy hesaplaması seçili dönemle sonraki hızlı açılış için saklanmalı');
 assert.match(html,/id="otherView"[\s\S]*data-theme-choice="light"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="system"/,'Diğer ekranı Açık, Koyu ve Sistem tema seçeneklerini içermeli');
 assert.doesNotMatch(html,/data-theme-choice="(?:ocean|plum|sand|contrast|oled)"/,'Ek renk paleti düğmeleri kaldırılmış olmalı');
-assert.match(html,/const themeOptions = \['light','dark','system'\]/,'Tema tercihleri yalnız standart üç seçenekle doğrulanmalı');
+assert.match(html,/const themeOptions = \['light','dark','system','graphite','lavender','petroleum'\]/,'Tema tercihleri standart seçenekleri ve üç renk paletini doğrulamalı');
 assert.match(html,/id="otherView"[\s\S]*id="backupDownload"[\s\S]*id="restoreBackup"/,'Veri yedekleme araçları Diğer ekranında korunmalı');
 assert.match(html,/function startRefreshTimers\(\{immediate=false,bypassGap=false\}=\{\}\)[\s\S]*setTimeout\([\s\S]*refreshInterval/,'Otomatik yenileme tek ve çakışmayan zamanlayıcıyla kullanıcı tercihine göre yeniden başlatılmalı');
 assert.match(html,/\/api\/prices\?symbols=[\s\S]*prefetchPricePayloads/,'Fiyatlar tek toplu API isteğiyle önceden alınmalı');
 assert.doesNotMatch(html,/chartRefreshTimerId|portfolioRefreshTimerId|marketRefreshTimerId/,'Aynı anda çalışan eski çoklu yenileme zamanlayıcıları kaldırılmalı');
 assert.match(html,/savedRefreshInterval===null\?15000:Number\(savedRefreshInterval\)/,'Yeni kullanıcılar için otomatik yenileme varsayılan olarak 15 saniye olmalı');
 assert.match(html,/themeMedia\.addEventListener\('change'[\s\S]*themePreference==='system'/,'Sistem teması cihaz görünümü değiştiğinde otomatik uygulanmalı');
-assert.match(html,/themeColorMeta\.content=resolved==='light'\?'#eef3f8':'#101827'/,'PWA üst çubuğu açık veya koyu temayla eşleşmeli');
+assert.match(html,/themeColorMeta\.content=getComputedStyle\(document\.documentElement\)\.getPropertyValue\('--surface-page'\)/,'PWA üst çubuğu açık veya koyu temayla eşleşmeli');
 assert.match(html,/function ensureChartLibrary\(\)[\s\S]*script\.src='assets\/chart\.umd\.min\.js\?v=4\.4\.4'/,'Chart.js ihtiyaç anında uygulamanın kendi dosyasından yüklenmeli');
 assert.match(html,/requestIdleCallback\(prewarmCharts,\{timeout:2500\}\)/,'Chart.js ilk Grafik geçişini hızlandırmak için ana ekran boşta kaldığında hazırlanmalı');
 assert.match(html,/let pendingActiveRefresh = false;[\s\S]*if\(bypassGap\)pendingActiveRefresh=true;[\s\S]*queueMicrotask\(\(\)=>runActiveRefresh\(\{leaderRequired:false,bypassGap:true\}\)\)/,'Sekme değişimindeki yenileme, devam eden istekten sonra beklemeden çalıştırılmalı');
@@ -497,5 +497,5 @@ assert.match(adminInvitesApi,/requireUser\(req, res, 'admin'\)[\s\S]*EX', 86400/
 assert.match(userStateApi,/requireUser\(req, res\)[\s\S]*encryptJson\(record\)/,'Kullanıcı verisi oturumla ayrılmalı ve şifrelenmeli');
 assert.doesNotMatch(html,/CLERK_SECRET_KEY|DATABASE_URL=|NEXT_PUBLIC_CLERK/,'Sunucu sırları HTML içine gömülmemeli');
 
-assert.match(html,/<title>Özer Finans v7\.6<\/title>/,'Kalıcı sürüm başlıkta açıkça belirtilmeli');
+assert.match(html,/<title>Özer Finans v7\.7 Önizleme<\/title>/,'Kalıcı sürüm başlıkta açıkça belirtilmeli');
 console.log('Özer Finans v7.6 regresyon testleri başarılı.');
