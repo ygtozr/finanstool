@@ -1,3 +1,13 @@
+## v7.7 Önizleme — Seçilen 21st.dev Görsel Referansları
+
+- [Split Button / shugar](https://21st.dev/@shugar/components/split-button): ince çerçeve, düz düğme yüzeyi, seçili durum vurgusu.
+- [Statistics Card 7 / sean0205](https://21st.dev/@sean0205/components/statistics-card-7): sade kart yüzeyi ve anlamlı kazanç/kayıp renkleri.
+- [Statistics Card 10 / sean0205](https://21st.dev/@sean0205/components/statistics-card-10): ana değer ve ikincil istatistikler arasında yüzey farkı.
+
+Uyarlama özgün CSS ile yapıldı. Kaynak bileşen kodu, görseli veya demo varlıkları uygulamaya kopyalanmadı. React bağımlılığı veya ücretli hizmet eklenmedi. Kart/düğme ölçüleri, şekilleri, font boyutları, içerik ve olay işleyicileri değişmez. Kazanç yeşil, kayıp kırmızı kalır. Altı mevcut tema seçeneğiyle uyumludur. Kalıcı sürüm için kullanıcı onayı beklenir.
+
+---
+
 ## v7.7 Önizleme — İlave Renk Temaları
 
 Görünüm ayarlarına mevcut Açık, Koyu ve Sistem seçeneklerinin yanında Grafit (buz mavisi), Lavanta (gece moru) ve Petrol (kırık beyaz/petrol yeşili) eklendi. Butonların mevcut boyutu, şekli, fontu ve üç sütunlu düzeni korunur; ilave seçenekler ikinci satırda gösterilir. Diğer sayfaların bilgi ve yerleşimi değişmez.
