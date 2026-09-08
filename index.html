@@ -751,6 +751,46 @@ html[data-palette] .favorite-card,html[data-palette] input,html[data-palette] se
 html[data-palette] .theme-choice.active,html[data-palette] .periods button.active,html[data-palette] .portfolio-book-tab[aria-pressed="true"],html[data-palette] .portfolio-currency-toggle[aria-pressed="true"],html[data-palette] .chart-ma-toggle[aria-pressed="true"],html[data-palette] .chart-asset-switcher-buttons button[aria-expanded="true"],html[data-palette] .app-tabs button.active,html[data-palette] .benchmark-presets button.active,html[data-palette] .benchmark-ranges button.active,html[data-palette] .market-summary-head #marketRefresh,html[data-palette] .favorites-panel-head button,html[data-palette] .portfolio-detail-controls button[aria-expanded="true"]{color:var(--on-accent);background:var(--accent);border-color:var(--accent)}
 html[data-palette] .periods button.active{box-shadow:0 0 0 2px var(--border-strong)}
 html[data-palette] .suggestion:hover,html[data-palette] .favorite-quick-menu button:hover,html[data-palette] .favorite-quick-menu button:focus-visible,html[data-palette] .distribution-toggle:hover,html[data-palette] .desktop-sidebar button:hover,html[data-palette] .desktop-sidebar button.is-active{background:var(--surface-control)}
+
+/* 21st.dev visual references: shugar/split-button; sean0205/statistics-card-7 and -10.
+   Original CSS adaptation only: no copied component code, layout or demo assets. */
+:root { --ui-card-shadow:0 1px 2px #00000016; --ui-inset:inset 0 1px 0 #ffffff09; --ui-popup-shadow:0 10px 30px #00000035; }
+html[data-theme="light"] { --ui-card-shadow:0 1px 3px #18362f0d; --ui-inset:inset 0 1px 0 #ffffffaa; --ui-popup-shadow:0 10px 30px #18362f12; }
+html[data-theme] body :is(.market-card,.favorite-card,.portfolio-row,.portfolio-cash-item,.settings-card,.distribution-card,.period-summary) {
+  background:var(--surface-card); border-color:var(--line); box-shadow:var(--ui-card-shadow),var(--ui-inset);
+}
+html[data-theme] body :is(.portfolio-overall-head,.portfolio-page .portfolio-head,.portfolio-glance) {
+  background:var(--surface-main); border-color:var(--line); box-shadow:var(--ui-card-shadow),var(--ui-inset);
+}
+html[data-theme] body :is(.portfolio-stat,.period-summary-item,.benchmark-stat) {
+  background:var(--surface-soft); box-shadow:inset 0 1px 0 #ffffff05;
+}
+html[data-theme] body .analysis-table tbody tr:nth-child(even) { background:var(--surface-soft); }
+html[data-theme] body :is(.market-card strong,.favorite-card-price,.portfolio-glance-value) { color:var(--text); }
+html[data-theme] body :is(.market-card-label,.portfolio-stat span,.period-summary-label) { color:var(--muted); }
+html[data-theme] body :is(.market-card-change.positive,.favorite-change.positive,.portfolio-daily-change.positive,.portfolio-glance-change.positive) {
+  color:var(--positive); background:color-mix(in srgb,var(--positive) 10%,transparent);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--positive) 10%,transparent);
+}
+html[data-theme] body :is(.market-card-change.negative,.favorite-change.negative,.portfolio-daily-change.negative,.portfolio-glance-change.negative) {
+  color:var(--negative); background:color-mix(in srgb,var(--negative) 10%,transparent);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--negative) 10%,transparent);
+}
+html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) {
+  box-shadow:var(--ui-card-shadow),var(--ui-inset); transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+html[data-theme] body :is(.theme-choice.active,.periods button.active,.portfolio-book-tab[aria-pressed="true"],.portfolio-currency-toggle[aria-pressed="true"],.favorite-menu-trigger[aria-expanded="true"]) {
+  background:var(--accent); color:var(--on-accent); border-color:var(--accent); box-shadow:inset 0 1px 0 #ffffff24,0 1px 2px #00000016;
+}
+html[data-theme] body :is(.favorite-quick-menu,.search-suggestions,.portfolio-dialog) { border-color:var(--line); box-shadow:var(--ui-popup-shadow); }
+html[data-theme] body .favorite-quick-menu button { background:transparent; }
+html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { background:var(--surface-soft); }
+@media(hover:hover) {
+ html[data-theme] body :is(.market-card,.favorite-card,.portfolio-row):hover { border-color:var(--border-strong); }
+ html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab):not(.active):not([aria-pressed="true"]):hover { background:var(--surface-soft); border-color:var(--border-strong); }
+}
+@media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
+
 </style>
 </head>
 <body class="auth-locked">
