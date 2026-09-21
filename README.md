@@ -1,5 +1,7 @@
 # Özer Finans v7.7
 
+Yeni sohbet / geliştirici başlangıcı: [Devir notları](DEVIR_NOTLARI.md). Çalışma kuralları: [AGENTS.md](AGENTS.md). Ayrıntılı tanım: [Ürün ve teknik tasarım](URUN_VE_TEKNIK_TASARIM.md).
+
 Özer Finans; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
 
 ## Canlı uygulama

@@ -21,12 +21,12 @@ Aşağıdaki belge uygulamanın mevcut işlevsel ve teknik temelini tanımlar; �
 
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
-**Belge sürümü:** 7.6
-**Uygulama sürümü:** v7.6
+**Belge sürümü:** 7.7
+**Uygulama sürümü:** v7.7
 **Durum:** Kullanıcı onaylı kalıcı sürüm
 **Canlı adres:** https://finanstool.vercel.app
 **Kaynak depo:** https://github.com/ygtozr/finanstool
-**Son güncelleme:** 4 Eylül 2026
+**Son güncelleme:** 21 Eylül 2026
 
 Bu belge Özer Finans uygulamasının amacını, kullanıcı tercihlerini, mevcut işlevlerini, görsel tasarımını, veri modelini ve teknik mimarisini tek yerde tanımlar. Hedefi, mevcut kaynak kod görülmeden uygulama sıfırdan geliştirilse bile aynı davranışın ve mümkün olduğunca aynı görünümün yeniden üretilebilmesidir.
 
@@ -902,7 +902,7 @@ Bu sürüm, iPhone'da Safari üzerinden Ana Ekrana Ekle ile açılan bağımsız
 - Uygulama kapalıyken fiyat alarmı çalışmaz; Web Push/e-posta alarmı kullanıcı kararıyla ertelenmiştir.
 - Yerel veri cihazlar arasında otomatik eşitlenmez.
 - Gelecek temettü tarihleri kesin olmayabilir; veri sağlayıcısının sunduğu olaylar gösterilir.
-- Kullanıcı hesabı, bulut veritabanı, emir gönderme ve aracı kurum entegrasyonu mevcut kapsamda yoktur.
+- Davetli kullanıcı hesabı ve Upstash üzerinde şifreli bulut kaydı v7.1 ile mevcuttur (bölüm 20). Emir gönderme ve aracı kurum entegrasyonu yoktur.
 - Mobil platform için yerel iOS/Android uygulaması yoktur; responsive web uygulaması kullanılır.
 
 ## 19. Kabul testi kontrol listesi
