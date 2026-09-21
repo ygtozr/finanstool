@@ -1,24 +1,3 @@
-## v7.7 — Kalıcı Görünüm Seçenekleri
-
-Kullanıcı onayıyla kalıcı sürüm olarak hazırlanmıştır. Sabit adres: https://finanstool.vercel.app
-
-- Görünüm modu: Açık, Koyu, Sistem. Cihaz teması değişirse Sistem seçeneği otomatik uyarlanır.
-- Vurgu rengi: Klasik, Turkuaz (#00D5D8), Safir (#246BFF), Lavanta (#A78BFA), Şampanya (#D6A34B).
-- Yüzey stili: Mat, Hafif Cam, İnce Çizgi, Seramik, Çift Çerçeve, Köşe Işığı, Ton Katmanı, Mikro Doku.
-- Mod, renk ve stil bağımsızdır. Mevcut kullanıcılarda mod korunur; yeni tercihler varsayılan Klasik/İnce Çizgi ile başlar.
-- Kartlar %6, ikincil yüzeyler %8, bölümler %5 ve toplam portföy yüzeyi %12 vurgu karışımı kullanır. Ana zemin açık veya koyu kalır.
-- Stil yalnız yüzey, çerçeve, gölge ve dokuya etki eder; ölçüler, köşe biçimleri, yazı boyutları ve sayfa yerleşimleri değişmez. Kazanç yeşil, kayıp kırmızıdır.
-- assets/appearance.js doğrulama, tercih kaydı ve CSS değişkenlerini yönetir. assets/appearance.css onaylanan sekiz stilin CSS tanımlarını içerir.
-- Yerel anahtar finans-grafigi-appearance; JSON yedeğinde data.appearance alanı. İçe aktarma ve hesap senkronizasyonu aynı yedek hattını kullanır. Eski yedeklerde eksik alan güvenli varsayılana döner.
-- Önizlemedeki Grafit/Lavanta/Petrol modları standart moda uyarlanır. Tasarım denemeleri onizleme dizininde tarihsel örneklerdir, uygulamanın varsayılan arayüzü değildir.
-- Yeni istek, zamanlayıcı, bağımlılık veya ücretli servis eklenmez; mevcut veri yenileme ve alarm davranışı değişmez.
-- Önceki kalıcı v7.6, archive/v7.6 dizininde korunur. Bu sürüm Git geçmişi ve v7.7 etiketiyle yedeklenir.
-- 21st.dev referansları görsel ilham olarak kullanılmıştır; bileşen kodu kopyalanmamıştır.
-
-Aşağıdaki belge uygulamanın mevcut işlevsel ve teknik temelini tanımlar; önceki sürüm notları tarihçedir.
-
----
-
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
 **Belge sürümü:** 7.6
