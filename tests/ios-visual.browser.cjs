@@ -128,6 +128,8 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.setViewportSize({width:1440,height:1000});await view('portfolio');
  const desktopTabs=await page.locator('.portfolio-book-tab').evaluateAll(nodes=>nodes.map(n=>Math.round(n.getBoundingClientRect().top)));
  assert.equal(desktopTabs[0],desktopTabs[3],'Desktop portfolio shortcuts should flow beyond three per row');
+ const portfolioCardFill=await page.locator('.portfolio-row').first().evaluate(card=>card.getBoundingClientRect().width/card.parentElement.getBoundingClientRect().width);
+ assert(portfolioCardFill>.9,'The last desktop holding should fill its row');
  await page.screenshot({path:path.join(output,'desktop-portfolio.png'),fullPage:true});
  await page.screenshot({path:path.join(output,'desktop-settings.png'),fullPage:true});
  await page.emulateMedia({reducedMotion:'reduce'});
