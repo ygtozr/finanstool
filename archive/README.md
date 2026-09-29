@@ -42,4 +42,8 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v7.4](./v7.4/) | Arşivlendi | [v7.4](https://github.com/ygtozr/finanstool/releases/tag/v7.4) |
 | [v7.5](./v7.5/) | Arşivlendi | [v7.5](https://github.com/ygtozr/finanstool/releases/tag/v7.5) |
 
-Güncel kalıcı sürüm v7.6'dır. Bir sonraki onaylı sürüm yayınlanırken v7.6 aynı düzenle arşivlenecektir.
+| [v7.6](./v7.6/) | Arşivlendi | v7.6 fiyat zamanı düzeltmesi |
+| [v7.7](./v7.7/) | Arşivlendi | Kaynak: 66a9355a6eb94612467a26e29792b484c607696f; eski v7.7 etiketi korunur |
+| [v7.8](./v7.8/) | Onaylı sürüm kaynak anı | v7.8 iOS görsel uyarlaması |
+
+Güncel kalıcı sürüm v7.8'dir. Arşivler kişisel kullanıcı verisi içermez ve Vercel dağıtımından hariç tutulur.
