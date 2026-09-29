@@ -792,7 +792,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/ios-parity.css?v=7.8">
+  <link rel="stylesheet" href="assets/ios-parity.css?v=7.9-preview">
 </head>
 <body class="auth-locked">
   <section id="authGate" class="auth-gate" aria-labelledby="authGateTitle">
@@ -1038,7 +1038,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
   </dialog>
   <script src="assets/storage-events.js?v=7.8"></script>
   <script src="assets/appearance.js?v=7.8"></script>
-  <script src="assets/ios-parity.js?v=7.8"></script>
+  <script src="assets/ios-parity.js?v=7.9-preview"></script>
   <script>
     let chart;
     let rsiChart;
@@ -4242,7 +4242,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         {label:'Aşırı alım (70)',data:labels.map(()=>70),borderColor:'#ff453a66',pointRadius:0,borderWidth:1,fill:false},
         {label:'Aşırı satım (30)',data:labels.map(()=>30),borderColor:'#30d15866',pointRadius:0,borderWidth:1,fill:false}
       ];
-      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:solidLegendLabels(colors.text)},tooltip:{callbacks:{label:context=>context.dataset.label+': '+Number(context.parsed.y).toFixed(2)}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},y:{min:0,max:100,grid:{color:colors.grid},ticks:{color:colors.text,stepSize:20}}}};
+      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:solidLegendLabels(colors.text)},tooltip:{filter:context=>context.datasetIndex===0,callbacks:{label:context=>'RSI (14): '+Number(context.parsed.y).toFixed(2),afterBody:items=>{const price=lastPrices[items[0]?.dataIndex];return Number.isFinite(price)?['Fiyat: '+money(price,currentCurrency)]:[]}}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},y:{min:0,max:100,grid:{color:colors.grid},ticks:{color:colors.text,stepSize:20}}}};
       if(rsiChart){
         rsiChart.data={labels:[...labels],datasets};
         rsiChart.options=options;
@@ -4262,7 +4262,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         datasets.push({label:'MA100',data:movingAverageData?.ma100||sma(lastPrices,100),borderColor:'#ffcc00',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
         datasets.push({label:'MA200',data:movingAverageData?.ma200||sma(lastPrices,200),borderColor:'#ff3b30',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
       }
-      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:solidLegendLabels(colors.text)},tooltip:{callbacks:{label:context=>(context.dataset.assetSymbol||context.dataset.label)+': '+money(context.parsed.y,currentCurrency)}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},price:{position:'left',grid:{color:colors.grid},ticks:{color:colors.text,callback:value=>money(value,currentCurrency)}}}};
+      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:solidLegendLabels(colors.text)},tooltip:{callbacks:{label:context=>(context.dataset.assetSymbol||context.dataset.label)+': '+money(context.parsed.y,currentCurrency),afterBody:items=>{const rsi=lastRsiValues[items[0]?.dataIndex];return Number.isFinite(rsi)?['RSI (14): '+rsi.toFixed(2)]:[]}}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},price:{position:'left',grid:{color:colors.grid},ticks:{color:colors.text,callback:value=>money(value,currentCurrency)}}}};
       if(chart){
         chart.data={labels:lastLabels,datasets};
         chart.options=options;
@@ -4621,11 +4621,14 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 
     const manualRefreshMarketAndFavorites=()=>{apiCache.clear();return refreshMarketAndFavorites({force:true})};
     ['gesturestart','gesturechange','gestureend'].forEach(type=>document.addEventListener(type,event=>event.preventDefault(),{passive:false}));
-    document.addEventListener('touchmove',event=>{if(event.touches.length>1)event.preventDefault()},{passive:false});
     const pullRefreshThreshold=72;
     let pullRefreshStartY=null,pullRefreshDistance=0,pullRefreshRunning=false,pullRefreshHideTimer=null;
+    function stopPullRefreshTracking() {
+      document.removeEventListener('touchmove',trackPullRefresh);
+      pullRefreshStartY=null;
+    }
     function resetPullRefreshIndicator({immediate=false}={}) {
-      pullRefreshStartY=null;pullRefreshDistance=0;
+      stopPullRefreshTracking();pullRefreshDistance=0;
       pullRefreshIndicator.classList.remove('visible','ready');
       pullRefreshIndicator.style.transform='translate(-50%,-150%)';
       if(immediate){pullRefreshIndicator.classList.remove('refreshing');pullRefreshIcon.textContent='↓';pullRefreshLabel.textContent='Yenilemek için çekin'}
@@ -4647,18 +4650,19 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     document.addEventListener('touchstart',event=>{
       if(pullRefreshRunning||document.querySelector('dialog[open]')||window.scrollY>0||event.touches.length!==1)return;
       clearTimeout(pullRefreshHideTimer);pullRefreshStartY=event.touches[0].clientY;pullRefreshDistance=0;
+      document.addEventListener('touchmove',trackPullRefresh,{passive:false});
     },{passive:true});
-    document.addEventListener('touchmove',event=>{
+    function trackPullRefresh(event) {
       if(pullRefreshStartY===null||event.touches.length!==1)return;
       if(window.scrollY>0){resetPullRefreshIndicator({immediate:true});return}
       const delta=event.touches[0].clientY-pullRefreshStartY;
-      if(delta<=0)return;
+      if(delta<=0){stopPullRefreshTracking();return}
       event.preventDefault();
       pullRefreshDistance=Math.min(104,delta*.55);
       pullRefreshIndicator.classList.add('visible');pullRefreshIndicator.classList.toggle('ready',pullRefreshDistance>=pullRefreshThreshold);
       pullRefreshIndicator.style.transform='translate(-50%,'+(Math.min(12,pullRefreshDistance-42))+'px)';
       pullRefreshIcon.textContent=pullRefreshDistance>=pullRefreshThreshold?'↻':'↓';pullRefreshLabel.textContent=pullRefreshDistance>=pullRefreshThreshold?'Yenilemek için bırakın':'Yenilemek için çekin';
-    },{passive:false});
+    }
     document.addEventListener('touchend',()=>{if(pullRefreshStartY===null)return;const reachedThreshold=pullRefreshDistance>=pullRefreshThreshold;resetPullRefreshIndicator();if(reachedThreshold)runPullRefresh()},{passive:true});
     document.addEventListener('touchcancel',()=>resetPullRefreshIndicator({immediate:true}),{passive:true});
     marketRefresh.addEventListener('click',manualRefreshMarketAndFavorites);

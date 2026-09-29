@@ -261,7 +261,8 @@ assert.match(html,/\.mobile-bottom-nav \{ position:fixed !important;[^}]*bottom:
 assert.match(html,/padding:6px 6px calc\(6px \+ env\(safe-area-inset-bottom,0px\)\)/,'Güvenli alan menüyü yukarı taşımak yerine iç dolgu olarak uygulanmalı');
 assert.doesNotMatch(html,/bottom:max\(8px,env\(safe-area-inset-bottom\)\)/,'Güvenli alan menünün tamamını yukarı taşımamalı');
 assert.match(html,/id="pullRefreshIndicator"[^>]*role="status"/,'Üstten çekerek yenileme için erişilebilir durum göstergesi bulunmalı');
-assert.match(html,/document\.addEventListener\('touchmove',[\s\S]*event\.preventDefault\(\)[\s\S]*\{passive:false\}\)/,'Üstten çekme hareketi mobil tarayıcının doğal sıçramasıyla çakışmamalı');
+assert.match(html,/document\.addEventListener\('touchmove',trackPullRefresh,\{passive:false\}\)/,'Üstten çekme dinleyicisi yalnız hareket başladığında eklenmeli');
+assert.match(html,/document\.removeEventListener\('touchmove',trackPullRefresh\)/,'Üstten çekme dinleyicisi hareket bittiğinde kaldırılmalı');
 assert.match(html,/async function refreshActiveViewFromPull\(\)[\s\S]*apiCache\.clear\(\)[\s\S]*runActiveRefresh\(\{force:true,leaderRequired:false\}\)/,'Çekerek yenileme önbelleği atlayıp yalnız etkin ekranı zorunlu yenilemeli');
 assert.match(html,/pullRefreshDistance>=pullRefreshThreshold[\s\S]*runPullRefresh\(\)/,'Yenileme yalnız çekme eşiği aşılıp parmak bırakıldığında başlamalı');
 assert.match(html,/id="periodRangeFill"/,'Dönem içi fiyat konum barı bulunmalı');
@@ -466,7 +467,8 @@ assert.doesNotMatch(html,/En yeni fiyat:/,'Piyasa özeti başlığında en yeni 
 assert.match(html,/@media \(min-width:761px\) and \(max-width:900px\)/,'Tablet geçişi için ayrı düzen bulunmalı');
 assert.match(html,/name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/,'Uygulama görünümünde sayfa ölçeği sabitlenmeli');
 assert.match(html,/@media \(max-width:760px\)[\s\S]*input,select,textarea \{ font-size:16px !important; \}/,'iOS odak yakınlaştırmasını önlemek için mobil girişler en az 16 px olmalı');
-assert.match(html,/\['gesturestart','gesturechange','gestureend'\][\s\S]*event=>event\.preventDefault\(\)[\s\S]*event\.touches\.length>1/,'iOS pinch ve gesture yakınlaştırması engellenmeli');
+assert.match(html,/\['gesturestart','gesturechange','gestureend'\][\s\S]*event=>event\.preventDefault\(\)/,'iOS gesture yakınlaştırması engellenmeli');
+assert.doesNotMatch(html,/document\.addEventListener\('touchmove',event=>\{if\(event\.touches\.length>1\)event\.preventDefault\(\)/,'Normal kaydırma genel bir engelleyici touchmove dinleyicisine bağlanmamalı');
 assert.match(html,/mobileMoreNav'\)\.addEventListener\('click',[\s\S]*openView\('other'\)/,'Mobil Diğer düğmesi sabit ayarlar ekranını açmalı');
 assert.match(html,/id="otherAlarmShortcut"[\s\S]*id="otherAlarmCount"/,'Mobil Diğer ekranında fiyat alarmları kısayolu ve aktif alarm sayısı bulunmalı');
 assert.match(html,/function syncPortfolioEmptyState\(\)[\s\S]*portfolioEmptyStart\.hidden/,'Boş portföyde uzun analiz alanları tek başlangıç kartına daraltılmalı');

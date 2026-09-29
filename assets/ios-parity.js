@@ -18,7 +18,7 @@ window.OzerNativeUI = (() => {
       clearTimeout(state.timer); cancelAnimationFrame(state.frame);
       (state.nodes || []).forEach(n => { n.style.transform = ''; n.style.transition = ''; n.classList.remove('native-dragging'); });
       window.removeEventListener('pointermove', pointerMove); window.removeEventListener('pointerup', pointerEnd); window.removeEventListener('pointercancel', cancel);
-      window.removeEventListener('touchmove', touchMove); window.removeEventListener('touchend', touchEnd); window.removeEventListener('touchcancel', cancel);
+      window.removeEventListener('touchmove', touchMovePending); window.removeEventListener('touchmove', touchMove); window.removeEventListener('touchend', touchEnd); window.removeEventListener('touchcancel', cancel);
       window.removeEventListener('keydown', escape); window.removeEventListener('blur', cancel);
       state = null; cancelCurrent = null;
     };
@@ -46,23 +46,22 @@ window.OzerNativeUI = (() => {
       const s=state; s.nodes=items(); if(s.nodes.length<2) return;
       beforeStart(); s.frames=s.nodes.map(n=>{const r=n.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};});
       s.from=s.nodes.indexOf(row); s.to=s.from; s.active=true; s.originX=s.x; s.originY=s.y; s.initialScroll=s.scroll.scrollTop;
+      if(s.touch) { window.removeEventListener('touchmove',touchMovePending); window.addEventListener('touchmove',touchMove,{passive:false}); }
       s.nodes.forEach(n=>n.style.transition=n===row||reduced()?'none':'transform 180ms ease-in-out');
       row.classList.add('native-dragging'); navigator.vibrate?.(15); draw();
     };
     const move = (x,y,event) => {
       if (!state || state.settling) return;
-      const previousY=state.y; state.x=x; state.y=y;
+      state.x=x; state.y=y;
       if (!state.active && Math.hypot(x-state.startX,y-state.startY)>10) {
         clearTimeout(state.timer); state.scrolling=true;
-        if(state.touch) { event.preventDefault(); state.scroll.scrollTop+=previousY-y; }
       } else if(state.active) event.preventDefault();
     };
     const finish = (event,cancelled=false) => {
       if(!state || state.settling) return;
       if(!state.active) {
-        const tap=state.touch&&!state.scrolling&&!cancelled;
         if(state.scrolling) suppressUntil=Date.now()+500;
-        clean(); if(tap) { event.preventDefault(); handle.click(); } return;
+        clean(); return;
       }
       event?.preventDefault(); suppressUntil=Date.now()+500;
       const s=state; s.settling=true; cancelAnimationFrame(s.frame);
@@ -80,6 +79,7 @@ window.OzerNativeUI = (() => {
     };
     const pointerMove=e=>{if(e.pointerId===state?.id)move(e.clientX,e.clientY,e);};
     const pointerEnd=e=>{if(e.pointerId===state?.id)finish(e);};
+    const touchMovePending=e=>{const t=[...e.touches].find(t=>t.identifier===state?.id);if(t)move(t.clientX,t.clientY,e);};
     const touchMove=e=>{const t=[...e.touches].find(t=>t.identifier===state?.id);if(t)move(t.clientX,t.clientY,e);};
     const touchEnd=e=>{if([...e.changedTouches].some(t=>t.identifier===state?.id))finish(e);};
     const cancel=e=>finish(e,true);
@@ -88,12 +88,12 @@ window.OzerNativeUI = (() => {
       if(state?.settling) return;
       cancelCurrent?.(); state={id,x,y,startX:x,startY:y,touch,scroll:scrollHost()}; cancelCurrent=clean;
       state.timer=setTimeout(activate,400);
-      if(touch) { window.addEventListener('touchmove',touchMove,{passive:false});window.addEventListener('touchend',touchEnd,{passive:false});window.addEventListener('touchcancel',cancel); }
+      if(touch) { window.addEventListener('touchmove',touchMovePending,{passive:true});window.addEventListener('touchend',touchEnd);window.addEventListener('touchcancel',cancel); }
       else { window.addEventListener('pointermove',pointerMove,{passive:false});window.addEventListener('pointerup',pointerEnd);window.addEventListener('pointercancel',cancel); }
       window.addEventListener('keydown',escape);window.addEventListener('blur',cancel);
     };
     handle.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.isPrimary&&e.button===0)begin(e.pointerId,e.clientX,e.clientY,false);});
-    handle.addEventListener('touchstart',e=>{if(e.touches.length!==1){cancel(e);return;}e.preventDefault();const t=e.changedTouches[0];begin(t.identifier,t.clientX,t.clientY,true);},{passive:false});
+    handle.addEventListener('touchstart',e=>{if(e.touches.length!==1){cancel(e);return;}const t=e.changedTouches[0];begin(t.identifier,t.clientX,t.clientY,true);},{passive:true});
     handle.addEventListener('click',e=>{if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();}},true);
     handle.addEventListener('contextmenu',e=>e.preventDefault());
     handle.addEventListener('dragstart',e=>e.preventDefault());

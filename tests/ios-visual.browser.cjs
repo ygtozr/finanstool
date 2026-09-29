@@ -41,6 +41,11 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.goto('https://parity.test');await page.locator('#authLocalContinue').click();
  await page.waitForFunction(()=>document.querySelector('#nativeFontUp')&&document.querySelector('.favorite-card-price'));
  assert.deepEqual(errors,[],'Startup errors');
+ const favoriteAlignment=await page.locator('.favorite-card').first().evaluate(card=>{
+  const middle=card.getBoundingClientRect().top+card.getBoundingClientRect().height/2;
+  return ['.favorite-card-badge','.favorite-card-head','.favorite-card-quote'].map(selector=>{const r=card.querySelector(selector).getBoundingClientRect();return Math.abs(r.top+r.height/2-middle)});
+ });
+ assert(favoriteAlignment.every(offset=>offset<3),'Favorite logo, name and quote should share the card center');
  const view=async name=>{await page.evaluate(async name=>{setActiveView(name);await refreshActiveView({force:true});if(name==='portfolio')await renderPortfolioBenchmark();},name);await page.evaluate(()=>scrollTo(0,0));};
  const noOverflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Horizontal overflow');
  for(const mode of ['dark','light']){
@@ -97,6 +102,13 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForTimeout(80);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await page.waitForTimeout(200);
  assert.equal((await page.evaluate(()=>createBackup().data.favorites.map(i=>i.symbol)))[1],beforeTouch[0],'Touch reorder');
  assert.equal(await page.locator('dialog[open]').count(),0,'Drag must not also open detail');
+ await page.evaluate(()=>scrollTo(0,0));
+ const swipeCard=await page.locator('.favorite-card').first().boundingBox();
+ const swipeX=swipeCard.x+Math.min(60,swipeCard.width/3),swipeY=swipeCard.y+swipeCard.height/2;
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:swipeX,y:swipeY}]});
+ for(let delta=25;delta<=175;delta+=25){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:swipeX,y:swipeY-delta}]});await page.waitForTimeout(20)}
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await page.waitForTimeout(150);
+ assert(await page.evaluate(()=>scrollY)>20,'Swiping a favorite card should use native page scrolling');
  await view('chart');
  const periodColumns=await page.locator('.periods').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length);assert.equal(periodColumns,3);
  await page.locator('#maToggle').click();assert.equal(await page.locator('#maToggle').getAttribute('aria-pressed'),'true');
@@ -104,12 +116,19 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForFunction(()=>chart.data.datasets.length===4);
  const plot=await page.locator('#priceChart').boundingBox();await page.mouse.move(plot.x+plot.width*.7,plot.y+plot.height*.5);
  await page.waitForFunction(()=>chart.tooltip.getActiveElements().length>0);
+ const inspection=await page.evaluate(()=>({price:chart.options.plugins.tooltip.callbacks.afterBody([{dataIndex:200}]),rsi:rsiChart.options.plugins.tooltip.callbacks.afterBody([{dataIndex:200}])}));
+ assert.match(inspection.price[0],/^RSI \(14\): \d/,'Price tooltip includes RSI');
+ assert.match(inspection.rsi[0],/^Fiyat: /,'RSI tooltip includes price');
  await page.screenshot({path:path.join(output,'chart-inspection.png')});
  await context.grantPermissions([]);
  for(const width of [320,390,760,1440]){
   await page.setViewportSize({width,height:1000});
   for(const name of ['main','chart','portfolio','other']){await view(name);await noOverflow();}
  }
+ await page.setViewportSize({width:1440,height:1000});await view('portfolio');
+ const desktopTabs=await page.locator('.portfolio-book-tab').evaluateAll(nodes=>nodes.map(n=>Math.round(n.getBoundingClientRect().top)));
+ assert.equal(desktopTabs[0],desktopTabs[3],'Desktop portfolio shortcuts should flow beyond three per row');
+ await page.screenshot({path:path.join(output,'desktop-portfolio.png'),fullPage:true});
  await page.screenshot({path:path.join(output,'desktop-settings.png'),fullPage:true});
  await page.emulateMedia({reducedMotion:'reduce'});
  assert.equal(await page.locator('.settings-card').first().evaluate(n=>getComputedStyle(n).animationName),'none');
