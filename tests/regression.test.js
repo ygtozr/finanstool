@@ -194,7 +194,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v7\.8<\/title>/,'Tarayıcı başlığı kalıcı sürüm adını kullanmalı');
+assert.match(html,/<title>Özer Finans v7\.9 önizleme<\/title>/,'Tarayıcı başlığı önizlemeyi kalıcı sürümden ayırmalı');
 assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.8[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.8[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -499,5 +499,5 @@ assert.match(adminInvitesApi,/requireUser\(req, res, 'admin'\)[\s\S]*EX', 86400/
 assert.match(userStateApi,/requireUser\(req, res\)[\s\S]*encryptJson\(record\)/,'Kullanıcı verisi oturumla ayrılmalı ve şifrelenmeli');
 assert.doesNotMatch(html,/CLERK_SECRET_KEY|DATABASE_URL=|NEXT_PUBLIC_CLERK/,'Sunucu sırları HTML içine gömülmemeli');
 
-assert.match(html,/<title>Özer Finans v7\.8<\/title>/,'Kalıcı sürüm başlıkta açıkça belirtilmeli');
-console.log('Özer Finans v7.8 regresyon testleri başarılı.');
+assert.match(html,/<title>Özer Finans v7\.9 önizleme<\/title>/,'Önizleme başlıkta açıkça belirtilmeli');
+console.log('Özer Finans v7.9 önizleme regresyon testleri başarılı.');
