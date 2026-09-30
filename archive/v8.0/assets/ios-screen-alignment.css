@@ -1,0 +1,81 @@
+/* Screen-level parity with the six native v7.7 reference captures. */
+html[data-theme][data-palette] body .native-positions-card .portfolio-positions-title { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+html[data-theme][data-palette] body .native-position-add { display:inline-flex; align-items:center; justify-content:center; flex:0 0 27px; width:27px; height:27px; min-width:27px; min-height:27px; padding:0; border:0; background:transparent; color:var(--accent-ink); font-size:23px; font-weight:400; line-height:1; }
+@media(max-width:600px) {
+  html[data-theme][data-palette] body .market-cards { gap:7px; }
+  html[data-theme][data-palette] body .market-card { min-height:48px; padding:3px 8px 3px 10px; line-height:1.12; }
+  html[data-theme][data-palette] body .market-card.loading { min-height:48px; }
+  html[data-theme][data-palette] body .market-card strong { margin-top:1px; font-size:var(--font-market-price); }
+  html[data-theme][data-palette] body .market-card .market-card-label { font-size:var(--font-market-label); }
+  html[data-theme][data-palette] body .market-card .market-card-change { font-size:var(--font-market-change); }
+  html[data-theme][data-palette] body .favorite-card { min-height:68px; padding:7px 8px; }
+  html[data-theme][data-palette] body .favorite-card-quote { gap:1px; }
+  html[data-theme][data-palette] body .favorite-market-time { font-size:10px; }
+  html[data-theme][data-palette] body .favorite-actions { gap:6px; }
+  html[data-theme][data-palette] body .favorite-actions button { width:30px; height:30px; }
+  html[data-theme][data-palette] body .favorite-row { grid-template-columns:minmax(0,1fr) 30px; }
+
+  html[data-theme][data-palette] body .chart-asset-switcher { margin-top:14px; padding-top:0; border-top:0; }
+  html[data-theme][data-palette] body .chart-asset-switcher-buttons { gap:7px; }
+  html[data-theme][data-palette] body .chart-asset-switcher-buttons button { min-height:36px; border-radius:999px; font-size:13px; }
+  html[data-theme][data-palette] body .chart-asset-switcher-buttons button[aria-expanded="true"] { color:var(--on-accent); background:var(--accent); border-color:var(--accent); }
+  html[data-theme][data-palette] body .chart-asset-panel { margin-top:7px; padding:7px 10px; border-radius:12px; background-color:var(--material-card-fill); background-image:var(--material-card-image); }
+  html[data-theme][data-palette] body .chart-asset-list { grid-template-columns:minmax(0,1fr); gap:0; }
+  html[data-theme][data-palette] body .chart-asset-item { grid-template-columns:30px auto minmax(0,1fr) 16px; gap:6px; min-height:41px; padding:4px 0; border:0; border-radius:0; background:transparent; }
+  html[data-theme][data-palette] body .chart-asset-logo { width:29px; height:29px; }
+  html[data-theme][data-palette] body .chart-asset-name { display:contents; }
+  html[data-theme][data-palette] body .chart-asset-name strong { font-size:14px; }
+  html[data-theme][data-palette] body .chart-asset-name small { font-size:11px; }
+  html[data-theme][data-palette] body .chart-asset-chevron { justify-self:end; font-size:23px; line-height:1; color:var(--muted); }
+
+  html[data-theme][data-palette] body .native-positions-card .portfolio-positions-title { margin-bottom:8px; }
+  html[data-theme][data-palette] body .portfolio-list { gap:7px; }
+  html[data-theme][data-palette] body .portfolio-row { min-height:65px; padding:6px 8px; background-color:color-mix(in srgb,var(--line) 23%,var(--surface-section)); }
+  html[data-theme][data-palette] body .portfolio-row-head { grid-template-columns:34px minmax(0,1fr) auto 30px; gap:6px; margin-bottom:2px; }
+  html[data-theme][data-palette] body .portfolio-row-title strong { font-size:15px; }
+  html[data-theme][data-palette] body .portfolio-row-title small { font-size:11px; }
+  html[data-theme][data-palette] body .portfolio-current-value { font-size:15px; }
+  html[data-theme][data-palette] body .portfolio-delete { width:30px; height:30px; font-size:14px; }
+  html[data-theme][data-palette] body .portfolio-compact-line { padding-left:40px; }
+  html[data-theme][data-palette] body :is(.portfolio-compact-detail,.portfolio-compact-profit) { font-size:10px; }
+
+  html[data-theme][data-palette] body #otherView .settings-horizontal { display:block; }
+  html[data-theme][data-palette] body #otherView .settings-card-controls { margin-top:10px; }
+  html[data-theme][data-palette] body .theme-choices[aria-label="Tema seçimi"] { border-radius:999px; }
+  html[data-theme][data-palette] body .theme-choices[aria-label="Tema seçimi"] button { border-radius:999px; }
+  html[data-theme][data-palette] body .theme-choices[aria-label="Tema seçimi"] button.active { background:#687381; color:#fff; }
+  html[data-theme][data-palette] body .native-font-control { align-items:center; }
+  html[data-theme][data-palette] body .native-font-control button { border-radius:999px; background:color-mix(in srgb,var(--accent) 19%,var(--surface-card)); }
+}
+
+html[data-theme][data-palette] body .appearance-menu summary { justify-content:flex-start; min-height:40px; padding:0 12px; border:1px solid var(--line); border-radius:9px; background:var(--surface-card); font-size:0; }
+html[data-theme][data-palette] body .appearance-menu summary .appearance-value { margin-left:0; padding:0; color:var(--text); font-size:15px; }
+html[data-theme][data-palette] body .appearance-menu summary::after { margin-left:auto; color:var(--muted); font-size:16px; content:"⌄"; }
+
+html[data-theme][data-palette] body .favorite-detail-dialog { width:min(560px,100vw); max-width:none; padding:0; border:0; border-radius:26px; background:#1c1c1e; color:var(--text); }
+html[data-theme][data-palette] body .favorite-detail-head { display:flex; flex-direction:column; align-items:stretch; gap:13px; padding:16px 16px 10px; border:0; }
+html[data-theme][data-palette] body .favorite-detail-head h2 { order:2; margin:0; font-size:22px; line-height:1.2; }
+html[data-theme][data-palette] body .favorite-detail-close { align-self:flex-end; width:auto; min-width:69px; height:36px; padding:0 13px; border:0; border-radius:999px; background:#38383d; color:var(--accent-ink); font-size:14px; }
+html[data-theme][data-palette] body .favorite-detail-body { display:grid; gap:12px; max-height:none; padding:12px 14px 0; overflow:auto; }
+html[data-theme][data-palette] body :is(.favorite-detail-hero,.favorite-detail-metrics-card) { display:grid; gap:6px; padding:12px; border:1px solid var(--line); border-radius:12px; background-color:var(--material-card-fill); background-image:var(--material-card-image); background-size:var(--material-card-image-size); box-shadow:var(--material-card-shadow); }
+html[data-theme][data-palette] body .favorite-detail-identity { grid-template-columns:38px minmax(0,1fr); gap:0 9px; }
+html[data-theme][data-palette] body .favorite-detail-identity .favorite-card-badge { grid-row:1/3; width:38px; height:38px; }
+html[data-theme][data-palette] body .favorite-detail-identity h3 { font-size:21px; }
+html[data-theme][data-palette] body .favorite-detail-identity p { grid-column:1/-1; margin:6px 0 0; white-space:normal; font-size:12px; }
+html[data-theme][data-palette] body .favorite-detail-price { gap:3px; margin-top:5px; }
+html[data-theme][data-palette] body .favorite-detail-price strong { font-size:26px; }
+html[data-theme][data-palette] body .favorite-detail-change { font-size:12px; }
+html[data-theme][data-palette] body .favorite-detail-time { text-align:left; font-size:11px; }
+html[data-theme][data-palette] body .favorite-detail-metrics-card h3 { margin:0 0 4px; font-size:17px; }
+html[data-theme][data-palette] body .favorite-detail-metrics { display:grid; grid-template-columns:minmax(0,1fr); gap:0; }
+html[data-theme][data-palette] body .favorite-detail-metric { display:flex; justify-content:space-between; align-items:center; gap:8px; min-height:31px; padding:3px 0; border:0; background:transparent; }
+html[data-theme][data-palette] body .favorite-detail-metric dt { font-size:12px; }
+html[data-theme][data-palette] body .favorite-detail-metric dd { font-size:12px; font-weight:500; text-align:right; }
+html[data-theme][data-palette] body .favorite-detail-source { text-align:left; font-size:11px; }
+html[data-theme][data-palette] body .favorite-detail-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:7px; padding:14px; border:0; }
+html[data-theme][data-palette] body .favorite-detail-actions button { flex:0 0 auto; min-height:31px; padding:6px 11px; border:0; border-radius:999px; background:color-mix(in srgb,var(--accent) 22%,var(--surface-card)); color:var(--accent-ink); font-size:12px; }
+html[data-theme="light"][data-palette] body .favorite-detail-dialog { background:#f3f3f5; }
+@media(max-width:600px) {
+  html[data-theme][data-palette] body .favorite-detail-dialog { width:100%; height:calc(100dvh - env(safe-area-inset-top,0px) - 48px); max-height:none; margin:auto 0 0; border-radius:34px 34px 0 0; }
+  html[data-theme][data-palette] body .favorite-detail-dialog::before { display:none; }
+}

@@ -47,4 +47,7 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | [v7.8](./v7.8/) | Arşivlendi | v7.8 iOS görsel uyarlaması; kaynak `49c0295` ve `v7.8` etiketi |
 | [v7.9](./v7.9/) | Onaylı sürüm kaynak anı | v7.9 iOS–web tasarım sistemi ve grafik uyumu |
 
-Güncel kalıcı sürüm v7.9'dur. Arşivler kişisel kullanıcı verisi içermez ve Vercel dağıtımından hariç tutulur.
+| [v7.10](./v7.10/) | Önceki onaylı sürüm | v7.10 iOS ekran düzeni ve görünüm seçicileri |
+| [v8.0](./v8.0/) | Onaylı sürüm kaynak anı | Sabit masaüstü menüsü ve orantılı varlık ekleme ikonu |
+
+Güncel kalıcı sürüm v8.0'dır. Arşivler kişisel kullanıcı verisi içermez ve Vercel dağıtımından hariç tutulur.
