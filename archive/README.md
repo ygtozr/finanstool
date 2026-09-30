@@ -4,7 +4,6 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 
 | Sürüm | Durum | Kaynak anı |
 |---|---|---|
-| [v7.6](./v7.6/) | Arşivlendi | [e280054](https://github.com/ygtozr/finanstool/commit/e280054d36562616fe410f082934a093a637e00e) |
 | [v2.3](./v2.3/) | Arşivlendi | [71d2ee6](https://github.com/ygtozr/finanstool/commit/71d2ee675732bf2c5c6059a995a87332744bfe54) |
 | [v2.4](./v2.4/) | Arşivlendi | [e122e4b](https://github.com/ygtozr/finanstool/commit/e122e4b90d9b55ed46a6db7c5117043aa790ce69) |
 | [v2.5](./v2.5/) | Arşivlendi | [30d1e82](https://github.com/ygtozr/finanstool/commit/30d1e8291c232add2d88069d28eeef727831a254) |
@@ -41,10 +40,10 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 | v7.3 | Git etiketiyle korundu | [v7.3](https://github.com/ygtozr/finanstool/releases/tag/v7.3) |
 | [v7.4](./v7.4/) | Arşivlendi | [v7.4](https://github.com/ygtozr/finanstool/releases/tag/v7.4) |
 | [v7.5](./v7.5/) | Arşivlendi | [v7.5](https://github.com/ygtozr/finanstool/releases/tag/v7.5) |
-
 | [v7.6](./v7.6/) | Arşivlendi | v7.6 fiyat zamanı düzeltmesi |
 | [v7.7](./v7.7/) | Arşivlendi | Kaynak: 66a9355a6eb94612467a26e29792b484c607696f; eski v7.7 etiketi korunur |
 | [v7.8](./v7.8/) | Arşivlendi | v7.8 iOS görsel uyarlaması; kaynak `49c0295` ve `v7.8` etiketi |
-| [v7.9](./v7.9/) | Onaylı sürüm kaynak anı | v7.9 iOS–web tasarım sistemi ve grafik uyumu |
+| [v7.9](./v7.9/) | Arşivlendi | v7.9 iOS–web tasarım sistemi ve grafik uyumu |
+| [v7.10](./v7.10/) | Onaylı sürüm kaynak anı | [v7.10](https://github.com/ygtozr/finanstool/releases/tag/v7.10): iOS ekran eşlemesi ve favori göstergeleri |
 
-Güncel kalıcı sürüm v7.9'dur. Arşivler kişisel kullanıcı verisi içermez ve Vercel dağıtımından hariç tutulur.
+Güncel kalıcı sürüm v7.10'dur. Arşivler kişisel kullanıcı verisi içermez ve Vercel dağıtımından hariç tutulur. Sürüm klasörlerinde aynı dosyanın tekrar görünmesi bilinçli kaynak anı saklamasıdır; Git eşit içerikleri tek blob olarak tutar. Aktif uygulama yalnız depo kökündeki kaynaklardan çalışır.
