@@ -29,7 +29,7 @@
 - Favoriler 6px aralık, 42px logo; portföy seçimi üç sütun, piyasa özeti 3px renk şeridi. Mobilde simgeli alt gezinme ve alt kenardan açılan pencereler.
 - Ortak sıralama: 400ms basılı tutma, sabit yuvalar, 8px eşik, 180ms komşu geçişi ve 160ms bırakma. Fare/dokunma, otomatik kaydırma, Escape/iptal ve Alt+ok erişimi. Kayıt yalnız başarılı bırakmada yapılır.
 - Grafik/RSI çizgileri dolgusuz; MA yeşil/sarı/kırmızı, karşılaştırma turuncu. MA anahtarı grafik altında; inceleme çizgisi tooltip ile eşleşir. Finansal hesaplama mantığı değişmez.
-- assets/ios-parity.css aktif görünüm katmanı; assets/ios-parity.js etkileşim uyarlaması; assets/appearance.js tercih yönetimidir. Eski appearance.css tarihsel kaynak olarak kalır, aktif sayfada yüklenmez.
+- assets/ios-parity.css aktif görünüm katmanı; assets/ios-parity.js etkileşim uyarlaması; assets/appearance.js tercih yönetimidir. Eski appearance.css yalnız bu sürümün arşivinde tarihsel kaynak olarak kalır, aktif sayfada yüklenmez.
 - Detaylı ekran/kontrol eşlemesi: [IOS_WEB_GORSEL_ESLEME.md](IOS_WEB_GORSEL_ESLEME.md). Tarayıcı/native sistem menüsü ve yazı rasterizasyonunda piksel eşitliği garanti edilmez.
 - API, lib, kimlik doğrulama, şifreleme anahtarları, veri şeması, zamanlayıcı ve finans hesaplamaları bu yayında değiştirilmez. iOS dalındaki ayrı çalışmalar dahil değildir.
 - v7.7 kaynakları archive/v7.7 altında, onaylı v7.8 kaynakları archive/v7.8 altında korunur. Arşivler Vercel paketinden hariç tutulur.
@@ -45,7 +45,7 @@ Kullanıcı onayıyla kalıcı sürüm olarak hazırlanmıştır. Sabit adres: h
 - Mod, renk ve stil bağımsızdır. Mevcut kullanıcılarda mod korunur; yeni tercihler varsayılan Klasik/İnce Çizgi ile başlar.
 - Kartlar %6, ikincil yüzeyler %8, bölümler %5 ve toplam portföy yüzeyi %12 vurgu karışımı kullanır. Ana zemin açık veya koyu kalır.
 - Stil yalnız yüzey, çerçeve, gölge ve dokuya etki eder; ölçüler, köşe biçimleri, yazı boyutları ve sayfa yerleşimleri değişmez. Kazanç yeşil, kayıp kırmızıdır.
-- assets/appearance.js doğrulama, tercih kaydı ve CSS değişkenlerini yönetir. assets/appearance.css onaylanan sekiz stilin CSS tanımlarını içerir.
+- assets/appearance.js doğrulama, tercih kaydı ve CSS değişkenlerini yönetir. O dönemin assets/appearance.css dosyası `archive/v7.7/` altında korunur; güncel kökteki görünüm `assets/design-tokens.css`, `assets/component-system.css` ve `assets/ios-screen-alignment.css` ile çizilir.
 - Yerel anahtar finans-grafigi-appearance; JSON yedeğinde data.appearance alanı. İçe aktarma ve hesap senkronizasyonu aynı yedek hattını kullanır. Eski yedeklerde eksik alan güvenli varsayılana döner.
 - Önizlemedeki Grafit/Lavanta/Petrol modları standart moda uyarlanır. Tasarım denemeleri onizleme dizininde tarihsel örneklerdir, uygulamanın varsayılan arayüzü değildir.
 - Yeni istek, zamanlayıcı, bağımlılık veya ücretli servis eklenmez; mevcut veri yenileme ve alarm davranışı değişmez.

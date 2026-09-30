@@ -16,7 +16,7 @@ Güncelleme: 30 Eylül 2026. Bu dosya kaynak kodun yerine geçmez; yeni oturum i
 
 v7.10, v7.9'un token/ChartTheme temelindeki mobil ekran bileşenlerini iOS fotoğraflarıyla daha yakın eşler. Favori Ayrıntısı, piyasa/favori kartları, grafik altı varlık listesi, portföy satırları ve Görünüm seçicileri güncellenmiştir. Favori ayrıntısındaki dokuz gösterge doğrudan karttadır; fiyat favoriyle aynı kompakt katmandan gelir. Nötr yüzeyler, beş renk/sekiz stil, A−/A+ ve yumuşak sıralama korunur. Ayrıntılar IOS_WEB_GORSEL_ESLEME.md içindedir.
 
-Aktif görünüm dosyaları assets/appearance.js, assets/design-tokens.css, assets/component-system.css, assets/ios-screen-alignment.css, assets/chart-theme.js, assets/ios-parity.css ve assets/ios-parity.js. Eski appearance.css yüklenmez. Tercih localStorage içindeki finans-grafigi-appearance anahtarında ve yedeğin data.appearance alanında tutulur. Eski yedek için varsayılan Klasik/İnce Çizgi. Mod anahtarı finans-grafigi-theme olarak devam eder. API, lib, hesap/şifreleme ve finans hesaplamaları değiştirilmedi.
+Aktif görünüm dosyaları assets/appearance.js, assets/design-tokens.css, assets/component-system.css, assets/ios-screen-alignment.css, assets/chart-theme.js, assets/ios-parity.css ve assets/ios-parity.js. Eski appearance.css yalnız sürüm arşivlerinde kalır, aktif kökte bulunmaz. Tercih localStorage içindeki finans-grafigi-appearance anahtarında ve yedeğin data.appearance alanında tutulur. Eski yedek için varsayılan Klasik/İnce Çizgi. Mod anahtarı finans-grafigi-theme olarak devam eder. API, lib, hesap/şifreleme ve finans hesaplamaları değiştirilmedi.
 
 ## 3. Kod haritası
 
@@ -29,6 +29,7 @@ Aktif görünüm dosyaları assets/appearance.js, assets/design-tokens.css, asse
 - tests/regression.test.js: mevcut regresyonlar. tests/appearance.browser.cjs: son görünüm testleri.
 - onizleme/ ve tasarim-onerileri/: tarihsel tasarım örnekleri; gerçek uygulama olarak yayınlamayın.
 - archive/: önceki sürüm kaynakları; .vercelignore bunları dağıtımdan dışlar.
+- BULUT_DEVIR.md: bulut çalışması için kaynak, test ve gizlilik sınırları. Onaylı üretim sürümünü değiştirmez.
 
 Uygulama React/Next.js değildir: statik arayüz + Vercel API işlevleri. Kurulumda mevcut package.json ve pnpm-lock.yaml esas alınır. Finans hesaplama/yenileme altyapısını sırf tasarım için yeniden yazmayın.
 
