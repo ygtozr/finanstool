@@ -240,7 +240,7 @@ assert.match(html,/allPortfolioCurrencyToggle\.addEventListener\('click',[\s\S]*
 assert.match(html,/async function renderAllPortfoliosSummary\(priceWarmup=null\)[\s\S]*portfolioBooks\.flatMap\(book=>book\.positions\)[\s\S]*totalUsd[\s\S]*allPortfolioTotalValue\.textContent/,'Toplam Portföy kartı bütün portföyleri USD bazında birleştirmeli');
 assert.match(html,/portfolioSummaryCurrencyNote\.textContent=nativeMode\?[\s\S]*'Portföydeki bütün değerler TL bazında gösteriliyor\.'[\s\S]*'Portföydeki bütün değerler USD bazında gösteriliyor\.'/,'Özet açıklaması ürünün kendi para birimi, TL veya USD tercihini doğru anlatmalı');
 assert.match(html,/\.market-summary-head #marketRefresh,\.favorites-panel-head #favoriteRefresh \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
-assert.ok((html.match(/labels:solidLegendLabels\(colors\.text\)/g)||[]).length>=2,'Fiyat ve RSI grafiklerinin lejant örnekleri dolu renk kullanmalı');
+assert.ok((html.match(/legend:\{display:false\}/g)||[]).length>=2,'Fiyat ve RSI grafiklerinde çizim alanını daraltan lejant gizlenmeli');
 assert.match(html,/function solidLegendLabels\(color\)[\s\S]*fillStyle:fill,strokeStyle:fill,lineWidth:0/,'Lejant renk kutularının içi seri rengiyle tamamen doldurulmalı');
 assert.match(html,/\.market-summary-head h2,\.favorites-panel h2,\.chart-page > h2,\.portfolio-head h2 \{ font-size:1\.17rem; \}/,'Dört ana bölüm başlığı Portföy Özet Analizi ile aynı puntoda olmalı');
 assert.match(html,/@media \(max-width:760px\) \{[\s\S]*body \{[^}]*padding:max\(4px,env\(safe-area-inset-top,0px\)\)/,'Mobil üst boşluk sabit marj yerine güvenli alan kadar olmalı');

@@ -118,13 +118,17 @@ window.OzerNativeUI = (() => {
     if(down)down.disabled=font.value==='small';if(up)up.disabled=font.value==='large';
   }
   function mount() {
-    const ma=document.getElementById('maToggle');document.querySelector('.chart-wrap').after(ma);
+    const ma=document.getElementById('maToggle');ma.textContent='MA50 / MA100 / MA200';document.querySelector('.chart-wrap').after(ma);
     const plot=document.querySelector('.chart-wrap'),plotCard=document.createElement('section');plotCard.className='native-plot-card';
-    plot.before(plotCard);plotCard.append(plot,ma);
+    plot.before(plotCard);plotCard.append(document.getElementById('meta'),plot,ma);
     const rsi=document.getElementById('rsiWrap'),rsiCard=document.createElement('section');rsiCard.className='native-plot-card';
     rsi.before(rsiCard);const rsiTitle=document.createElement('h3');rsiTitle.textContent='RSI 14';rsiCard.append(rsiTitle,rsi);
     const switcher=document.querySelector('.portfolio-switcher'),selectorCard=document.createElement('section');selectorCard.className='native-selector-card';
-    switcher.before(selectorCard);selectorCard.append(switcher,document.getElementById('portfolioBookTabs'));
+    const selectorHeading=document.createElement('h2');selectorHeading.textContent='Aktif Portföy';
+    const selectorActions=switcher.querySelector('.portfolio-switcher-actions');
+    switcher.before(selectorCard);selectorCard.append(selectorHeading,selectorActions,switcher,document.getElementById('portfolioBookTabs'));
+    const positionTitle=document.querySelector('.portfolio-positions-title'),positionsCard=document.createElement('section');positionsCard.className='native-positions-card native-surface';
+    positionTitle.before(positionsCard);positionsCard.append(positionTitle,document.getElementById('portfolioList'),document.querySelector('.portfolio-search'));
     const themeGroup=document.querySelector('[aria-label="Tema seçimi"]');
     ['system','dark','light'].forEach(mode=>{const b=themeGroup.querySelector('[data-theme-choice="'+mode+'"]');b.textContent=({system:'Sistem',dark:'Koyu',light:'Açık'})[mode];themeGroup.append(b);});
     const numberCard=document.getElementById('numberFormatTitle').closest('section');
@@ -173,6 +177,20 @@ window.OzerNativeUI = (() => {
       const {ctx,chartArea}=chart;ctx.save();ctx.beginPath();ctx.setLineDash([4,3]);
       ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim();ctx.lineWidth=1;
       ctx.moveTo(point.element.x,chartArea.top);ctx.lineTo(point.element.x,chartArea.bottom);ctx.stroke();ctx.restore();
+    },afterEvent(source){
+      if(!['priceChart','rsiChart'].includes(source.canvas.id))return;
+      const other=Chart.getChart(source.canvas.id==='priceChart'?'rsiChart':'priceChart');
+      if(!other?.tooltip)return;
+      const active=source.getActiveElements().find(item=>item.datasetIndex===0);
+      const index=active?.index??null;
+      const shownIndex=other.tooltip.getActiveElements()[0]?.index??null;
+      if(other.$linkedInspectionIndex===index&&shownIndex===index)return;
+      other.$linkedInspectionIndex=index;
+      const point=index===null?null:other.getDatasetMeta(0).data[index];
+      const value=index===null?null:other.data.datasets[0]?.data[index];
+      if(point&&Number.isFinite(value))other.tooltip.setActiveElements([{datasetIndex:0,index}],{x:point.x,y:point.y});
+      else other.tooltip.setActiveElements([],{x:0,y:0});
+      other.update('none');
     }});
   }
   document.addEventListener('DOMContentLoaded',mount);

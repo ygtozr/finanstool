@@ -1,8 +1,15 @@
 # iOS → Web görsel eşleme
 
-28 Eylül 2026 — yerel çalışma; son doğrulama 29 Eylül 2026. Üretime yayımlanmadı.
+30 Eylül 2026 — v7.9 önizleme çalışması. Üretime yayımlanmadı; son onaylı sürüm v7.8.
 
-Referans: `ios/OzerFinans/RootView.swift` ve `ios/OzerFinans/Screens.swift` kaynaklarındaki güncel iOS arayüzü. Web: `index.html`, `assets/appearance.js`. Bu belge bir piksel karşılaştırması değil, kaynak temelli bileşen ve davranış envanteridir.
+Referans: `ios/OzerFinans/RootView.swift` ve `ios/OzerFinans/Screens.swift` kaynaklarındaki iOS arayüzü ile kullanıcının paylaştığı grafik ekran görüntüleri. Web: `index.html`, `assets/appearance.js`. Native v7.7 ve web v7.8 veri/sürüm farkı nedeniyle karşılaştırma yerleşim ve stil odaklıdır; aynı veriyle otomatik piksel farkı değildir.
+
+## v7.9 önizlemede ortak tasarım sistemi
+
+- `assets/design-tokens.css`: iOS AppPalette renkleri, boşluk/köşe, yazı/kontrol ölçekleri, yüzey malzemeleri ve grafik paleti. Kullanıcının renk, görünüm ve A−/A+ tercihleri korunur.
+- `assets/component-system.css`: kart, kontrol, gezinme, grafik, portföy ve ayar düzenleri. Mobilde ≤600px iki sütun piyasa ve alt gezinme; tablette 601–1023px üç sütun piyasa ve üst sekmeler; masaüstünde ≥1024px dört sütun piyasa ve sol menü.
+- `assets/chart-theme.js`: fiyat, RSI, MA, portföy kıyası ve dağılım grafiklerinin ortak renk ve temel çizim ayarları. Mevcut kısa/yatay tarih ekseni, sağ değer ekseni ve eşzamanlı fiyat–RSI incelemesi korunur. Mobil fiyat/RSI çizimleri, kullanıcının gönderdiği ekran ölçülerine yakın kalması için 360/165px'dir.
+- Fiyat bilgisi fiyat grafiği kartı içindedir. Portföy seçimi ve işlemleri tek kartta, pozisyon listesi ve ekleme alanı ayrı tek kartta yer alır. Sekme değişiminde mobil/masaüstü etkin gezinme durumu birlikte güncellenir.
 
 ## Bulunan farklar ve uygulanan karşılıklar
 
@@ -17,8 +24,8 @@ Referans: `ios/OzerFinans/RootView.swift` ve `ios/OzerFinans/Screens.swift` kayn
 | Köşe Işığı / Ton Katmanı | Sağ üst ışık / keskin yatay bant | Sol üstten başlayan yumuşak çapraz geçiş |
 | Mikro Doku | 7 px aralıklı sık noktalar | 14 px aralık, 2 px noktalar; açık modda daha düşük opaklık |
 | Kart geometrisi | Farklı yarıçaplar, güçlü gölgeler | Ana kart 12 px; pozisyon satırı 10 px; düğme 9 px |
-| Marka | 50 px logo, daha büyük boşluk | 42 px logo, 8 px ara, 20 px kalın başlık |
-| Yazı ölçeği | 15/16/18 px kök boyutu | 16/17/19 px; A− / A+ ve mevcut kalıcı tercih |
+| Marka | 50 px logo, daha büyük boşluk | 42 px logo, 8 px ara, 23 px kalın başlık |
+| Yazı ölçeği | Dağınık sabit puntolar | 18 px gövde, 22 px başlık, 15 px kontrol tokenları; A− / A+ tercihi korunur |
 | Yenile düğmeleri | Farklı kontrol gölgeleri | Ortak vurgu, 38 px yükseklik, 10 px yatay dolgu |
 | Piyasa kartları | Stil seçimine bağlı güçlü şerit | Her stilde 3 px ince vurgu; 8 px kart arası |
 | Kazanç/kayıp | Metin altında renkli dolgu ve çerçeve | Sadece semantik renk; vurgu seçimiyle anlamı değişmez |
@@ -29,7 +36,7 @@ Referans: `ios/OzerFinans/RootView.swift` ve `ios/OzerFinans/Screens.swift` kayn
 | Alt gezinme | Karakter simgeleri, yüzen çerçeve | Çizgi SVG simgeler, kenardan kenara zemin, 48 px seçili alan |
 | Grafik araçları | Tek sırada dört işlem | İki sütun, iki sıra; ayrı tam genişlikte Getir düğmesi |
 | Grafik kartları | Açıkta grafikler | Fiyat ve RSI ayrı, başlık/içerik birleşik kartlar |
-| Fiyat / RSI | Alan dolgusu, eğri yumuşatma | Dolgusuz doğrusal çizgiler; RSI 70 kırmızı, 30 yeşil |
+| Fiyat / RSI | Alan dolgusu, eğri yumuşatma | Dolgusuz doğrusal çizgiler, gizli lejant, sağ değer ekseni ve ortak tarih işaretleri; RSI 70 kırmızı, 30 yeşil |
 | MA ve inceleme | Grafik üstünde yüzen düğme | Grafik altında anahtar; yeşil/sarı/kırmızı MA; imleçte tarih çizgisi ve mevcut değer balonu |
 | Süre seçimleri | Ekrana göre iki sütun / serbest sarma | Üç sütun kapsül; özel tarih tam genişlik; kıyas sürelerinde aynı düzen |
 | Dönem özeti | Masaüstünde dört sütun | İki sütun metrik; turuncudan vurguya geçişli 8 px konum çubuğu |
@@ -55,11 +62,11 @@ Referans: `ios/OzerFinans/RootView.swift` ve `ios/OzerFinans/Screens.swift` kayn
 
 ## Doğrulama
 
-29 Eylül son durumu: aşağıdaki üç test başarılı; JavaScript sözdizimi ve `git diff --check` temiz. Açılır menülerin cam stilde diğer kartların arkasına düşmesi giderildi; 120 kombinasyon testi bu düzeltmeden sonra yeniden geçti.
+30 Eylül son durumu: aşağıdaki üç test başarılı. Açılır menülerin cam stilde diğer kartların arkasına düşmesini önleyen önceki düzeltme korunur.
 
 - `node tests/regression.test.js`: finans/veri/sözdizimi regresyonları.
 - `node tests/appearance.browser.cjs`: 3 mod × 5 renk × 8 yüzey; taşma, geometri, kalıcılık, yedek geri yükleme.
 - `node tests/ios-visual.browser.cjs`: izole Chromium; dört ekran, açık/koyu, 320–1440 px, seçimler, yeniden yükleme, üç listeyi sürükleme, iptal, dokunmatik dokunma/sürükleme, MA ve grafik balonu, hareket azaltma.
 - Ortamda hazır tarayıcı CLI bulunmadığından mevcut Playwright paketi ve geçici test tarayıcısı kullanıldı; uygulama bağımlılığı eklenmedi.
-- Testlerin aldığı görseller `/private/tmp/ozer-web-ios-parity` altında; örnek veri içerir.
-- Fiziksel iPhone Safari/PWA ve native ekranlarla birebir piksel karşılaştırması henüz yapılmadı. Canlı yayın ve GitHub push yapılmadı.
+- Windows önizleme testinin görselleri `C:/Users/YigitOzer/AppData/Local/Temp/ozer-v79-design-parity` altında; örnek veri içerir. Mac'te native UI testi ve dört ekran görüntüsü ayrıca alınmıştır; bu Windows çalışma alanında native kaynak dosyaları yoktur.
+- Fiziksel iPhone Safari/PWA ve canlı veri sağlayıcıları bu çevrimdışı testlerin kapsamında değildir.

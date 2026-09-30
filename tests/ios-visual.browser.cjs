@@ -41,6 +41,8 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.goto('https://parity.test');await page.locator('#authLocalContinue').click();
  await page.waitForFunction(()=>document.querySelector('#nativeFontUp')&&document.querySelector('.favorite-card-price'));
  assert.deepEqual(errors,[],'Startup errors');
+ assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--radius-card').trim()),'12px','Shared card token');
+ assert.equal(await page.evaluate(()=>OzerChartTheme.palette().ma100),'#ffcc00','Shared chart palette');
  const favoriteAlignment=await page.locator('.favorite-card').first().evaluate(card=>{
   const middle=card.getBoundingClientRect().top+card.getBoundingClientRect().height/2;
   return ['.favorite-card-badge','.favorite-card-head','.favorite-card-quote'].map(selector=>{const r=card.querySelector(selector).getBoundingClientRect();return Math.abs(r.top+r.height/2-middle)});
@@ -111,19 +113,60 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  assert(await page.evaluate(()=>scrollY)>20,'Swiping a favorite card should use native page scrolling');
  await view('chart');
  const periodColumns=await page.locator('.periods').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length);assert.equal(periodColumns,3);
+ assert(await page.locator('.native-plot-card #meta').count(),'Price details should be inside the price chart card');
+ assert.equal(await page.evaluate(()=>chart.options.plugins.legend.display),false,'Price legend should not shrink the plot');
+ assert.equal(await page.evaluate(()=>rsiChart.options.plugins.legend.display),false,'RSI legend should not shrink the plot');
+ assert.equal(await page.evaluate(()=>chart.options.scales.price.position),'right','Price axis should match iOS placement');
+ assert.equal(await page.evaluate(()=>rsiChart.options.scales.y.position),'right','RSI axis should match iOS placement');
+ const dates=await page.evaluate(()=>{
+  const yearLabels=Array.from({length:72},(_,i)=>dateFormatters.chart.format(new Date(Date.UTC(2021,8+i,1))));
+  const monthLabels=Array.from({length:30},(_,i)=>dateFormatters.chart.format(new Date(Date.UTC(2026,8,1+i))));
+  return {years:[...chartAxisLayout(yearLabels).text.values()],weeks:[...chartAxisLayout(monthLabels).text.values()],shown:chart.scales.x.ticks.map(t=>t.label)};
+ });
+ assert(dates.years.length>=4&&dates.years.every(label=>/^20\d\d$/.test(label)),'Multi-year ticks should show years only');
+ assert(dates.weeks.length>=3&&dates.weeks.length<=6&&dates.weeks.every(label=>/\d+ \S+/.test(label)),'One-month ticks should show short horizontal dates');
+ assert(dates.shown.length<=5,'Mobile chart should not crowd the time axis');
  await page.locator('#maToggle').click();assert.equal(await page.locator('#maToggle').getAttribute('aria-pressed'),'true');
  assert.equal(await page.locator('#maToggle').evaluate(n=>getComputedStyle(n).backgroundColor),'rgba(0, 0, 0, 0)','MA switch has no filled button background');
  await page.waitForFunction(()=>chart.data.datasets.length===4);
  const plot=await page.locator('#priceChart').boundingBox();await page.mouse.move(plot.x+plot.width*.7,plot.y+plot.height*.5);
  await page.waitForFunction(()=>chart.tooltip.getActiveElements().length>0);
+ await page.waitForFunction(()=>rsiChart.tooltip.getActiveElements().length>0);
  const inspection=await page.evaluate(()=>({price:chart.options.plugins.tooltip.callbacks.afterBody([{dataIndex:200}]),rsi:rsiChart.options.plugins.tooltip.callbacks.afterBody([{dataIndex:200}])}));
  assert.match(inspection.price[0],/^RSI \(14\): \d/,'Price tooltip includes RSI');
  assert.match(inspection.rsi[0],/^Fiyat: /,'RSI tooltip includes price');
  await page.screenshot({path:path.join(output,'chart-inspection.png')});
+ for(const [name,count,unit] of [['one-month',30,'day'],['five-year',61,'month']]){
+  await page.evaluate(({count,unit})=>{
+   const dates=Array.from({length:count},(_,i)=>new Date(unit==='day'?Date.UTC(2026,8,1+i):Date.UTC(2021,8+i,1)));
+   const labels=dates.map(date=>dateFormatters.chart.format(date));
+   const values=dates.map((_,i)=>220+i*.5+Math.sin(i/3)*8);
+   movingAverageData={ma50:values.map(value=>value-8),ma100:values.map(value=>value-18),ma200:values.map(value=>value-28)};
+   renderChart(labels,values,'Apple Inc.','USD');
+  },{count,unit});
+  const axis=await page.evaluate(()=>chart.scales.x.ticks.map(tick=>tick.label));
+  assert(axis.length>=3&&axis.length<=7,'The '+name+' axis should stay readable');
+  if(unit==='month')assert(axis.every(label=>/^20\d\d$/.test(label)),'Five-year axis should contain only years');
+  else assert(axis.every(label=>/^\d+ \S+$/.test(label)),'One-month axis should contain day and month');
+  await page.locator('.native-plot-card').first().scrollIntoViewIfNeeded();
+  const currentPlot=await page.locator('#priceChart').boundingBox();
+  await page.mouse.move(currentPlot.x+currentPlot.width*.6,currentPlot.y+currentPlot.height*.5);
+  await page.waitForFunction(()=>chart.tooltip.getActiveElements().length>0&&rsiChart.tooltip.getActiveElements().length>0&&chart.tooltip.getActiveElements()[0].index===rsiChart.tooltip.getActiveElements()[0].index);
+  await page.screenshot({path:path.join(output,'chart-'+name+'.png')});
+ }
  await context.grantPermissions([]);
- for(const width of [320,390,760,1440]){
+ for(const width of [320,390,760,1024,1440]){
   await page.setViewportSize({width,height:1000});
-  for(const name of ['main','chart','portfolio','other']){await view(name);await noOverflow();}
+  for(const name of ['main','chart','portfolio','other']){
+   await view(name);await noOverflow();
+   if(name==='main'){
+    const layout=await page.evaluate(()=>({columns:getComputedStyle(document.querySelector('.market-cards')).gridTemplateColumns.split(' ').length,sidebar:getComputedStyle(document.querySelector('.desktop-sidebar')).display,tabs:getComputedStyle(document.querySelector('.app-tabs')).display}));
+    assert.equal(layout.columns,width<=600?2:width<=1023?3:4,'Market columns at '+width);
+    assert.equal(layout.sidebar==='none',width<1024,'Desktop sidebar breakpoint at '+width);
+    assert.equal(layout.tabs==='none',width<=600||width>=1024,'Tablet tabs breakpoint at '+width);
+   }
+   if(width<=600)assert.equal(await page.locator('.mobile-bottom-nav .is-active').getAttribute('id'),{main:'mobileOverviewNav',chart:'mobileChartNav',portfolio:'mobilePortfolioNav',other:'mobileMoreNav'}[name],'Mobile tab state');
+  }
  }
  await page.setViewportSize({width:1440,height:1000});await view('portfolio');
  const desktopTabs=await page.locator('.portfolio-book-tab').evaluateAll(nodes=>nodes.map(n=>Math.round(n.getBoundingClientRect().top)));

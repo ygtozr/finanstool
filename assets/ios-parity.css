@@ -12,17 +12,17 @@ html[data-look][data-palette] body :is(.market-card,.favorite-card,.settings-car
 html[data-look][data-palette] body :is(.portfolio-stat,.period-summary-item,.benchmark-stat) { background:transparent; box-shadow:none; border:0; }
 html[data-look][data-palette] body :is(.periods button,.theme-choice,.portfolio-currency-toggle,.market-summary-head button) { background-image:none; box-shadow:none; }
 html[data-look="cam"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) {
-  background:color-mix(in srgb,var(--surface-card) 75%,transparent); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  background:color-mix(in srgb,var(--surface-card) var(--material-glass-opacity),transparent); backdrop-filter:blur(var(--material-glass-blur)); -webkit-backdrop-filter:blur(var(--material-glass-blur));
 }
 html[data-look="seramik"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) {
-  background-image:linear-gradient(135deg,color-mix(in srgb,var(--accent) 10%,transparent),transparent,color-mix(in srgb,var(--accent) 2%,transparent)); box-shadow:0 5px 10px #00000040;
+  background-image:linear-gradient(135deg,color-mix(in srgb,var(--accent) var(--material-ceramic-tint),transparent),transparent,color-mix(in srgb,var(--accent) 2%,transparent)); box-shadow:var(--shadow-card);
 }
 html[data-theme="light"][data-look="seramik"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) { box-shadow:0 5px 10px #0000001a; }
-html[data-look="cerceve"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) { outline:1px solid color-mix(in srgb,var(--accent) 16%,transparent); outline-offset:-5px; }
+html[data-look="cerceve"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) { outline:1px solid color-mix(in srgb,var(--accent) var(--material-frame-tint),transparent); outline-offset:-5px; }
 html[data-look="isik"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) { background-image:linear-gradient(135deg,color-mix(in srgb,var(--accent) 23%,transparent),transparent,color-mix(in srgb,var(--accent) 2%,transparent)); }
 html[data-look="katman"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) { background-image:linear-gradient(135deg,color-mix(in srgb,var(--accent) 10%,transparent),transparent,color-mix(in srgb,var(--accent) 9%,transparent)); }
-html[data-look="doku"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) { background-image:radial-gradient(circle at 9px 9px,color-mix(in srgb,var(--accent) 38%,transparent) 1px,transparent 1.2px); background-size:14px 14px; }
-html[data-theme="light"][data-look="doku"][data-palette] body { --texture-dot:color-mix(in srgb,var(--accent) 29%,transparent); }
+html[data-look="doku"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) { background-image:radial-gradient(circle at 9px 9px,color-mix(in srgb,var(--accent) var(--material-texture-tint),transparent) 1px,transparent 1.2px); background-size:var(--material-texture-size) var(--material-texture-size); }
+html[data-theme="light"][data-look="doku"][data-palette] body { --texture-dot:color-mix(in srgb,var(--accent) var(--material-texture-tint),transparent); }
 html[data-theme="light"][data-look="doku"][data-palette] body :is(.market-card,.favorite-card,.settings-card,.portfolio-overall-head,.period-summary,.distribution-card,.benchmark-chart-wrap,.portfolio-summary-card) { background-image:radial-gradient(circle at 9px 9px,var(--texture-dot) 1px,transparent 1.2px); }
 html body button { border-radius:9px; font-weight:700; transition:opacity .12s ease,background-color .18s ease,border-color .18s ease; }
 html body button:active:not(:disabled) { opacity:.75; }
@@ -44,7 +44,8 @@ html body .favorite-card { padding:10px 9px; gap:9px; grid-template-columns:42px
 html body .favorite-card:hover { transform:none; }
 html body .favorite-card-badge { width:42px; height:42px; }
 html body .favorite-card-price { font-size:1rem; }
-html body .favorite-market-time { bottom:6px; right:10px; font-size:.625rem; max-width:calc(100% - 20px); overflow:hidden; text-overflow:ellipsis; }
+html body .favorite-card-quote { align-self:center; gap:1px; }
+html body .favorite-market-time { position:static; font-size:.6rem; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
 html body .favorite-actions button { border-radius:8px; border:0; }
 html[data-palette] body .favorite-remove { color:#ffcc00; background:#ffcc0021; }
 html body .favorite-row.favorite-drag-ghost { filter:drop-shadow(0 5px 12px #00000029); }
@@ -72,6 +73,11 @@ html body #symbolForm { display:grid; grid-template-columns:1fr; gap:8px; margin
 html body #submitButton { min-height:36px; padding:8px; font-size:.8125rem; }
 html[data-palette] body #favoriteButton { color:var(--accent-ink); background:color-mix(in srgb,var(--accent) 13%,transparent); border:1px solid var(--line); }
 html body .native-plot-card,html body #meta:not(:empty) { border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:12px; background:var(--surface-card); }
+html body .native-plot-card #meta:empty { display:none; }
+html body .native-plot-card #meta:not(:empty) { display:grid; gap:2px; min-height:0; padding:0; margin:0 0 8px; border:0; border-radius:0; background:transparent; }
+html body .native-plot-card #meta > span:first-child { color:var(--text); font-size:1.1rem; font-weight:700; }
+html body .native-plot-card #meta > span:nth-child(3) { color:var(--text); }
+html body .native-plot-card #meta .favorites-note { color:var(--muted); font-size:.75rem; }
 html body .native-plot-card h3 { margin:0 0 10px; font-size:1.1875rem; }
 html body .date-picker { grid-column:1/-1; }
 html body .portfolio-delete { border-radius:7px; color:#ff453a; background:#ff453a21; }
@@ -137,8 +143,8 @@ html body .favorite-quick-menu.open,html body .chart-asset-panel:not([hidden]) {
   html body .mobile-bottom-nav button { height:48px; padding:5px 4px; border-radius:10px; font-size:.6875rem; font-weight:600; }
   html body .mobile-bottom-nav button.is-active { background:color-mix(in srgb,var(--line) 90%,var(--surface-section)); color:var(--text); }
   .mobile-bottom-nav svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
-  html body .chart-page .chart-wrap { height:280px; }
-  html body .rsi-wrap { height:125px; }
+  html body .chart-page .chart-wrap { height:360px; }
+  html body .rsi-wrap { height:165px; }
   html body .settings-horizontal { display:block; }
   html body .settings-card-controls { margin-top:10px; }
   html body .portfolio-dialog { width:100%; max-width:100%; max-height:90dvh; margin:auto 0 0; border-radius:18px 18px 0 0; padding:20px 16px max(20px,env(safe-area-inset-bottom)); }

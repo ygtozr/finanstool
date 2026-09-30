@@ -792,7 +792,9 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/ios-parity.css?v=7.9-preview">
+  <link rel="stylesheet" href="assets/design-tokens.css?v=7.9-preview-2">
+  <link rel="stylesheet" href="assets/ios-parity.css?v=7.9-preview-2">
+  <link rel="stylesheet" href="assets/component-system.css?v=7.9-preview-2">
 </head>
 <body class="auth-locked">
   <section id="authGate" class="auth-gate" aria-labelledby="authGateTitle">
@@ -1038,7 +1040,8 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
   </dialog>
   <script src="assets/storage-events.js?v=7.8"></script>
   <script src="assets/appearance.js?v=7.8"></script>
-  <script src="assets/ios-parity.js?v=7.9-preview"></script>
+  <script src="assets/ios-parity.js?v=7.9-preview-2"></script>
+  <script src="assets/chart-theme.js?v=7.9-preview-2"></script>
   <script>
     let chart;
     let rsiChart;
@@ -3208,6 +3211,12 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         tab.setAttribute('aria-selected',String(active));
         tab.tabIndex=active?0:-1;
       });
+      const navIds={main:['desktopOverviewNav','mobileOverviewNav'],chart:['desktopChartNav','mobileChartNav'],portfolio:['desktopPortfolioNav','mobilePortfolioNav'],other:['desktopMoreNav','mobileMoreNav']};
+      document.querySelectorAll('.desktop-sidebar button,.mobile-bottom-nav button').forEach(button=>{
+        const active=navIds[view]?.includes(button.id)||false;
+        button.classList.toggle('is-active',active);
+        if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+      });
       if(states.chart){ensureChartLibrary().catch(()=>{});requestAnimationFrame(()=>{if(chart)chart.resize();if(rsiChart)rsiChart.resize()})}
       if(states.portfolio)ensureChartLibrary().catch(()=>{});
       if(states.portfolio)renderAllPortfoliosSummary();
@@ -3508,7 +3517,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       table.append(row);
     }
 
-    const distributionColors=['#52d5b1','#60a5fa','#fb7185','#fbbf24','#a78bfa','#22d3ee','#f97316','#84cc16','#f472b6','#94a3b8'];
+    const distributionColors=OzerChartTheme.palette().allocation;
 
     function destroyPortfolioDistributionCharts() {
       if(portfolioAllocationChart){portfolioAllocationChart.destroy();portfolioAllocationChart=null}
@@ -3524,10 +3533,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         type:'doughnut',
         data:{labels,datasets:[{label,data:values,backgroundColor:labels.map((_,index)=>distributionColors[index%distributionColors.length]),borderColor:'rgba(255,255,255,.14)',borderWidth:1,hoverOffset:7}]},
         options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          cutout:'70%',
-          animation:{duration:450},
+          ...OzerChartTheme.doughnutOptions(),
           plugins:{
             legend:{display:false},
             tooltip:{callbacks:{label:context=>{
@@ -3714,7 +3720,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         {label:'Portföy',data:portfolioPerformance,borderColor:colors.accent,backgroundColor:colors.fillSoft,borderWidth:2.4,pointRadius:0,pointHoverRadius:4,tension:.18,spanGaps:true},
         {label:benchmarkSettings.name,data:benchmarkPerformance,borderColor:'#ff9500',backgroundColor:colors.infoFill,borderWidth:2.2,pointRadius:0,pointHoverRadius:4,tension:0,spanGaps:true}
       ];
-      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:colors.text,usePointStyle:true,boxWidth:10}},tooltip:{callbacks:{label:context=>context.dataset.label+': '+percentText(context.parsed.y)}}},scales:{x:{ticks:{color:colors.text,maxTicksLimit:8},grid:{color:colors.grid}},y:{ticks:{color:colors.text,callback:value=>(value>=0?'+':'')+value+'%'},grid:{color:colors.grid}}}};
+      const options={...OzerChartTheme.lineOptions(),plugins:{legend:{labels:{color:colors.text,usePointStyle:true,boxWidth:10}},tooltip:{callbacks:{label:context=>context.dataset.label+': '+percentText(context.parsed.y)}}},scales:{x:{ticks:{color:colors.text,maxTicksLimit:8},grid:{color:colors.grid}},y:{ticks:{color:colors.text,callback:value=>(value>=0?'+':'')+value+'%'},grid:{color:colors.grid}}}};
       if(portfolioBenchmarkChart){
         portfolioBenchmarkChart.data={labels:[...labels],datasets};
         portfolioBenchmarkChart.options=options;
@@ -4207,16 +4213,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     }
 
     function chartThemeColors() {
-      const style=getComputedStyle(document.documentElement);
-      return {
-        text:style.getPropertyValue('--muted').trim()||'#64748b',
-        grid:style.getPropertyValue('--line').trim()||'#cbd5e1',
-        accent:style.getPropertyValue('--accent').trim()||'#0f766e',
-        info:style.getPropertyValue('--info').trim()||'#2563eb',
-        fill:style.getPropertyValue('--chart-fill').trim()||'rgba(15,118,110,.13)',
-        fillSoft:style.getPropertyValue('--chart-fill-soft').trim()||'rgba(15,118,110,.07)',
-        infoFill:style.getPropertyValue('--info-fill').trim()||'rgba(37,99,235,.06)'
-      };
+      return OzerChartTheme.palette();
     }
 
     function solidLegendLabels(color) {
@@ -4232,6 +4229,50 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       };
     }
 
+    function chartDateParts(label) {
+      const match=String(label||'').match(/^(\d{1,2})\s+(\S+)\s+(\d{4})$/);
+      if(!match)return null;
+      const months=['oca','şub','mar','nis','may','haz','tem','ağu','eyl','eki','kas','ara'];
+      const month=months.indexOf(match[2].toLocaleLowerCase('tr-TR').slice(0,3));
+      if(month<0)return null;
+      return {day:Number(match[1]),month,monthLabel:match[2],year:Number(match[3]),time:Date.UTC(Number(match[3]),month,Number(match[1]))};
+    }
+
+    function chartAxisLayout(labels) {
+      const dates=labels.map(chartDateParts),first=dates[0],last=dates.at(-1);
+      if(!first||!last)return {ticks:[0,Math.max(0,labels.length-1)],text:new Map([[0,labels[0]||'']])};
+      const spanDays=(last.time-first.time)/86400000;
+      const ticks=[],text=new Map();
+      const add=(index,label)=>{if(!text.has(index)){ticks.push(index);text.set(index,label)}};
+      if(spanDays>730){
+        for(let index=1;index<dates.length;index++)if(dates[index]?.year!==dates[index-1]?.year)add(index,String(dates[index].year));
+      }else if(spanDays>75){
+        let monthCount=0;
+        for(let index=1;index<dates.length;index++){
+          const date=dates[index],previous=dates[index-1];
+          if(!date||!previous||date.month===previous.month&&date.year===previous.year)continue;
+          if(monthCount++%(spanDays>250?3:spanDays>130?2:1)===0)add(index,date.monthLabel+(date.year!==first.year?' '+String(date.year).slice(-2):''));
+        }
+      }else if(spanDays>14){
+        for(let index=1;index<dates.length;index++){
+          const date=dates[index],previous=dates[index-1];
+          if(date&&previous&&Math.floor((date.time+259200000)/604800000)!==Math.floor((previous.time+259200000)/604800000))add(index,date.day+' '+date.monthLabel);
+        }
+      }else{
+        const step=Math.max(1,Math.ceil(labels.length/6));
+        for(let index=0;index<labels.length;index+=step)if(dates[index])add(index,dates[index].day+' '+dates[index].monthLabel);
+      }
+      if(!ticks.length)add(0,first.day+' '+first.monthLabel);
+      return {ticks,text};
+    }
+
+    function chartTimeScale(labels,colors) {
+      const axis=chartAxisLayout(labels);
+      return {afterBuildTicks:scale=>{scale.ticks=axis.ticks.map(value=>({value}))},ticks:{color:colors.text,autoSkip:false,maxRotation:0,minRotation:0,padding:7,callback:value=>axis.text.get(Number(value))||''},grid:{color:colors.grid,borderDash:[3,4],drawTicks:false},border:{display:false}};
+    }
+
+    const chartInspectionStyle={backgroundColor:'#24272d',titleColor:'#fff',bodyColor:'#fff',displayColors:false,cornerRadius:7,padding:9,titleFont:{size:12,weight:'bold'},bodyFont:{size:12}};
+
     function renderRsiChart(labels,prices,preparedValues=null) {
       const wrap=document.getElementById('rsiWrap');
       wrap.classList.add('visible');
@@ -4239,10 +4280,10 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       const rsiValues=Array.isArray(preparedValues)&&preparedValues.length===prices.length?preparedValues:calculateRsi(prices);
       const datasets=[
         {label:'RSI (14)',data:rsiValues,borderColor:colors.accent,backgroundColor:colors.fillSoft,fill:false,pointRadius:0,pointHoverRadius:4,borderWidth:2,tension:0},
-        {label:'Aşırı alım (70)',data:labels.map(()=>70),borderColor:'#ff453a66',pointRadius:0,borderWidth:1,fill:false},
-        {label:'Aşırı satım (30)',data:labels.map(()=>30),borderColor:'#30d15866',pointRadius:0,borderWidth:1,fill:false}
+        {label:'Aşırı alım (70)',data:labels.map(()=>70),borderColor:colors.rsiHigh,pointRadius:0,borderWidth:1,fill:false},
+        {label:'Aşırı satım (30)',data:labels.map(()=>30),borderColor:colors.rsiLow,pointRadius:0,borderWidth:1,fill:false}
       ];
-      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:solidLegendLabels(colors.text)},tooltip:{filter:context=>context.datasetIndex===0,callbacks:{label:context=>'RSI (14): '+Number(context.parsed.y).toFixed(2),afterBody:items=>{const price=lastPrices[items[0]?.dataIndex];return Number.isFinite(price)?['Fiyat: '+money(price,currentCurrency)]:[]}}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},y:{min:0,max:100,grid:{color:colors.grid},ticks:{color:colors.text,stepSize:20}}}};
+      const options={...OzerChartTheme.lineOptions(),plugins:{legend:{display:false},tooltip:{...chartInspectionStyle,filter:context=>context.datasetIndex===0,callbacks:{label:context=>'RSI (14): '+Number(context.parsed.y).toFixed(2),afterBody:items=>{const price=lastPrices[items[0]?.dataIndex];return Number.isFinite(price)?['Fiyat: '+money(price,currentCurrency)]:[]}}}},scales:{x:chartTimeScale(labels,colors),y:{position:'right',min:0,max:100,grid:{color:colors.grid,drawTicks:false},border:{display:false},ticks:{color:colors.text,stepSize:25,padding:5}}}};
       if(rsiChart){
         rsiChart.data={labels:[...labels],datasets};
         rsiChart.options=options;
@@ -4258,11 +4299,12 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       const colors=chartThemeColors();
       const datasets=[{label:currentChartName+' kapanış fiyatı ('+currentCurrency+')',assetSymbol:primarySymbol||currentSymbol(),data:lastPrices,borderColor:colors.accent,backgroundColor:colors.fill,fill:false,pointRadius:0,pointHoverRadius:5,tension:0,borderWidth:2,yAxisID:'price'}];
       if(maEnabled){
-        datasets.push({label:'MA50',data:movingAverageData?.ma50||sma(lastPrices,50),borderColor:'#34c759',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
-        datasets.push({label:'MA100',data:movingAverageData?.ma100||sma(lastPrices,100),borderColor:'#ffcc00',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
-        datasets.push({label:'MA200',data:movingAverageData?.ma200||sma(lastPrices,200),borderColor:'#ff3b30',pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
+        datasets.push({label:'MA50',data:movingAverageData?.ma50||sma(lastPrices,50),borderColor:colors.ma50,pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
+        datasets.push({label:'MA100',data:movingAverageData?.ma100||sma(lastPrices,100),borderColor:colors.ma100,pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
+        datasets.push({label:'MA200',data:movingAverageData?.ma200||sma(lastPrices,200),borderColor:colors.ma200,pointRadius:0,borderWidth:1.8,fill:false,yAxisID:'price'});
       }
-      const options={responsive:true,maintainAspectRatio:false,animation:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,labels:solidLegendLabels(colors.text)},tooltip:{callbacks:{label:context=>(context.dataset.assetSymbol||context.dataset.label)+': '+money(context.parsed.y,currentCurrency),afterBody:items=>{const rsi=lastRsiValues[items[0]?.dataIndex];return Number.isFinite(rsi)?['RSI (14): '+rsi.toFixed(2)]:[]}}}},scales:{x:{grid:{display:false},ticks:{color:colors.text,maxTicksLimit:7}},price:{position:'left',grid:{color:colors.grid},ticks:{color:colors.text,callback:value=>money(value,currentCurrency)}}}};
+      const priceTick=cachedNumberFormatter('tr-TR',{maximumFractionDigits:2});
+      const options={...OzerChartTheme.lineOptions(),plugins:{legend:{display:false},tooltip:{...chartInspectionStyle,callbacks:{label:context=>(context.dataset.assetSymbol||context.dataset.label)+': '+money(context.parsed.y,currentCurrency),afterBody:items=>{const rsi=lastRsiValues[items[0]?.dataIndex];return Number.isFinite(rsi)?['RSI (14): '+rsi.toFixed(2)]:[]},labelTextColor:context=>context.datasetIndex===0?'#fff':context.dataset.borderColor}}},scales:{x:chartTimeScale(labels,colors),price:{position:'right',grid:{color:colors.grid,drawTicks:false},border:{display:false},ticks:{color:colors.text,maxTicksLimit:5,padding:5,callback:value=>priceTick.format(value)}}}};
       if(chart){
         chart.data={labels:lastLabels,datasets};
         chart.options=options;
