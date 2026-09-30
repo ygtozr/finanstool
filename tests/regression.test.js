@@ -179,11 +179,12 @@ assert.doesNotMatch(html,/class="app-view[^>]*tabindex="-1"/,'Sekme kapsayıcıl
 assert.match(html,/\.app-view:focus,\.app-view:focus-visible \{ outline:none !important; \}/,'Safari sekme kapsayıcısı odak çerçevesi bastırılmalı');
 assert.match(html,/body\.modal-open \{ position:fixed; left:0; right:0; width:100%; \}/,'Açık panel arka plan kaydırmasını sabitlemeli');
 assert.match(html,/event\.target===favoriteDetailDialog\)closeFavoriteDetail\(\)/,'Panel dışındaki karartılmış alana dokunmak hızlı detayı kapatmalı');
-assert.match(html,/Günlük düşük – yüksek[\s\S]*52 hafta düşük – yüksek[\s\S]*Piyasa değeri[\s\S]*F\/K[\s\S]*Temettü verimi[\s\S]*Hacim[\s\S]*RSI \(14\)/,'Hızlı detay temel ekonomik ve teknik göstergeleri içermeli');
+assert.match(html,/Günlük değişim[\s\S]*Piyasa değeri[\s\S]*F\/K[\s\S]*Temettü verimi[\s\S]*1 yıllık düşük[\s\S]*1 yıllık yüksek/,'Hızlı detay iOS temel bilgi sırasını korumalı');
+assert.match(html,/Diğer göstergeler[\s\S]*Günlük düşük – yüksek[\s\S]*Hacim[\s\S]*RSI \(14\)/,'Önceki ekonomik ve teknik veriler açılır bölümde korunmalı');
 assert.match(html,/Number\.isFinite\(value\)\?formatter\(value\):fallback/,'Eksik detay verileri tahmin edilmeden uygun durum metniyle gösterilmeli');
 assert.match(html,/\/api\/fundamentals\?symbol=/,'Hızlı detay ayrı temel veri servisiyle zenginleştirilmeli');
-assert.match(html,/F\/K \(TTM\)/,'F/K değeri gerçekleşmiş son dört çeyrek bazında etiketlenmeli');
-assert.match(html,/Temel veri kaynağı:/,'Temel veri kaynağı panelde açıklanmalı');
+assert.match(html,/addFavoriteDetailMetric\(metrics,'F\/K'/,'F/K değeri iOS temel bilgiler satırında gösterilmeli');
+assert.match(html,/Temel veri:/,'Temel veri kaynağı panelde açıklanmalı');
 assert.match(html,/id="favoriteDetailChart"[^>]*>Grafiği Aç<[\s\S]*id="favoriteDetailAlarm"[^>]*>Alarm Kur<[\s\S]*id="favoriteDetailPortfolio"[^>]*>Portföye Ekle</,'Hızlı detay alt eylemleri bulunmalı');
 assert.match(html,/id="portfolioTargetField" hidden>Hedef portföy<select id="portfolioTargetBook"[^>]*aria-label="Hissenin ekleneceği portföy"/,'Favoriden eklemede erişilebilir hedef portföy seçicisi bulunmalı');
 assert.match(html,/function openFavoritePortfolio\(item\)[\s\S]*openPortfolioDialog\(null,\{choosePortfolio:true\}\)[\s\S]*function syncPortfolioTargetChoices\(selectedId=activePortfolioId\)[\s\S]*portfolioBooks\.forEach\(book=>/,'Favori bilgi kartı mevcut portföyleri hedef seçimine yüklemeli');
@@ -385,7 +386,7 @@ assert.match(pricesApi,/MAX_SYMBOLS=40[\s\S]*mapWithLimit\(symbols,6[\s\S]*resul
 assert.match(pricesApi,/priceHandler[\s\S]*quoteHandler[\s\S]*goldHandler[\s\S]*tefasHandler/,'Toplu fiyat servisi mevcut sağlayıcı yollarını yeniden kullanmalı');
 assert.match(html,/portfolioSnapshotsKey[\s\S]*function renderCachedPortfolioSnapshot\(\)[\s\S]*Son kayıt gösteriliyor; güncel veriler arka planda alınıyor/,'Son başarılı portföy değerleri ekran açılır açılmaz cihazdan gösterilmeli');
 assert.match(html,/savePortfolioSnapshot\(\{mode:portfolioMetricsMode,totalValue:[\s\S]*rows:snapshotRows\}\)/,'Başarılı portföy hesaplaması seçili dönemle sonraki hızlı açılış için saklanmalı');
-assert.match(html,/id="otherView"[\s\S]*data-theme-choice="light"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="system"/,'Diğer ekranı Açık, Koyu ve Sistem tema seçeneklerini içermeli');
+assert.match(html,/id="otherView"[\s\S]*data-theme-choice="system"[\s\S]*data-theme-choice="dark"[\s\S]*data-theme-choice="light"/,'Diğer ekranı iOS sırasıyla Sistem, Koyu ve Açık tema seçeneklerini içermeli');
 assert.doesNotMatch(html,/data-theme-choice="(?:ocean|plum|sand|contrast|oled)"/,'Ek renk paleti düğmeleri kaldırılmış olmalı');
 assert.match(html,/const themeOptions = \['light','dark','system'\]/,'Tema tercihleri üç standart modu doğrulamalı');
 assert.match(html,/id="otherView"[\s\S]*id="backupDownload"[\s\S]*id="restoreBackup"/,'Veri yedekleme araçları Diğer ekranında korunmalı');

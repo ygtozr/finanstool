@@ -14,6 +14,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
   if(localStorage.getItem('parity-seeded'))return;
   localStorage.setItem('parity-seeded','1');
   localStorage.setItem('finans-grafigi-theme','dark');
+  localStorage.setItem('finans-grafigi-appearance',JSON.stringify({color:'turkuaz',look:'seramik'}));
   localStorage.setItem('finans-grafigi-refresh-interval','0');
   localStorage.setItem('finans-grafigi-favorites',JSON.stringify([{symbol:'AAPL',name:'Apple Inc.'},{symbol:'MSFT',name:'Microsoft Corporation'},{symbol:'BJKAS.IS',name:'Beşiktaş Futbol Yatırımları'}]));
   localStorage.setItem('finans-grafigi-portfolios-v2',JSON.stringify(Array.from({length:6},(_,i)=>({id:'visual-'+i,name:['Uzun Vadeli','Temettü','Amerika','Birikim','Fonlar','Altın'][i],positions:i?[]:[{symbol:'AAPL',name:'Apple Inc.',quantity:10,baseQuantity:10,unitCost:110,costCurrency:'USD',dripEnabled:false}],cashBalances:[],createdAt:'2026-01-01T00:00:00Z'}))));
@@ -92,8 +93,14 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await drag(page.locator('.favorite-card').first(),page.locator('.favorite-card').nth(2));
  assert.equal((await page.evaluate(()=>createBackup().data.favorites.map(i=>i.symbol)))[2],'AAPL');
  // Touch tap still opens detail; touch hold reorders without a duplicate click.
+ await page.evaluate(()=>{OzerAppearance.restore({color:'turkuaz',look:'seramik'});applyTheme('dark')});
  const card=page.locator('.favorite-card').first();await card.scrollIntoViewIfNeeded();await card.tap();
- assert(await page.locator('dialog[open]').count());await page.keyboard.press('Escape');
+ assert(await page.locator('dialog[open]').count());
+ await page.locator('.favorite-detail-metrics-card').waitFor();
+ assert.equal(await page.locator('.favorite-detail-metrics-card > .favorite-detail-metrics > .favorite-detail-metric').count(),6,'Native detail uses six primary metric rows');
+ assert.match(await page.locator('.favorite-detail-price strong').innerText(),/145,50/,'Favorite detail must reuse the same compact quote as the favorite card');
+ await page.screenshot({path:path.join(output,'favorite-detail.png')});
+ await page.keyboard.press('Escape');
  const beforeTouch=await page.evaluate(()=>createBackup().data.favorites.map(i=>i.symbol));
  await page.locator('.favorite-card').first().scrollIntoViewIfNeeded();
  const ta=await page.locator('.favorite-card').first().boundingBox(),tb=await page.locator('.favorite-card').nth(1).boundingBox();
@@ -123,6 +130,11 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  assert.equal(await page.evaluate(()=>rsiChart.options.plugins.legend.display),false,'RSI legend should not shrink the plot');
  assert.equal(await page.evaluate(()=>chart.options.scales.price.position),'right','Price axis should match iOS placement');
  assert.equal(await page.evaluate(()=>rsiChart.options.scales.y.position),'right','RSI axis should match iOS placement');
+ await page.locator('#chartPortfolioToggle').click();
+ assert.equal(await page.locator('#chartPortfolioPanel .chart-asset-item').count(),1);
+ assert.equal(await page.locator('#chartPortfolioPanel .chart-asset-list').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length),1,'Chart holdings use one native-style list column');
+ await page.locator('#chartPortfolioPanel').scrollIntoViewIfNeeded();
+ await page.screenshot({path:path.join(output,'chart-assets.png'),fullPage:true});
  const dates=await page.evaluate(()=>{
   const yearLabels=Array.from({length:72},(_,i)=>dateFormatters.chart.format(new Date(Date.UTC(2021,8+i,1))));
   const monthLabels=Array.from({length:30},(_,i)=>dateFormatters.chart.format(new Date(Date.UTC(2026,8,1+i))));

@@ -77,14 +77,14 @@ assert(boxes.every(b=>b.width===boxes[0].width&&b.height===boxes[0].height),'Sty
 assert.equal(lookStyles.mat,lookStyles.cizgi,'Native Mat and İnce Çizgi intentionally share one AppCard material');
 assert.equal(new Set(Object.values(lookStyles)).size,7,'The six remaining native materials must have their own paint');
 const marketSpacing=await page.locator('#styleTestMarket').evaluate(card=>({height:card.getBoundingClientRect().height,paddingTop:getComputedStyle(card).paddingTop,paddingBottom:getComputedStyle(card).paddingBottom}));
-assert.equal(marketSpacing.paddingTop,'4px');assert.equal(marketSpacing.paddingBottom,'4px');assert(marketSpacing.height<=58,'Market card should stay compact');
-for(const [density,expected] of [['small',['11px','16px','11px']],['standard',['12px','17px','12px']],['large',['13px','18px','13px']]]){
+assert.equal(marketSpacing.paddingTop,'3px');assert.equal(marketSpacing.paddingBottom,'3px');assert(marketSpacing.height<=50,'Market card should match compact native rows');
+for(const [density,expected] of [['small',['10px','15px','10px']],['standard',['11px','16px','10px']],['large',['12px','17px','11px']]]){
  const actual=await page.evaluate(density=>{
   document.documentElement.dataset.fontSize=density;
   const card=document.getElementById('styleTestMarket');
   return [getComputedStyle(card.querySelector('.market-card-label')).fontSize,getComputedStyle(card.querySelector('strong')).fontSize,getComputedStyle(card.querySelector('.market-card-change')).fontSize,getComputedStyle(card).paddingTop];
  },density);
- assert.deepEqual(actual,[...expected,'4px'],'Market type roles must scale once without changing padding');
+ assert.deepEqual(actual,[...expected,'3px'],'Market type roles must scale once without changing padding');
  await page.setViewportSize({width:320,height:700});
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Density must not cause horizontal overflow at 320px');
 }

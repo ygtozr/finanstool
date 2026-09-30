@@ -129,6 +129,9 @@ window.OzerNativeUI = (() => {
     switcher.before(selectorCard);selectorCard.append(selectorHeading,selectorActions,switcher,document.getElementById('portfolioBookTabs'));
     const positionTitle=document.querySelector('.portfolio-positions-title'),positionsCard=document.createElement('section');positionsCard.className='native-positions-card native-surface';
     positionTitle.before(positionsCard);positionsCard.append(positionTitle,document.getElementById('portfolioList'),document.querySelector('.portfolio-search'));
+    positionTitle.firstChild.textContent='Varlıklar';
+    const positionAdd=document.createElement('button');positionAdd.type='button';positionAdd.className='native-position-add';positionAdd.textContent='⊕';positionAdd.setAttribute('aria-label','Varlık eklemek için aramaya git');
+    positionAdd.addEventListener('click',()=>{const search=document.getElementById('portfolioSymbol');search.scrollIntoView({behavior:'smooth',block:'center'});search.focus()});positionTitle.append(positionAdd);
     const themeGroup=document.querySelector('[aria-label="Tema seçimi"]');
     ['system','dark','light'].forEach(mode=>{const b=themeGroup.querySelector('[data-theme-choice="'+mode+'"]');b.textContent=({system:'Sistem',dark:'Koyu',light:'Açık'})[mode];themeGroup.append(b);});
     const numberCard=document.getElementById('numberFormatTitle').closest('section');
