@@ -44,6 +44,7 @@ Bu klasör, yeni bir onaylı sürüm yayınlanırken bir önceki sürümün çal
 
 | [v7.6](./v7.6/) | Arşivlendi | v7.6 fiyat zamanı düzeltmesi |
 | [v7.7](./v7.7/) | Arşivlendi | Kaynak: 66a9355a6eb94612467a26e29792b484c607696f; eski v7.7 etiketi korunur |
-| [v7.8](./v7.8/) | Onaylı sürüm kaynak anı | v7.8 iOS görsel uyarlaması |
+| [v7.8](./v7.8/) | Arşivlendi | v7.8 iOS görsel uyarlaması; kaynak `49c0295` ve `v7.8` etiketi |
+| [v7.9](./v7.9/) | Onaylı sürüm kaynak anı | v7.9 iOS–web tasarım sistemi ve grafik uyumu |
 
-Güncel kalıcı sürüm v7.8'dir. Arşivler kişisel kullanıcı verisi içermez ve Vercel dağıtımından hariç tutulur.
+Güncel kalıcı sürüm v7.9'dur. Arşivler kişisel kullanıcı verisi içermez ve Vercel dağıtımından hariç tutulur.
