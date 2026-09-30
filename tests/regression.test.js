@@ -196,7 +196,7 @@ assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler 
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v7\.10<\/title>/,'Tarayıcı başlığı kalıcı sürümü göstermeli');
+assert.match(html,/<title>Özer Finans v7\.11<\/title>/,'Tarayıcı başlığı uygulama sürümünü göstermeli');
 assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.9[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.9[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -402,8 +402,8 @@ assert.match(html,/requestIdleCallback\(prewarmCharts,\{timeout:2500\}\)/,'Chart
 assert.match(html,/let pendingActiveRefresh = false;[\s\S]*if\(bypassGap\)pendingActiveRefresh=true;[\s\S]*queueMicrotask\(\(\)=>runActiveRefresh\(\{leaderRequired:false,bypassGap:true\}\)\)/,'Sekme değişimindeki yenileme, devam eden istekten sonra beklemeden çalıştırılmalı');
 assert.doesNotMatch(html,/cdn\.jsdelivr\.net\/npm\/chart\.js/,'Grafikler çalışma anında harici CDN’ye bağlı olmamalı');
 assert.ok(chartVendor.length>150000&&/Chart/.test(chartVendor),'Yerel Chart.js paketi eksiksiz görünmeli');
-assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=7\.10"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
-assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=7\.10"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
+assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="assets\/apple-touch-icon\.png\?v=7\.11"/,'iPhone ana ekranı özel Özer Finans ikonunu kullanmalı');
+assert.match(html,/rel="manifest" href="manifest\.webmanifest\?v=7\.11"/,'PWA manifesti sürümlü bağlantıyla yüklenmeli');
 assert.equal(manifest.name,'Özer Finans','Manifest uygulamanın tam adını taşımalı');
 assert.equal(manifest.display,'standalone','PWA bağımsız uygulama görünümünde açılmalı');
 assert.deepEqual(manifest.icons.map(icon=>icon.sizes),['192x192','512x512'],'Manifest standart PWA ikon boyutlarını içermeli');
@@ -487,7 +487,7 @@ assert.ok(html.indexOf('id="backupTitle"')<html.indexOf('id="helpTitle"'),'Yard�
 assert.match(html,/id="authGate"[\s\S]*id="authLoginForm"[\s\S]*id="authLocalContinue"/,'Açılış ekranında e-posta girişi ve yerel devam seçenekleri bulunmalı');
 assert.match(html,/id="authRegisterForm"[\s\S]*id="authBootstrapForm"/,'Davetli kayıt ve ilk yönetici kurulum formları bulunmalı');
 assert.match(html,/id="adminUsersCard"[\s\S]*id="createInvite"[\s\S]*id="inviteResult"/,'Yönetici için kullanıcı davet ekranı bulunmalı');
-assert.match(html,/assets\/storage-events\.js\?v=7\.10[\s\S]*assets\/auth-account\.js\?v=7\.10\.0/,'Yerel değişiklik gözlemi yeni hesap istemcisinden önce yüklenmeli');
+assert.match(html,/assets\/storage-events\.js\?v=7\.11[\s\S]*assets\/auth-account\.js\?v=7\.11\.0/,'Yerel değişiklik gözlemi yeni hesap istemcisinden önce yüklenmeli');
 assert.match(authAccount,/credentials: 'same-origin'[\s\S]*\/api\/account\?action=login[\s\S]*\/api\/account\?action=register/,'İstemci güvenli çerezle birleşik giriş ve davetli kayıt API’sini kullanmalı');
 assert.ok(fs.readdirSync(path.join(root,'api')).filter(name=>name.endsWith('.js')).length<=12,'Hobby planı için sunucu fonksiyonu sayısı 12’yi aşmamalı');
 assert.match(authAccount,/localStorage\.setItem\(GUEST_BACKUP_KEY[\s\S]*function restoreGuestSnapshot/,'Misafir verisi hesap verisinden ayrı korunmalı');
@@ -501,5 +501,5 @@ assert.match(adminInvitesApi,/requireUser\(req, res, 'admin'\)[\s\S]*EX', 86400/
 assert.match(userStateApi,/requireUser\(req, res\)[\s\S]*encryptJson\(record\)/,'Kullanıcı verisi oturumla ayrılmalı ve şifrelenmeli');
 assert.doesNotMatch(html,/CLERK_SECRET_KEY|DATABASE_URL=|NEXT_PUBLIC_CLERK/,'Sunucu sırları HTML içine gömülmemeli');
 
-assert.match(html,/<title>Özer Finans v7\.10<\/title>/,'Kalıcı sürüm başlıkta açıkça belirtilmeli');
-console.log('Özer Finans v7.10 regresyon testleri başarılı.');
+assert.match(html,/<title>Özer Finans v7\.11<\/title>/,'Uygulama sürümü başlıkta açıkça belirtilmeli');
+console.log('Özer Finans v7.11 regresyon testleri başarılı.');

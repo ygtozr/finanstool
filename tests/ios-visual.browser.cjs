@@ -182,6 +182,25 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
     assert.equal(layout.sidebar==='none',width<1024,'Desktop sidebar breakpoint at '+width);
     assert.equal(layout.tabs==='none',width<=600||width>=1024,'Tablet tabs breakpoint at '+width);
    }
+   if(name==='portfolio'){
+    const add=await page.locator('.native-position-add').boundingBox();
+    assert.equal(add.width,27,'Asset add icon width at '+width);
+    assert.equal(add.height,27,'Asset add icon height at '+width);
+    await page.locator('.native-position-add').click();
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'portfolioSymbol','Asset add still focuses search');
+    await page.evaluate(()=>scrollTo(0,0));
+   }
+   if(width>=1024){
+    const nav=page.locator('.desktop-sidebar');
+    const before=await nav.boundingBox();
+    await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));
+    await page.waitForTimeout(100);
+    const after=await nav.boundingBox();
+    assert(Math.abs(before.y-after.y)<1,'Desktop navigation stays fixed while scrolling '+name+' at '+width);
+    assert(after.height<=1000,'Desktop navigation fits viewport');
+    if(name==='other')assert(await page.evaluate(()=>scrollY)>100,'Settings scroll exercises sticky navigation');
+    await page.evaluate(()=>scrollTo(0,0));
+   }
    if(width<=600)assert.equal(await page.locator('.mobile-bottom-nav .is-active').getAttribute('id'),{main:'mobileOverviewNav',chart:'mobileChartNav',portfolio:'mobilePortfolioNav',other:'mobileMoreNav'}[name],'Mobile tab state');
   }
  }

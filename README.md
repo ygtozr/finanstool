@@ -1,8 +1,15 @@
-# Özer Finans v7.10
+# Özer Finans v7.11 — Ön izleme
 
 Yeni sohbet / geliştirici başlangıcı: [Devir notları](DEVIR_NOTLARI.md). Çalışma kuralları: [AGENTS.md](AGENTS.md). Ayrıntılı tanım: [Ürün ve teknik tasarım](URUN_VE_TEKNIK_TASARIM.md).
 
 Özer Finans; piyasa verilerini izlemek, hisse ve ETF fiyat grafiklerini teknik göstergelerle incelemek, Favorileri takip etmek ve kişisel portföy performansını hesaplamak için geliştirilmiş responsive web uygulamasıdır.
+
+## v7.11 ön izleme: masaüstü gezinme ve varlık ekleme ikonu
+
+- Masaüstü (≥1024px) sol menü ekran yüksekliğinde tutulur; sayfa kaydırılırken gezinme düğmeleri yerinde kalır. Kısa ekranlarda menünün kendi kaydırması kullanılabilir.
+- Portföy “Varlıklar” ekleme düğmesi tüm ekranlarda 27×27px ölçüdedir ve başlığın sağında hizalanır; aramaya geçiş korunur.
+- Dal: `preview/v7.11-desktop-navigation`. Kullanıcı onayı beklenir; kalıcı v7.10 değişmez. Onaydan sonra arşiv, teknik belge ve Git etiketi tamamlanır.
+- Finans hesapları, API, hesap/portföy verileri ve yedek şeması değişmez.
 
 ## Canlı uygulama
 

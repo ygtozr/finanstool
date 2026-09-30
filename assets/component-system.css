@@ -82,7 +82,7 @@ html[data-theme][data-palette] body :is(.negative,.favorite-change.negative,.por
 }
 @media(min-width:1024px) {
   html[data-theme][data-palette] body main { width:min(1440px,100%);display:grid;grid-template-columns:216px minmax(0,1fr);column-gap:24px;padding:0 30px 38px 0; }
-  html[data-theme][data-palette] body .desktop-sidebar { display:flex;grid-column:1;grid-row:1 / span 3;background:var(--color-card);border-right:var(--stroke-card); }
+  html[data-theme][data-palette] body .desktop-sidebar { display:flex;grid-column:1;grid-row:1 / span 3;position:fixed;top:0;left:max(0px,calc((100% - 1440px)/2));width:216px;z-index:40;height:100vh;height:100dvh;min-height:0;overflow-y:auto;background:var(--color-card);border-right:var(--stroke-card); }
   html[data-theme][data-palette] body main > .app-tabs { display:none; }
   html[data-theme][data-palette] body main > .app-view { grid-column:2;padding-top:28px; }
   html[data-theme][data-palette] body .mobile-bottom-nav { display:none; }

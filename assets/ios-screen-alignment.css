@@ -1,4 +1,6 @@
 /* Screen-level parity with the six native v7.7 reference captures. */
+html[data-theme][data-palette] body .native-positions-card .portfolio-positions-title { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+html[data-theme][data-palette] body .native-position-add { display:inline-flex; align-items:center; justify-content:center; flex:0 0 27px; width:27px; height:27px; min-width:27px; min-height:27px; padding:0; border:0; background:transparent; color:var(--accent-ink); font-size:23px; font-weight:400; line-height:1; }
 @media(max-width:600px) {
   html[data-theme][data-palette] body .market-cards { gap:7px; }
   html[data-theme][data-palette] body .market-card { min-height:48px; padding:3px 8px 3px 10px; line-height:1.12; }
@@ -27,8 +29,6 @@
   html[data-theme][data-palette] body .chart-asset-chevron { justify-self:end; font-size:23px; line-height:1; color:var(--muted); }
 
   html[data-theme][data-palette] body .native-positions-card .portfolio-positions-title { margin-bottom:8px; }
-  html[data-theme][data-palette] body .native-positions-card .portfolio-positions-title { display:flex; align-items:center; justify-content:space-between; }
-  html[data-theme][data-palette] body .native-position-add { min-width:27px; min-height:27px; padding:0; border:0; background:transparent; color:var(--accent-ink); font-size:23px; font-weight:400; line-height:1; }
   html[data-theme][data-palette] body .portfolio-list { gap:7px; }
   html[data-theme][data-palette] body .portfolio-row { min-height:65px; padding:6px 8px; background-color:color-mix(in srgb,var(--line) 23%,var(--surface-section)); }
   html[data-theme][data-palette] body .portfolio-row-head { grid-template-columns:34px minmax(0,1fr) auto 30px; gap:6px; margin-bottom:2px; }

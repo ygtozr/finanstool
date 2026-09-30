@@ -1,3 +1,12 @@
+## v7.11 — Ön izleme: masaüstü menü ve varlık ekleme ikonu
+
+30 Eylül 2026. Kullanıcı onayı bekleniyor; kalıcı uygulama v7.10 olarak devam eder.
+
+- ≥1024px sol menü `position:fixed` ve 100dvh yükseklikle ekranın soluna (1440px üstünde ortalanan ana çerçevenin soluna) sabitlenir; sayfa kaydırılırken konumunu korur. Kısa ekranlarda `overflow-y:auto` gezinmeye erişimi sağlar.
+- Varlıklar başlığı tüm ekranlarda flex hizalama kullanır. Ekleme düğmesi 27×27px ve 23px glif ölçüsündedir; mevcut aramaya kaydırma/odaklama işlevi korunur.
+- Mobil alt gezinme, API, hesaplar, finans hesapları ve JSON yedek şeması korunur.
+- Regresyon ve sentetik verili tarayıcı testleri kullanılır; menü kaydırma konumu ve ikonun aramaya yönlendirmesi 320–1440px kapsamına eklenmiştir. Fiziksel iPhone/PWA ve canlı veri sağlayıcıları bu doğrulama kapsamında değildir.
+
 ## v7.10 — iOS Ekran Bileşenleri ve Favori Ayrıntısı
 
 30 Eylül 2026 tarihinde kullanıcı tarafından kalıcı yayın için onaylandı. Sabit adres https://finanstool.vercel.app; sürüm etiketi v7.10.
@@ -519,7 +528,8 @@ Geri yükleme seçenekleri:
 Yüklenen dosya JSON olarak doğrulanır, beklenmeyen alanlar ayıklanır ve yaklaşık 1 MB dosya sınırı uygulanır. Şema v1 tek portföylü yedekleri `Portföyüm` kaydına dönüştürülerek geriye uyumlu biçimde desteklenir.
 
 ## 7. Teknik mimari
-…497 tokens truncated…aktır.
+
+…497 tokens truncated…aktır.
 - Desteklenen ABD hisse/ETF'lerinde Nasdaq geçmiş fiyat uç noktası yedek kaynaktır.
 - İkinci Yahoo alan adı ek yedek olarak kullanılır.
 - Nasdaq cevabı istemcinin beklediği Yahoo-benzeri grafik yapısına dönüştürülür.

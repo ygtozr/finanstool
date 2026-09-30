@@ -2,6 +2,10 @@
 
 Güncelleme: 30 Eylül 2026. Bu dosya kaynak kodun yerine geçmez; yeni oturum için başlangıç rehberidir.
 
+## v7.11 ön izleme adayı
+
+`preview/v7.11-desktop-navigation` dalı masaüstü sol menünün sayfayla kaymasını ve Portföy “Varlıklar” yanındaki ekleme ikonunun masaüstünde büyümesini düzeltir. Uygulama adayı 7.11.0; kalıcı yayın hâlâ v7.10. Kullanıcı onaylamadan main birleştirmesi, üretim yayını veya v7.11 kalıcı etiketi yapılmaz. Onayda önceki kaynak arşivi korunur ve yayın belgeleri güncellenir.
+
 ## 1. Doğru kaynak ve mevcut durum
 
 - Depo: https://github.com/ygtozr/finanstool
