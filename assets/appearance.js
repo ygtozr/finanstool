@@ -11,14 +11,39 @@ window.OzerAppearance = (() => {
   const mix=(a,b,p)=>'#'+rgb(a).map((v,i)=>Math.round(v*(1-p)+rgb(b)[i]*p).toString(16).padStart(2,'0')).join('');
   const lum=h=>rgb(h).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0);
   const contrast=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+  // Resolve each independent preference before assigning CSS tokens. Native AppCard
+  // intentionally gives Mat and İnce Çizgi the same material treatment.
+  function resolve({mode='dark',color=state.color,look=state.look,density='standard',systemLight=false}={}){
+    const normalized=normalize({color,look});
+    const theme=mode==='system'?(systemLight?'light':'dark'):mode==='light'?'light':'dark';
+    const light=theme==='light',accent=colors[normalized.color][1];
+    const material={fill:'var(--surface-card)',image:'none',shadow:'none',outline:'none',outlineOffset:'-5px',blur:'none',imageSize:'auto'};
+    if(normalized.look==='cam'){
+      material.fill='color-mix(in srgb,var(--surface-card) 75%,transparent)';material.blur='blur(20px)';
+    }else if(normalized.look==='seramik'){
+      material.image='linear-gradient(135deg,color-mix(in srgb,var(--accent) 10%,transparent),transparent,color-mix(in srgb,var(--accent) 2%,transparent))';
+      material.shadow=light?'0 5px 10px #0000001a':'0 5px 10px #00000040';
+    }else if(normalized.look==='cerceve'){
+      material.outline='1px solid color-mix(in srgb,var(--accent) 16%,transparent)';
+    }else if(normalized.look==='isik'||normalized.look==='katman'){
+      const start=normalized.look==='isik'?23:10,end=normalized.look==='isik'?2:9;
+      material.image=`linear-gradient(135deg,color-mix(in srgb,var(--accent) ${start}%,transparent),transparent,color-mix(in srgb,var(--accent) ${end}%,transparent))`;
+    }else if(normalized.look==='doku'){
+      material.image=`radial-gradient(circle at 9px 9px,color-mix(in srgb,var(--accent) ${light?29:38}%,transparent) 1px,transparent 1.2px)`;
+      material.imageSize='14px 14px';
+    }
+    return {theme,color:normalized.color,look:normalized.look,density:['small','large'].includes(density)?density:'standard',accent,material};
+  }
   function apply(mode){
-    const root=document.documentElement,light=mode==='light',accent=colors[state.color][1];
-    root.dataset.palette=state.color;root.dataset.look=state.look;
+    const root=document.documentElement,resolved=resolve({mode,color:state.color,look:state.look,density:root.dataset.fontSize,systemLight:matchMedia('(prefers-color-scheme: light)').matches});
+    const light=resolved.theme==='light',accent=resolved.accent;
+    root.dataset.theme=resolved.theme;root.dataset.palette=resolved.color;root.dataset.look=resolved.look;
     const ink=light?mix('#000000',accent,.46):accent;
     const values={'surface-page':light?'#f1f3f5':'#101827','surface-main':light?'#ffffff':'#192337','surface-section':mix(light?'#f3f4f6':'#111a2b',accent,.05),'surface-card':mix(light?'#ffffff':'#0d1523',accent,.06),'surface-soft':mix(light?'#f0f2f5':'#182235',accent,.08),'surface-summary':mix(light?'#ffffff':'#192337',accent,.12),'surface-control':light?'#e5e7eb':'#26344d','line':light?'#d1d5db':'#2b3a55','border-strong':light?'#9ca3af':'#40516e','text':light?'#172033':'#eef3fb','muted':light?'#5f6f86':'#aebbd0','accent':accent,'accent-ink':ink,'on-accent':contrast(accent,'#ffffff')>contrast(accent,'#061018')?'#ffffff':'#061018','positive':light?'#17623e':'#75efa7','negative':light?'#ad2343':'#ffb1bd','warning':light?'#80531d':'#ffd482','info':light?'#275da0':'#a8d1ff','focus-ring':ink,'chart-fill':accent+'24','chart-fill-soft':accent+'12'};
     // Match AppPalette / AppCard in the native app; accents do not tint every surface.
     Object.assign(values,{'surface-page':light?'#eef3f8':'#101827','surface-section':light?'#ffffff':'#192337','surface-card':light?'#ffffff':'#0d1523','surface-soft':light?'#f3f5f8':'#202e46','surface-summary':light?'#ffffff':'#0d1523','surface-control':light?'#d9e0e9':'#26344d','line':light?'#cbd5e1':'#2b3a55','border-strong':light?'#cbd5e1':'#2b3a55'});
     Object.entries(values).forEach(([k,v])=>root.style.setProperty('--'+k,v));
+    Object.entries({fill:resolved.material.fill,image:resolved.material.image,shadow:resolved.material.shadow,outline:resolved.material.outline,'outline-offset':resolved.material.outlineOffset,blur:resolved.material.blur,'image-size':resolved.material.imageSize}).forEach(([k,v])=>root.style.setProperty('--material-card-'+k,v));
     document.querySelectorAll('[data-appearance-color],[data-appearance-look]').forEach(b=>{
       const active=b.dataset.appearanceColor?b.dataset.appearanceColor===state.color:b.dataset.appearanceLook===state.look;
       b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));
@@ -39,5 +64,5 @@ window.OzerAppearance = (() => {
       });menu.append(group);
     }
   }
-  return {normalize,apply,restore,mount,snapshot:()=>({...state})};
+  return {normalize,resolve,apply,restore,mount,snapshot:()=>({...state})};
 })();

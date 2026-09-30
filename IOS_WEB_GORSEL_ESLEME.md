@@ -4,6 +4,23 @@
 
 Referans: `ios/OzerFinans/RootView.swift` ve `ios/OzerFinans/Screens.swift` kaynaklarındaki iOS arayüzü ile kullanıcının paylaştığı grafik ekran görüntüleri. Web: `index.html`, `assets/appearance.js`. Native v7.7 ve web v7.8 veri/sürüm farkı nedeniyle karşılaştırma yerleşim ve stil odaklıdır; aynı veriyle otomatik piksel farkı değildir.
 
+## v7.10 önizleme — bağımsız görünüm çözümü
+
+Mod, vurgu rengi, kart malzemesi ve yazı yoğunluğu ayrı tercihler olarak çözülür. `assets/appearance.js` yalnız seçilen malzemenin boya tokenlarını atar; `assets/component-system.css` kartları tek boya yolundan çizer. Arka plan rengi, desen/geçiş, gölge, kontur ve bulanıklık ayrı CSS özellikleridir. Bu ayrım, sonradan gelen ortak kart kuralının seçili stili ezmesini engeller. Native AppCard'da Mat ve İnce Çizgi aynı malzemeyi kullandığı için webde de aynı görünür; diğer altı malzeme kendi görsel tokenlarına sahiptir. Camın CSS bulanıklığı SwiftUI `ultraThinMaterial` için yaklaşık karşılıktır, birebir ölçüm değildir.
+
+| Ölçü / rol | iOS kaynak noktası | Web mobil uygulama | Not |
+|---|---:|---:|---|
+| Ana kart köşesi / sınır | 12 / 1 | 12 / 1 px | Malzeme değişirken geometri sabit. |
+| Genel kart iç boşluğu | 12 | 12 px | Piyasa kartı istisnadır. |
+| Piyasa kartı iç boşluğu | 8 | dikey 4, yatay 8 px | Kullanıcının istediği kompakt web uyarlaması; native ölçüm diye sunulmaz. |
+| Piyasa kartı asgari yüksekliği | sabit değil | 56 px | İçerik gerekirse kart büyür. |
+| Piyasa kartı sütunu | 2 | mobil 2, tablet 3, masaüstü 4 | Tablet/masaüstü web uyarlaması. |
+| Piyasa kartı etiketi/fiyat/değişim | 11 / 16 / 10 temel punto | standart 12 / 17 / 12 px | SwiftUI `@ScaledMetric` fiziksel CSS pikseli değildir. |
+| Mobil fiyat çizim alanı | 240 | 240 px | Başlık, meta ve dış kart yüksekliği dahil değil. |
+| Mobil RSI çizim alanı | 100 | 100 px | Fiyatla aynı tarih aralığı korunur. |
+
+Webin piyasa yazı rolleri küçük/standart/büyük tercihlerinde sırasıyla 11–12–13 px etiket, 16–17–18 px fiyat ve 11–12–13 px değişim kullanır. Bu roller kök `rem` ölçeğiyle ikinci kez çarpılmaz. Mobil ≤600 px, tablet 601–1023 px ve masaüstü ≥1024 px eşikleri web düzeni içindir. Açık/koyu × beş renk × sekiz malzemenin 80 hesaplanmış CSS durumu ve sistem modunun iki OS görünümü test edilir; gerçek iPhone Safari/PWA doğrulaması ayrı kalır.
+
 ## v7.9 ortak tasarım sistemi
 
 - `assets/design-tokens.css`: iOS AppPalette renkleri, boşluk/köşe, yazı/kontrol ölçekleri, yüzey malzemeleri ve grafik paleti. Kullanıcının renk, görünüm ve A−/A+ tercihleri korunur.

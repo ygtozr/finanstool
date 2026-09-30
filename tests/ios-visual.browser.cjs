@@ -115,6 +115,8 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  assert(await page.evaluate(()=>scrollY)>20,'Swiping a favorite card should use native page scrolling');
  await page.setViewportSize({width:390,height:844});
  await view('chart');
+ assert.equal(await page.locator('.chart-page .chart-wrap').evaluate(n=>n.getBoundingClientRect().height),240,'Mobile price plot uses the native logical-height reference');
+ assert.equal(await page.locator('.chart-page .rsi-wrap').evaluate(n=>n.getBoundingClientRect().height),100,'Mobile RSI plot uses the native logical-height reference');
  const periodColumns=await page.locator('.periods').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length);assert.equal(periodColumns,3);
  assert(await page.locator('.native-plot-card #meta').count(),'Price details should be inside the price chart card');
  assert.equal(await page.evaluate(()=>chart.options.plugins.legend.display),false,'Price legend should not shrink the plot');
