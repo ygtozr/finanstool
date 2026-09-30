@@ -1,0 +1,58 @@
+/* Shared native-inspired tokens. Accent, mode and material are existing preferences. */
+html {
+  --color-page:var(--surface-page);
+  --color-section:var(--surface-section);
+  --color-card:var(--surface-card);
+  --color-control:var(--surface-control);
+  --color-border:var(--line);
+  --color-primary:var(--text);
+  --color-secondary:var(--muted);
+  --color-action:var(--accent);
+  --color-profit:var(--positive);
+  --color-loss:var(--negative);
+  --space-1:3px;
+  --space-2:6px;
+  --space-3:8px;
+  --space-4:10px;
+  --space-5:12px;
+  --space-6:14px;
+  --space-7:18px;
+  --radius-control:9px;
+  --radius-row:10px;
+  --radius-card:12px;
+  --radius-sheet:18px;
+  --radius-pill:999px;
+  --stroke-card:1px solid var(--color-border);
+  --shadow-menu:0 10px 28px #00000035;
+  --material-card-fill:var(--surface-card);
+  --material-card-image:none;
+  --material-card-image-size:auto;
+  --material-card-shadow:none;
+  --material-card-outline:none;
+  --material-card-outline-offset:-5px;
+  --material-card-blur:none;
+  --font-system:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --font-caption:12px;
+  --font-control:15px;
+  --font-body:18px;
+  --font-heading:22px;
+  --font-brand:23px;
+  --font-market-label:11px;
+  --font-market-price:16px;
+  --font-market-change:10px;
+  --control-height:36px;
+  --pill-height:38px;
+  --brand-size:42px;
+  --chart-price:var(--accent);
+  --chart-ma50:#34c759;
+  --chart-ma100:#ffcc00;
+  --chart-ma200:#ff3b30;
+  --chart-benchmark:#ff9500;
+  --chart-rsi-high:#ff453a66;
+  --chart-rsi-low:#30d15866;
+  --chart-grid:var(--line);
+  --chart-label:var(--muted);
+}
+html[data-theme="light"] { --shadow-menu:0 10px 28px #18362f1f; }
+html[data-font-size="small"] { --font-body:17px;--font-heading:20px;--font-control:14px;--font-market-label:10px;--font-market-price:15px;--font-market-change:10px; }
+html[data-font-size="large"] { --font-body:20px;--font-heading:24px;--font-control:16px;--font-market-label:12px;--font-market-price:17px;--font-market-change:11px; }
