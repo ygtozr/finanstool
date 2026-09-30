@@ -1,14 +1,15 @@
 /* Components and responsive layouts share the tokens while preserving app behavior. */
 html[data-theme][data-palette] body { font-family:var(--font-system);font-size:var(--font-body);color:var(--color-primary);background:var(--color-page); }
 html[data-theme][data-palette] body main { background:var(--color-section);border-color:var(--color-border);box-shadow:none; }
-html[data-theme][data-palette] body :is(.market-card,.favorite-card,.native-plot-card,.settings-card,.native-surface,.native-selector-card,.period-summary,.portfolio-glance,.portfolio-summary-card,.portfolio-distribution,.portfolio-benchmark,.distribution-card,.portfolio-overall-head) { border:var(--stroke-card);border-radius:var(--radius-card);background:var(--color-card);box-shadow:var(--shadow-card); }
+/* Surface material owns background and shadow; shared geometry must not erase the selected look. */
+html[data-theme][data-palette] body :is(.market-card,.favorite-card,.native-plot-card,.settings-card,.native-surface,.native-selector-card,.period-summary,.portfolio-glance,.portfolio-summary-card,.portfolio-distribution,.portfolio-benchmark,.distribution-card,.portfolio-overall-head) { border:var(--stroke-card);border-radius:var(--radius-card); }
 html[data-theme][data-palette] body :is(.market-summary-head,.favorites-panel-head,.portfolio-summary-card > .portfolio-head,.portfolio-benchmark-head) { border:0;background:transparent;box-shadow:none; }
 html[data-theme][data-palette] body :is(.market-summary-head h2,.favorites-panel h2,.chart-page > h2,.portfolio-head h2,.settings-card h3,.native-plot-card h3,.portfolio-positions-title,.portfolio-distribution h3,.portfolio-benchmark h3) { font-size:var(--font-heading);font-weight:700;letter-spacing:0;line-height:1.25; }
 html[data-theme][data-palette] body .page-brand { min-height:56px;gap:var(--space-3);margin-bottom:var(--space-6);padding:7px 0;background:var(--color-section); }
 html[data-theme][data-palette] body .page-brand .brand-lockup-mark { width:var(--brand-size);height:var(--brand-size);flex-basis:var(--brand-size);border-radius:var(--radius-row); }
 html[data-theme][data-palette] body .brand-lockup-name { font-size:var(--font-brand);font-weight:900;letter-spacing:-.5px; }
 html[data-theme][data-palette] body :is(.market-card,.favorite-card,.settings-card,.native-plot-card,.period-summary,.distribution-card,.native-surface) { padding:var(--space-5); }
-html[data-theme][data-palette] body .market-card { padding:var(--space-3);min-height:66px; }
+html[data-theme][data-palette] body .market-card { padding:4px var(--space-3);min-height:56px; }
 html[data-theme][data-palette] body .market-card strong { font-size:1rem; }
 html[data-theme][data-palette] body .market-cards { gap:var(--space-3); }
 html[data-theme][data-palette] body .favorites-list { gap:var(--space-2); }

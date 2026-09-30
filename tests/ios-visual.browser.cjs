@@ -104,6 +104,8 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForTimeout(80);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await page.waitForTimeout(200);
  assert.equal((await page.evaluate(()=>createBackup().data.favorites.map(i=>i.symbol)))[1],beforeTouch[0],'Touch reorder');
  assert.equal(await page.locator('dialog[open]').count(),0,'Drag must not also open detail');
+ // Compact market rows can fit the 844px fixture; use a shorter viewport for the scroll gesture.
+ await page.setViewportSize({width:390,height:700});
  await page.evaluate(()=>scrollTo(0,0));
  const swipeCard=await page.locator('.favorite-card').first().boundingBox();
  const swipeX=swipeCard.x+Math.min(60,swipeCard.width/3),swipeY=swipeCard.y+swipeCard.height/2;
@@ -111,6 +113,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  for(let delta=25;delta<=175;delta+=25){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:swipeX,y:swipeY-delta}]});await page.waitForTimeout(20)}
  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await page.waitForTimeout(150);
  assert(await page.evaluate(()=>scrollY)>20,'Swiping a favorite card should use native page scrolling');
+ await page.setViewportSize({width:390,height:844});
  await view('chart');
  const periodColumns=await page.locator('.periods').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length);assert.equal(periodColumns,3);
  assert(await page.locator('.native-plot-card #meta').count(),'Price details should be inside the price chart card');
