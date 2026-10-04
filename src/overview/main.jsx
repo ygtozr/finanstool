@@ -3,10 +3,13 @@ import { createRoot } from 'react-dom/client';
 import { createPortal } from 'react-dom';
 import Framework7 from 'framework7/lite';
 import SheetModule from 'framework7/components/sheet';
+import PopupModule from 'framework7/components/popup';
 import Framework7React, { App, View, Page, Toolbar, Button, Sheet } from 'framework7-react';
 import { overview } from './legacy-adapter';
+import { AssetSearch } from './AssetSearch';
+import { MarketSettings } from './MarketSettings';
 import './pilot.css';
-Framework7.use([Framework7React, SheetModule]);
+Framework7.use([Framework7React, SheetModule, PopupModule]);
 
 export function LoadingState() { return <span className="pilot-loading" role="status">Yükleniyor…</span>; }
 export function ErrorState({ message = 'Veri alınamadı', retry }) {
@@ -27,17 +30,19 @@ export function MarketCard({ item }) {
   </button>;
 }
 export function FavoriteRow({ item, openActions, order, actionsOpen }) {
-  const row = useRef(null), handle = useRef(null);
+  const row = useRef(null), handle = useRef(null), keyboard = useRef(false);
   const [logoSource, setLogoSource] = useState(0);
   const logoKey = item.logoSources.join('|');
   useEffect(() => { setLogoSource(0); }, [logoKey]);
   useEffect(() => {
     window.OzerNativeUI.reorder(handle.current, row.current, row.current.parentNode, ':scope > .pilot-favorite-row', () => {
-      overview.reorder([...row.current.parentNode.children].map(node => node.dataset.symbol));
+      const container = row.current.parentNode, focused = keyboard.current;
+      overview.reorder([...container.children].map(node => node.dataset.symbol));
+      if (focused) requestAnimationFrame(() => [...container.children].find(node => node.dataset.symbol === item.symbol)?.querySelector('.favorite-card')?.focus());
     });
   }, [order]);
   return <li ref={row} className="favorite-row pilot-favorite-row" data-symbol={item.symbol}>
-    <button type="button" ref={handle} className="favorite-card pilot-favorite-main" title={item.title} onClick={() => overview.favorite(item.symbol)}>
+    <button type="button" ref={handle} onKeyDownCapture={event => { keyboard.current = event.altKey && event.key.startsWith("Arrow"); }} onPointerDownCapture={() => { keyboard.current = false; }} className="favorite-card pilot-favorite-main" title={item.title} aria-label={`${item.symbol} hızlı detay. Sıralamak için basılı tutup sürükleyin.`} onClick={() => overview.favorite(item.symbol)}>
       <span className="favorite-card-badge"><span>{item.badge}</span>{item.logoSources[logoSource] ? <img className={item.logoClass} src={item.logoSources[logoSource]} alt="" referrerPolicy="no-referrer" decoding="async" onError={() => setLogoSource(index => index + 1)} /> : null}</span>
       <span className="favorite-card-head"><strong className="favorite-card-symbol">{item.displaySymbol}</strong><small className="favorite-card-name">{item.name}</small></span>
       <span className="favorite-card-quote pilot-quote"><strong className="favorite-card-price">{item.price}</strong><span className={`favorite-change ${item.tone}`}>{item.change}</span><small className="favorite-market-time">{item.time}</small></span>
@@ -59,7 +64,8 @@ export function MobileTabBar({ view, authenticated }) {
 function AppShell() {
   const state = useSyncExternalStore(overview.subscribe, overview.getSnapshot);
   const [actions, setActions] = useState(null), [refreshError, setRefreshError] = useState('');
-  const search = useRef(null), sheet = useRef(null), actionOpener = useRef(null), sheetLocks = useRef([]);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const sheet = useRef(null), actionOpener = useRef(null), sheetLocks = useRef([]);
   const unlockSheet = () => {
     sheetLocks.current.forEach(([node, inert]) => { node.inert = inert; });
     sheetLocks.current = [];
@@ -88,12 +94,11 @@ function AppShell() {
     try { await overview.refresh(); } catch { setRefreshError('Yenileme tamamlanamadı. Mevcut fiyatlar korunuyor.'); }
   };
   useEffect(() => {
-    const restore = overview.mountSearch(search.current);
     const release = overview.claimView();
     const oldTitle = document.title;
-    document.title = 'Özer Finans v8.1.0-preview.3 — Ön izleme';
+    document.title = 'Özer Finans v8.1.0-preview.4 — Ön izleme';
     document.documentElement.dataset.overviewPilot = 'ready';
-    return () => { unlockSheet(); release(); restore(); document.title = oldTitle; delete document.documentElement.dataset.overviewPilot; };
+    return () => { unlockSheet(); release(); document.title = oldTitle; delete document.documentElement.dataset.overviewPilot; };
   }, []);
   return <App theme="ios" name="Özer Finans" className={`pilot-app ${state.theme === 'dark' ? 'dark' : ''}`}
     touch={{ fastClicks: false }} view={{ router: false }}>
@@ -101,16 +106,17 @@ function AppShell() {
       <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v8.1</span></h1>
       {refreshError ? <ErrorState message={refreshError} retry={refresh} /> : null}
       <div className="app-layout"><section className="chart-panel">
-      <Section className="market-summary" title="Piyasa Özeti" note={state.marketUpdated} actions={<div className="market-actions"><button type="button" id="pilotMarketRefresh" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile">{state.busy ? 'Yenileniyor…' : 'Yenile'}</button><button type="button" id="pilotMarketSettings" onClick={overview.settings} aria-label="Piyasa özetini düzenle">⚙</button></div>}>
+      <Section className="market-summary" title="Piyasa Özeti" note={state.marketUpdated} actions={<div className="market-actions"><button type="button" id="pilotMarketRefresh" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile">{state.busy ? 'Yenileniyor…' : 'Yenile'}</button><button type="button" id="pilotMarketSettings" onClick={() => setSettingsOpen(true)} aria-label="Piyasa özetini düzenle">⚙</button></div>}>
         <div className="market-cards" aria-busy={state.busy}>{state.markets.map(item => <MarketCard key={item.symbol} item={item} />)}{!state.markets.length ? <p className="market-settings-empty">Dişli düğmesinden piyasa verisi ekleyin.</p> : null}</div>
       </Section>
       <Section className="favorites-panel" title="Favoriler" note={state.favoriteUpdated} actions={<button type="button" id="pilotFavoriteRefresh" disabled={state.busy} onClick={refresh} aria-label="Favorileri yenile">Yenile</button>}>
         {!state.favorites.length ? <p className="favorites-note">Henüz favori hisse yok.</p> : null}
         <ul className="favorites-list pilot-favorites">{state.favorites.map(item => <FavoriteRow key={`${item.symbol}:${order}`} order={order} item={item} openActions={openActions} actionsOpen={actions?.symbol === item.symbol} />)}</ul>
-        <div ref={search} className="pilot-search-slot" />
+        <AssetSearch onAdd={overview.addFavorite} />
       </Section>
       </section></div>
     </Page></View>
+    <MarketSettings opened={settingsOpen} onClose={() => setSettingsOpen(false)} items={state.marketItems} />
     <MobileTabBar view={state.view} authenticated={state.authenticated} />
     {createPortal(<Sheet ref={sheet} role="dialog" aria-modal="true" aria-labelledby="pilotActionsTitle" className="pilot-action-sheet" opened={Boolean(actions)} backdrop closeByBackdropClick closeOnEscape swipeToClose
       containerEl="body" onSheetOpen={() => {

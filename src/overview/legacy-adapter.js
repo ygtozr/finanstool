@@ -41,9 +41,9 @@ export const overview = {
   theme: mode => legacy.theme(mode), settings: () => legacy.settings(),
   market: symbol => legacy.market(symbol), favorite: (symbol, action) => legacy.favorite(symbol, action),
   reorder: symbols => legacy.reorder(symbols),
-  mountSearch(host) {
-    const form = $('#favoriteAddForm'), parent = form.parentNode, next = form.nextSibling;
-    host.append(form);
-    return () => parent.insertBefore(form, next);
-  },
+  search: (query, deliver) => legacy.search(query, deliver),
+  resolveAsset: query => legacy.resolveAsset(query), displaySymbol: symbol => legacy.displaySymbol(symbol),
+  positionSuggestions: (input, list) => legacy.positionSuggestions(input, list),
+  addFavorite: item => legacy.addFavorite(item), addMarket: item => legacy.addMarket(item),
+  removeMarket: symbol => legacy.removeMarket(symbol), reorderMarkets: symbols => legacy.reorderMarkets(symbols),
 };

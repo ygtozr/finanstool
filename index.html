@@ -792,7 +792,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.3">
+  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.4">
   <link rel="stylesheet" href="assets/design-tokens.css?v=8.0">
   <link rel="stylesheet" href="assets/ios-parity.css?v=8.0">
   <link rel="stylesheet" href="assets/component-system.css?v=8.0">
@@ -2315,7 +2315,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       if(!list.classList.contains('visible'))return;
       const viewport=window.visualViewport;
       const viewportTop=viewport?.offsetTop||0,viewportBottom=viewportTop+(viewport?.height||window.innerHeight);
-      const rect=input.getBoundingClientRect(),mobileNav=document.querySelector('.mobile-bottom-nav');
+      const rect=input.getBoundingClientRect(),mobileNav=[...document.querySelectorAll('.mobile-bottom-nav')].find(node=>getComputedStyle(node).display!=='none');
       const navTop=mobileNav&&getComputedStyle(mobileNav).display!=='none'?mobileNav.getBoundingClientRect().top:viewportBottom;
       const lowerLimit=Math.min(viewportBottom,navTop),spaceBelow=Math.max(0,lowerLimit-rect.bottom-8),spaceAbove=Math.max(0,rect.top-viewportTop-8);
       const openUp=spaceBelow<Math.min(190,spaceAbove);
@@ -5126,7 +5126,22 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     // Pilot boundary: existing services remain the single owner of data and timers.
     window.OzerOverviewLegacy = Object.freeze({
       sheetOpen:open=>{overviewSheetOpen=open;syncModalScrollLock()},
-      getData:()=>({markets:marketItems.map(overviewMarketItem),favorites:favorites.map(overviewFavoriteItem),marketCount:marketItems.length,marketUpdated:overviewMarketUpdated,favoriteUpdated:overviewFavoriteUpdated}),
+      search:(value,deliver)=>{
+        const query=value.trim();let current=true,timer;
+        if(query.length<2){deliver([]);return()=>{current=false}}
+        const seed=knownTefasMatches(query);deliver(seed,seed.length?'':'Fonlar ve hisseler aranıyor…');
+        timer=setTimeout(()=>startUnifiedAssetSearch(query,()=>current,deliver,seed),400);
+        return()=>{current=false;clearTimeout(timer)};
+      },
+      resolveAsset:resolveAssetInput,displaySymbol,positionSuggestions:positionSuggestionList,
+      addFavorite:addOverviewFavorite,addMarket:addMarketItem,
+      removeMarket:symbol=>{marketItems=marketItems.filter(item=>item.symbol!==symbol);saveMarketItems();loadMarketSummary()},
+      reorderMarkets:symbols=>{
+        const items=new Map(marketItems.map(item=>[item.symbol,item]));
+        if(symbols.length!==items.size||new Set(symbols).size!==items.size||symbols.some(symbol=>!items.has(symbol)))return;
+        marketItems=symbols.map(symbol=>items.get(symbol));saveMarketItems();loadMarketSummary();
+      },
+      getData:()=>({marketItems:marketItems.map(item=>({...item})),markets:marketItems.map(overviewMarketItem),favorites:favorites.map(overviewFavoriteItem),marketCount:marketItems.length,marketUpdated:overviewMarketUpdated,favoriteUpdated:overviewFavoriteUpdated}),
       claimView:()=>{
         overviewOwnsView=true;marketCards.replaceChildren();favoritesList.replaceChildren();notifyOverview();
         return ()=>{
@@ -5198,6 +5213,6 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     })();
   </script>
   <script src="assets/auth-account.js?v=8.0.0"></script>
-  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.3"></script>
+  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.4"></script>
 </body>
 </html>

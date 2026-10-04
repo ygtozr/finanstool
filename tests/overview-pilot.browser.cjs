@@ -9,7 +9,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH});
  try {
  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
- let unavailable=false;
+ let unavailable=false;const heldSearch=[];
  const referenceHtml=require('node:child_process').execFileSync('git',['show','v8.0:index.html'],{cwd:root});
  const referenceContext=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
  const reference=await referenceContext.newPage();
@@ -30,13 +30,15 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
   const u=new URL(route.request().url());
   if(u.hostname!=='parity.test')return route.abort();
   if(u.pathname.startsWith('/api/')){
+   if(['/api/search','/api/tefas'].includes(u.pathname)&&u.searchParams.get('q')==='SERVFAIL')return route.abort();
+   if(u.pathname==='/api/search'&&u.searchParams.get('q')==='SLOWOLD')return new Promise(resolve=>heldSearch.push(async()=>{await route.fulfill({contentType:'application/json',body:JSON.stringify({quotes:[{symbol:'OLD',name:'Eski sorgu'}]})});resolve();}));
    const symbol=u.searchParams.get('symbol')||'AAPL';let data;requests.push(u.pathname+u.search);
    if(u.pathname==='/api/account')data={authenticated:false,user:null,configured:false};
    else if(u.pathname==='/api/prices'&&unavailable)data={results:{}};
    else if(u.pathname==='/api/prices')data={results:Object.fromEntries((u.searchParams.get('symbols')||'AAPL').split(',').map(s=>[s,{ok:true,data:u.searchParams.get('mode')==='compact'?{symbol:s,name:s==='AAPL'?'Apple Inc.':s==='MSFT'?'Microsoft Corporation':s,currency:s.endsWith('.IS')?'TRY':'USD',price:145.5,previousClose:143,delta:2.5,change:1.748,marketTimestamp:stamp,asOf:stamp,provider:'Test verisi'}:history(s)}]))};
    else if(u.pathname==='/api/quote')data={symbol,currency:'TRY',price:2.11,previousClose:2.08,delta:.03,change:1.44,asOf:stamp,priceType:'delayed_quote',delayed:true};
    else if(u.pathname.includes('dividend'))data={results:{},events:[],prices:[],status:'no_data'};
-   else if(u.pathname==='/api/search')data={quotes:[{symbol:'NVDA',shortname:'NVIDIA'}]};
+   else if(u.pathname==='/api/search')data={quotes:u.searchParams.get('q')==='NOMATCH'?[]:u.searchParams.get('q')==='FASTNEW'?[{symbol:'MSFT',name:'Microsoft'},{symbol:'AAPL',name:'Apple'}]:[{symbol:'NVDA',name:'NVIDIA',shortname:'NVIDIA'}]};
    else if(u.pathname==='/api/fundamentals')data={status:'no_data'};
    else if(u.pathname==='/api/logo')return route.abort();
    else data=history(symbol);
@@ -78,6 +80,21 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
     });
    };
    assert.deepEqual(await page.evaluate(measure,'#overview-react'),await reference.evaluate(measure,'#mainView'),'v8.0 geometry and styling at '+width+'/'+mode);
+   const cardsMeasure=scope=>[...document.querySelectorAll(scope+' .favorite-card, '+scope+' .favorite-card *')].map(n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n);return [n.tagName,n.textContent.trim(),...['x','y','width','height'].map(k=>Math.round(r[k]*100)/100),...['fontSize','fontWeight','lineHeight','color','backgroundColor','backgroundImage','borderRadius','padding','gap'].map(k=>c[k])];});
+   assert.deepEqual(await page.evaluate(cardsMeasure,'#overview-react'),await reference.evaluate(cardsMeasure,'#mainView'),'All stock-card contents match v8.0 at '+width+'/'+mode);
+   await page.locator('.pilot-favorite-main').first().click();
+   await reference.locator('#favoritesList .favorite-card').first().click();
+   await page.locator('#favoriteDetailDialog .favorite-detail-hero').waitFor();
+   await reference.locator('#favoriteDetailDialog .favorite-detail-hero').waitFor();
+   await page.waitForTimeout(350);
+   const detailMeasure=()=>[...document.querySelectorAll('#favoriteDetailDialog, #favoriteDetailDialog .favorite-detail-hero, #favoriteDetailDialog .favorite-detail-identity, #favoriteDetailDialog .favorite-detail-price, #favoriteDetailDialog .favorite-detail-metric')].map(n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n);return [n.className,n.textContent.trim(),...['x','y','width','height'].map(k=>Math.round(r[k]*100)/100),...['fontSize','lineHeight','color','backgroundColor','borderRadius','padding','gap'].map(k=>c[k])];});
+   assert.deepEqual(await page.evaluate(detailMeasure),await reference.evaluate(detailMeasure),'Stock detail card matches v8.0 at '+width+'/'+mode);
+   await page.screenshot({path:path.join(output,`${width}-${mode}-stock-detail.png`)});
+   await reference.screenshot({path:path.join(output,`${width}-${mode}-stock-detail-v8.0.png`)});
+   await page.locator('.favorite-detail-close').click();
+   await reference.locator('.favorite-detail-close').click();
+   await page.waitForFunction(()=>!document.body.classList.contains('modal-open'));
+   await reference.waitForFunction(()=>!document.body.classList.contains('modal-open'));
    if(width<601){
     const navMeasure=()=>{const n=document.querySelector('.pilot-tabbar')||document.querySelector('.mobile-bottom-nav'),r=n.getBoundingClientRect(),c=getComputedStyle(n);return [r.x,r.y,r.width,r.height,c.backgroundColor,c.borderRadius,c.padding,...[...n.querySelectorAll('button')].map(b=>{const r=b.getBoundingClientRect();return [r.x,r.y,r.width,r.height,...['fontSize','backgroundColor','border','color','padding','gap'].map(k=>getComputedStyle(b)[k])];})];};
     assert.deepEqual(await page.evaluate(navMeasure),await reference.evaluate(navMeasure),'v8.0 mobile navigation at '+width+'/'+mode);
@@ -112,8 +129,63 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  const last= requests.filter(url=>url.startsWith('/api/prices?')&&url.includes('mode=compact')).at(-1);
  const symbols=new URL('https://parity.test'+last).searchParams.get('symbols').split(',');
  assert.equal(symbols.length,new Set(symbols).size,'Batch symbols stay deduplicated');
- await page.locator('#favoriteSearch').fill('NVDA');
- await page.locator('#favoriteSearchSuggestions button').filter({hasText:'NVDA'}).click();
+ const initialMarkets=await page.evaluate(()=>JSON.parse(localStorage.getItem('finans-grafigi-market-items')));
+ const settingsButton=page.getByRole('button',{name:'Piyasa özetini düzenle',exact:true});
+ await settingsButton.click();
+ await page.locator('.pilot-market-popup.modal-in').waitFor();
+ await page.waitForFunction(()=>document.activeElement.id==='pilotMarketSearch');
+ assert.equal(await page.locator('#marketSettingsDialog').evaluate(n=>n.open),false,'Settings UI uses Framework7 Popup');
+ assert.equal(await page.locator('main').evaluate(n=>n.inert),true);
+ for(const width of [375,390,430,1024]){
+  await page.setViewportSize({width,height:844});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Market popup does not overflow at '+width);
+  const popupCard=await page.locator('.pilot-market-popup .portfolio-dialog').boundingBox();
+  assert(popupCard.width<=width&&popupCard.height<=844*.9+1,'Popup stays inside viewport');
+  await page.screenshot({path:path.join(output,`${width}-market-settings.png`)});
+ }
+ await page.setViewportSize({width:390,height:844});
+ await page.locator('#pilotMarketSearch').fill('NVDA');
+ await page.locator('#pilotMarketSearchSuggestions button').filter({hasText:'NVDA'}).click();
+ await page.waitForFunction(()=>document.querySelectorAll('.pilot-market-popup .market-settings-row').length===9);
+ const marketHandle=page.locator('.pilot-market-popup .market-settings-row[data-symbol="NVDA"] > span');
+ await marketHandle.focus();await page.keyboard.press('Alt+ArrowUp');
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('finans-grafigi-market-items'))[7].symbol==='NVDA');
+ await page.waitForFunction(()=>document.activeElement?.closest('.market-settings-row')?.dataset.symbol==='NVDA');
+ await page.keyboard.press('Alt+ArrowDown');
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('finans-grafigi-market-items'))[8].symbol==='NVDA');
+ await page.locator('.pilot-market-popup .market-settings-row[data-symbol="NVDA"] button').click();
+ await page.waitForFunction(()=>document.querySelectorAll('.pilot-market-popup .market-settings-row').length===8);
+ for(let i=0;i<8;i++)await page.locator('.pilot-market-popup .market-settings-remove').first().click();
+ await page.locator('.pilot-market-popup .market-settings-empty').waitFor();
+ await page.locator('#overview-react .market-settings-empty').waitFor();
+ assert.equal(await page.locator('#marketCards > *').count(),0);
+ await page.evaluate(items=>items.forEach(item=>OzerOverviewLegacy.addMarket(item)),initialMarkets);
+ await page.waitForFunction(()=>document.querySelectorAll('.pilot-market-popup .market-settings-row').length===8);
+ await page.locator('.pilot-market-popup').getByRole('button',{name:'Kapat',exact:true}).click();
+ await page.waitForFunction(()=>!document.querySelector('main').inert);
+ assert.equal(await settingsButton.evaluate(n=>n===document.activeElement),true,'Settings returns focus to gear');
+ assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('finans-grafigi-market-items'))),initialMarkets,'Market schema and original order preserved');
+ const favoriteInput=page.locator('#pilotFavoriteSearch');
+ await favoriteInput.fill('NOMATCH');
+ await page.locator('#pilotFavoriteSearchSuggestions .suggestion-empty').filter({hasText:'Eşleşen ürün bulunamadı.'}).waitFor();
+ await favoriteInput.fill('SERVFAIL');
+ await page.locator('#pilotFavoriteSearchSuggestions .suggestion-empty').filter({hasText:'Arama servisine ulaşılamadı.'}).waitFor();
+ const slow=page.waitForRequest(request=>request.url().includes('/api/search?q=SLOWOLD'));
+ await favoriteInput.fill('SLOWOLD');await slow;
+ await favoriteInput.fill('FASTNEW');
+ await page.locator('#pilotFavoriteSearchSuggestions button').filter({hasText:'MSFT'}).waitFor();
+ await Promise.all(heldSearch.splice(0).map(release=>release()));
+ await page.waitForTimeout(50);
+ assert.equal(await page.locator('#pilotFavoriteSearchSuggestions button').filter({hasText:'OLD'}).count(),0,'Late old search does not overwrite new results');
+ await page.keyboard.press('ArrowUp');
+ assert.equal(await favoriteInput.getAttribute('aria-activedescendant'),'pilotFavoriteSearchSuggestions-1','ArrowUp selects last result');
+ await page.keyboard.press('ArrowDown');
+ assert.equal(await favoriteInput.getAttribute('aria-activedescendant'),'pilotFavoriteSearchSuggestions-0');
+ await page.keyboard.press('Enter');
+ await page.waitForFunction(()=>document.getElementById('pilotFavoriteSearch').value==='');
+ assert.equal(await page.locator('.pilot-favorite-row').count(),3,'Adding an existing favorite does not duplicate it');
+ await page.locator('#pilotFavoriteSearch').fill('NVDA');
+ await page.locator('#pilotFavoriteSearchSuggestions button').filter({hasText:'NVDA'}).click();
  await page.waitForFunction(()=>document.querySelectorAll('.pilot-favorite-row').length===4);
  assert((await page.evaluate(()=>JSON.parse(localStorage.getItem('finans-grafigi-favorites')))).some(item=>item.symbol==='NVDA'));
  await page.getByRole('button',{name:'NVDA işlemleri',exact:true}).click();
@@ -161,6 +233,12 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.locator('.pilot-favorite-main').first().click();
  await page.locator('#favoriteDetailDialog[open]').waitFor();
  await page.locator('.favorite-detail-close').click();
+ const keyboardCard=page.locator('.pilot-favorite-row[data-symbol="AAPL"] .favorite-card');
+ await keyboardCard.focus();await page.keyboard.press('Alt+ArrowDown');
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('finans-grafigi-favorites'))[1].symbol==='AAPL');
+ await page.waitForFunction(()=>document.activeElement?.closest('.pilot-favorite-row')?.dataset.symbol==='AAPL');
+ await page.keyboard.press('Alt+ArrowUp');
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('finans-grafigi-favorites'))[0].symbol==='AAPL');
  // Reuse stable-slot hold/reorder and persist through the existing storage format.
  const first=page.locator('.pilot-favorite-main').first(),third=page.locator('.pilot-favorite-main').nth(2);
  await first.scrollIntoViewIfNeeded();const a=await first.boundingBox(),b=await third.boundingBox();
@@ -230,6 +308,6 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForFunction(()=>document.querySelector('.pilot-market-card strong'));
  assert.equal(await page.locator('.pilot-market-card strong').filter({hasText:'Veri alınamadı'}).count(),0,'Existing data service recovers after error');
  assert.deepEqual(errors,[],'No console or runtime errors');
- console.log('PASS: DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
+ console.log('PASS: React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

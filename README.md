@@ -1,5 +1,13 @@
 # Özer Finans v8.0
 
+## v8.1.0-preview.4 — React arama/piyasa ayarları ve hisse kartı eşlemesi
+
+Favori ve piyasa araması `AssetSearch.jsx`, piyasa düzenleme popup’ı `MarketSettings.jsx` üzerinden React tarafından yönetilir. Mevcut birleşik arama, 400 ms gecikme, veri kaynakları ve kayıt işlemleri adaptör üzerinden kullanılır; geç gelen eski sorgular yeni sonuçları değiştirmez. Popup odak tuzağı, arka plan inert/kaydırma kilidi ve klavye ile sıralama sonrası odak korunur. Finans/API/cache/batch/auth/Upstash, kullanıcı/portföy/yedek formatları ve Portföy/Grafik/Diğer korunur. Yeni dependency yok.
+
+Favori hisse satırları ve mevcut hisse ayrıntı kartı v8.0 ile aynı ölçü/yazı/renk/boşluk değerlerine eşlendi. Framework7’nin genel button genişliğinin eski düğmeleri tam satıra yayması giderildi; ayrıntı alt düğmeleri eski yerleşimini kullanır. Eski ayrıntı veri/hesaplama akışı yeniden yazılmaz.
+
+Build, hedefli tarayıcı testi ve aşama sonu regresyon geçti. 375/390/430/1024 px açık/koyu karşılaştırma, manuel/otomatik yenileme, favori işlemleri, piyasa ekle/çıkar/sırala/boş liste, arama hata/gecikmiş yanıt, klavye odağı, PWA/safe-area emülasyonu ve veri formatı kontrolleri geçti. Fiziksel iPhone/Safari ve canlı sağlayıcı kontrolü yapılmadı. Yalnız `migration/v8.1-framework7-overview` ön izlemesi; main/production v8.0 değişmez. Sonraki öneri mevcut veri akışını koruyarak Favori Ayrıntısı görünümünü React’e taşımaktır; bu sürümde uygulanmaz.
+
 ## v8.1.0-preview.3 — DOM’dan bağımsız Özet ve sheet erişilebilirliği
 
 Özet fiyat/favori görüntü modeli doğrudan mevcut quote/veri durumundan ve aynı formatlama/logo işlevlerinden üretilir. React devraldıktan sonra eski piyasa/favori listeleri boş tutulur; yalnız auth, gezinme, tema ve yenileme düğmesi gibi kabuk durumları dar DOM gözlemcisiyle izlenir. Arama formu mevcut dinleyicileriyle kalır. API/cache/batch/zamanlayıcı/finans hesapları, kullanıcı/yedek/portföy şemaları korunur.
