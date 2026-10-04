@@ -35,6 +35,8 @@ window.addEventListener('ozer:local-data-change', update);
 export const overview = {
   sheetOpen: open => legacy.sheetOpen(open),
   claimView: () => legacy.claimView(),
+  claimDetailView: () => legacy.claimDetailView(),
+  closeDetail: () => legacy.closeDetail(), detailAction: action => legacy.detailAction(action),
   getSnapshot: () => snapshot,
   subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
   refresh: () => legacy.refresh(), navigate: view => legacy.navigate(view),

@@ -8,6 +8,7 @@ import Framework7React, { App, View, Page, Toolbar, Button, Sheet } from 'framew
 import { overview } from './legacy-adapter';
 import { AssetSearch } from './AssetSearch';
 import { MarketSettings } from './MarketSettings';
+import { FavoriteDetail } from './FavoriteDetail';
 import './pilot.css';
 Framework7.use([Framework7React, SheetModule, PopupModule]);
 
@@ -96,7 +97,7 @@ function AppShell() {
   useEffect(() => {
     const release = overview.claimView();
     const oldTitle = document.title;
-    document.title = 'Özer Finans v8.1.0-preview.4 — Ön izleme';
+    document.title = 'Özer Finans v8.1.0-preview.5 — Ön izleme';
     document.documentElement.dataset.overviewPilot = 'ready';
     return () => { unlockSheet(); release(); document.title = oldTitle; delete document.documentElement.dataset.overviewPilot; };
   }, []);
@@ -135,3 +136,7 @@ const mount = document.createElement('div'); mount.id = 'overview-react';
 const main = document.getElementById('mainView'); main.append(mount);
 const navigation = document.createElement('div'); navigation.id = 'pilot-navigation'; document.body.append(navigation);
 createRoot(mount).render(<AppShell />);
+
+// Retain the native top-layer dialog, focus and scroll lock; React owns its contents.
+overview.claimDetailView();
+createRoot(document.getElementById('favoriteDetailDialog')).render(<FavoriteDetail />);

@@ -792,7 +792,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.4">
+  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.5">
   <link rel="stylesheet" href="assets/design-tokens.css?v=8.0">
   <link rel="stylesheet" href="assets/ios-parity.css?v=8.0">
   <link rel="stylesheet" href="assets/component-system.css?v=8.0">
@@ -1622,6 +1622,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     let favoriteRefreshQueued = false;
     let favoriteDetailRequestId = 0;
     let favoriteDetailItem = null;
+    let favoriteDetailOwnsView = false, favoriteDetailView = null;
     let favorites = (() => { try { const saved = JSON.parse(localStorage.getItem(favoritesKey) || (legacyFavoritesKey && localStorage.getItem(legacyFavoritesKey))); return Array.isArray(saved) ? saved.filter(item => item && item.symbol).map(item => ({symbol:item.symbol.toUpperCase(), name:item.name || item.symbol.toUpperCase()})) : []; } catch { return []; } })();
     if (legacyFavoritesKey && !localStorage.getItem(favoritesKey)) {
       localStorage.setItem(favoritesKey, JSON.stringify(favorites));
@@ -1672,6 +1673,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     function detailValue(value,formatter=value=>String(value),fallback='Veri yok') { return Number.isFinite(value)?formatter(value):fallback; }
     function compactNumber(value) { return new Intl.NumberFormat('tr-TR',{notation:'compact',maximumFractionDigits:2}).format(value); }
     function renderFavoriteDetailIdentity(item,name=item.name||item.symbol) {
+      if(favoriteDetailOwnsView)return;
       favoriteDetailIdentity.replaceChildren();
       const badge=document.createElement('span');badge.className='favorite-card-badge';
       const initials=document.createElement('span');initials.textContent=item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•';badge.append(initials);
@@ -1686,7 +1688,29 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       const description=document.createElement('dd');description.textContent=value;
       row.append(term,description);list.append(row);
     }
+    function favoriteDetailProjection(item,data) {
+      const identity={symbol:item.symbol,displaySymbol:displaySymbol(item.symbol),
+        name:data.name!==item.symbol?data.name:'Hisse',badge:item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•',
+        logoSources:favoriteLogoUrls(item.symbol,item.name),logoClass:'favorite-card-logo'+(normalizeSymbol(item.symbol).startsWith('TEFAS-')?' fund-manager-logo':'')};
+      const signed=new Intl.NumberFormat('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2,signDisplay:'always'});
+      const fundamentalFallback=data.fundamentalsStatus==='provider_error'?'Kaynak erişilemiyor':(data.fundamentalsStatus==='unsupported'?'Desteklenmiyor':'Veri yok');
+      return {...identity,status:'ready',price:money(data.price,data.currency),change:signed.format(data.change)+'%',
+        tone:data.change>=0?'positive':'negative',time:(data.delayed?'Gecikmeli · ':'Son fiyat · ')+formatMarketDataTime(data.marketTimestamp),
+        priceSource:'Kaynak: '+(data.priceSource||'Piyasa verisi'),fundamentalsSource:data.fundamentalsSource?'Temel veri: '+data.fundamentalsSource:'',
+        metrics:[
+        ['Günlük değişim',money(data.delta,data.currency)],
+        ['Piyasa değeri',detailValue(data.marketCap,value=>compactNumber(value)+' '+data.currency,data.marketCapApplicable===false?'Uygulanamaz':fundamentalFallback)],
+        ['F/K',detailValue(data.pe,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(value),data.peApplicable===false?'Uygulanamaz':fundamentalFallback)],
+        ['Temettü verimi',detailValue(data.dividendYieldPercent,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(value)+'%',data.dividendApplicable===false?'Uygulanamaz':fundamentalFallback)],
+        ['1 yıllık düşük',detailValue(data.yearLow,value=>money(value,data.currency))],
+        ['1 yıllık yüksek',detailValue(data.yearHigh,value=>money(value,data.currency))],
+        ['Günlük düşük – yüksek',Number.isFinite(data.dayLow)&&Number.isFinite(data.dayHigh)?money(data.dayLow,data.currency)+' – '+money(data.dayHigh,data.currency):'Veri yok'],
+        ['Hacim',detailValue(data.volume,compactNumber)],
+        ['RSI (14)',detailValue(data.rsi,value=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:1}).format(value))],
+        ]};
+    }
     function renderFavoriteDetail(data) {
+      if(favoriteDetailOwnsView){favoriteDetailView=favoriteDetailProjection(favoriteDetailItem,data);notifyOverview();return;}
       favoriteDetailBody.replaceChildren();
       const hero=document.createElement('section');hero.className='favorite-detail-hero';
       const priceBlock=document.createElement('div');priceBlock.className='favorite-detail-price';
@@ -1734,11 +1758,13 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       return {name:meta.longName||meta.shortName||item.name||item.symbol,currency:String(compact?.currency||meta.currency||fundamentals.currency||'USD').toUpperCase(),price:Number.isFinite(compact?.price)?compact.price:last.close,delta:Number.isFinite(compact?.delta)?compact.delta:last.close-previous.close,change:Number.isFinite(compact?.change)?compact.change:(last.close/previous.close-1)*100,dayLow:Number.isFinite(last.low)?last.low:finiteMeta('regularMarketDayLow','dayLow'),dayHigh:Number.isFinite(last.high)?last.high:finiteMeta('regularMarketDayHigh','dayHigh'),yearLow:lows.length?Math.min(...lows):finiteMeta('fiftyTwoWeekLow'),yearHigh:highs.length?Math.max(...highs):finiteMeta('fiftyTwoWeekHigh'),marketCap,pe,dividendYieldPercent,peApplicable:fundamentals.peApplicable,marketCapApplicable:fundamentals.marketCapApplicable,dividendApplicable:fundamentals.dividendApplicable,fundamentalsSource:fundamentals.source||null,fundamentalsStatus:fundamentals.status||'no_data',volume:Number.isFinite(last.volume)?last.volume:finiteMeta('regularMarketVolume'),rsi:rsiSeries.at(-1),marketTimestamp:compact?.marketTimestamp||finiteMeta('regularMarketTime')||last.time,priceSource:compact?.provider||meta.dataProvider||null,delayed:Boolean(compact?.delayed)};
     }
     async function openFavoriteDetail(item) {
-      closeFavoriteMenus();favoriteDetailItem={...item};const requestId=++favoriteDetailRequestId;renderFavoriteDetailIdentity(item);favoriteDetailBody.replaceChildren();
-      const loading=document.createElement('p');loading.className='favorite-detail-loading';loading.textContent='Veriler yükleniyor…';favoriteDetailBody.append(loading);
+      closeFavoriteMenus();favoriteDetailItem={...item};const requestId=++favoriteDetailRequestId;renderFavoriteDetailIdentity(item);
+      if(favoriteDetailOwnsView){favoriteDetailView={symbol:item.symbol,status:'loading'};notifyOverview();}
+      else {favoriteDetailBody.replaceChildren();
+      const loading=document.createElement('p');loading.className='favorite-detail-loading';loading.textContent='Veriler yükleniyor…';favoriteDetailBody.append(loading);}
       if(!favoriteDetailDialog.open)favoriteDetailDialog.showModal();
       try{const data=await fetchFavoriteDetail(item);if(requestId!==favoriteDetailRequestId||!favoriteDetailDialog.open)return;renderFavoriteDetailIdentity(item,data.name);renderFavoriteDetail(data)}
-      catch{if(requestId!==favoriteDetailRequestId||!favoriteDetailDialog.open)return;favoriteDetailBody.replaceChildren();const error=document.createElement('p');error.className='favorite-detail-error';error.textContent='Detay verileri alınamadı. Daha sonra tekrar deneyin.';favoriteDetailBody.append(error)}
+      catch{if(requestId!==favoriteDetailRequestId||!favoriteDetailDialog.open)return;if(favoriteDetailOwnsView){favoriteDetailView={symbol:item.symbol,status:'error',message:'Detay verileri alınamadı. Daha sonra tekrar deneyin.'};notifyOverview();return;}favoriteDetailBody.replaceChildren();const error=document.createElement('p');error.className='favorite-detail-error';error.textContent='Detay verileri alınamadı. Daha sonra tekrar deneyin.';favoriteDetailBody.append(error)}
     }
     function fundManagerIdentity(name) {
       const folded=foldSearchText(name||'');
@@ -4994,6 +5020,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       dialog.close();
     });
     const closeFavoriteDetail=()=>{favoriteDetailRequestId++;if(favoriteDetailDialog.open)favoriteDetailDialog.close()};
+    favoriteDetailDialog.addEventListener('close',()=>{if(favoriteDetailDialog.open)return;favoriteDetailRequestId++;favoriteDetailView=null;notifyOverview()});
     favoriteDetailClose.addEventListener('click',closeFavoriteDetail);
     favoriteDetailDialog.addEventListener('click',event=>{if(event.target===favoriteDetailDialog)closeFavoriteDetail()});
     favoriteDetailDialog.addEventListener('cancel',()=>{favoriteDetailRequestId++});
@@ -5141,7 +5168,10 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         if(symbols.length!==items.size||new Set(symbols).size!==items.size||symbols.some(symbol=>!items.has(symbol)))return;
         marketItems=symbols.map(symbol=>items.get(symbol));saveMarketItems();loadMarketSummary();
       },
-      getData:()=>({marketItems:marketItems.map(item=>({...item})),markets:marketItems.map(overviewMarketItem),favorites:favorites.map(overviewFavoriteItem),marketCount:marketItems.length,marketUpdated:overviewMarketUpdated,favoriteUpdated:overviewFavoriteUpdated}),
+      claimDetailView:()=>{favoriteDetailOwnsView=true;favoriteDetailDialog.dataset.reactDetail='ready'},
+      closeDetail:closeFavoriteDetail,
+      detailAction:action=>{const item=favoriteDetailItem;if(!item)return;closeFavoriteDetail();({chart:openFavoriteChart,alarm:openFavoriteAlarm,portfolio:openFavoritePortfolio})[action]?.(item)},
+      getData:()=>({detail:favoriteDetailView,marketItems:marketItems.map(item=>({...item})),markets:marketItems.map(overviewMarketItem),favorites:favorites.map(overviewFavoriteItem),marketCount:marketItems.length,marketUpdated:overviewMarketUpdated,favoriteUpdated:overviewFavoriteUpdated}),
       claimView:()=>{
         overviewOwnsView=true;marketCards.replaceChildren();favoritesList.replaceChildren();notifyOverview();
         return ()=>{
@@ -5213,6 +5243,6 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     })();
   </script>
   <script src="assets/auth-account.js?v=8.0.0"></script>
-  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.4"></script>
+  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.5"></script>
 </body>
 </html>

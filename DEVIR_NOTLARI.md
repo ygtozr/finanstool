@@ -1,5 +1,11 @@
 # Özer Finans — Yeni sohbet devir notları
 
+## v8.1.0-preview.5 — React Favori Ayrıntısı
+
+`src/overview/FavoriteDetail.jsx`, mevcut native `favoriteDetailDialog` içeriğini React ile çizer. Dialogun top-layer/arka plan, Escape, odak geri dönüşü ve ortak kaydırma kilidi korunur; Tab/Shift+Tab odağı içeride tutulur. Grafik/Alarm/Portföy düğmeleri adaptör üzerinden mevcut işlemlere gider. Mevcut `fetchFavoriteDetail` sorgu/cache/hesaplama işlevi birebir korunur. Biçimlenmiş görüntü modeli hizmet sınırında hazırlanır; JSX finans hesabı veya yeni fetch/timer içermez. Eski renderer pilot yüklenmezse kullanılabilir. Yeni dependency veya kullanıcı/depolama/yedek alanı yok.
+
+375/390/430/1024 px açık/koyu v8.0 ayrıntı eşlemesi; yükleme/hata, kapatılan sorgunun yeni sembolü ezmemesi, odak/kaydırma kilidi ve üç mevcut ekrana geçiş; temel veri sayı/destek/kaynak/applicability durumları, logo yedek kaynağı ve PWA safe-area emülasyonu hedefli kontrolleri, build ve aşama sonu regresyon geçti. Konsol/runtime hatası yok. Fiziksel iPhone/Safari ve canlı sağlayıcı kontrolü yapılmaz. Yalnız `migration/v8.1-framework7-overview` ön izlemesi; main/production v8.0 değişmez. Sonraki öneri mevcut Chart.js/veri akışını koruyarak mobil Grafik ekranının kabuğunu taşımaktır; bu sürümde uygulanmaz.
+
 ## v8.1.0-preview.4 — React arama/piyasa ayarları ve hisse kartı eşlemesi
 
 Favori ve piyasa araması `AssetSearch.jsx`, piyasa düzenleme popup’ı `MarketSettings.jsx` üzerinden React tarafından yönetilir. Mevcut birleşik arama, 400 ms gecikme, veri kaynakları ve kayıt işlemleri adaptör üzerinden kullanılır; geç gelen eski sorgular yeni sonuçları değiştirmez. Popup odak tuzağı, arka plan inert/kaydırma kilidi ve klavye ile sıralama sonrası odak korunur. Finans/API/cache/batch/auth/Upstash, kullanıcı/portföy/yedek formatları ve Portföy/Grafik/Diğer korunur. Yeni dependency yok.

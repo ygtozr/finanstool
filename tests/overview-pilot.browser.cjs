@@ -9,7 +9,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH});
  try {
  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
- let unavailable=false;const heldSearch=[];
+ let unavailable=false,detailMode='',fundamentalFixture=null;const heldSearch=[],heldDetails=[];
  const referenceHtml=require('node:child_process').execFileSync('git',['show','v8.0:index.html'],{cwd:root});
  const referenceContext=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
  const reference=await referenceContext.newPage();
@@ -33,13 +33,17 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
    if(['/api/search','/api/tefas'].includes(u.pathname)&&u.searchParams.get('q')==='SERVFAIL')return route.abort();
    if(u.pathname==='/api/search'&&u.searchParams.get('q')==='SLOWOLD')return new Promise(resolve=>heldSearch.push(async()=>{await route.fulfill({contentType:'application/json',body:JSON.stringify({quotes:[{symbol:'OLD',name:'Eski sorgu'}]})});resolve();}));
    const symbol=u.searchParams.get('symbol')||'AAPL';let data;requests.push(u.pathname+u.search);
+   if(u.pathname==='/api/price'&&symbol==='MSFT'&&u.searchParams.get('query')==='range=1y&interval=1d'){
+    if(detailMode==='hold')return new Promise(resolve=>heldDetails.push(async()=>{await route.fulfill({contentType:'application/json',body:JSON.stringify(history(symbol))});resolve();}));
+    if(detailMode==='fail')return route.fulfill({contentType:'application/json',body:JSON.stringify({chart:{result:[]}})});
+   }
    if(u.pathname==='/api/account')data={authenticated:false,user:null,configured:false};
    else if(u.pathname==='/api/prices'&&unavailable)data={results:{}};
    else if(u.pathname==='/api/prices')data={results:Object.fromEntries((u.searchParams.get('symbols')||'AAPL').split(',').map(s=>[s,{ok:true,data:u.searchParams.get('mode')==='compact'?{symbol:s,name:s==='AAPL'?'Apple Inc.':s==='MSFT'?'Microsoft Corporation':s,currency:s.endsWith('.IS')?'TRY':'USD',price:145.5,previousClose:143,delta:2.5,change:1.748,marketTimestamp:stamp,asOf:stamp,provider:'Test verisi'}:history(s)}]))};
    else if(u.pathname==='/api/quote')data={symbol,currency:'TRY',price:2.11,previousClose:2.08,delta:.03,change:1.44,asOf:stamp,priceType:'delayed_quote',delayed:true};
    else if(u.pathname.includes('dividend'))data={results:{},events:[],prices:[],status:'no_data'};
    else if(u.pathname==='/api/search')data={quotes:u.searchParams.get('q')==='NOMATCH'?[]:u.searchParams.get('q')==='FASTNEW'?[{symbol:'MSFT',name:'Microsoft'},{symbol:'AAPL',name:'Apple'}]:[{symbol:'NVDA',name:'NVIDIA',shortname:'NVIDIA'}]};
-   else if(u.pathname==='/api/fundamentals')data={status:'no_data'};
+   else if(u.pathname==='/api/fundamentals')data=symbol==='MSFT'&&fundamentalFixture?fundamentalFixture:{status:'no_data'};
    else if(u.pathname==='/api/logo')return route.abort();
    else data=history(symbol);
    return route.fulfill({contentType:'application/json',body:JSON.stringify(data)});
@@ -87,7 +91,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
    await page.locator('#favoriteDetailDialog .favorite-detail-hero').waitFor();
    await reference.locator('#favoriteDetailDialog .favorite-detail-hero').waitFor();
    await page.waitForTimeout(350);
-   const detailMeasure=()=>[...document.querySelectorAll('#favoriteDetailDialog, #favoriteDetailDialog .favorite-detail-hero, #favoriteDetailDialog .favorite-detail-identity, #favoriteDetailDialog .favorite-detail-price, #favoriteDetailDialog .favorite-detail-metric')].map(n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n);return [n.className,n.textContent.trim(),...['x','y','width','height'].map(k=>Math.round(r[k]*100)/100),...['fontSize','lineHeight','color','backgroundColor','borderRadius','padding','gap'].map(k=>c[k])];});
+   const detailMeasure=()=>[...document.querySelectorAll('#favoriteDetailDialog, #favoriteDetailDialog .favorite-detail-hero, #favoriteDetailDialog .favorite-detail-identity, #favoriteDetailDialog .favorite-detail-price, #favoriteDetailDialog .favorite-detail-metric')].map(n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n);return [n.className,n.textContent.replace(/\s/g,''),...['x','y','width','height'].map(k=>Math.round(r[k]*100)/100),...['fontSize','lineHeight','color','backgroundColor','borderRadius','padding','gap'].map(k=>c[k])];});
    assert.deepEqual(await page.evaluate(detailMeasure),await reference.evaluate(detailMeasure),'Stock detail card matches v8.0 at '+width+'/'+mode);
    await page.screenshot({path:path.join(output,`${width}-${mode}-stock-detail.png`)});
    await reference.screenshot({path:path.join(output,`${width}-${mode}-stock-detail-v8.0.png`)});
@@ -119,6 +123,59 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
   }
  }
  await page.setViewportSize({width:390,height:844});
+ // React owns the detail content; the native top-layer shell preserves focus/lock.
+ assert.equal(await page.locator('#favoriteDetailDialog').getAttribute('data-react-detail'),'ready');
+ const clearDetailCache=()=>page.evaluate(()=>apiCache.delete(priceApiUrl('MSFT','range=1y&interval=1d')));
+ await clearDetailCache();detailMode='hold';
+ const pendingDetail=page.waitForRequest(r=>r.url().includes('/api/price?symbol=MSFT')&&r.url().includes('range%3D1y'));
+ await page.locator('.pilot-favorite-row[data-symbol="MSFT"] .favorite-card').click();
+ await pendingDetail;
+ await page.locator('#favoriteDetailBody [role="status"]').filter({hasText:'Veriler yükleniyor…'}).waitFor();
+ assert.equal(await page.locator('body').evaluate(n=>n.classList.contains('modal-open')),true);
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'favoriteDetailClose');
+ await page.keyboard.press('Shift+Tab');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'favoriteDetailPortfolio','Native dialog wraps focus');
+ await page.keyboard.press('Tab');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'favoriteDetailClose');
+ await page.keyboard.press('Escape');
+ await page.waitForFunction(()=>!document.querySelector('#favoriteDetailDialog').open&&!document.body.classList.contains('modal-open'));
+ assert.equal(await page.evaluate(()=>document.activeElement.closest('.pilot-favorite-row')?.dataset.symbol),'MSFT');
+ await page.locator('.pilot-favorite-row[data-symbol="AAPL"] .favorite-card').click();
+ await page.locator('#favoriteDetailIdentity h3').filter({hasText:'AAPL'}).waitFor();
+ await Promise.all(heldDetails.splice(0).map(release=>release()));detailMode='';
+ await page.waitForTimeout(50);
+ assert.equal(await page.locator('#favoriteDetailIdentity h3').textContent(),'AAPL','Late closed detail cannot replace the new symbol');
+ await page.locator('#favoriteDetailClose').click();
+ await clearDetailCache();detailMode='fail';
+ await page.locator('.pilot-favorite-row[data-symbol="MSFT"] .favorite-card').click();
+ await page.locator('#favoriteDetailBody [role="alert"]').filter({hasText:'Detay verileri alınamadı'}).waitFor();
+ await page.locator('#favoriteDetailClose').click();
+ await clearDetailCache();detailMode='';
+ for(const [action,target] of [['Chart','chartView'],['Alarm','alarmDialog'],['Portfolio','portfolioDialog']]){
+  await page.locator('.pilot-favorite-row[data-symbol="MSFT"] .favorite-card').click();
+  await page.locator('#favoriteDetailIdentity h3').filter({hasText:'MSFT'}).waitFor();
+  await page.locator('#favoriteDetail'+action).click();
+  await page.waitForFunction(id=>{const n=document.getElementById(id);return id==='chartView'?!n.hidden:n.open},target);
+  assert.equal(await page.locator('#favoriteDetailDialog').evaluate(n=>n.open),false);
+  if(target==='chartView')await page.locator('.pilot-tabbar').getByRole('button',{name:'Özet',exact:true}).click();
+  else {assert.equal(await page.locator('body').evaluate(n=>n.classList.contains('modal-open')),true,'Handoff keeps the native modal lock');await page.keyboard.press('Escape');}
+ }
+ // Preserve formatted fundamental values and honest provider/applicability states.
+ for(const [fixture,expected] of [
+  [{status:'ok',pe:25.25,dividendYieldPercent:1.4,marketCap:1200000000,source:'Test temel veri'},['1,2 Mr USD','25,25','1,4%']],
+  [{status:'provider_error'},['Kaynak erişilemiyor','Kaynak erişilemiyor','Kaynak erişilemiyor']],
+  [{status:'unsupported'},['Desteklenmiyor','Desteklenmiyor','Desteklenmiyor']],
+  [{status:'no_data',peApplicable:false,marketCapApplicable:false,dividendApplicable:false},['Uygulanamaz','Uygulanamaz','Uygulanamaz']]
+ ]){
+  fundamentalFixture=fixture;
+  await page.evaluate(()=>apiCache.delete('/api/fundamentals?symbol=MSFT'));
+  await page.locator('.pilot-favorite-row[data-symbol="MSFT"] .favorite-card').click();
+  await page.locator('#favoriteDetailIdentity h3').filter({hasText:'MSFT'}).waitFor();
+  assert.deepEqual((await page.locator('#favoriteDetailBody dd').allTextContents()).slice(1,4).map(value=>value.replace(/\u00a0/g,' ')),expected);
+  if(fixture.source)assert.equal(await page.locator('.favorite-detail-source').textContent(),'Temel veri: Test temel veri');
+  await page.locator('#favoriteDetailClose').click();
+ }
+ fundamentalFixture=null;
  const compact=()=>requests.filter(url=>url.startsWith('/api/prices?')&&url.includes('mode=compact')).length;
  // Advance only the test clock beyond the existing 15s cache; keep policy intact.
  await page.clock.setSystemTime(new Date(Date.now()+60000));
@@ -255,6 +312,9 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.route('https://eodhd.com/img/logos/US/AAPL.png',route=>route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="42" height="42"><rect width="42" height="42" fill="#00D5D8"/></svg>'}));
  await page.reload();if(await page.locator('#authLocalContinue').isVisible())await page.locator('#authLocalContinue').click();
  await page.waitForFunction(()=>{const image=document.querySelector('.pilot-favorite-row[data-symbol="AAPL"] img');return image?.src.includes('eodhd.com')&&image.naturalWidth>0;});
+ await page.locator('.pilot-favorite-row[data-symbol="AAPL"] .favorite-card').click();
+ await page.waitForFunction(()=>{const image=document.querySelector('#favoriteDetailIdentity img');return image?.src.includes('eodhd.com')&&image.naturalWidth>0;});
+ await page.locator('#favoriteDetailClose').click();
  assert.equal(await page.locator('#marketCards > *, #favoritesList > *').count(),0);
  // Presentation must keep official timestamps and missing-close values honest.
  await page.evaluate(stamp=>{
@@ -288,6 +348,12 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  assert.equal(await page.evaluate(()=>matchMedia('(display-mode: standalone)').matches&&navigator.standalone),true);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Standalone safe-area does not change viewport width');
  await page.screenshot({path:path.join(output,'standalone-safe-area.png')});
+ await page.locator('.pilot-favorite-row[data-symbol="AAPL"] .favorite-card').click();
+ await page.locator('#favoriteDetailDialog .favorite-detail-hero').waitFor();await page.waitForTimeout(350);
+ const safeDetail=await page.locator('#favoriteDetailDialog').boundingBox();
+ assert(safeDetail.x>=0&&safeDetail.y>=0&&safeDetail.y+safeDetail.height<=844.5,'Standalone detail stays in viewport');
+ await page.screenshot({path:path.join(output,'standalone-safe-area-detail.png')});
+ await page.locator('#favoriteDetailClose').click();
  await device.send('Emulation.setSafeAreaInsetsOverride',{insets:{top:0,bottom:0,left:0,right:0}});
  await page.emulateMedia({reducedMotion:'reduce'});
  assert.equal(await page.locator('meta[name="viewport"]').getAttribute('content'),'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
@@ -308,6 +374,6 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForFunction(()=>document.querySelector('.pilot-market-card strong'));
  assert.equal(await page.locator('.pilot-market-card strong').filter({hasText:'Veri alınamadı'}).count(),0,'Existing data service recovers after error');
  assert.deepEqual(errors,[],'No console or runtime errors');
- console.log('PASS: React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
+ console.log('PASS: React detail loading/error/stale-response/focus/native handoffs, React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
