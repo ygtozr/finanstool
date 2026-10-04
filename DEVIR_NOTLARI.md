@@ -2,6 +2,10 @@
 
 Güncelleme: 30 Eylül 2026. Bu dosya kaynak kodun yerine geçmez; yeni oturum için başlangıç rehberidir.
 
+## v8.1 pilot çalışması
+
+`migration/v8.1-framework7-overview` yalnız ön izleme dalıdır; kalıcı sürüm v8.0. Kaynaklar `src/overview/{main.jsx,legacy-adapter.js,pilot.css}`; build `scripts/build-overview.mjs`. Özet React + Framework7, diğer ekranlar mevcut kod. Girişteki dar `OzerOverviewLegacy` sınırı finans, API, batch/cache/timer, auth, Upstash ve yedek şemalarını korur; gizli eski Özet DOM’u geçici görüntü modelidir. JSX içine finans mantığı taşınmaz. `assets/overview-pilot/` üretildiği için Git’e alınmaz; Vercel build aynı çıktıyı oluşturur.
+
 ## v8.0 onaylı yayın
 
 Kullanıcı v7.11 ön izlemesini 30 Eylül 2026 tarihinde onayladı ve sürümün **v8.0** (8.0.0) olarak yayınlanmasını istedi. Masaüstü menüsü ekrana sabitlendi; Portföy “Varlıklar” ekleme ikonu tüm ekranlarda 27×27px olarak hizalandı. Önceki v7.10 arşivi korunur; yeni kaynak archive/v8.0 ve v8.0 Git etiketiyle saklanır. Sabit üretim adresi değişmez.

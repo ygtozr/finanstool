@@ -1,3 +1,13 @@
+## v8.1 React + Framework7 Özet pilotu — ön izleme
+
+Dal: `migration/v8.1-framework7-overview`; main ve kalıcı v8.0 değişmez. `npm run build` (veya `pnpm run build`) yalnız Özet pilotunu `assets/overview-pilot/` altında üretir. React/React DOM + Framework7 React, esbuild ile derlenir. `pnpm install --frozen-lockfile` mevcut kilidi kullanır; yalnız esbuild kurulum betiğine izin verilir.
+
+Özet, piyasa kartları, favori satırları, mobil tab bar ve işlem sheet’i React tarafından çizilir. `OzerOverviewLegacy` adaptörü mevcut fiyat/formatlama/batch/cache/yenileme ve favori işlemlerini kullanır. Eski Özet DOM’u geçici salt-okunur görüntü modeli olarak gizli kalır; arama formu dinleyicileriyle birlikte taşınır. React yeni fetch veya timer oluşturmaz. Portföy/Grafik/Diğer mevcut kodla açılır.
+
+CSS katmanı Framework7’yi eski stillerin altına yerleştirir; pilot stilleri kendi köklerine sınırlanır. iOS tema, mevcut renk/yüzey/yazı tercihi ve açık/koyu mod korunur. CSS katmanları için Safari 15.4+ gerekir. Framework7’nin gömülü fontu için CSP’ye yalnız `font-src self data:` eklenir. Yeni veri alanı veya depolama anahtarı eklenmez.
+
+Hedefli kontrol: `CHROMIUM_PATH=/usr/bin/chromium npm run test:overview`. Aşama sonunda `npm test`. 375/390/430/1024px, açık/koyu mod, manuel/otomatik tek batch, favori ekle/çıkar/ayrıntı/sıralama/kalıcılık, eski ekran gezinmesi, standalone emülasyonu, gerçek CSS safe-area inset değerleri ve hata toparlanması geçti; konsol hatası yok. Aşama sonu regresyon da geçti. Fiziksel iPhone/Safari/PWA ve canlı hesap/sağlayıcı kontrolleri ayrı yapılmalıdır.
+
 # Özer Finans v8.0
 
 Yeni sohbet / geliştirici başlangıcı: [Devir notları](DEVIR_NOTLARI.md). Çalışma kuralları: [AGENTS.md](AGENTS.md). Ayrıntılı tanım: [Ürün ve teknik tasarım](URUN_VE_TEKNIK_TASARIM.md).

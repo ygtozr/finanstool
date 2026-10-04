@@ -1,11 +1,21 @@
 {
-	"name": "ozer-finans",
-	"private": true,
-	"version": "8.0.0",
-	"scripts": {
-		"test": "node tests/regression.test.js"
-	},
-	"dependencies": {
-		"@vercel/functions": "^3.9.5"
-	}
+  "name": "ozer-finans",
+  "private": true,
+  "version": "8.1.0-preview.1",
+  "scripts": {
+    "test": "node tests/regression.test.js",
+    "build": "node scripts/build-overview.mjs",
+    "test:overview": "node tests/overview-pilot.browser.cjs"
+  },
+  "dependencies": {
+    "@vercel/functions": "^3.9.5",
+    "framework7": "^9.2.0",
+    "framework7-react": "^9.2.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  },
+  "packageManager": "pnpm@11.19.0"
 }

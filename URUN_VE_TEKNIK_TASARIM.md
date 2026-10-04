@@ -1,3 +1,9 @@
+## v8.1 — React + Framework7 Özet pilotu (onaysız ön izleme)
+
+Kalıcı v8.0 ve main değişmez. React yalnız görünür Özet, piyasa/favori bileşenleri, mobil tab bar ve favori işlem sheet’ini yönetir. Framework7 iOS teması kullanılır; finans/formatlama/veri/yenileme mevcut uygulamada kalır. `OzerOverviewLegacy` mevcut işlemleri çağırır; adaptör yalnız eski Özet DOM değişikliklerini ve tema/görünüm durumunu izleyerek `useSyncExternalStore` üzerinden React’e görüntü modeli sunar. Özet arama formu mevcut dinleyicileriyle taşınır. Gizli eski DOM, pilot için geçici sınırdır; sonraki aşamada DOM’dan bağımsız görüntü modeline geçilebilir.
+
+Framework7 CSS’i düşük öncelikli katmandadır, pilot kuralları kendi köklerine sınırlanır. React ek timer, cache, API çağrısı, depolama anahtarı veya yedek alanı oluşturmaz. Portföy/Grafik/Diğer, mevcut gezinme işlemleriyle eski kod üzerinde çalışır. Safe-area `env()` ve mevcut viewport/PWA manifesti korunur. Kaynaklar/derleme/test komutları README’de; Safari 15.4+ gereklidir. Fiziksel iPhone ve gerçek sağlayıcı kontrolü ayrıca yapılır. Sonraki öneri, veri görüntü modelini DOM’dan ayırmak; diğer ekranları bu pilotta taşımamak.
+
 ## v8.0 — masaüstü menü ve varlık ekleme ikonu
 
 30 Eylül 2026. Ön izleme kullanıcı tarafından onaylandı; kullanıcının isteğiyle v8.0 (8.0.0) olarak kalıcı yayın hazırlanır. Sabit adres https://finanstool.vercel.app; önceki v7.10 arşivi korunur ve bu kaynak archive/v8.0 altında saklanır.
