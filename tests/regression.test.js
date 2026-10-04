@@ -192,7 +192,7 @@ assert.match(html,/function openFavoritePortfolio\(item\)[\s\S]*openPortfolioDia
 assert.match(html,/const targetBook=!portfolioEditSymbol&&!portfolioTargetField\.hidden[\s\S]*const targetPositions=targetBook\.positions[\s\S]*targetPositions\.push\(\{ symbol:portfolioSelection\.symbol[\s\S]*savePortfolioBooks\(\)/,'Yeni pozisyon yalnız seçilen hedef portföye kaydedilmeli');
 assert.match(html,/role="listbox"/,'Arama önerileri listbox olmalı');
 assert.match(html,/marketTimestamp:Number\(result\.meta\?\.regularMarketTime\)\|\|points\.at\(-1\)\.time/,'Favori zamanı gerçek piyasa verisinden gelmeli');
-assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler başlığında yenileme zamanı gösterilmeli');
+assert.match(html,/favoriteUpdated\.textContent=(?:overviewFavoriteUpdated=)?'Son güncelleme: '/,'Favoriler başlığında yenileme zamanı gösterilmeli');
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 

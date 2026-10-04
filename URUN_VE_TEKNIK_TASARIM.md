@@ -1,3 +1,12 @@
+# Özer Finans — Ürün ve Teknik Tasarım Belgesi
+
+## v8.1.0-preview.3 — DOM’dan bağımsız Özet ve sheet erişilebilirliği
+
+Özet fiyat/favori görüntü modeli doğrudan mevcut quote/veri durumundan ve aynı formatlama/logo işlevlerinden üretilir. React devraldıktan sonra eski piyasa/favori listeleri boş tutulur; yalnız auth, gezinme, tema ve yenileme düğmesi gibi kabuk durumları dar DOM gözlemcisiyle izlenir. Arama formu mevcut dinleyicileriyle kalır. API/cache/batch/zamanlayıcı/finans hesapları, kullanıcı/yedek/portföy şemaları korunur.
+
+Favori logoları mevcut kaynak sırasıyla yedek sağlayıcıya geçer. Framework7 işlem sheet’i dialog olarak etiketlenir; klavye odağı içeride kalır, Escape kapanışı odağı açan düğmeye döndürür. Arka plan inert yapılır ve mevcut modal kaydırma kilidi paylaşılır; eski dialoglara geçişte odak ve kilit çakışmaz. Boş piyasa listesinde ekleme yönlendirmesi, piyasa kartlarında erişilebilir fiyat etiketi vardır. v8.0 görsel eşlemesi korunur.
+
+Hedefli test: DOM boşken fiyat/yenileme/favori işlemleri, logo yedek kaynağı, sheet odağı/arka plan kilidi, eksik önceki kapanış ve resmî fiyat zamanı, 375/390/430/1024px açık/koyu görsel eşleşme ve PWA safe-area emülasyonu. Genel regresyon aşama sonunda çalıştırılır. Canlı sağlayıcı ve fiziksel iPhone kontrolü kapsam dışıdır. Çalışma yalnız migration ön izlemesidir; main/production v8.0 değişmez. Yeni dependency yok. Sonraki aşama için arama ve piyasa ayarları bağımsız React bileşenlerine taşınabilir; Portföy/Grafik/Diğer bu sürümde yeniden yazılmaz.
 
 ## v8.1.0-preview.2 — Özet görünüm eşlemesi
 
@@ -77,7 +86,6 @@ Aşağıdaki belge uygulamanın mevcut işlevsel ve teknik temelini tanımlar; �
 
 ---
 
-# Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
 **Belge sürümü:** 8.0
 **Uygulama sürümü:** v8.0

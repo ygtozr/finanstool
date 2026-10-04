@@ -1,7 +1,7 @@
 {
   "name": "ozer-finans",
   "private": true,
-  "version": "8.1.0-preview.2",
+  "version": "8.1.0-preview.3",
   "scripts": {
     "test": "node tests/regression.test.js",
     "build": "node scripts/build-overview.mjs",

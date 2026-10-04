@@ -792,7 +792,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.2">
+  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.3">
   <link rel="stylesheet" href="assets/design-tokens.css?v=8.0">
   <link rel="stylesheet" href="assets/ios-parity.css?v=8.0">
   <link rel="stylesheet" href="assets/component-system.css?v=8.0">
@@ -1117,6 +1117,13 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     })();
     let marketSearchTimer;
     let marketSearchResults = [];
+    // In-memory presentation state only; no cache, API or persisted schema changes.
+    let overviewOwnsView = false;
+    let overviewSheetOpen = false;
+    const overviewMarketQuotes = new Map();
+    let overviewMarketUpdated = 'Veriler yükleniyor…';
+    let overviewFavoriteUpdated = 'Veriler yükleniyor…';
+    function notifyOverview() { window.dispatchEvent(new Event('ozer:overview-change')); }
     let marketSummaryRequest = 0;
     let chartRefreshInProgress = false;
     let priceRequestId = 0;
@@ -2058,6 +2065,8 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     }
 
     function renderFavorites() {
+      notifyOverview();
+      if(overviewOwnsView)return;
       favoritesList.replaceChildren();
       favoritesEmpty.hidden=favorites.length>0;
       favorites.forEach(item=>{
@@ -2164,6 +2173,8 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     }
 
     function updateFavoriteQuoteCard(symbol) {
+      notifyOverview();
+      if(overviewOwnsView)return;
       const row=[...favoritesList.children].find(item=>item.dataset.symbol===symbol);
       if(!row)return;
       const item=favorites.find(entry=>entry.symbol===symbol);
@@ -2212,7 +2223,8 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     }
 
     function updateFavoriteRefreshTimestamp() {
-      favoriteUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
+      favoriteUpdated.textContent=overviewFavoriteUpdated='Son güncelleme: '+formatUpdateTime(new Date());
+      notifyOverview();
     }
 
     async function refreshFavoriteQuotes({force=false,quotes=null}={}) {
@@ -2408,6 +2420,9 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     }
 
     function updateMarketCard(card,item,data) {
+      overviewMarketQuotes.set(item.symbol,data);
+      notifyOverview();
+      if(overviewOwnsView||!card)return;
       const label=card.querySelector('.market-card-label');
       const value=card.querySelector('.market-card-value');
       const change=card.querySelector('.market-card-change');
@@ -2438,6 +2453,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     }
 
     function ensureMarketCards(items) {
+      if(overviewOwnsView){notifyOverview();return [];}
       const current=[...marketCards.children];
       const same=current.length===items.length&&current.every((card,index)=>card.dataset.symbol===items[index].symbol);
       if(same)return current;
@@ -2449,13 +2465,14 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       const requestId=++marketSummaryRequest;
       const items=marketItems.map(item=>({...item}));
       if(!items.length){
-        if(!marketCards.querySelector('.market-settings-empty')){
+        if(!overviewOwnsView&&!marketCards.querySelector('.market-settings-empty')){
           const empty=document.createElement('p');
           empty.className='market-settings-empty';
           empty.textContent='Dişli düğmesinden piyasa verisi ekleyin.';
           marketCards.replaceChildren(empty);
         }
-        marketUpdated.textContent='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
+        marketUpdated.textContent=overviewMarketUpdated='Son güncelleme: '+new Intl.DateTimeFormat('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
+        notifyOverview();
         return;
       }
       const cards=ensureMarketCards(items);
@@ -2463,7 +2480,8 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       const results=items.map(item=>{const quote=sharedQuotes.get(normalizeSymbol(item.symbol));return quote?{ok:true,...quote}:{ok:false}});
       if(requestId!==marketSummaryRequest)return;
       items.forEach((item,index)=>updateMarketCard(cards[index],item,results[index]));
-      marketUpdated.textContent='Son güncelleme: '+formatUpdateTime(new Date());
+      marketUpdated.textContent=overviewMarketUpdated='Son güncelleme: '+formatUpdateTime(new Date());
+      notifyOverview();
     }
 
     function formatUpdateTime(date) {
@@ -4954,7 +4972,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     portfolioPrivacyToggle.addEventListener('click',()=>{portfolioPrivacyEnabled=!portfolioPrivacyEnabled;localStorage.setItem(portfolioPrivacyKey,String(portfolioPrivacyEnabled));syncPortfolioViewControls()});
     let modalScrollY=0;
     function syncModalScrollLock(){
-      const hasOpenDialog=Boolean(document.querySelector('dialog[open]'));
+      const hasOpenDialog=overviewSheetOpen||Boolean(document.querySelector('dialog[open]'));
       if(hasOpenDialog&&!document.body.classList.contains('modal-open')){
         modalScrollY=window.scrollY;
         document.documentElement.classList.add('modal-open');document.body.classList.add('modal-open');document.body.style.top='-'+modalScrollY+'px';
@@ -5078,12 +5096,48 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       startRefreshTimers({immediate:true});
     });
     window.addEventListener('pagehide',releasePollingLeadership);
+    // View projection uses the existing formatting and logo resolvers. Financial
+    // values remain in the original quote maps and are never calculated in React.
+    function overviewMarketItem(item) {
+      const data=overviewMarketQuotes.get(item.symbol),good=data?.ok;
+      const hasChange=good&&Number.isFinite(data.change);
+      const updated=good?(data.priceType==='official_daily'?formatQuoteDate(data.marketTimestamp):formatMarketDataTime(data.marketTimestamp)):'';
+      return {symbol:item.symbol,label:item.label,symbolLabel:'· '+displaySymbol(item.symbol),
+        price:good?money(data.price,data.currency):data?'Veri alınamadı':'Yükleniyor…',
+        change:good?(hasChange?percentText(data.change):'Önceki kapanış yok'):data?'Tekrar yenileyin':'Canlı veri',
+        tone:good?(hasChange?(data.change>=0?'positive':'negative'):''):data?'negative':'positive',
+        disabled:!good,
+        title:good?(data.stale?'Önbellekteki son fiyat · ':'')+(data.priceType==='official_daily'?'Son resmî fon fiyatı ':data.delayed?'15 dk gecikmeli · ':'Fiyat zamanı ')+updated+(data.provider?' · '+data.provider:'')+' · '+item.label+' grafiğini aç':''};
+    }
+    function overviewFavoriteItem(item) {
+      const quote=favoriteQuotes.get(item.symbol),good=quote&&!quote.error;
+      const numberFormat=new Intl.NumberFormat('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2,signDisplay:'always'});
+      const hasChange=good&&Number.isFinite(quote.delta)&&Number.isFinite(quote.change);
+      const updated=good?(quote.priceType==='official_daily'?formatQuoteDate(quote.marketTimestamp):formatMarketDataTime(quote.marketTimestamp)):'';
+      return {symbol:item.symbol,displaySymbol:displaySymbol(item.symbol),name:item.name!==item.symbol?item.name:'Hisse',
+        badge:item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•',
+        logoSources:favoriteLogoUrls(item.symbol,item.name),logoClass:'favorite-card-logo'+(normalizeSymbol(item.symbol).startsWith('TEFAS-')?' fund-manager-logo':''),
+        price:good?money(quote.price,quote.currency):quote?.error?'Veri alınamadı':'Yükleniyor…',
+        change:good?(hasChange?numberFormat.format(quote.delta)+' '+numberFormat.format(quote.change)+'%':'Önceki kapanış yok'):quote?.error?'Yeniden denenecek':'Canlı veri',
+        tone:good?(hasChange?(quote.change>=0?'positive':'negative'):''):quote?.error?'negative':'positive',
+        time:good?(quote.priceType==='official_daily'?'Son resmî · ':quote.delayed?'15 dk gecikmeli · ':'')+updated:quote?.error?'Fiyat zamanı alınamadı':'Fiyat zamanı bekleniyor',
+        title:good?(quote.stale?'Son başarılı fiyat · ':'')+updated+(quote.provider?' · '+quote.provider:'')+' · '+item.symbol+' grafiğini aç':item.symbol+' grafiğini aç'};
+    }
     // Pilot boundary: existing services remain the single owner of data and timers.
     window.OzerOverviewLegacy = Object.freeze({
+      sheetOpen:open=>{overviewSheetOpen=open;syncModalScrollLock()},
+      getData:()=>({markets:marketItems.map(overviewMarketItem),favorites:favorites.map(overviewFavoriteItem),marketCount:marketItems.length,marketUpdated:overviewMarketUpdated,favoriteUpdated:overviewFavoriteUpdated}),
+      claimView:()=>{
+        overviewOwnsView=true;marketCards.replaceChildren();favoritesList.replaceChildren();notifyOverview();
+        return ()=>{
+          overviewOwnsView=false;renderFavorites();
+          ensureMarketCards(marketItems).forEach((card,index)=>{const item=marketItems[index],data=overviewMarketQuotes.get(item.symbol);if(data)updateMarketCard(card,item,data)});
+        };
+      },
       refresh:()=>refreshMarketAndFavorites({force:true}),
       navigate:view=>setActiveView(view),
       theme:mode=>applyTheme(mode),
-      market:symbol=>[...marketCards.children].find(card=>card.dataset.symbol===symbol)?.click(),
+      market:symbol=>{if(!overviewMarketQuotes.get(symbol)?.ok)return;chartTab.click();symbolInput.value=symbol;updateFavoriteButton();loadPrice(symbol)},
       settings:()=>marketSettingsButton.click(),
       marketCount:()=>marketItems.length,
       favorite:(symbol,action='detail')=>{
@@ -5144,6 +5198,6 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     })();
   </script>
   <script src="assets/auth-account.js?v=8.0.0"></script>
-  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.2"></script>
+  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.3"></script>
 </body>
 </html>

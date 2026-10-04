@@ -58,6 +58,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await reference.locator('#authLocalContinue').click();
  await reference.locator('#marketRefresh').click();
  await reference.waitForFunction(()=>document.querySelector('#marketCards strong')?.textContent!=='Yükleniyor…');
+ assert.equal(await page.locator('#marketCards > *, #favoritesList > *').count(),0,'React owns the lists; hidden legacy cards are not rendered');
  const originals=await page.evaluate(()=>({portfolios:localStorage.getItem('finans-grafigi-portfolios-v2'),appearance:localStorage.getItem('finans-grafigi-appearance'),backup:Object.keys(createBackup().data).sort()}));
  for(const width of [375,390,430,1024]){
   await page.setViewportSize({width,height:844});
@@ -119,6 +120,35 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.locator('.pilot-action-sheet.modal-in').waitFor();
  await page.locator('.pilot-action-sheet').getByRole('button',{name:'Favorilerden çıkar'}).click();
  await page.waitForFunction(()=>document.querySelectorAll('.pilot-favorite-row').length===3);
+ await page.locator('.pilot-action-sheet.modal-in').waitFor({state:'hidden'});
+ await page.waitForFunction(()=>!document.querySelector('main').inert);
+ assert.equal(await page.locator('main').evaluate(n=>n.inert),false);
+ const opener=page.getByRole('button',{name:'AAPL işlemleri',exact:true});
+ await opener.click();
+ await page.locator('.pilot-action-sheet.modal-in').waitFor();
+ await page.waitForFunction(()=>document.querySelector('.pilot-action-sheet').contains(document.activeElement));
+ assert.equal(await page.locator('main').evaluate(n=>n.inert),true,'Sheet makes underlying controls inert');
+ assert.equal(await page.locator('body').evaluate(n=>n.classList.contains('modal-open')),true,'Sheet shares the existing scroll lock');
+ assert.equal(await page.locator('.pilot-action-sheet').getAttribute('role'),'dialog');
+ await page.keyboard.press('Shift+Tab');
+ assert.equal(await page.evaluate(()=>document.activeElement.textContent),'Favorilerden çıkar','Focus wraps within sheet');
+ await page.keyboard.press('Tab');
+ assert.equal(await page.evaluate(()=>document.activeElement.textContent),'Kapat');
+ await page.keyboard.press('Escape');
+ await page.locator('.pilot-action-sheet.modal-in').waitFor({state:'hidden'});
+ await page.waitForFunction(()=>!document.querySelector('main').inert);
+ assert.equal(await page.locator('main').evaluate(n=>n.inert),false);
+ assert.equal(await opener.evaluate(n=>n===document.activeElement),true,'Escape returns focus to opener');
+ await opener.click();
+ await page.locator('.pilot-action-sheet.modal-in').waitFor();
+ await page.locator('.pilot-action-sheet').getByRole('button',{name:'Portföye ekle',exact:true}).click();
+ await page.locator('#portfolioDialog[open]').waitFor();
+ await page.waitForFunction(()=>!document.querySelector('main').inert);
+ assert.equal(await page.locator('body').evaluate(n=>n.classList.contains('modal-open')),true,'Legacy dialog keeps scroll locked after sheet closes');
+ assert.equal(await page.locator('#portfolioDialog').evaluate(n=>n.contains(document.activeElement)),true,'Sheet does not steal focus from legacy dialog');
+ await page.locator('#portfolioCancel').click();
+ await page.waitForFunction(()=>!document.body.classList.contains('modal-open'));
+ assert.equal(await page.locator('#marketCards > *, #favoritesList > *').count(),0,'Refresh/add/remove keep legacy lists empty');
  // Other screens still execute their original code through the shared navigation.
  for(const [label,view] of [['Grafik','chartView'],['Portföy','portfolioView'],['Diğer','otherView'],['Özet','mainView']]){
   await page.locator('.pilot-tabbar').getByRole('button',{name:label,exact:true}).click();
@@ -143,6 +173,22 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  assert.equal(await page.locator('.pilot-favorite-row').nth(2).getAttribute('data-symbol'),'AAPL','Favorite order survives reload');
  const current=await page.evaluate(()=>({portfolios:localStorage.getItem('finans-grafigi-portfolios-v2'),appearance:localStorage.getItem('finans-grafigi-appearance'),backup:Object.keys(createBackup().data).sort()}));
  assert.deepEqual(current,originals,'Portfolio, appearance and backup format unchanged');
+ // First logo provider fails; the existing second provider must recover.
+ await page.route('https://eodhd.com/img/logos/US/AAPL.png',route=>route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="42" height="42"><rect width="42" height="42" fill="#00D5D8"/></svg>'}));
+ await page.reload();if(await page.locator('#authLocalContinue').isVisible())await page.locator('#authLocalContinue').click();
+ await page.waitForFunction(()=>{const image=document.querySelector('.pilot-favorite-row[data-symbol="AAPL"] img');return image?.src.includes('eodhd.com')&&image.naturalWidth>0;});
+ assert.equal(await page.locator('#marketCards > *, #favoritesList > *').count(),0);
+ // Presentation must keep official timestamps and missing-close values honest.
+ await page.evaluate(stamp=>{
+  const quote={price:12.5,currency:'USD',delta:null,change:null,priceType:'official_daily',marketTimestamp:stamp,provider:'Resmî test verisi'};
+  favoriteQuotes.set('AAPL',quote);updateFavoriteQuoteCard('AAPL');
+  overviewMarketQuotes.set('TRY=X',{ok:true,...quote});notifyOverview();
+ },stamp);
+ await page.locator('.pilot-favorite-row[data-symbol="AAPL"] .favorite-change').filter({hasText:'Önceki kapanış yok'}).waitFor();
+ assert.equal(await page.locator('.pilot-favorite-row[data-symbol="AAPL"] .favorite-change').evaluate(n=>n.classList.contains('positive')||n.classList.contains('negative')),false,'Missing previous close has no invented positive/negative signal');
+ assert.match(await page.locator('.pilot-favorite-row[data-symbol="AAPL"] .favorite-market-time').textContent(),/^Son resmî · /);
+ assert.equal(await page.locator('.pilot-market-card').first().locator('.market-card-change').textContent(),'Önceki kapanış yok');
+ assert.equal(await page.locator('#marketCards > *, #favoritesList > *').count(),0);
  // Emulate standalone and real CSS env() insets through Chromium's device API.
  await page.addInitScript(()=>{
   const original=window.matchMedia.bind(window);
@@ -184,6 +230,6 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForFunction(()=>document.querySelector('.pilot-market-card strong'));
  assert.equal(await page.locator('.pilot-market-card strong').filter({hasText:'Veri alınamadı'}).count(),0,'Existing data service recovers after error');
  assert.deepEqual(errors,[],'No console or runtime errors');
- console.log('PASS: v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
+ console.log('PASS: DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

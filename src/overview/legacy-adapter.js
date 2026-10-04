@@ -1,35 +1,16 @@
-// Transitional read model. Legacy rendering/formatting, auth, refresh and storage
-// stay authoritative. React owns only the new visible Overview DOM.
+// Legacy services and formatters own data; React owns visible Overview rendering.
 const legacy = window.OzerOverviewLegacy;
 const $ = selector => document.querySelector(selector);
-const text = (node, selector) => node.querySelector(selector)?.textContent?.trim() || '';
+// Only shell/auth attributes remain observed. Prices and lists come directly
+// from the service-owned projection, even when the legacy lists are empty.
 function read() {
   return {
+    ...legacy.getData(),
     view: $('.app-view.active')?.id.replace('View', '') || 'main',
     theme: document.documentElement.dataset.theme || 'dark',
     themePreference: localStorage.getItem('finans-grafigi-theme') || 'system',
     authenticated: $('#authGate').hidden,
     busy: $('#marketRefresh').disabled,
-    marketCount: legacy.marketCount(),
-    marketUpdated: $('#marketUpdated').textContent,
-    favoriteUpdated: $('#favoriteUpdated').textContent,
-    markets: [...$('#marketCards').querySelectorAll('.market-card')].map(node => ({
-      symbol: node.dataset.symbol, label: node.querySelector('.market-card-label').firstChild.textContent.trim(),
-      symbolLabel: text(node, '.market-card-symbol'),
-      price: text(node, '.market-card-value'), change: text(node, '.market-card-change'),
-      tone: node.querySelector('.market-card-change').classList.contains('negative') ? 'negative' : 'positive',
-      disabled: node.disabled, title: node.title,
-    })),
-    favorites: [...$('#favoritesList').children].map(node => ({
-      symbol: node.dataset.symbol, displaySymbol: text(node, '.favorite-card-symbol'),
-      name: text(node, '.favorite-card-name'), price: text(node, '.favorite-card-price'),
-      change: text(node, '.favorite-change'), time: text(node, '.favorite-market-time'),
-      tone: node.querySelector('.favorite-change').classList.contains('negative') ? 'negative' : 'positive',
-      logo: node.querySelector('.favorite-card-logo')?.getAttribute('src') || '',
-      logoClass: node.querySelector('.favorite-card-logo')?.className || 'favorite-card-logo',
-      badge: text(node, '.favorite-card-badge'),
-      title: node.querySelector('.favorite-card').title,
-    })),
   };
 }
 let snapshot = read(), serialized = JSON.stringify(snapshot), pending = false;
@@ -46,14 +27,14 @@ function update() {
   });
 }
 const observer = new MutationObserver(update);
-for (const selector of ['#marketCards', '#favoritesList', '#marketUpdated', '#favoriteUpdated']) {
-  observer.observe($(selector), { subtree: true, childList: true, characterData: true, attributes: true });
-}
 for (const selector of ['html', '#marketRefresh', '#authGate', '.app-view']) {
   document.querySelectorAll(selector).forEach(node => observer.observe(node, { attributes: true }));
 }
+window.addEventListener('ozer:overview-change', update);
 window.addEventListener('ozer:local-data-change', update);
 export const overview = {
+  sheetOpen: open => legacy.sheetOpen(open),
+  claimView: () => legacy.claimView(),
   getSnapshot: () => snapshot,
   subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
   refresh: () => legacy.refresh(), navigate: view => legacy.navigate(view),
