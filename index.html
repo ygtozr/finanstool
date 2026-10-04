@@ -792,7 +792,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.6">
+  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.7">
   <link rel="stylesheet" href="assets/design-tokens.css?v=8.0">
   <link rel="stylesheet" href="assets/ios-parity.css?v=8.0">
   <link rel="stylesheet" href="assets/component-system.css?v=8.0">
@@ -1118,7 +1118,9 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     let marketSearchTimer;
     let marketSearchResults = [];
     // In-memory presentation state only; no cache, API or persisted schema changes.
-    let overviewOwnsView = false;
+    let overviewOwnsView = false, chartOwnsControls = false;
+    const emptyChartSummary={last:'—',lastDate:'—',change:'—',tone:'',low:'—',lowDate:'—',high:'—',highDate:'—',width:'0%',position:'Güncel: —',positionValue:'0'};
+    let chartSummaryView=emptyChartSummary;
     let overviewSheetOpen = false;
     const overviewMarketQuotes = new Map();
     let overviewMarketUpdated = 'Veriler yükleniyor…';
@@ -1636,7 +1638,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     }
     const currentSymbol = () => symbolInput.value.trim().toUpperCase();
     const isFavorite = symbol => favorites.some(item => item.symbol === symbol);
-    function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; }
+    function updateFavoriteButton() { const on = isFavorite(currentSymbol()); favoriteButton.textContent = on ? '★' : '☆'; favoriteButton.classList.toggle('is-favorite',on); favoriteButton.setAttribute('aria-pressed',String(on)); favoriteButton.title = on ? 'Favorilerden çıkar' : 'Favorilere ekle'; if(chartOwnsControls)notifyOverview(); }
 
     function closeFavoriteMenus(except=null) {
       favoritesList.querySelectorAll('.favorite-quick-menu.open').forEach(menu=>{
@@ -1831,6 +1833,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       });
     }
     function renderChartAssetPanels() {
+      if(chartOwnsControls){notifyOverview();return;}
       renderChartAssetList(chartFavoritesList,favorites,'Henüz favori hisse yok.');
       renderChartAssetList(chartPortfolioList,portfolio,'Portföyünüzde hisse yok.');
     }
@@ -4387,6 +4390,8 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     }
 
     function resetPeriodSummary() {
+      chartSummaryView=emptyChartSummary;
+      if(chartOwnsControls){notifyOverview();return;}
       [periodLast,periodLastDate,periodChange,periodLow,periodLowDate,periodHigh,periodHighDate].forEach(item=>item.textContent='—');
       periodChange.classList.remove('positive','negative');
       periodRangeFill.style.width='0%';
@@ -4411,6 +4416,11 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       const summary=calculatePeriodSummary(points);
       if(!summary)return resetPeriodSummary();
       const {last,low,high,change,position}=summary;
+      chartSummaryView={last:money(last.close,currency),lastDate:formatPeriodPointDate(last.time),
+        change:Number.isFinite(change)?percentText(change):'—',tone:Number.isFinite(change)?(change>=0?'positive':'negative'):'',
+        low:money(low.close,currency),lowDate:formatPeriodPointDate(low.time),high:money(high.close,currency),highDate:formatPeriodPointDate(high.time),
+        width:position.toFixed(1)+'%',position:'Güncel: %'+position.toFixed(0),positionValue:position.toFixed(0)};
+      if(chartOwnsControls){notifyOverview();return;}
       periodLast.textContent=money(last.close,currency);
       periodLastDate.textContent=formatPeriodPointDate(last.time);
       periodLow.textContent=money(low.close,currency);
@@ -5150,6 +5160,11 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         time:good?(quote.priceType==='official_daily'?'Son resmî · ':quote.delayed?'15 dk gecikmeli · ':'')+updated:quote?.error?'Fiyat zamanı alınamadı':'Fiyat zamanı bekleniyor',
         title:good?(quote.stale?'Son başarılı fiyat · ':'')+updated+(quote.provider?' · '+quote.provider:'')+' · '+item.symbol+' grafiğini aç':item.symbol+' grafiğini aç'};
     }
+    function chartAssetProjection(item) {
+      return {symbol:item.symbol,displaySymbol:displaySymbol(item.symbol),name:item.name||displaySymbol(item.symbol),
+        badge:item.symbol.replace(/[^A-Z0-9]/g,'').slice(0,2)||'•',logoSources:favoriteLogoUrls(item.symbol,item.name),
+        logoClass:normalizeSymbol(item.symbol).startsWith('TEFAS-')?'fund-manager-logo':''};
+    }
     // Pilot boundary: existing services remain the single owner of data and timers.
     window.OzerOverviewLegacy = Object.freeze({
       sheetOpen:open=>{overviewSheetOpen=open;syncModalScrollLock()},
@@ -5169,19 +5184,22 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         marketItems=symbols.map(symbol=>items.get(symbol));saveMarketItems();loadMarketSummary();
       },
       mountChartShell:slots=>{
-        const nodes={search:form,plot:document.getElementById('priceChart').closest('.native-plot-card'),rsi:document.getElementById('rsiWrap').closest('.native-plot-card'),dates:datePicker,summary:document.querySelector('.period-summary'),saved:document.querySelector('.chart-asset-switcher'),hint:chartView.querySelector(':scope > p.hint')};
+        const nodes={plot:document.getElementById('priceChart').closest('.native-plot-card'),rsi:document.getElementById('rsiWrap').closest('.native-plot-card'),dates:datePicker,hint:chartView.querySelector(':scope > p.hint')};
         if(Object.values(nodes).some(node=>!node))throw new Error('Grafik kabuğu hazır değil');
         const moved=Object.entries(nodes).map(([key,node])=>{const record=[node,node.parentNode,node.nextSibling];slots[key].append(node);return record});
-        const hidden=[chartView.querySelector(':scope > .page-brand'),chartView.querySelector(':scope > h2'),chartView.querySelector(':scope > .toolbar'),chartView.querySelector(':scope > .periods')].map(node=>[node,node.hidden]);
-        hidden.forEach(([node])=>{node.hidden=true});chartView.dataset.reactChart='ready';
-        return ()=>{moved.reverse().forEach(([node,parent,next])=>parent.insertBefore(node,next?.parentNode===parent?next:null));hidden.forEach(([node,value])=>{node.hidden=value});delete chartView.dataset.reactChart};
+        const hidden=[chartView.querySelector(':scope > .page-brand'),chartView.querySelector(':scope > h2'),chartView.querySelector(':scope > .toolbar'),chartView.querySelector(':scope > .periods'),form,chartView.querySelector(':scope > .period-summary'),chartView.querySelector(':scope > .chart-asset-switcher')].map(node=>[node,node.hidden]);
+        hidden.forEach(([node])=>{node.hidden=true});chartOwnsControls=true;chartFavoritesList.replaceChildren();chartPortfolioList.replaceChildren();chartView.dataset.reactChart='ready';notifyOverview();
+        return ()=>{chartOwnsControls=false;renderChartAssetPanels();moved.reverse().forEach(([node,parent,next])=>parent.insertBefore(node,next?.parentNode===parent?next:null));hidden.forEach(([node,value])=>{node.hidden=value});delete chartView.dataset.reactChart};
       },
+      chartQuery:value=>{symbolInput.value=value;updateFavoriteButton()},
+      chartSelect:(item,scroll=false)=>{symbolInput.value=item.symbol;updateComboboxState(symbolInput,suggestions,false);updateFavoriteButton();closeChartAssetPanels();if(scroll)chartView.scrollIntoView({behavior:'smooth',block:'start'});loadPrice(item.symbol)},
+      chartFavorite:()=>favoriteButton.click(),
       chartPeriod:range=>{const target=range==='custom'?customPeriod:periodButtons.find(node=>node.dataset.range===range);target?.click();notifyOverview()},
       chartAction:id=>{if(['advancedSearchButton','alarmButton','exportCsv','exportPng'].includes(id))document.getElementById(id).click()},
       claimDetailView:()=>{favoriteDetailOwnsView=true;favoriteDetailDialog.dataset.reactDetail='ready'},
       closeDetail:closeFavoriteDetail,
       detailAction:action=>{const item=favoriteDetailItem;if(!item)return;closeFavoriteDetail();({chart:openFavoriteChart,alarm:openFavoriteAlarm,portfolio:openFavoritePortfolio})[action]?.(item)},
-      getData:()=>({chart:{range:selectedRange,start:selectedStart,pngBusy:exportPng.disabled,pngLabel:exportPng.textContent,customLabel:customPeriod.textContent,customOpen:datePicker.classList.contains('visible')},detail:favoriteDetailView,marketItems:marketItems.map(item=>({...item})),markets:marketItems.map(overviewMarketItem),favorites:favorites.map(overviewFavoriteItem),marketCount:marketItems.length,marketUpdated:overviewMarketUpdated,favoriteUpdated:overviewFavoriteUpdated}),
+      getData:()=>({chart:{query:symbolInput.value,isFavorite:isFavorite(currentSymbol()),busy:button.disabled,buttonLabel:button.textContent,summary:{...chartSummaryView,label:periodLastLabel.textContent},favorites:favorites.map(chartAssetProjection),portfolio:portfolio.map(chartAssetProjection),range:selectedRange,start:selectedStart,pngBusy:exportPng.disabled,pngLabel:exportPng.textContent,customLabel:customPeriod.textContent,customOpen:datePicker.classList.contains('visible')},detail:favoriteDetailView,marketItems:marketItems.map(item=>({...item})),markets:marketItems.map(overviewMarketItem),favorites:favorites.map(overviewFavoriteItem),marketCount:marketItems.length,marketUpdated:overviewMarketUpdated,favoriteUpdated:overviewFavoriteUpdated}),
       claimView:()=>{
         overviewOwnsView=true;marketCards.replaceChildren();favoritesList.replaceChildren();notifyOverview();
         return ()=>{
@@ -5253,6 +5271,6 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     })();
   </script>
   <script src="assets/auth-account.js?v=8.0.0"></script>
-  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.6"></script>
+  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.7"></script>
 </body>
 </html>

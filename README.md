@@ -1,5 +1,13 @@
 # Özer Finans v8.0
 
+## v8.1.0-preview.7 — Grafik araması, kayıtlı varlıklar ve Dönem Özeti
+
+Grafik araması ve favori düğmesi ortak `AssetSearch.jsx` ile React’e taşındı. Mevcut arama/çözümleme servisleri ve gecikme kullanılır; kayıtlı varlık veya başka ekrandan seçim, yeni arama sorgusu başlatmadan girişe yansır. `ChartAssets.jsx` Favoriler/Portföy seçicisini Framework7 Segmented/Button ile çizer; seçim paneli kapatıp mevcut `loadPrice` akışına gider. `ChartSummary.jsx` hizmet katmanının biçimlenmiş görüntü modelini gösterir; JSX finans hesabı yapmaz. Gizli eski varlık listeleri boş kalır. Fiyat/RSI canvas’ları, MA, tarih girişi ve dinleyicileri korunur.
+
+`loadPrice`, `fetchFavoriteDetail` ve `calculatePeriodSummary` önceki ön izleme ile birebir aynı. API/cache/batch/auth/Upstash ve kullanıcı/portföy/yedek formatları değişmez. Yeni dependency yok. Hedefli grafik testi ve v8.0 Dönem Özeti yazı/renk/boşluk eşlemesi geçti. Build, genel regresyon ve 375/390/430/1024 px açık/koyu tarayıcı akışı geçti; konsol/runtime hatası yok. Testler sentetik sağlayıcı verisi kullanır.
+
+Yalnız `migration/v8.1-framework7-overview` ön izlemesi; main/production v8.0 korunur. Sonraki öneri Portföy mobil kabuğunu mevcut hesap/veri işlemleriyle taşımaktır; bu sürümde yapılmaz. Diğer ekranı, fiziksel iPhone/Safari/PWA ve canlı hesap/sağlayıcı doğrulaması kalan işlerdir.
+
 ## v8.1.0-preview.6 — Ayrıntı kaydırması ve Grafik kabuğu
 
 Hisse ayrıntısında ortak stil gövdenin yükseklik sınırını kaldırıyor, dış dialog `overflow:hidden` ile uzun içeriği kesiyordu. Dialog flex sütun, gövde `min-height:0` ve ayrı scroll alanı oldu; başlık/alt düğmeler yerinde kalır. Mobil alt düğmeler safe-area boşluğu alır; yeni ayrıntı üstten açılır. 375/390/430/1024 px’de 640/500 px yüksekliklerde gerçek wheel/touch olaylarıyla kontrol edilir.

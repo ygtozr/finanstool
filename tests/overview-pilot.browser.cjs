@@ -221,15 +221,26 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  // React/F7 chart shell must preserve real Chart.js canvases and legacy controls.
  assert.equal(await page.locator('#chartView').getAttribute('data-react-chart'),'ready');
  await page.locator('.pilot-tabbar').getByRole('button',{name:'Grafik',exact:true}).click();
- await page.locator('#submitButton').click();
+ await page.locator('#pilotChartSubmit').click();
  await page.waitForFunction(()=>window.Chart?.getChart(document.getElementById('priceChart'))&&!document.getElementById('submitButton').disabled);
  await page.evaluate(()=>{window.pilotPriceCanvas=document.getElementById('priceChart');window.pilotRsiCanvas=document.getElementById('rsiChart')});
- assert.equal(await page.locator('#chart-react #symbolForm').count(),1,'Existing search form is retained');
+ assert.equal(await page.locator('#chart-react #pilotChartSearchForm').count(),1,'React owns chart search');
+ assert.equal(await page.locator('#chart-react #symbolForm, #chart-react #chartFavoritesPanel, #chart-react #periodLast').count(),0,'Migrated chart controls do not move old widgets');
+ assert.equal(await page.locator('#chartFavoritesList > *, #chartPortfolioList > *').count(),0,'Hidden legacy chart asset lists stay empty');
  assert.equal(await page.locator('#priceChart').count(),1,'Single price canvas');
  assert.equal(await page.locator('#rsiChart').count(),1,'Single RSI canvas');
  assert(await page.evaluate(()=>Chart.getChart(document.getElementById('rsiChart')).data.datasets[0].data.some(Number.isFinite)),'Existing RSI has calculated values');
  const priceCalls=(symbol,range)=>requests.filter(url=>{const u=new URL('https://parity.test'+url);return u.pathname==='/api/price'&&u.searchParams.get('symbol')===symbol&&u.searchParams.get('query')===`range=${range}&interval=1d`}).length;
- const initialChartSymbol=await page.locator('#symbol').inputValue(),startCalls=priceCalls(initialChartSymbol,'1mo');
+ await reference.setViewportSize({width:390,height:844});
+ await reference.evaluate(()=>setActiveView('chart'));
+ await reference.locator('#symbol').fill(await page.locator('#pilotChartSearch').inputValue());await reference.locator('#symbolForm').evaluate(form=>form.requestSubmit());
+ await reference.waitForFunction(()=>!document.getElementById('submitButton').disabled&&document.getElementById('periodLast').textContent!=='—');
+ const summaryMeasure=selector=>{
+  const root=document.querySelector(selector);
+  return [...root.querySelectorAll('h3,dt,dd,small,.period-summary-range-fill,.period-summary-range-labels')].map(n=>{const c=getComputedStyle(n);return [n.tagName,n.className,n.textContent.replace(/\s/g,''),c.fontSize,c.fontWeight,c.color,c.backgroundColor,c.borderRadius,c.padding,c.gap,n.classList.contains('period-summary-range-fill')?n.style.width:''];});
+ };
+ assert.deepEqual(await page.evaluate(summaryMeasure,'#pilotPeriodSummary'),await reference.evaluate(summaryMeasure,'.period-summary'),'Service-owned React summary matches v8.0');
+ const initialChartSymbol=await page.locator('#pilotChartSearch').inputValue(),startCalls=priceCalls(initialChartSymbol,'1mo');
  await page.locator('#chart-react [data-range="1mo"]').click();
  await page.waitForFunction(()=>!document.getElementById('submitButton').disabled&&selectedRange==='1mo');
  assert.equal(priceCalls(initialChartSymbol,'1mo')-startCalls,1,'One legacy price request per period selection');
@@ -240,11 +251,12 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  assert.match(await page.locator('#pilotCustomPeriod').textContent(),/15.01.2025 tarihinden itibaren/);
  await page.locator('#chart-react [data-range="6mo"]').click();
  await page.waitForFunction(()=>!document.getElementById('submitButton').disabled&&!selectedStart);
- await page.locator('#symbol').fill('NVDA');await page.locator('#suggestions button').filter({hasText:'NVDA'}).click();
+ await page.locator('#pilotChartSearch').fill('NVDA');await page.locator('#pilotChartSearchSuggestions button').filter({hasText:'NVDA'}).click();
  await page.waitForFunction(()=>primarySymbol==='NVDA'&&!document.getElementById('submitButton').disabled);
+ assert.equal(await page.locator('#pilotChartSearch').inputValue(),'NVDA','Selection keeps its symbol in the React input');
  assert.match(await page.locator('#meta').textContent(),/NVDA örnek şirket/);
- await page.locator('#favoriteButton').click();await page.waitForFunction(()=>favorites.some(item=>item.symbol==='NVDA'));
- await page.locator('#favoriteButton').click();await page.waitForFunction(()=>!favorites.some(item=>item.symbol==='NVDA'));
+ await page.locator('#pilotChartFavorite').click();await page.waitForFunction(()=>favorites.some(item=>item.symbol==='NVDA'));
+ await page.locator('#pilotChartFavorite').click();await page.waitForFunction(()=>!favorites.some(item=>item.symbol==='NVDA'));
  await page.locator('#maToggle').click();await page.waitForFunction(()=>maEnabled&&Chart.getChart(document.getElementById('priceChart')).data.datasets.length>=4);
  await page.locator('#maToggle').click();await page.waitForFunction(()=>!maEnabled);
  await page.locator('#pilot-advancedSearchButton').click();await page.locator('#advancedSearchDialog[open]').waitFor();await page.keyboard.press('Escape');
@@ -266,9 +278,20 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  assert.equal(await page.locator('#pilot-exportPng').textContent(),'PNG hazırlanıyor…');
  await page.evaluate(()=>releasePngPicker());await page.waitForFunction(()=>window.savedPng?.closed);
  assert.equal(await page.evaluate(()=>savedPng.type),'image/png');assert(await page.evaluate(()=>savedPng.size>0));
- await page.locator('#chartFavoritesToggle').click();await page.locator('#chartFavoritesPanel').waitFor();
- await page.locator('#chartFavoritesList button').first().click();
+ await page.locator('#pilotChartFavoritesToggle').click();await page.locator('#pilotChart-favorites').waitFor();
+ await page.locator('#pilotChart-favorites button').first().click();
  await page.waitForFunction(()=>!document.getElementById('submitButton').disabled);
+ assert.equal(await page.locator('#pilotChart-favorites').isVisible(),false,'Selecting a saved asset closes the panel');
+ assert.equal(await page.locator('#pilotChartSearch').inputValue(),await page.evaluate(()=>primarySymbol),'Saved asset selection syncs React search');
+ await page.locator('#pilotChartPortfolioToggle').click();await page.locator('#pilotChart-portfolio').waitFor();
+ assert.match(await page.locator('#pilotChart-portfolio').textContent(),/AAPL/);
+ // Empty/repopulated states are read from the services, even with empty legacy lists.
+ await page.evaluate(()=>{window.chartFavoritesBefore=favorites;window.chartPortfolioBefore=portfolio;favorites=[];portfolio=[];renderChartAssetPanels();renderFavorites()});
+ await page.locator('#pilotChart-portfolio .chart-asset-empty').filter({hasText:'Portföyünüzde hisse yok.'}).waitFor();
+ await page.locator('#pilotChartFavoritesToggle').click();await page.locator('#pilotChart-favorites .chart-asset-empty').filter({hasText:'Henüz favori hisse yok.'}).waitFor();
+ await page.evaluate(()=>{favorites=window.chartFavoritesBefore;portfolio=window.chartPortfolioBefore;renderChartAssetPanels();renderFavorites()});
+ await page.locator('#pilotChart-favorites .chart-asset-item').first().waitFor();
+ await page.locator('#pilotChartFavoritesToggle').click();
  assert.equal(await page.evaluate(()=>document.getElementById('priceChart')===window.pilotPriceCanvas&&document.getElementById('rsiChart')===window.pilotRsiCanvas),true,'React updates retain canvas nodes');
  for(const width of [375,390,430,1024])for(const mode of ['light','dark']){
   await page.setViewportSize({width,height:844});await page.evaluate(mode=>OzerOverviewLegacy.theme(mode),mode);await page.waitForTimeout(250);
@@ -479,6 +502,6 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForFunction(()=>document.querySelector('.pilot-market-card strong'));
  assert.equal(await page.locator('.pilot-market-card strong').filter({hasText:'Veri alınamadı'}).count(),0,'Existing data service recovers after error');
  assert.deepEqual(errors,[],'No console or runtime errors');
- console.log('PASS: wheel/touch short-screen detail scroll, React chart shell/real canvases/period/custom-date/search/MA/actions/exports, React detail loading/error/stale-response/focus/native handoffs, React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
+ console.log('PASS: React chart search/asset picker/summary, v8.0 summary parity and empty states, wheel/touch short-screen detail scroll, React chart shell/real canvases/period/custom-date/search/MA/actions/exports, React detail loading/error/stale-response/focus/native handoffs, React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -2,12 +2,15 @@ import React, { useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Button, Page, Segmented } from 'framework7-react';
 import { overview } from './legacy-adapter';
+import { AssetSearch } from './AssetSearch';
+import { ChartAssets } from './ChartAssets';
+import { ChartSummary } from './ChartSummary';
 
 const ranges = [['5d', '1 hafta'], ['1mo', '1 ay'], ['3mo', '3 ay'], ['6mo', '6 ay'], ['1y', '1 yıl'], ['5y', '5 yıl']];
 const actions = [['advancedSearchButton', 'Gelişmiş Arama'], ['alarmButton', 'Fiyat Alarmı'], ['exportCsv', 'CSV İndir'], ['exportPng', 'PNG İndir']];
 
-// Only the shell is React-owned. The existing search, canvases, summaries and
-// saved-asset widgets keep their DOM nodes, event listeners and Chart.js instances.
+// Existing canvases, MA and date input retain their DOM nodes and listeners.
+// React controls consume the existing service-owned view model.
 export function ChartShell({ chart }) {
   const host = useRef(null);
   useLayoutEffect(() => {
@@ -21,7 +24,7 @@ export function ChartShell({ chart }) {
     <Page name="chart" className="pilot-chart-page">
       <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v8.1</span></h1>
       <h2 id="pilotChartTitle">Grafik Ve Teknik Analiz</h2>
-      <div data-chart-slot="search" className="pilot-chart-slot" />
+      <AssetSearch kind="chart" onAdd={overview.chartSelect} chartState={chart} />
       <div className="toolbar pilot-chart-toolbar" role="group" aria-label="Grafik işlemleri">
         {actions.map(([id, label]) => <Button type="button" key={id} id={`pilot-${id}`} disabled={id === 'exportPng' && chart.pngBusy} aria-disabled={id === 'exportPng' ? chart.pngBusy : undefined} aria-busy={id === 'exportPng' ? chart.pngBusy : undefined} onClick={() => overview.chartAction(id)}>{id === 'exportPng' ? chart.pngLabel : label}</Button>)}
       </div>
@@ -32,9 +35,9 @@ export function ChartShell({ chart }) {
         <Button id="pilotCustomPeriod" type="button" className={chart.start ? 'active' : ''} aria-pressed={Boolean(chart.start)} aria-expanded={chart.customOpen} aria-controls="datePicker" onClick={() => overview.chartPeriod('custom')}>{chart.customLabel}</Button>
         <div data-chart-slot="dates" className="pilot-chart-slot" />
       </Segmented>
-      <div data-chart-slot="summary" className="pilot-chart-slot" />
+      <ChartSummary summary={chart.summary} />
       <div data-chart-slot="hint" className="pilot-chart-slot" />
-      <div data-chart-slot="saved" className="pilot-chart-slot" />
+      <ChartAssets favorites={chart.favorites} portfolio={chart.portfolio} />
     </Page>
   </div>, document.getElementById('chartView'));
 }

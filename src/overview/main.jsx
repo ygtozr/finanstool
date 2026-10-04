@@ -98,7 +98,7 @@ function AppShell() {
   useEffect(() => {
     const release = overview.claimView();
     const oldTitle = document.title;
-    document.title = 'Özer Finans v8.1.0-preview.6 — Ön izleme';
+    document.title = 'Özer Finans v8.1.0-preview.7 — Ön izleme';
     document.documentElement.dataset.overviewPilot = 'ready';
     return () => { unlockSheet(); release(); document.title = oldTitle; delete document.documentElement.dataset.overviewPilot; };
   }, []);

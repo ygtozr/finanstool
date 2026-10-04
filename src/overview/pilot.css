@@ -77,3 +77,10 @@ html[data-overview-pilot] body > .mobile-bottom-nav { display:none !important; }
 /* Neutralize Framework7's fixed toolbar sizing and overlays for chart action grids. */
 #chart-react .pilot-chart-toolbar { position:relative; top:auto; bottom:auto; height:auto; transform:none; z-index:auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:0 0 12px; padding:0; border:0; background:transparent; box-shadow:none; }
 #chart-react .pilot-chart-toolbar::before, #chart-react .pilot-chart-toolbar::after { display:none; }
+
+#chart-react #pilotChartSearchForm { display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:12px; }
+#chart-react #pilotChartSubmit { min-height:44px; padding:8px; font-size:.8125rem; }
+#chart-react #pilotChartFavorite { color:var(--accent-ink); background:color-mix(in srgb,var(--accent) 13%,transparent); border:1px solid var(--line); }
+#chart-react .chart-asset-switcher-buttons { box-shadow:none; }
+#chart-react .chart-asset-switcher-buttons .button { height:auto; line-height:1.5; text-transform:none; letter-spacing:normal; }
+@media(max-width:760px) { #chart-react .chart-asset-switcher-buttons .button, #chart-react .chart-asset-item { min-height:44px; } }

@@ -28,7 +28,7 @@ function update() {
 }
 const observer = new MutationObserver(update);
 for (const selector of ['html', '#marketRefresh', '#submitButton', '#customPeriod', '#exportPng', '#authGate', '.app-view']) {
-  document.querySelectorAll(selector).forEach(node => observer.observe(node, { attributes: true, childList: ['#customPeriod', '#exportPng'].includes(selector), subtree: ['#customPeriod', '#exportPng'].includes(selector) }));
+  document.querySelectorAll(selector).forEach(node => observer.observe(node, { attributes: true, childList: ['#customPeriod', '#exportPng', '#submitButton'].includes(selector), subtree: ['#customPeriod', '#exportPng', '#submitButton'].includes(selector) }));
 }
 window.addEventListener('ozer:overview-change', update);
 window.addEventListener('ozer:local-data-change', update);
@@ -36,6 +36,7 @@ export const overview = {
   sheetOpen: open => legacy.sheetOpen(open),
   claimView: () => legacy.claimView(),
   mountChartShell: slots => legacy.mountChartShell(slots), chartPeriod: range => legacy.chartPeriod(range), chartAction: id => legacy.chartAction(id),
+  chartQuery: value => legacy.chartQuery(value), chartSelect: (item, scroll) => legacy.chartSelect(item, scroll), chartFavorite: () => legacy.chartFavorite(),
   claimDetailView: () => legacy.claimDetailView(),
   closeDetail: () => legacy.closeDetail(), detailAction: action => legacy.detailAction(action),
   getSnapshot: () => snapshot,
