@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useSyncExternalStore } from 'react';
 import { overview } from './legacy-adapter';
 
 // All displayed values are formatted by the existing detail service.
@@ -6,6 +6,7 @@ import { overview } from './legacy-adapter';
 export function FavoriteDetail() {
   const { detail } = useSyncExternalStore(overview.subscribe, overview.getSnapshot);
   const ready = detail?.status === 'ready';
+  useLayoutEffect(() => { document.getElementById('favoriteDetailBody').scrollTop = 0; }, [detail?.symbol]);
   useEffect(() => {
     const dialog = document.getElementById('favoriteDetailDialog');
     const trapFocus = event => {

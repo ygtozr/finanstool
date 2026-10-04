@@ -186,6 +186,103 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  const last= requests.filter(url=>url.startsWith('/api/prices?')&&url.includes('mode=compact')).at(-1);
  const symbols=new URL('https://parity.test'+last).searchParams.get('symbols').split(',');
  assert.equal(symbols.length,new Set(symbols).size,'Batch symbols stay deduplicated');
+ // Long stock detail content must scroll independently at short viewport heights.
+ const touchDevice=await context.newCDPSession(page);
+ for(const width of [375,390,430,1024])for(const height of [640,500]){
+  await page.setViewportSize({width,height});
+  await page.locator('.pilot-favorite-row[data-symbol="AAPL"] .favorite-card').click();
+  await page.locator('#favoriteDetailDialog .favorite-detail-hero').waitFor();await page.waitForTimeout(250);
+  const body=page.locator('#favoriteDetailBody'),footer=page.locator('.favorite-detail-actions'),head=page.locator('.favorite-detail-head');
+  const geometry=await body.evaluate(n=>({scroll:n.scrollHeight,client:n.clientHeight}));
+  assert(geometry.scroll>geometry.client,'Detail content has a scroll area at '+width+'/'+height);
+  const beforeFooter=await footer.boundingBox(),beforeHead=await head.boundingBox();
+  assert(beforeFooter.y+beforeFooter.height<=height+.5,'Actions remain inside short viewport');
+  await body.hover();await page.mouse.wheel(0,600);await page.waitForFunction(()=>document.getElementById('favoriteDetailBody').scrollTop>0);
+  assert.equal((await footer.boundingBox()).y,beforeFooter.y,'Footer stays fixed while content scrolls');
+  assert.equal((await head.boundingBox()).y,beforeHead.y,'Header stays fixed while content scrolls');
+  await body.evaluate(n=>{n.scrollTop=0});
+  const bounds=await body.boundingBox(),x=Math.round(bounds.x+bounds.width/2),y=Math.round(bounds.y+bounds.height*.75);
+  await touchDevice.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});
+  for(let step=1;step<=6;step++){await touchDevice.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y-step*18,id:1}]});await page.waitForTimeout(16);}
+  await touchDevice.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  await page.waitForFunction(()=>document.getElementById('favoriteDetailBody').scrollTop>0);
+  assert.equal(await page.locator('body').evaluate(n=>n.classList.contains('modal-open')),true,'Background remains locked during touch scroll');
+  await page.screenshot({path:path.join(output,`${width}-${height}-detail-scroll.png`)});
+  // Let native touch momentum settle, then keep touch input (no ghost mouse clicks).
+  await page.waitForTimeout(400);
+  await page.locator('#favoriteDetailClose').tap();
+  await page.waitForFunction(()=>!document.getElementById('favoriteDetailDialog').open);
+  await page.locator('.pilot-favorite-row[data-symbol="AAPL"] .favorite-card').click();
+  await page.locator('#favoriteDetailDialog .favorite-detail-hero').waitFor();
+  assert.equal(await body.evaluate(n=>n.scrollTop),0,'Reopened detail starts at the top');
+  await page.locator('#favoriteDetailClose').click();
+ }
+ await page.setViewportSize({width:390,height:844});
+ // React/F7 chart shell must preserve real Chart.js canvases and legacy controls.
+ assert.equal(await page.locator('#chartView').getAttribute('data-react-chart'),'ready');
+ await page.locator('.pilot-tabbar').getByRole('button',{name:'Grafik',exact:true}).click();
+ await page.locator('#submitButton').click();
+ await page.waitForFunction(()=>window.Chart?.getChart(document.getElementById('priceChart'))&&!document.getElementById('submitButton').disabled);
+ await page.evaluate(()=>{window.pilotPriceCanvas=document.getElementById('priceChart');window.pilotRsiCanvas=document.getElementById('rsiChart')});
+ assert.equal(await page.locator('#chart-react #symbolForm').count(),1,'Existing search form is retained');
+ assert.equal(await page.locator('#priceChart').count(),1,'Single price canvas');
+ assert.equal(await page.locator('#rsiChart').count(),1,'Single RSI canvas');
+ assert(await page.evaluate(()=>Chart.getChart(document.getElementById('rsiChart')).data.datasets[0].data.some(Number.isFinite)),'Existing RSI has calculated values');
+ const priceCalls=(symbol,range)=>requests.filter(url=>{const u=new URL('https://parity.test'+url);return u.pathname==='/api/price'&&u.searchParams.get('symbol')===symbol&&u.searchParams.get('query')===`range=${range}&interval=1d`}).length;
+ const initialChartSymbol=await page.locator('#symbol').inputValue(),startCalls=priceCalls(initialChartSymbol,'1mo');
+ await page.locator('#chart-react [data-range="1mo"]').click();
+ await page.waitForFunction(()=>!document.getElementById('submitButton').disabled&&selectedRange==='1mo');
+ assert.equal(priceCalls(initialChartSymbol,'1mo')-startCalls,1,'One legacy price request per period selection');
+ assert.equal(await page.locator('#chart-react [data-range="1mo"]').getAttribute('aria-pressed'),'true');
+ await page.locator('#pilotCustomPeriod').click();await page.locator('#startDate').fill('15.01.2025');await page.locator('#startDate').press('Enter');
+ await page.waitForFunction(()=>selectedStart==='2025-01-15'&&!document.getElementById('submitButton').disabled);
+ assert.equal(await page.locator('#pilotCustomPeriod').getAttribute('aria-pressed'),'true');
+ assert.match(await page.locator('#pilotCustomPeriod').textContent(),/15.01.2025 tarihinden itibaren/);
+ await page.locator('#chart-react [data-range="6mo"]').click();
+ await page.waitForFunction(()=>!document.getElementById('submitButton').disabled&&!selectedStart);
+ await page.locator('#symbol').fill('NVDA');await page.locator('#suggestions button').filter({hasText:'NVDA'}).click();
+ await page.waitForFunction(()=>primarySymbol==='NVDA'&&!document.getElementById('submitButton').disabled);
+ assert.match(await page.locator('#meta').textContent(),/NVDA örnek şirket/);
+ await page.locator('#favoriteButton').click();await page.waitForFunction(()=>favorites.some(item=>item.symbol==='NVDA'));
+ await page.locator('#favoriteButton').click();await page.waitForFunction(()=>!favorites.some(item=>item.symbol==='NVDA'));
+ await page.locator('#maToggle').click();await page.waitForFunction(()=>maEnabled&&Chart.getChart(document.getElementById('priceChart')).data.datasets.length>=4);
+ await page.locator('#maToggle').click();await page.waitForFunction(()=>!maEnabled);
+ await page.locator('#pilot-advancedSearchButton').click();await page.locator('#advancedSearchDialog[open]').waitFor();await page.keyboard.press('Escape');
+ await page.locator('#pilot-alarmButton').click();await page.locator('#alarmDialog[open]').waitFor();await page.keyboard.press('Escape');
+ // iPhone download fallback: native file picker is unavailable in mobile Safari.
+ await page.evaluate(()=>{window.showSaveFilePicker=undefined});
+ for(const type of ['Csv','Png']){
+  const downloading=page.waitForEvent('download');await page.locator('#pilot-export'+type).click();const download=await downloading;
+  assert.match(download.suggestedFilename(),type==='Csv'?/\.csv$/:/\.png$/);
+  const bytes=fs.readFileSync(await download.path());
+  if(type==='Csv'){assert.match(bytes.toString('utf8'),/Tarih.*NVDA.*RSI \(14\)/);assert(bytes.toString('utf8').split('\n').length>200);}
+  else assert.equal(bytes.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+  await download.delete();
+ }
+ await page.evaluate(()=>{window.savedPng=null;window.showSaveFilePicker=options=>new Promise(resolve=>{window.releasePngPicker=()=>resolve({createWritable:async()=>({write:async blob=>{window.savedPng={name:options.suggestedName,size:blob.size,type:blob.type}},close:async()=>{window.savedPng.closed=true}})})})});
+ await page.locator('#pilot-exportPng').click();
+ await page.waitForFunction(()=>document.getElementById('pilot-exportPng').classList.contains('disabled'));
+ assert.equal(await page.locator('#pilot-exportPng').getAttribute('aria-disabled'),'true');
+ assert.equal(await page.locator('#pilot-exportPng').textContent(),'PNG hazırlanıyor…');
+ await page.evaluate(()=>releasePngPicker());await page.waitForFunction(()=>window.savedPng?.closed);
+ assert.equal(await page.evaluate(()=>savedPng.type),'image/png');assert(await page.evaluate(()=>savedPng.size>0));
+ await page.locator('#chartFavoritesToggle').click();await page.locator('#chartFavoritesPanel').waitFor();
+ await page.locator('#chartFavoritesList button').first().click();
+ await page.waitForFunction(()=>!document.getElementById('submitButton').disabled);
+ assert.equal(await page.evaluate(()=>document.getElementById('priceChart')===window.pilotPriceCanvas&&document.getElementById('rsiChart')===window.pilotRsiCanvas),true,'React updates retain canvas nodes');
+ for(const width of [375,390,430,1024])for(const mode of ['light','dark']){
+  await page.setViewportSize({width,height:844});await page.evaluate(mode=>OzerOverviewLegacy.theme(mode),mode);await page.waitForTimeout(250);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Chart has no horizontal overflow');
+  assert(await page.locator('#priceChart').evaluate(n=>n.width>0&&n.height>0),'Live Chart.js canvas is sized');
+  const toolbarBox=await page.locator('.pilot-chart-toolbar').boundingBox(),plotBox=await page.locator('#chart-react .native-plot-card').first().boundingBox();
+  assert(plotBox.y>=toolbarBox.y+toolbarBox.height,'Toolbar does not overlap chart metadata');
+  const actionBoxes=await page.locator('.pilot-chart-toolbar button').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {y:r.y,height:r.height}}));
+  assert(actionBoxes.every(b=>b.y+b.height<=toolbarBox.y+toolbarBox.height+.5),'All chart actions fit their toolbar');
+  if(width<761)assert((await page.locator('#pilot-alarmButton').boundingBox()).height>=44,'Chart actions have mobile touch targets');
+  await page.screenshot({path:path.join(output,`${width}-${mode}-chart.png`),fullPage:true});
+ }
+ await page.setViewportSize({width:390,height:844});
+ await page.locator('.pilot-tabbar').getByRole('button',{name:'Özet',exact:true}).click();
  const initialMarkets=await page.evaluate(()=>JSON.parse(localStorage.getItem('finans-grafigi-market-items')));
  const settingsButton=page.getByRole('button',{name:'Piyasa özetini düzenle',exact:true});
  await settingsButton.click();
@@ -201,6 +298,14 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
   await page.screenshot({path:path.join(output,`${width}-market-settings.png`)});
  }
  await page.setViewportSize({width:390,height:844});
+ // Framework sheets/popups must not start the background pull-to-refresh gesture.
+ const popupList=await page.locator('.pilot-market-popup .market-settings-list').boundingBox(),popupX=Math.round(popupList.x+popupList.width/2),popupY=Math.round(popupList.y+30),popupRequests=compact();
+ await touchDevice.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:popupX,y:popupY,id:2}]});
+ for(let step=1;step<=5;step++){await touchDevice.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:popupX,y:popupY+step*22,id:2}]});await page.waitForTimeout(16);}
+ assert.equal(await page.locator('.pull-refresh-indicator.visible').count(),0,'Popup drag does not intercept background refresh');
+ await touchDevice.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ await page.waitForTimeout(400);await page.locator('#pilotMarketSearch').tap();
+ assert.equal(compact(),popupRequests,'Popup drag does not send a background price batch');
  await page.locator('#pilotMarketSearch').fill('NVDA');
  await page.locator('#pilotMarketSearchSuggestions button').filter({hasText:'NVDA'}).click();
  await page.waitForFunction(()=>document.querySelectorAll('.pilot-market-popup .market-settings-row').length===9);
@@ -344,7 +449,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  assert.equal(await page.locator('.pilot-tabbar').evaluate(n=>getComputedStyle(n).paddingBottom),'40px','Actual bottom env inset');
  assert.equal(Math.round((await page.locator('.pilot-tabbar').boundingBox()).height),95);
  assert.equal(await page.locator('main').evaluate(n=>getComputedStyle(n).paddingTop),'47px','Top safe-area reserved once');
- assert.equal(await page.locator('.pilot-brand').evaluate(n=>getComputedStyle(n).top),'47px','Actual sticky top env inset');
+ assert.equal(await page.locator('#overview-react .pilot-brand').evaluate(n=>getComputedStyle(n).top),'47px','Actual sticky top env inset');
  assert.equal(await page.evaluate(()=>matchMedia('(display-mode: standalone)').matches&&navigator.standalone),true);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Standalone safe-area does not change viewport width');
  await page.screenshot({path:path.join(output,'standalone-safe-area.png')});
@@ -374,6 +479,6 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForFunction(()=>document.querySelector('.pilot-market-card strong'));
  assert.equal(await page.locator('.pilot-market-card strong').filter({hasText:'Veri alınamadı'}).count(),0,'Existing data service recovers after error');
  assert.deepEqual(errors,[],'No console or runtime errors');
- console.log('PASS: React detail loading/error/stale-response/focus/native handoffs, React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
+ console.log('PASS: wheel/touch short-screen detail scroll, React chart shell/real canvases/period/custom-date/search/MA/actions/exports, React detail loading/error/stale-response/focus/native handoffs, React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

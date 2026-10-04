@@ -52,3 +52,28 @@ html[data-overview-pilot] body > .mobile-bottom-nav { display:none !important; }
 .pilot-market-popup .market-settings-list { overscroll-behavior:contain; }
 .search-suggestions .suggestion[aria-selected="true"] { background:var(--surface-control); }
 @media(max-width:600px) { .pilot-market-popup.modal-in, .pilot-market-popup.modal-out { align-items:flex-end; } }
+
+/* Keep the native sheet chrome fixed while long detail content can scroll. */
+#favoriteDetailDialog[open] { display:flex; flex-direction:column; max-height:calc(100dvh - env(safe-area-inset-top,0px) - 48px); }
+#favoriteDetailDialog > .favorite-detail-head,
+#favoriteDetailDialog > .favorite-detail-actions { flex-shrink:0; }
+#favoriteDetailDialog > .favorite-detail-body { flex:1 1 auto; min-height:0; align-content:start; overflow-y:auto; overscroll-behavior-y:contain; touch-action:pan-y; -webkit-overflow-scrolling:touch; }
+@media(max-width:760px) { #favoriteDetailDialog > .favorite-detail-actions { padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); } }
+
+#chart-react { min-width:0; }
+#chart-react .page, #chart-react .page-content { position:relative; height:auto; min-height:0; width:100%; overflow:visible; transform:none; background:transparent; }
+#chart-react .page-content { padding:0; }
+.pilot-chart-slot { display:contents; }
+#pilotChartTitle { font-size:1.1875rem; font-weight:700; }
+#chart-react .pilot-chart-toolbar .button { display:block; height:auto; line-height:1.5; text-transform:none; letter-spacing:normal; }
+#chart-react .pilot-chart-periods { box-shadow:none; }
+#chart-react .pilot-chart-periods .button { height:auto; line-height:1.5; text-transform:none; letter-spacing:normal; }
+#chart-react #pilotCustomPeriod { grid-column:1 / -1; }
+@media(max-width:760px) {
+  #chart-react .pilot-brand { top:env(safe-area-inset-top,0px); }
+  #chart-react .pilot-chart-toolbar .button, #chart-react .pilot-chart-periods .button { min-height:44px; }
+}
+@media(prefers-reduced-motion:reduce) { #chart-react * { transition:none !important; animation:none !important; } }
+/* Neutralize Framework7's fixed toolbar sizing and overlays for chart action grids. */
+#chart-react .pilot-chart-toolbar { position:relative; top:auto; bottom:auto; height:auto; transform:none; z-index:auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:0 0 12px; padding:0; border:0; background:transparent; box-shadow:none; }
+#chart-react .pilot-chart-toolbar::before, #chart-react .pilot-chart-toolbar::after { display:none; }

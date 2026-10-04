@@ -1,5 +1,15 @@
 # Özer Finans v8.0
 
+## v8.1.0-preview.6 — Ayrıntı kaydırması ve Grafik kabuğu
+
+Hisse ayrıntısında ortak stil gövdenin yükseklik sınırını kaldırıyor, dış dialog `overflow:hidden` ile uzun içeriği kesiyordu. Dialog flex sütun, gövde `min-height:0` ve ayrı scroll alanı oldu; başlık/alt düğmeler yerinde kalır. Mobil alt düğmeler safe-area boşluğu alır; yeni ayrıntı üstten açılır. 375/390/430/1024 px’de 640/500 px yüksekliklerde gerçek wheel/touch olaylarıyla kontrol edilir.
+
+`ChartShell.jsx` Grafik sayfası, araç çubuğu ve dönem/özel tarih düğmelerini React + Framework7 Page/Segmented/Button ile çizer. Mevcut arama formu, fiyat/RSI canvas’ları, MA toggle, dönem özeti ve kayıtlı varlık seçici aynı DOM düğümleri/dinleyicileriyle korunur. Dönem ve araç işlemleri mevcut handler’lara yönlenir. Mobil düğmeler en az 44 px; Framework7 toolbar yüksekliği/katmanları sıfırlanarak grafikle çakışma önlenir. `loadPrice` ve `fetchFavoriteDetail` API/cache/hesaplama işlevleri birebir korunur. Yeni dependency veya veri alanı yok.
+
+Framework7’nin indirme linklerini router olarak yakalaması engellenir (`a[download]` ve mevcut davet bağlantısı tarayıcıya bırakılır); CSV/PNG üretim mantığı değişmez; React PNG düğmesi mevcut hazırlama/kilit durumunu yansıtır. Sheet/popup açıkken eski aşağı çekerek yenileme başlayamaz. Hedefli kapsam: dört genişlik/iki tema, bağımsız ayrıntı kaydırma/odak, gerçek Chart.js/RSI, tek dönem sorgusu, özel tarih, öneri seçimi, favori/MA, mevcut arama/alarm pencereleri, gerçek CSV/PNG indirme ve masaüstü PNG save-picker yazma yolu, popup hareketi, PWA/safe-area, veri/yedek uyumluluğu ve genel regresyon geçti; konsol/runtime hatası yok. Fiziksel iPhone/Safari ve canlı sağlayıcı kontrolü yapılmaz.
+
+Yalnız `migration/v8.1-framework7-overview` ön izlemesi; main/production v8.0 değişmez. Kalan migration işleri: Grafik arama/kayıtlı varlık/özet kontrolleri hâlâ eski DOM ile çalışır; Portföy ve Diğer taşınmadı. Sonraki öneri Grafik araması ve kayıtlı varlık seçimini mevcut servislerle React’e almaktır; bu sürümde uygulanmaz. Fiziksel iPhone kurulum/klavye/standalone ve canlı sağlayıcı uçtan uca kontrolü ayrıca gerekir.
+
 ## v8.1.0-preview.5 — React Favori Ayrıntısı
 
 `src/overview/FavoriteDetail.jsx`, mevcut native `favoriteDetailDialog` içeriğini React ile çizer. Dialogun top-layer/arka plan, Escape, odak geri dönüşü ve ortak kaydırma kilidi korunur; Tab/Shift+Tab odağı içeride tutulur. Grafik/Alarm/Portföy düğmeleri adaptör üzerinden mevcut işlemlere gider. Mevcut `fetchFavoriteDetail` sorgu/cache/hesaplama işlevi birebir korunur. Biçimlenmiş görüntü modeli hizmet sınırında hazırlanır; JSX finans hesabı veya yeni fetch/timer içermez. Eski renderer pilot yüklenmezse kullanılabilir. Yeni dependency veya kullanıcı/depolama/yedek alanı yok.

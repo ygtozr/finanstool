@@ -9,6 +9,7 @@ import { overview } from './legacy-adapter';
 import { AssetSearch } from './AssetSearch';
 import { MarketSettings } from './MarketSettings';
 import { FavoriteDetail } from './FavoriteDetail';
+import { ChartShell } from './ChartShell';
 import './pilot.css';
 Framework7.use([Framework7React, SheetModule, PopupModule]);
 
@@ -97,12 +98,12 @@ function AppShell() {
   useEffect(() => {
     const release = overview.claimView();
     const oldTitle = document.title;
-    document.title = 'Özer Finans v8.1.0-preview.5 — Ön izleme';
+    document.title = 'Özer Finans v8.1.0-preview.6 — Ön izleme';
     document.documentElement.dataset.overviewPilot = 'ready';
     return () => { unlockSheet(); release(); document.title = oldTitle; delete document.documentElement.dataset.overviewPilot; };
   }, []);
   return <App theme="ios" name="Özer Finans" className={`pilot-app ${state.theme === 'dark' ? 'dark' : ''}`}
-    touch={{ fastClicks: false }} view={{ router: false }}>
+    touch={{ fastClicks: false }} clicks={{ externalLinks: '.external, a[download], #inviteLink' }} view={{ router: false }}>
     <View main router={false}><Page name="overview" className="pilot-page">
       <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v8.1</span></h1>
       {refreshError ? <ErrorState message={refreshError} retry={refresh} /> : null}
@@ -118,6 +119,7 @@ function AppShell() {
       </section></div>
     </Page></View>
     <MarketSettings opened={settingsOpen} onClose={() => setSettingsOpen(false)} items={state.marketItems} />
+    <ChartShell chart={state.chart} />
     <MobileTabBar view={state.view} authenticated={state.authenticated} />
     {createPortal(<Sheet ref={sheet} role="dialog" aria-modal="true" aria-labelledby="pilotActionsTitle" className="pilot-action-sheet" opened={Boolean(actions)} backdrop closeByBackdropClick closeOnEscape swipeToClose
       containerEl="body" onSheetOpen={() => {

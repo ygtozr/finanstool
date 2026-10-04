@@ -792,7 +792,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.5">
+  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.6">
   <link rel="stylesheet" href="assets/design-tokens.css?v=8.0">
   <link rel="stylesheet" href="assets/ios-parity.css?v=8.0">
   <link rel="stylesheet" href="assets/component-system.css?v=8.0">
@@ -4744,7 +4744,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       finally{pullRefreshRunning=false;pullRefreshHideTimer=setTimeout(()=>resetPullRefreshIndicator({immediate:true}),850)}
     }
     document.addEventListener('touchstart',event=>{
-      if(pullRefreshRunning||document.querySelector('dialog[open]')||window.scrollY>0||event.touches.length!==1)return;
+      if(pullRefreshRunning||overviewSheetOpen||document.querySelector('dialog[open]')||window.scrollY>0||event.touches.length!==1)return;
       clearTimeout(pullRefreshHideTimer);pullRefreshStartY=event.touches[0].clientY;pullRefreshDistance=0;
       document.addEventListener('touchmove',trackPullRefresh,{passive:false});
     },{passive:true});
@@ -5168,10 +5168,20 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         if(symbols.length!==items.size||new Set(symbols).size!==items.size||symbols.some(symbol=>!items.has(symbol)))return;
         marketItems=symbols.map(symbol=>items.get(symbol));saveMarketItems();loadMarketSummary();
       },
+      mountChartShell:slots=>{
+        const nodes={search:form,plot:document.getElementById('priceChart').closest('.native-plot-card'),rsi:document.getElementById('rsiWrap').closest('.native-plot-card'),dates:datePicker,summary:document.querySelector('.period-summary'),saved:document.querySelector('.chart-asset-switcher'),hint:chartView.querySelector(':scope > p.hint')};
+        if(Object.values(nodes).some(node=>!node))throw new Error('Grafik kabuğu hazır değil');
+        const moved=Object.entries(nodes).map(([key,node])=>{const record=[node,node.parentNode,node.nextSibling];slots[key].append(node);return record});
+        const hidden=[chartView.querySelector(':scope > .page-brand'),chartView.querySelector(':scope > h2'),chartView.querySelector(':scope > .toolbar'),chartView.querySelector(':scope > .periods')].map(node=>[node,node.hidden]);
+        hidden.forEach(([node])=>{node.hidden=true});chartView.dataset.reactChart='ready';
+        return ()=>{moved.reverse().forEach(([node,parent,next])=>parent.insertBefore(node,next?.parentNode===parent?next:null));hidden.forEach(([node,value])=>{node.hidden=value});delete chartView.dataset.reactChart};
+      },
+      chartPeriod:range=>{const target=range==='custom'?customPeriod:periodButtons.find(node=>node.dataset.range===range);target?.click();notifyOverview()},
+      chartAction:id=>{if(['advancedSearchButton','alarmButton','exportCsv','exportPng'].includes(id))document.getElementById(id).click()},
       claimDetailView:()=>{favoriteDetailOwnsView=true;favoriteDetailDialog.dataset.reactDetail='ready'},
       closeDetail:closeFavoriteDetail,
       detailAction:action=>{const item=favoriteDetailItem;if(!item)return;closeFavoriteDetail();({chart:openFavoriteChart,alarm:openFavoriteAlarm,portfolio:openFavoritePortfolio})[action]?.(item)},
-      getData:()=>({detail:favoriteDetailView,marketItems:marketItems.map(item=>({...item})),markets:marketItems.map(overviewMarketItem),favorites:favorites.map(overviewFavoriteItem),marketCount:marketItems.length,marketUpdated:overviewMarketUpdated,favoriteUpdated:overviewFavoriteUpdated}),
+      getData:()=>({chart:{range:selectedRange,start:selectedStart,pngBusy:exportPng.disabled,pngLabel:exportPng.textContent,customLabel:customPeriod.textContent,customOpen:datePicker.classList.contains('visible')},detail:favoriteDetailView,marketItems:marketItems.map(item=>({...item})),markets:marketItems.map(overviewMarketItem),favorites:favorites.map(overviewFavoriteItem),marketCount:marketItems.length,marketUpdated:overviewMarketUpdated,favoriteUpdated:overviewFavoriteUpdated}),
       claimView:()=>{
         overviewOwnsView=true;marketCards.replaceChildren();favoritesList.replaceChildren();notifyOverview();
         return ()=>{
@@ -5243,6 +5253,6 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     })();
   </script>
   <script src="assets/auth-account.js?v=8.0.0"></script>
-  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.5"></script>
+  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.6"></script>
 </body>
 </html>
