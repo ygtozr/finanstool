@@ -3,57 +3,56 @@ import { createRoot } from 'react-dom/client';
 import { createPortal } from 'react-dom';
 import Framework7 from 'framework7/lite';
 import SheetModule from 'framework7/components/sheet';
-import Framework7React, { App, View, Page, Toolbar, Link, Button, List, Sheet, Segmented } from 'framework7-react';
+import Framework7React, { App, View, Page, Toolbar, Button, Sheet } from 'framework7-react';
 import { overview } from './legacy-adapter';
 import './pilot.css';
 Framework7.use([Framework7React, SheetModule]);
 
 export function LoadingState() { return <span className="pilot-loading" role="status">Yükleniyor…</span>; }
 export function ErrorState({ message = 'Veri alınamadı', retry }) {
-  return <span className="pilot-error" role="status">{message}{retry ? <Button type="button" onClick={retry}>Tekrar dene</Button> : null}</span>;
+  return <span className="pilot-error" role="status">{message}{retry ? <button type="button" onClick={retry}>Tekrar dene</button> : null}</span>;
 }
-export function Section({ title, note, actions, children }) {
-  return <section className="pilot-section" aria-label={title}>
-    <header><div><h2>{title}</h2>{note ? <p>{note}</p> : null}</div><div className="pilot-section-actions">{actions}</div></header>
+export function Section({ title, note, actions, children, className }) {
+  return <section className={className} aria-label={title}>
+    <div className={`${className}-head`}><div><h2>{title}</h2><p className="favorites-note">{note}</p></div>{actions}</div>
     {children}
   </section>;
 }
 export function MarketCard({ item }) {
-  const error = item.price === 'Veri alınamadı';
-  return <Button type="button" className="pilot-market-card" disabled={item.disabled} title={item.title}
+  return <button type="button" className="market-card pilot-market-card" disabled={item.disabled} title={item.title}
     onClick={() => overview.market(item.symbol)}>
-    <span className="pilot-market-label">{item.label}</span>
-    {error ? <ErrorState /> : item.price === 'Yükleniyor…' ? <LoadingState /> : <strong>{item.price}</strong>}
-    <small className={item.tone}>{item.change}</small>
-  </Button>;
+    <span className="market-card-label">{item.label} <small className="market-card-symbol">{item.symbolLabel}</small></span>
+    <strong className="market-card-value">{item.price}</strong>
+    <small className={`market-card-change ${item.tone}`}>{item.change}</small>
+  </button>;
 }
 export function FavoriteRow({ item, openActions, order }) {
   const row = useRef(null), handle = useRef(null);
   useEffect(() => {
-    // Reuse existing touch/keyboard reordering. A fresh handle avoids duplicate listeners.
-    window.OzerNativeUI.reorder(handle.current.el, row.current, row.current.parentNode, ':scope > .pilot-favorite-row', () => {
+    window.OzerNativeUI.reorder(handle.current, row.current, row.current.parentNode, ':scope > .pilot-favorite-row', () => {
       overview.reorder([...row.current.parentNode.children].map(node => node.dataset.symbol));
     });
   }, [order]);
-  return <li ref={row} className="pilot-favorite-row" data-symbol={item.symbol}>
-    <Button type="button" ref={handle} className="pilot-favorite-main" title={item.title} onClick={() => overview.favorite(item.symbol)}>
-      <span className="pilot-logo"><span>{item.displaySymbol.slice(0, 2)}</span>{item.logo ? <img src={item.logo} alt="" onError={event => { event.currentTarget.hidden = true; }} /> : null}</span>
-      <span className="pilot-identity"><strong>{item.displaySymbol}</strong><small>{item.name}</small></span>
-      <span className="pilot-quote">{item.price === 'Veri alınamadı' ? <ErrorState /> : item.price === 'Yükleniyor…' ? <LoadingState /> : <strong>{item.price}</strong>}<small className={item.tone}>{item.change}</small><time>{item.time}</time></span>
-    </Button>
-    <Button type="button" className="pilot-favorite-actions" aria-label={`${item.displaySymbol} işlemleri`} onClick={() => openActions(item)}>⋯</Button>
+  return <li ref={row} className="favorite-row pilot-favorite-row" data-symbol={item.symbol}>
+    <button type="button" ref={handle} className="favorite-card pilot-favorite-main" title={item.title} onClick={() => overview.favorite(item.symbol)}>
+      <span className="favorite-card-badge"><span>{item.badge}</span>{item.logo ? <img className={item.logoClass} src={item.logo} alt="" onError={event => { event.currentTarget.hidden = true; }} /> : null}</span>
+      <span className="favorite-card-head"><strong className="favorite-card-symbol">{item.displaySymbol}</strong><small className="favorite-card-name">{item.name}</small></span>
+      <span className="favorite-card-quote pilot-quote"><strong className="favorite-card-price">{item.price}</strong><span className={`favorite-change ${item.tone}`}>{item.change}</span><small className="favorite-market-time">{item.time}</small></span>
+    </button>
+    <div className="favorite-actions"><button type="button" className="favorite-menu-trigger" aria-label={`${item.displaySymbol} işlemleri`} onClick={() => openActions(item)}>⋯</button><button type="button" className="favorite-remove" aria-label={`${item.displaySymbol} favorilerden çıkar`} onClick={() => overview.favorite(item.symbol, 'remove')}>★</button></div>
   </li>;
 }
-const tabs = [['main', 'Özet', 'M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9'], ['chart', 'Grafik', 'M3 3v18h18M6 15l4-5 4 3 6-8'], ['portfolio', 'Portföy', 'M4 6h16v15H4zM8 6V3h8v3M4 11h16M10 11v3h4v-3'], ['other', 'Diğer', 'M5 12h.01M12 12h.01M19 12h.01']];
+const tabs = [['main', 'Özet', 'M3 11 12 3l9 8M5 10v11h5v-6h4v6h5V10'], ['chart', 'Grafik', 'M3 3v18h18M6 15l5-6 4 3 5-7'], ['portfolio', 'Portföy', 'M4 7h16v13H4zM7 4h10'], ['other', 'Diğer', 'M5 12h.01M12 12h.01M19 12h.01']];
 export function MobileTabBar({ view, authenticated }) {
-  return createPortal(<Toolbar tabbar icons bottom className="pilot-tabbar" hidden={!authenticated}>
-    {tabs.map(([id, label, icon]) => <Link key={id} href="#" className={id === view ? 'tab-link-active' : ''}
+  return createPortal(<Toolbar bottom className="mobile-bottom-nav pilot-tabbar" hidden={!authenticated} aria-label="Mobil gezinme">
+    {tabs.map(([id, label, icon]) => <button type="button" key={id} className={id === view ? 'is-active' : ''}
       aria-current={id === view ? 'page' : undefined} aria-label={label}
-      onClick={event => { event.preventDefault(); overview.navigate(id); }}>
-      <svg className="pilot-tab-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth={id === 'other' ? 4 : 1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={icon} /></svg><span className="tabbar-label">{label}</span>
-    </Link>)}
+      onClick={() => overview.navigate(id)}>
+      <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d={icon} /></svg></span>{label}
+    </button>)}
   </Toolbar>, document.getElementById('pilot-navigation'));
 }
+
 function AppShell() {
   const state = useSyncExternalStore(overview.subscribe, overview.getSnapshot);
   const [actions, setActions] = useState(null), [refreshError, setRefreshError] = useState('');
@@ -66,27 +65,25 @@ function AppShell() {
   useEffect(() => {
     const restore = overview.mountSearch(search.current);
     const oldTitle = document.title;
-    document.title = 'Özer Finans v8.1 — Ön izleme';
+    document.title = 'Özer Finans v8.1.0-preview.2 — Ön izleme';
     document.documentElement.dataset.overviewPilot = 'ready';
     return () => { restore(); document.title = oldTitle; delete document.documentElement.dataset.overviewPilot; };
   }, []);
   return <App theme="ios" name="Özer Finans" className={`pilot-app ${state.theme === 'dark' ? 'dark' : ''}`}
     touch={{ fastClicks: false }} view={{ router: false }}>
     <View main router={false}><Page name="overview" className="pilot-page">
-      <header className="pilot-brand"><img src="assets/brand-symbol-a.png?v=7.9" alt="" /><div><h1>Özer Finans</h1><small>v8.1 · Ön izleme</small></div></header>
-      <div className="pilot-preferences"><span>Özet</span><Segmented strong aria-label="Görünüm modu">
-        {['system', 'light', 'dark'].map(mode => <Button type="button" key={mode} active={(state.themePreference) === mode} onClick={() => overview.theme(mode)}>{({ system: 'Sistem', light: 'Açık', dark: 'Koyu' })[mode]}</Button>)}
-      </Segmented></div>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v8.1</span></h1>
       {refreshError ? <ErrorState message={refreshError} retry={refresh} /> : null}
-      <Section title="Piyasa Özeti" note={state.marketUpdated} actions={<><Button type="button" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile">{state.busy ? 'Yenileniyor…' : 'Yenile'}</Button><Button type="button" className="pilot-settings" onClick={overview.settings} aria-label="Piyasa özetini düzenle">⚙</Button></>}>
-        <div className="pilot-market-grid">{state.markets.map(item => <MarketCard key={item.symbol} item={item} />)}</div>
-        {!state.markets.length ? state.busy ? <LoadingState /> : <p className="pilot-empty">{state.marketCount ? 'Fiyatları görmek için Yenile’ye dokunun.' : 'Piyasa listesine ayarlardan varlık ekleyebilirsiniz.'}</p> : null}
+      <div className="app-layout"><section className="chart-panel">
+      <Section className="market-summary" title="Piyasa Özeti" note={state.marketUpdated} actions={<div className="market-actions"><button type="button" id="pilotMarketRefresh" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile">{state.busy ? 'Yenileniyor…' : 'Yenile'}</button><button type="button" id="pilotMarketSettings" onClick={overview.settings} aria-label="Piyasa özetini düzenle">⚙</button></div>}>
+        <div className="market-cards">{state.markets.map(item => <MarketCard key={item.symbol} item={item} />)}</div>
       </Section>
-      <Section title="Favoriler" note={state.favoriteUpdated} actions={<Button type="button" disabled={state.busy} onClick={refresh} aria-label="Favorileri yenile">Yenile</Button>}>
-        <List className="pilot-favorites">{state.favorites.map(item => <FavoriteRow key={`${item.symbol}:${order}`} order={order} item={item} openActions={setActions} />)}</List>
-        {!state.favorites.length ? <p className="pilot-empty">Henüz favori yok. Hisse veya fon arayarak ekleyin.</p> : null}
+      <Section className="favorites-panel" title="Favoriler" note={state.favoriteUpdated} actions={<button type="button" id="pilotFavoriteRefresh" disabled={state.busy} onClick={refresh} aria-label="Favorileri yenile">Yenile</button>}>
+        {!state.favorites.length ? <p className="favorites-note">Henüz favori hisse yok.</p> : null}
+        <ul className="favorites-list pilot-favorites">{state.favorites.map(item => <FavoriteRow key={`${item.symbol}:${order}`} order={order} item={item} openActions={setActions} />)}</ul>
         <div ref={search} className="pilot-search-slot" />
       </Section>
+      </section></div>
     </Page></View>
     <MobileTabBar view={state.view} authenticated={state.authenticated} />
     {createPortal(<Sheet className="pilot-action-sheet" opened={Boolean(actions)} backdrop closeByBackdropClick closeOnEscape swipeToClose

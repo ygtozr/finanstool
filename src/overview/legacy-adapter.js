@@ -14,7 +14,8 @@ function read() {
     marketUpdated: $('#marketUpdated').textContent,
     favoriteUpdated: $('#favoriteUpdated').textContent,
     markets: [...$('#marketCards').querySelectorAll('.market-card')].map(node => ({
-      symbol: node.dataset.symbol, label: text(node, '.market-card-label'),
+      symbol: node.dataset.symbol, label: node.querySelector('.market-card-label').firstChild.textContent.trim(),
+      symbolLabel: text(node, '.market-card-symbol'),
       price: text(node, '.market-card-value'), change: text(node, '.market-card-change'),
       tone: node.querySelector('.market-card-change').classList.contains('negative') ? 'negative' : 'positive',
       disabled: node.disabled, title: node.title,
@@ -25,6 +26,8 @@ function read() {
       change: text(node, '.favorite-change'), time: text(node, '.favorite-market-time'),
       tone: node.querySelector('.favorite-change').classList.contains('negative') ? 'negative' : 'positive',
       logo: node.querySelector('.favorite-card-logo')?.getAttribute('src') || '',
+      logoClass: node.querySelector('.favorite-card-logo')?.className || 'favorite-card-logo',
+      badge: text(node, '.favorite-card-badge'),
       title: node.querySelector('.favorite-card').title,
     })),
   };

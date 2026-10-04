@@ -10,8 +10,11 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  try {
  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
  let unavailable=false;
+ const referenceHtml=require('node:child_process').execFileSync('git',['show','v8.0:index.html'],{cwd:root});
+ const referenceContext=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
+ const reference=await referenceContext.newPage();
  const page=await context.newPage(),errors=[],requests=[];page.on('pageerror',e=>{errors.push(e.message);console.error('PAGE ERROR',e.message)});page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('net::')){errors.push(m.text());console.error('CONSOLE',m.text())}});
- await page.addInitScript(()=>{
+ const seed=()=>{
   if(localStorage.getItem('parity-seeded'))return;
   localStorage.setItem('parity-seeded','1');
   localStorage.setItem('finans-grafigi-theme','dark');
@@ -20,8 +23,10 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
   localStorage.setItem('finans-grafigi-favorites',JSON.stringify([{symbol:'AAPL',name:'Apple Inc.'},{symbol:'MSFT',name:'Microsoft Corporation'},{symbol:'BJKAS.IS',name:'Beşiktaş Futbol Yatırımları'}]));
   localStorage.setItem('finans-grafigi-portfolios-v2',JSON.stringify(Array.from({length:6},(_,i)=>({id:'visual-'+i,name:['Uzun Vadeli','Temettü','Amerika','Birikim','Fonlar','Altın'][i],positions:i?[]:[{symbol:'AAPL',name:'Apple Inc.',quantity:10,baseQuantity:10,unitCost:110,costCurrency:'USD',dripEnabled:false}],cashBalances:[],createdAt:'2026-01-01T00:00:00Z'}))));
   localStorage.setItem('finans-grafigi-active-portfolio','visual-0');
- });
- await page.route('**/*',route=>{
+ };
+ await context.addInitScript(seed);
+ await referenceContext.addInitScript(seed);
+ const routeHandler=route=>{
   const u=new URL(route.request().url());
   if(u.hostname!=='parity.test')return route.abort();
   if(u.pathname.startsWith('/api/')){
@@ -39,20 +44,44 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
   }
   const file=path.resolve(root,'.'+(u.pathname==='/'?'/index.html':u.pathname));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.abort();
-  return route.fulfill({contentType:({'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream',body:fs.readFileSync(file)});
- });
+  return route.fulfill({contentType:({'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream',body:route.request().frame().page()===reference&&u.pathname==='/'?referenceHtml:fs.readFileSync(file)});
+ };
+ await context.route('**/*',routeHandler);
+ await referenceContext.route('**/*',routeHandler);
 
  await page.goto('https://parity.test');
  await page.locator('#authLocalContinue').click();
  await page.waitForSelector('html[data-overview-pilot="ready"]');
  await page.getByRole('button',{name:'Piyasa verilerini yenile',exact:true}).click();
  await page.waitForFunction(()=>document.querySelector('.pilot-market-card strong')&&document.querySelector('.pilot-quote strong'));
+ await reference.goto('https://parity.test');
+ await reference.locator('#authLocalContinue').click();
+ await reference.locator('#marketRefresh').click();
+ await reference.waitForFunction(()=>document.querySelector('#marketCards strong')?.textContent!=='Yükleniyor…');
  const originals=await page.evaluate(()=>({portfolios:localStorage.getItem('finans-grafigi-portfolios-v2'),appearance:localStorage.getItem('finans-grafigi-appearance'),backup:Object.keys(createBackup().data).sort()}));
  for(const width of [375,390,430,1024]){
   await page.setViewportSize({width,height:844});
+  await reference.setViewportSize({width,height:844});
   for(const mode of ['light','dark']){
-   await page.locator('.pilot-preferences button').filter({hasText:mode==='light'?'Açık':'Koyu'}).click();
+   await page.evaluate(mode=>OzerOverviewLegacy.theme(mode),mode);
    assert.equal(await page.locator('html').getAttribute('data-theme'),mode);
+   await reference.evaluate(mode=>applyTheme(mode),mode);
+   await page.waitForTimeout(350);
+   await reference.evaluate(()=>scrollTo(0,0));
+   await page.evaluate(()=>scrollTo(0,0));
+   const measure=scope=>{
+    const selectors=['.page-brand','.brand-lockup-mark','.brand-lockup-name','.market-summary','.market-summary-head','.market-cards','.market-card','.market-card-label','.market-card-value','.market-card-change','.favorites-panel','.favorites-panel-head','.favorites-list','.favorite-row','.favorite-card','.favorite-card-badge','.favorite-card-head','.favorite-card-quote','.favorite-menu-trigger','.favorite-remove','.favorite-add-search'];
+    return selectors.map(selector=>{
+     const node=document.querySelector(scope+' '+selector),r=node.getBoundingClientRect(),c=getComputedStyle(node);
+     return [selector,...['x','y','width','height'].map(k=>Math.round(r[k]*100)/100),...['fontSize','fontWeight','lineHeight','color','backgroundColor','backgroundImage','borderRadius','padding','gap'].map(k=>c[k])];
+    });
+   };
+   assert.deepEqual(await page.evaluate(measure,'#overview-react'),await reference.evaluate(measure,'#mainView'),'v8.0 geometry and styling at '+width+'/'+mode);
+   if(width<601){
+    const navMeasure=()=>{const n=document.querySelector('.pilot-tabbar')||document.querySelector('.mobile-bottom-nav'),r=n.getBoundingClientRect(),c=getComputedStyle(n);return [r.x,r.y,r.width,r.height,c.backgroundColor,c.borderRadius,c.padding,...[...n.querySelectorAll('button')].map(b=>{const r=b.getBoundingClientRect();return [r.x,r.y,r.width,r.height,...['fontSize','backgroundColor','border','color','padding','gap'].map(k=>getComputedStyle(b)[k])];})];};
+    assert.deepEqual(await page.evaluate(navMeasure),await reference.evaluate(navMeasure),'v8.0 mobile navigation at '+width+'/'+mode);
+   }
+   await reference.screenshot({path:path.join(output,`${width}-${mode}-v8.0.png`),fullPage:true});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'No overflow at '+width);
    assert.equal(await page.locator('.pilot-market-card').count(),8);
    assert.equal(await page.locator('.pilot-favorite-row').count(),3);
@@ -66,7 +95,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
    await page.evaluate(()=>scrollTo(0,0));
    await page.screenshot({path:path.join(output,`${width}-${mode}.png`),fullPage:true});
    if(width<601){
-    const links=await page.locator('.pilot-tabbar a').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().width));
+    const links=await page.locator('.pilot-tabbar button').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().width));
     assert(links.every(size=>size>width/5),'Each mobile tab has an evenly spaced touch target');
    }
   }
@@ -92,13 +121,13 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForFunction(()=>document.querySelectorAll('.pilot-favorite-row').length===3);
  // Other screens still execute their original code through the shared navigation.
  for(const [label,view] of [['Grafik','chartView'],['Portföy','portfolioView'],['Diğer','otherView'],['Özet','mainView']]){
-  await page.locator('.pilot-tabbar').getByRole('link',{name:label,exact:true}).click();
+  await page.locator('.pilot-tabbar').getByRole('button',{name:label,exact:true}).click();
   await page.waitForFunction(id=>!document.getElementById(id).hidden,view);
   assert.equal(await page.locator('.pilot-tabbar [aria-current="page"]').getAttribute('aria-label'),label);
  }
  await page.locator('.pilot-market-card').first().click();
  await page.waitForFunction(()=>!document.getElementById('chartView').hidden);
- await page.locator('.pilot-tabbar').getByRole('link',{name:'Özet',exact:true}).click();
+ await page.locator('.pilot-tabbar').getByRole('button',{name:'Özet',exact:true}).click();
  await page.locator('.pilot-favorite-main').first().click();
  await page.locator('#favoriteDetailDialog[open]').waitFor();
  await page.locator('.favorite-detail-close').click();
@@ -128,10 +157,10 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await page.waitForSelector('html[data-overview-pilot="ready"]');
  const device=await context.newCDPSession(page);
  await device.send('Emulation.setSafeAreaInsetsOverride',{insets:{top:47,bottom:34,left:0,right:0}});
- assert.equal(await page.locator('.pilot-tabbar').evaluate(n=>getComputedStyle(n).paddingBottom),'34px','Actual bottom env inset');
- assert.equal(Math.round((await page.locator('.pilot-tabbar').boundingBox()).height),90);
- assert.equal(await page.locator('main').evaluate(n=>getComputedStyle(n).paddingTop),'0px','No doubled top safe-area padding');
- assert.equal(await page.locator('.pilot-brand').evaluate(n=>getComputedStyle(n).paddingTop),'47px','Actual top env inset');
+ assert.equal(await page.locator('.pilot-tabbar').evaluate(n=>getComputedStyle(n).paddingBottom),'40px','Actual bottom env inset');
+ assert.equal(Math.round((await page.locator('.pilot-tabbar').boundingBox()).height),95);
+ assert.equal(await page.locator('main').evaluate(n=>getComputedStyle(n).paddingTop),'47px','Top safe-area reserved once');
+ assert.equal(await page.locator('.pilot-brand').evaluate(n=>getComputedStyle(n).top),'47px','Actual sticky top env inset');
  assert.equal(await page.evaluate(()=>matchMedia('(display-mode: standalone)').matches&&navigator.standalone),true);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Standalone safe-area does not change viewport width');
  await page.screenshot({path:path.join(output,'standalone-safe-area.png')});
@@ -149,12 +178,12 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  assert.equal(compact()-startup,2,'Exactly one next scheduler batch');
  unavailable=true;
  await page.reload();if(await page.locator('#authLocalContinue').isVisible())await page.locator('#authLocalContinue').click();
- await page.locator('.pilot-market-card .pilot-error').first().waitFor();
+ await page.locator('.pilot-market-card strong').filter({hasText:'Veri alınamadı'}).first().waitFor();
  unavailable=false;
  await page.getByRole('button',{name:'Piyasa verilerini yenile',exact:true}).click();
  await page.waitForFunction(()=>document.querySelector('.pilot-market-card strong'));
- assert.equal(await page.locator('.pilot-market-card .pilot-error').count(),0,'Existing data service recovers after error');
+ assert.equal(await page.locator('.pilot-market-card strong').filter({hasText:'Veri alınamadı'}).count(),0,'Existing data service recovers after error');
  assert.deepEqual(errors,[],'No console or runtime errors');
- console.log('PASS: Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
+ console.log('PASS: v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

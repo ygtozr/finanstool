@@ -1,3 +1,9 @@
+
+## v8.1.0-preview.2 — Özet görünüm eşlemesi
+
+React + Framework7 pilotu korunarak Özet ve mobil alt menü v8.0 ortak bileşen stillerine eşlendi. Ek Özet/tema satırı kaldırıldı; marka başlığı, kompakt piyasa kartları, Favoriler satırı, yıldız düğmesi, arama ve masaüstü yerleşimi eski ölçülerdedir. Finans/veri katmanları ve kullanıcı şemaları değişmez. Yalnız migration dalında ön izleme; production v8.0 kalır.
+
+375/390/430/1024 px açık/koyu modda v8.0 etiketi ayrı tarayıcı bağlamında aynı sentetik verilerle karşılaştırılır: ekran görüntüleri ve bileşen ölçüleri/yazı/renk/yüzey/boşluk değerleri, mobil menü sabitliği, favori ve yenileme işlemleri, standalone safe-area ve regresyon kontrolleri. Canlı API ve fiziksel iPhone doğrulaması bu çevrimdışı kontrole dahil değildir.
 ## v8.1 — React + Framework7 Özet pilotu (onaysız ön izleme)
 
 Kalıcı v8.0 ve main değişmez. React yalnız görünür Özet, piyasa/favori bileşenleri, mobil tab bar ve favori işlem sheet’ini yönetir. Framework7 iOS teması kullanılır; finans/formatlama/veri/yenileme mevcut uygulamada kalır. `OzerOverviewLegacy` mevcut işlemleri çağırır; adaptör yalnız eski Özet DOM değişikliklerini ve tema/görünüm durumunu izleyerek `useSyncExternalStore` üzerinden React’e görüntü modeli sunar. Özet arama formu mevcut dinleyicileriyle taşınır. Gizli eski DOM, pilot için geçici sınırdır; sonraki aşamada DOM’dan bağımsız görüntü modeline geçilebilir.

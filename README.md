@@ -1,3 +1,9 @@
+
+## v8.1.0-preview.2 — Özet görünüm eşlemesi
+
+React + Framework7 pilotu korunarak Özet ve mobil alt menü v8.0 ortak bileşen stillerine eşlendi. Ek Özet/tema satırı kaldırıldı; marka başlığı, kompakt piyasa kartları, Favoriler satırı, yıldız düğmesi, arama ve masaüstü yerleşimi eski ölçülerdedir. Finans/veri katmanları ve kullanıcı şemaları değişmez. Yalnız migration dalında ön izleme; production v8.0 kalır.
+
+375/390/430/1024 px açık/koyu modda v8.0 etiketi ayrı tarayıcı bağlamında aynı sentetik verilerle karşılaştırılır: ekran görüntüleri ve bileşen ölçüleri/yazı/renk/yüzey/boşluk değerleri, mobil menü sabitliği, favori ve yenileme işlemleri, standalone safe-area ve regresyon kontrolleri. Canlı API ve fiziksel iPhone doğrulaması bu çevrimdışı kontrole dahil değildir.
 ## v8.1 React + Framework7 Özet pilotu — ön izleme
 
 Dal: `migration/v8.1-framework7-overview`; main ve kalıcı v8.0 değişmez. `npm run build` (veya `pnpm run build`) yalnız Özet pilotunu `assets/overview-pilot/` altında üretir. React/React DOM + Framework7 React, esbuild ile derlenir. `pnpm install --frozen-lockfile` mevcut kilidi kullanır; yalnız esbuild kurulum betiğine izin verilir.
