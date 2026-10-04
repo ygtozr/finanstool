@@ -1,5 +1,15 @@
 # Özer Finans v8.0
 
+## v8.1.0-preview.8 — Portföy ve Diğer ekranlarının kontrollü geçişi
+
+`RemainingPages.jsx` kalan iki ekranı React + Framework7 Page kabuğuna alır. Portföy Bugün/Toplam ve rakam gizleme ile Diğer tema/bildirim kontrolleri React/Framework7 üzerinden mevcut işlemleri çağırır. Bildirim anahtarları mevcut tercihlerle eşleşir, klavye odağı ve erişilebilir adları vardır. Framework7 Toggle’ın React 19 kontrollü checkbox olay sırası çakışması, native olay sahibini koruyup dış tercihleri layout effect ile yansıtarak giderilir. Yeni dependency yok; mevcut Framework7 Toggle modülü kullanılır.
+
+Hesap, yedek, portföy formları, varlık/nakit listeleri, portföy sıralama, dağılım/benchmark canvas’ları ve dinleyicileri aynı DOM düğümleriyle korunur. Finans/veri widget’larının JSX içinde yeniden yazılması bu kontrollü geçişin hedefi değildir. `renderPortfolio`, toplam/benchmark/temettü/fiyat hesaplama işlevleri, `createBackup`, `normalizeBackup`, `applyBackup`, portföy kayıt/geçiş işlevleri önceki kaynakla birebir aynıdır. API/cache/batch/auth/Upstash ve kullanıcı/portföy/yedek formatları değişmez. Mobil temel kontroller 44 px dokunma alanı alır; Varlıklar ikonu v8.0 ölçüsündedir. Uzun native formlar kısa iPhone ekranında ve safe-area içinde kaydırılır. Diğer’de sürüm bilgisi gerçek ön izleme sürümünü gösterir.
+
+Hedefli doğrulama ayrı sentetik storage bağlamında: dört genişlik/iki tema, v8.0 finans çıktısı, portföy oluştur/adlandır/sırala/sil/geri al, hisse ekle/düzenle/sil/geri al, nakit, boş ekran, tercih/klavye anahtarları, kısa form/safe-area, yedek indir/geri yükle ve yerel hesap ekranı geçişi. Build, pilot tarayıcı akışı ve genel regresyon geçti; konsol/runtime hatası yok. Fiziksel iPhone kurulumu/klavye/standalone ve gerçek hesap senkronizasyonu ayrıca cihaz/hesap gerektirir; emülasyon bunları doğrulamaz.
+
+Yalnız `migration/v8.1-framework7-overview` ön izlemesi; production/main v8.0 kalır. Kalan iki sayfanın planlanan kabuk geçişi tamamlanır; sonraki adım ön izlemenin gerçek iPhone ve hesapla kabul kontrolüdür. Kullanıcı kalıcı yayın için ayrıca onay vermeden production’a geçilmez.
+
 ## v8.1.0-preview.7 — Grafik araması, kayıtlı varlıklar ve Dönem Özeti
 
 Grafik araması ve favori düğmesi ortak `AssetSearch.jsx` ile React’e taşındı. Mevcut arama/çözümleme servisleri ve gecikme kullanılır; kayıtlı varlık veya başka ekrandan seçim, yeni arama sorgusu başlatmadan girişe yansır. `ChartAssets.jsx` Favoriler/Portföy seçicisini Framework7 Segmented/Button ile çizer; seçim paneli kapatıp mevcut `loadPrice` akışına gider. `ChartSummary.jsx` hizmet katmanının biçimlenmiş görüntü modelini gösterir; JSX finans hesabı yapmaz. Gizli eski varlık listeleri boş kalır. Fiyat/RSI canvas’ları, MA, tarih girişi ve dinleyicileri korunur.
@@ -49,7 +59,7 @@ React + Framework7 pilotu korunarak Özet ve mobil alt menü v8.0 ortak bileşen
 
 Dal: `migration/v8.1-framework7-overview`; main ve kalıcı v8.0 değişmez. `npm run build` (veya `pnpm run build`) yalnız Özet pilotunu `assets/overview-pilot/` altında üretir. React/React DOM + Framework7 React, esbuild ile derlenir. `pnpm install --frozen-lockfile` mevcut kilidi kullanır; yalnız esbuild kurulum betiğine izin verilir.
 
-Özet, piyasa kartları, favori satırları, mobil tab bar ve işlem sheet’i React tarafından çizilir. `OzerOverviewLegacy` adaptörü mevcut fiyat/formatlama/batch/cache/yenileme ve favori işlemlerini kullanır. Eski Özet DOM’u geçici salt-okunur görüntü modeli olarak gizli kalır; arama formu dinleyicileriyle birlikte taşınır. React yeni fetch veya timer oluşturmaz. Portföy/Grafik/Diğer mevcut kodla açılır.
+Özet, piyasa/favori bileşenleri ve ayrıntısı, ortak arama, mobil tab bar, sheet/popup ve Grafik kontrolleri React tarafından çizilir. Portföy/Diğer React + Framework7 sayfa kabuğuna ve temel UI kontrollerine sahiptir; finans, auth ve yedek widget’ları aynı DOM düğümleri/dinleyicileriyle korunur. `OzerOverviewLegacy` hizmetin görüntü modelini ve mevcut işlemlerini sunar; fiyat listeleri gizli DOM’dan okunmaz. React ek fiyat fetch veya timer oluşturmaz. Finans algoritmaları, API ve depolama formatları eski hizmet katmanında kalır.
 
 CSS katmanı Framework7’yi eski stillerin altına yerleştirir; pilot stilleri kendi köklerine sınırlanır. iOS tema, mevcut renk/yüzey/yazı tercihi ve açık/koyu mod korunur. CSS katmanları için Safari 15.4+ gerekir. Framework7’nin gömülü fontu için CSP’ye yalnız `font-src self data:` eklenir. Yeni veri alanı veya depolama anahtarı eklenmez.
 

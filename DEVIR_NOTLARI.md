@@ -1,5 +1,15 @@
 # Özer Finans — Yeni sohbet devir notları
 
+## v8.1.0-preview.8 — Portföy ve Diğer ekranlarının kontrollü geçişi
+
+`RemainingPages.jsx` kalan iki ekranı React + Framework7 Page kabuğuna alır. Portföy Bugün/Toplam ve rakam gizleme ile Diğer tema/bildirim kontrolleri React/Framework7 üzerinden mevcut işlemleri çağırır. Bildirim anahtarları mevcut tercihlerle eşleşir, klavye odağı ve erişilebilir adları vardır. Framework7 Toggle’ın React 19 kontrollü checkbox olay sırası çakışması, native olay sahibini koruyup dış tercihleri layout effect ile yansıtarak giderilir. Yeni dependency yok; mevcut Framework7 Toggle modülü kullanılır.
+
+Hesap, yedek, portföy formları, varlık/nakit listeleri, portföy sıralama, dağılım/benchmark canvas’ları ve dinleyicileri aynı DOM düğümleriyle korunur. Finans/veri widget’larının JSX içinde yeniden yazılması bu kontrollü geçişin hedefi değildir. `renderPortfolio`, toplam/benchmark/temettü/fiyat hesaplama işlevleri, `createBackup`, `normalizeBackup`, `applyBackup`, portföy kayıt/geçiş işlevleri önceki kaynakla birebir aynıdır. API/cache/batch/auth/Upstash ve kullanıcı/portföy/yedek formatları değişmez. Mobil temel kontroller 44 px dokunma alanı alır; Varlıklar ikonu v8.0 ölçüsündedir. Uzun native formlar kısa iPhone ekranında ve safe-area içinde kaydırılır. Diğer’de sürüm bilgisi gerçek ön izleme sürümünü gösterir.
+
+Hedefli doğrulama ayrı sentetik storage bağlamında: dört genişlik/iki tema, v8.0 finans çıktısı, portföy oluştur/adlandır/sırala/sil/geri al, hisse ekle/düzenle/sil/geri al, nakit, boş ekran, tercih/klavye anahtarları, kısa form/safe-area, yedek indir/geri yükle ve yerel hesap ekranı geçişi. Build, pilot tarayıcı akışı ve genel regresyon geçti; konsol/runtime hatası yok. Fiziksel iPhone kurulumu/klavye/standalone ve gerçek hesap senkronizasyonu ayrıca cihaz/hesap gerektirir; emülasyon bunları doğrulamaz.
+
+Yalnız `migration/v8.1-framework7-overview` ön izlemesi; production/main v8.0 kalır. Kalan iki sayfanın planlanan kabuk geçişi tamamlanır; sonraki adım ön izlemenin gerçek iPhone ve hesapla kabul kontrolüdür. Kullanıcı kalıcı yayın için ayrıca onay vermeden production’a geçilmez.
+
 ## v8.1.0-preview.7 — Grafik araması, kayıtlı varlıklar ve Dönem Özeti
 
 Grafik araması ve favori düğmesi ortak `AssetSearch.jsx` ile React’e taşındı. Mevcut arama/çözümleme servisleri ve gecikme kullanılır; kayıtlı varlık veya başka ekrandan seçim, yeni arama sorgusu başlatmadan girişe yansır. `ChartAssets.jsx` Favoriler/Portföy seçicisini Framework7 Segmented/Button ile çizer; seçim paneli kapatıp mevcut `loadPrice` akışına gider. `ChartSummary.jsx` hizmet katmanının biçimlenmiş görüntü modelini gösterir; JSX finans hesabı yapmaz. Gizli eski varlık listeleri boş kalır. Fiyat/RSI canvas’ları, MA, tarih girişi ve dinleyicileri korunur.
@@ -51,7 +61,7 @@ Güncelleme: 30 Eylül 2026. Bu dosya kaynak kodun yerine geçmez; yeni oturum i
 
 ## v8.1 pilot çalışması
 
-`migration/v8.1-framework7-overview` yalnız ön izleme dalıdır; kalıcı sürüm v8.0. Kaynaklar `src/overview/{main.jsx,legacy-adapter.js,pilot.css}`; build `scripts/build-overview.mjs`. Özet React + Framework7, diğer ekranlar mevcut kod. Girişteki dar `OzerOverviewLegacy` sınırı finans, API, batch/cache/timer, auth, Upstash ve yedek şemalarını korur; gizli eski Özet DOM’u geçici görüntü modelidir. JSX içine finans mantığı taşınmaz. `assets/overview-pilot/` üretildiği için Git’e alınmaz; Vercel build aynı çıktıyı oluşturur.
+`migration/v8.1-framework7-overview` yalnız ön izleme dalıdır; kalıcı sürüm v8.0. Kaynaklar `src/overview/{main.jsx,legacy-adapter.js,pilot.css}`; build `scripts/build-overview.mjs`. Dört ana sayfa React + Framework7 kabuğundadır; Özet/Grafik kontrolleri React tarafından çizilir, Portföy/Diğer temel kontrolleri mevcut hizmete yönlenir. Finans, auth ve yedek widget’ları mevcut DOM/dinleyicileri korur. Girişteki dar `OzerOverviewLegacy` sınırı finans, API, batch/cache/timer, auth, Upstash ve yedek şemalarını korur; fiyat görüntü modeli doğrudan hizmet durumundan üretilir; gizli eski fiyat listeleri boştur. JSX içine finans mantığı taşınmaz. `assets/overview-pilot/` üretildiği için Git’e alınmaz; Vercel build aynı çıktıyı oluşturur.
 
 ## v8.0 onaylı yayın
 

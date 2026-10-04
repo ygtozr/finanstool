@@ -4,14 +4,16 @@ import { createPortal } from 'react-dom';
 import Framework7 from 'framework7/lite';
 import SheetModule from 'framework7/components/sheet';
 import PopupModule from 'framework7/components/popup';
+import ToggleModule from 'framework7/components/toggle';
 import Framework7React, { App, View, Page, Toolbar, Button, Sheet } from 'framework7-react';
 import { overview } from './legacy-adapter';
 import { AssetSearch } from './AssetSearch';
 import { MarketSettings } from './MarketSettings';
 import { FavoriteDetail } from './FavoriteDetail';
 import { ChartShell } from './ChartShell';
+import { PortfolioShell, OtherShell } from './RemainingPages';
 import './pilot.css';
-Framework7.use([Framework7React, SheetModule, PopupModule]);
+Framework7.use([Framework7React, SheetModule, PopupModule, ToggleModule]);
 
 export function LoadingState() { return <span className="pilot-loading" role="status">Yükleniyor…</span>; }
 export function ErrorState({ message = 'Veri alınamadı', retry }) {
@@ -98,7 +100,7 @@ function AppShell() {
   useEffect(() => {
     const release = overview.claimView();
     const oldTitle = document.title;
-    document.title = 'Özer Finans v8.1.0-preview.7 — Ön izleme';
+    document.title = 'Özer Finans v8.1.0-preview.8 — Ön izleme';
     document.documentElement.dataset.overviewPilot = 'ready';
     return () => { unlockSheet(); release(); document.title = oldTitle; delete document.documentElement.dataset.overviewPilot; };
   }, []);
@@ -120,6 +122,8 @@ function AppShell() {
     </Page></View>
     <MarketSettings opened={settingsOpen} onClose={() => setSettingsOpen(false)} items={state.marketItems} />
     <ChartShell chart={state.chart} />
+    <PortfolioShell state={state.portfolioControls} />
+    <OtherShell theme={state.themePreference} settings={state.settings} />
     <MobileTabBar view={state.view} authenticated={state.authenticated} />
     {createPortal(<Sheet ref={sheet} role="dialog" aria-modal="true" aria-labelledby="pilotActionsTitle" className="pilot-action-sheet" opened={Boolean(actions)} backdrop closeByBackdropClick closeOnEscape swipeToClose
       containerEl="body" onSheetOpen={() => {

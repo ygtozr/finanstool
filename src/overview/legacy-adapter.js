@@ -35,6 +35,8 @@ window.addEventListener('ozer:local-data-change', update);
 export const overview = {
   sheetOpen: open => legacy.sheetOpen(open),
   claimView: () => legacy.claimView(),
+  mountNativePage: (view, content) => legacy.mountNativePage(view, content),
+  portfolioAction: id => legacy.portfolioAction(id), settingsToggle: (id, checked) => legacy.settingsToggle(id, checked),
   mountChartShell: slots => legacy.mountChartShell(slots), chartPeriod: range => legacy.chartPeriod(range), chartAction: id => legacy.chartAction(id),
   chartQuery: value => legacy.chartQuery(value), chartSelect: (item, scroll) => legacy.chartSelect(item, scroll), chartFavorite: () => legacy.chartFavorite(),
   claimDetailView: () => legacy.claimDetailView(),
