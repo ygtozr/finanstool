@@ -12,8 +12,11 @@ import { MarketSettings } from './MarketSettings';
 import { FavoriteDetail } from './FavoriteDetail';
 import { ChartShell } from './ChartShell';
 import { PortfolioShell, OtherShell } from './RemainingPages';
+import appPackage from '../../package.json';
 import './pilot.css';
 Framework7.use([Framework7React, SheetModule, PopupModule, ToggleModule]);
+document.documentElement.dataset.appVersion = appPackage.version;
+document.getElementById('desktopVersion').textContent = `v${appPackage.version}`;
 
 export function LoadingState() { return <span className="pilot-loading" role="status">Yükleniyor…</span>; }
 export function ErrorState({ message = 'Veri alınamadı', retry }) {
@@ -100,7 +103,7 @@ function AppShell() {
   useEffect(() => {
     const release = overview.claimView();
     const oldTitle = document.title;
-    document.title = 'Özer Finans v8.1.0-preview.8 — Ön izleme';
+    document.title = `Özer Finans v${appPackage.version} — Ön izleme`;
     document.documentElement.dataset.overviewPilot = 'ready';
     return () => { unlockSheet(); release(); document.title = oldTitle; delete document.documentElement.dataset.overviewPilot; };
   }, []);

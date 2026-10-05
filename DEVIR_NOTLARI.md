@@ -1,5 +1,13 @@
 # Özer Finans — Yeni sohbet devir notları
 
+## v8.1.0-preview.9 — Denetimde bulunan hataların giderilmesi
+
+Alım tarihi ve portföy adındaki özel doğrulama hataları kullanıcı girdiyi düzelttiğinde temizlenir; DRIP kapatıldığında tarih hatası kaydı engellemez. Başarısız manuel grafik sorgusu eski fiyat/RSI grafiklerini ve görüntü verilerini kaldırır; CSV/PNG hem React hem native işlemde kilitlenir. Başarılı sorgu grafik ve dışa aktarımı geri açar. Başarısız arama ile boş sonuç ayrılır; gelişmiş aramada servis hatası tekrar deneme düğmesi sunar. Masaüstü ve ayarlar sürüm bilgisi package.json sürümünü kullanır. 320 px piyasa kartlarında fiyat ve değişim ayrı satırlara alınarak yüksek hassasiyet korunur.
+
+Yeni dependency yok. Finans hesaplama algoritmaları, API/cache/batch, hesap/Upstash ve kullanıcı/portföy/yedek formatları korunur. loadPrice değişikliği kullanıcı sorgusunun hata durumu ve dışa aktarım geçerliliğiyle sınırlıdır; sağlayıcı kontratları değişmez. tests/audit-fixes.browser.cjs tarih/DRIP ve ad düzeltme, grafik hata/başarılı tekrar/dışa aktarım, arama hata/tekrar/boş sonuç, sürüm eşleşmesi ve dar ekran hassasiyetini izole sentetik verilerle doğrular. Build, hedefli test, genel regresyon ve 375/390/430/1024 px açık/koyu tarayıcı akışı geçti. Gerçek sağlayıcı/hesap ve fiziksel iPhone/Safari/PWA doğrulaması yapılmadı.
+
+Yalnız migration/v8.1-framework7-overview ön izlemesi; main/production v8.0 korunur. Kalıcı yayın ayrıca kullanıcı onayı gerektirir.
+
 ## v8.1.0-preview.8 — Portföy ve Diğer ekranlarının kontrollü geçişi
 
 `RemainingPages.jsx` kalan iki ekranı React + Framework7 Page kabuğuna alır. Portföy Bugün/Toplam ve rakam gizleme ile Diğer tema/bildirim kontrolleri React/Framework7 üzerinden mevcut işlemleri çağırır. Bildirim anahtarları mevcut tercihlerle eşleşir, klavye odağı ve erişilebilir adları vardır. Framework7 Toggle’ın React 19 kontrollü checkbox olay sırası çakışması, native olay sahibini koruyup dış tercihleri layout effect ile yansıtarak giderilir. Yeni dependency yok; mevcut Framework7 Toggle modülü kullanılır.

@@ -26,7 +26,10 @@ export function ChartShell({ chart }) {
       <h2 id="pilotChartTitle">Grafik Ve Teknik Analiz</h2>
       <AssetSearch kind="chart" onAdd={overview.chartSelect} chartState={chart} />
       <div className="toolbar pilot-chart-toolbar" role="group" aria-label="Grafik işlemleri">
-        {actions.map(([id, label]) => <Button type="button" key={id} id={`pilot-${id}`} disabled={id === 'exportPng' && chart.pngBusy} aria-disabled={id === 'exportPng' ? chart.pngBusy : undefined} aria-busy={id === 'exportPng' ? chart.pngBusy : undefined} onClick={() => overview.chartAction(id)}>{id === 'exportPng' ? chart.pngLabel : label}</Button>)}
+        {actions.map(([id, label]) => {
+          const disabled=(id === 'exportCsv' || id === 'exportPng') && (!chart.exportReady || chart.busy || (id === 'exportPng' && chart.pngBusy));
+          return <Button type="button" key={id} id={`pilot-${id}`} disabled={disabled} aria-disabled={disabled} aria-busy={id === 'exportPng' ? chart.pngBusy : undefined} onClick={() => overview.chartAction(id)}>{id === 'exportPng' ? chart.pngLabel : label}</Button>;
+        })}
       </div>
       <div data-chart-slot="plot" className="pilot-chart-slot" />
       <div data-chart-slot="rsi" className="pilot-chart-slot" />

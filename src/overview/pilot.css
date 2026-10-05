@@ -24,6 +24,13 @@ html[data-overview-pilot] body > .mobile-bottom-nav { display:none !important; }
 #pilot-navigation .pilot-tabbar::before, #pilot-navigation .pilot-tabbar::after { display:none; }
 .pilot-loading, .pilot-error { font-size:12px; color:var(--muted); }
 .pilot-error { color:var(--negative); }
+html body #chartView.chart-no-data :is(.chart-wrap,#maToggle,#rsiWrap,[data-chart-slot="rsi"],.period-summary) { display:none; }
+/* Preserve full configured prices on compact phones. */
+@media(max-width:360px) {
+  html[data-overview-pilot] .pilot-market-card .market-card-value,
+  html[data-overview-pilot] .pilot-market-card .market-card-change { grid-column:1/-1; }
+  html[data-overview-pilot] .pilot-market-card .market-card-change { justify-self:start; }
+}
 .pilot-action-sheet .button { display:inline-flex; align-items:center; justify-content:center; height:auto; min-height:38px; padding:7px 12px; border:1px solid var(--line); border-radius:10px; color:var(--accent-ink); background:var(--surface-control); font-size:var(--font-control); font-weight:600; line-height:1.25; text-transform:none; letter-spacing:0; box-shadow:none; }
 .pilot-action-sheet { height:auto; max-height:85dvh; z-index:15000; color:var(--text); background:var(--surface-section);
   border-radius:22px 22px 0 0; backdrop-filter:none !important; box-shadow:none !important; }
