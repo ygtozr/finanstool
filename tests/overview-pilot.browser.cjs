@@ -10,7 +10,8 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  try {
  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
  let unavailable=false,detailMode='',fundamentalFixture=null;const heldSearch=[],heldDetails=[];
- const referenceHtml=require('node:child_process').execFileSync('git',['show','v8.0:index.html'],{cwd:root});
+ // Normalize only the release badge; the reference layout and finance remain v8.0.
+ const referenceHtml=require('node:child_process').execFileSync('git',['show','v8.0:index.html'],{cwd:root}).toString().replaceAll('version-badge">v8.0','version-badge">v'+require('../package.json').version);
  const referenceContext=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
  const reference=await referenceContext.newPage();
  const page=await context.newPage(),errors=[],requests=[];page.on('pageerror',e=>{errors.push(e.message);console.error('PAGE ERROR',e.message)});page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('net::')){errors.push(m.text());console.error('CONSOLE',m.text())}});

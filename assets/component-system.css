@@ -25,7 +25,7 @@ html[data-theme][data-palette] body :is(.toolbar:not(.pilot-tabbar):not(.mobile-
 html[data-theme][data-palette] body { font-family:var(--font-system);font-size:var(--font-body);color:var(--color-primary);background:var(--color-page); }
 html[data-theme][data-palette] body main { background:var(--color-section);border-color:var(--color-border);box-shadow:none; }
 /* One card paint path: material changes never alter card geometry or density. */
-html[data-theme][data-palette] body :is(.market-card,.favorite-card,.native-plot-card,.settings-card,.settings-group,.native-surface,.native-selector-card,.period-summary,.portfolio-glance,.portfolio-summary-card,.portfolio-distribution,.portfolio-benchmark,.distribution-card,.portfolio-overall-head) {
+html[data-theme][data-palette] body :is(.market-card,.favorite-card,.native-plot-card,.settings-card,.native-surface,.native-selector-card,.period-summary,.portfolio-glance,.portfolio-summary-card,.portfolio-distribution,.portfolio-benchmark,.distribution-card,.portfolio-overall-head) {
   border:var(--stroke-card);border-radius:var(--radius-card);
   background-color:var(--material-card-fill,var(--color-card));
   background-image:var(--material-card-image,none);

@@ -118,15 +118,6 @@ html[data-theme][data-palette] body #appMain #otherView .settings-segments butto
 }
 html[data-theme][data-palette] body #appMain #otherView .settings-segments button:is(.active,[aria-pressed="true"]) { background:transparent; color:var(--on-accent); }
 .pilot-page-title { margin-top:0; font-size:var(--font-heading); }
-html[data-theme][data-palette] body #otherView .settings-group { min-width:0; padding:0; overflow:visible; }
-html[data-theme][data-palette] body #otherView .settings-group:has(.appearance-menu[open]) { position:relative; z-index:70; }
-html[data-theme][data-palette] body #otherView .settings-group-title { margin:0; padding:14px 12px 6px; font-size:calc(var(--font-heading) - 3px); color:var(--muted); line-height:1.25; }
-html[data-theme][data-palette] body #otherView .settings-group > .settings-card {
-  margin:0; padding:12px; border:0; border-radius:0; background:none; box-shadow:none; outline:none; backdrop-filter:none; -webkit-backdrop-filter:none;
-}
-html[data-theme][data-palette] body #otherView .settings-group > .settings-card ~ .settings-card { border-top:1px solid var(--line); }
-html[data-theme][data-palette] body #otherView .settings-card h3 { font-size:calc(var(--font-heading) - 2px); margin-bottom:5px; }
-html[data-theme][data-palette] body #otherView .settings-card-copy > p { font-size:calc(var(--font-body) - 1px); line-height:1.4; }
 html[data-theme][data-palette] body :is(.market-card-value,.market-card-change,.favorite-card-price,.favorite-change,.favorite-market-time,.portfolio-head-value,.portfolio-daily-change,.portfolio-current-value,.portfolio-compact-profit,.portfolio-compact-detail,.portfolio-cash-value,.analysis-table td,.distribution-summary-value,.benchmark-stat strong,.period-summary-item dd,.period-summary-item strong,.favorite-detail-metric strong,.dividend-row strong) { font-variant-numeric:tabular-nums; }
 .pilot-portfolio-modes { box-shadow:none; }
 .pilot-preserved-page .button { height:auto; line-height:1.5; text-transform:none; letter-spacing:normal; }

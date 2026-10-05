@@ -1,5 +1,13 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
+## v9.0.0 — Onaylı kalıcı sürüm
+
+Kullanıcı v9.0.0 adıyla kalıcı yayını açıkça onayladı. Ayarlar preview.11 sürümündeki ayrı kart düzenine geri döner; preview.12'nin beş birleşik grubu ve grup stilleri kaldırılır. Tam genişlikte üçlü seçimler, mevcut vurgu renkli kayan gösterge, kısa açıklamalar ve eş genişlikli finans rakamları korunur. React + Framework7 kabukları ve önceki denetim düzeltmeleri kalıcı sürüme dahildir. Yeni dependency yok; finans/API/cache/batch/auth/Upstash ve kullanıcı/portföy/yedek formatları değişmez.
+
+Sürüm başlığı, tüm sayfa rozetleri, footer ve ayarlar 9.0.0 gösterir. Kalıcı adres https://finanstool.vercel.app; güncel kaynak main ve v9.0.0 etiketi. Önceki v8.0 etiketi korunur; yayın iş akışı archive/v8.0 dalını ve GitHub Release kaydını oluşturur. Sürüm notları RELEASE_NOTES_v9.0.0.md içindedir. Aşağıdaki preview notları tarihsel kayıttır; production için eski v8.0 ifadeleri bu sürümle geçersiz olur.
+
+Doğrulama: build, genel regresyon ve dört genişlik/iki tema tarayıcı akışı. Çevrimdışı sentetik test, gerçek hesap/veri sağlayıcısı veya fiziksel iPhone doğrulaması değildir.
+
 ## v8.1.0-preview.12 — Tam genişlik ve vurgu rengi
 
 Görünüm ve para birimi üçlü seçimleri satırın tamamını doldurur. Kayan gösterge mevcut vurgu rengini, seçili metin ona uygun kontrast rengini kullanır; 32 px görünür track, 44 px dokunma alanı ve azaltılmış hareket desteği korunur. Ayarlar beş ortak yüzeyde gruplanır: Tercihler, Veri ve alarmlar, Yedek ve depolama, Hesap, Destek. İç bölümler ince ayraçlarla ayrılır; başlık ve açıklamalar sadeleşir. Finans rakamları tabular-nums kullanır. Kullanıcının tema/renk/stil tercihi değiştirilmez; finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları korunur. Yeni dependency yok.

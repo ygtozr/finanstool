@@ -1,5 +1,13 @@
 # Özer Finans — Yeni sohbet devir notları
 
+## v9.0.0 — Onaylı kalıcı sürüm
+
+Kullanıcı v9.0.0 adıyla kalıcı yayını açıkça onayladı. Ayarlar preview.11 sürümündeki ayrı kart düzenine geri döner; preview.12'nin beş birleşik grubu ve grup stilleri kaldırılır. Tam genişlikte üçlü seçimler, mevcut vurgu renkli kayan gösterge, kısa açıklamalar ve eş genişlikli finans rakamları korunur. React + Framework7 kabukları ve önceki denetim düzeltmeleri kalıcı sürüme dahildir. Yeni dependency yok; finans/API/cache/batch/auth/Upstash ve kullanıcı/portföy/yedek formatları değişmez.
+
+Sürüm başlığı, tüm sayfa rozetleri, footer ve ayarlar 9.0.0 gösterir. Kalıcı adres https://finanstool.vercel.app; güncel kaynak main ve v9.0.0 etiketi. Önceki v8.0 etiketi korunur; yayın iş akışı archive/v8.0 dalını ve GitHub Release kaydını oluşturur. Sürüm notları RELEASE_NOTES_v9.0.0.md içindedir. Aşağıdaki preview notları tarihsel kayıttır; production için eski v8.0 ifadeleri bu sürümle geçersiz olur.
+
+Doğrulama: build, genel regresyon ve dört genişlik/iki tema tarayıcı akışı. Çevrimdışı sentetik test, gerçek hesap/veri sağlayıcısı veya fiziksel iPhone doğrulaması değildir.
+
 ## v8.1.0-preview.12 — Tam genişlik ve vurgu rengi
 
 Görünüm ve para birimi üçlü seçimleri satırın tamamını doldurur. Kayan gösterge mevcut vurgu rengini, seçili metin ona uygun kontrast rengini kullanır; 32 px görünür track, 44 px dokunma alanı ve azaltılmış hareket desteği korunur. Ayarlar beş ortak yüzeyde gruplanır: Tercihler, Veri ve alarmlar, Yedek ve depolama, Hesap, Destek. İç bölümler ince ayraçlarla ayrılır; başlık ve açıklamalar sadeleşir. Finans rakamları tabular-nums kullanır. Kullanıcının tema/renk/stil tercihi değiştirilmez; finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları korunur. Yeni dependency yok.
@@ -125,14 +133,14 @@ Aktif görünüm dosyaları assets/appearance.js, assets/design-tokens.css, asse
 - onizleme/ ve tasarim-onerileri/: tarihsel tasarım örnekleri; gerçek uygulama olarak yayınlamayın.
 - archive/: önceki sürüm kaynakları; .vercelignore bunları dağıtımdan dışlar.
 
-Uygulama React/Next.js değildir: statik arayüz + Vercel API işlevleri. Kurulumda mevcut package.json ve pnpm-lock.yaml esas alınır. Finans hesaplama/yenileme altyapısını sırf tasarım için yeniden yazmayın.
+Uygulama React + Framework7 arayüz kabukları ve korunmuş finans/veri katmanı + Vercel API işlevlerinden oluşur. Next.js kullanılmaz. Kurulumda mevcut package.json ve pnpm-lock.yaml esas alınır. Finans hesaplama/yenileme altyapısını sırf tasarım için yeniden yazmayın.
 
 ## 4. Ürün ve çalışma kuralları
 
 - Dört ana görünüm: Özet (piyasa ve favoriler), Grafik, Portföy, Diğer. Açılış Özet.
 - Birden çok portföy, nakit, para birimi tercihleri, temettü yeniden yatırımı, TEFAS ve altın ürünleri vardır. Ayrıntılar teknik belgede.
 - Türkçe, mobil öncelikli; kullanıcı çoğunlukla telefondan kontrol eder. Önizleme linki telefonda erişilebilir olmalı; korumalı Vercel linki oturum isteyebilir.
-- Yeni tasarım/işlev önce önizleme ve kullanıcı onayı; kalıcı yayın daha sonra. Son sürüm v8.0 olduğundan sonraki sürüm adayı normalde v8.1 olur; kalıcılaştırmayı kendiliğinden yapmayın.
+- Yeni tasarım/işlev önce önizleme ve kullanıcı onayı; kalıcı yayın daha sonra. Son onaylı sürüm v9.0.0 olduğundan sonraki sürüm adayı normalde v9.1 olur; kalıcılaştırmayı kendiliğinden yapmayın.
 - Her onaylı sürümü GitHub'da koruyun, önceki sürümü arşivleyin, kapsamlı teknik belgeyi güncelleyin. Sabit üretim URL'sini değiştirmeyin.
 - Periyodik yenilemeyi adaptif aralığa dönüştürme önerisi kullanıcı tarafından dışlanmıştır. Mevcut bölüm/görünürlük kontrollerini, batch ve önbelleği koruyun.
 - Alarm uygulama kapalıyken çalışmaz; bağımsız push/e-posta servisi için yeni onay gerekir.
