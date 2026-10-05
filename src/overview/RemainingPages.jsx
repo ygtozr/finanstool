@@ -62,7 +62,7 @@ function NotificationToggle({ id, label, note, checked }) {
 export function OtherShell({ theme, settings }) {
   return <>
     <PreservedPage view="other" title="Diğer" />
-    {createPortal(<Segmented className="pilot-theme-controls">
+    {createPortal(<Segmented strong className="pilot-theme-controls settings-segments" style={{ '--selected-segment': ['system', 'dark', 'light'].indexOf(theme) }}>
       {[['system', 'Sistem'], ['dark', 'Koyu'], ['light', 'Açık']].map(([mode, label]) => <Button type="button" key={mode} id={`pilot-theme-${mode}`} className={`theme-choice ${theme === mode ? 'active' : ''}`} aria-pressed={theme === mode} onClick={() => overview.theme(mode)}>{label}</Button>)}
     </Segmented>, document.querySelector('#otherView .theme-choices'))}
     {createPortal(notificationControls.map(([id, label, note]) => <NotificationToggle key={id} id={id} label={label} note={id === 'alarmNotificationsToggle' ? settings.alarmStatus : note} checked={settings[id]} />), document.querySelector('#otherView .settings-switches'))}

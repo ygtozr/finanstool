@@ -96,6 +96,27 @@ html body #chartView.chart-no-data :is(.chart-wrap,#maToggle,#rsiWrap,[data-char
 .pilot-preserved-page .page, .pilot-preserved-page .page-content { position:relative; height:auto; min-height:0; width:100%; overflow:visible; transform:none; background:transparent; }
 .pilot-preserved-page .page-content { padding:0; }
 .pilot-preserved-content, .pilot-theme-controls { display:contents; }
+/* Compact iOS segmented paint; the full 44px target remains tappable. */
+html[data-theme][data-palette] body #appMain #otherView .theme-choices[aria-label="Tema seçimi"] { padding:0; background:transparent; display:block; }
+html[data-theme][data-palette] body #appMain #otherView .settings-segments {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); position:relative;
+  width:min(100%,300px); height:44px; padding:0; gap:0; background:transparent; border:0; box-shadow:none;
+}
+html[data-theme][data-palette] body #appMain #otherView .settings-segments::before {
+  content:""; position:absolute; inset:6px 0; border-radius:8px; background:var(--surface-control); pointer-events:none;
+}
+html[data-theme][data-palette] body #appMain #otherView .settings-segments .segmented-highlight {
+  position:absolute; left:2px; top:8px; bottom:8px; height:auto; width:calc((100% - 4px)/3); margin:0;
+  border-radius:6px; background:var(--surface-card); border:1px solid var(--line); box-shadow:0 1px 2px #0001;
+  transform:translateX(calc(var(--selected-segment,0)*100%)); pointer-events:none;
+  transition:transform 220ms cubic-bezier(.2,.8,.2,1),background-color 180ms ease;
+}
+html[data-theme][data-palette] body #appMain #otherView .settings-segments button {
+  z-index:1; position:relative; min-height:44px; height:44px; padding:6px 8px; border:0; border-radius:8px;
+  font-size:calc(var(--font-control) - 1px); line-height:1.25; color:var(--muted); background:transparent;
+  transition:color 160ms ease; box-shadow:none;
+}
+html[data-theme][data-palette] body #appMain #otherView .settings-segments button:is(.active,[aria-pressed="true"]) { background:transparent; color:var(--text); }
 .pilot-page-title { margin-top:0; font-size:var(--font-heading); }
 .pilot-portfolio-modes { box-shadow:none; }
 .pilot-preserved-page .button { height:auto; line-height:1.5; text-transform:none; letter-spacing:normal; }

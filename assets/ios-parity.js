@@ -113,6 +113,7 @@ window.OzerNativeUI = (() => {
       value.textContent=selected?.textContent||'';
     });
     document.querySelectorAll('[data-native-select]').forEach(button=>button.setAttribute('aria-pressed',String(document.getElementById(button.dataset.nativeSelect).value===button.dataset.value)));
+    document.querySelectorAll('.native-segments.settings-segments').forEach(group=>group.style.setProperty('--selected-segment',[...group.querySelectorAll('button')].findIndex(button=>button.getAttribute('aria-pressed')==='true')));
     const font=document.getElementById('fontSizeSelect');
     const down=document.getElementById('nativeFontDown'),up=document.getElementById('nativeFontUp');
     if(down)down.disabled=font.value==='small';if(up)up.disabled=font.value==='large';
@@ -149,11 +150,11 @@ window.OzerNativeUI = (() => {
       const values=['small','standard','large'];font.value=values[Math.max(0,Math.min(2,values.indexOf(font.value)+delta))];font.dispatchEvent(new Event('change',{bubbles:true}));sync();
     }));
     const select=document.getElementById('baseCurrencySelect');select.hidden=true;
-    const group=document.createElement('div');group.className='native-segments';group.setAttribute('role','group');group.setAttribute('aria-label','Tercih edilen para birimi');
+    const group=document.createElement('div');group.className='native-segments settings-segments';group.setAttribute('role','group');group.setAttribute('aria-label','Tercih edilen para birimi');
     [['NATIVE','Yerel'],['TRY','TRY'],['USD','USD']].forEach(([value,label])=>{
       const button=document.createElement('button');button.type='button';button.textContent=label;button.dataset.nativeSelect=select.id;button.dataset.value=value;
       button.addEventListener('click',()=>{select.value=value;select.dispatchEvent(new Event('change',{bubbles:true}));sync();});group.append(button);
-    });select.after(group);
+    });const highlight=document.createElement('span');highlight.className='segmented-highlight';highlight.setAttribute('aria-hidden','true');group.append(highlight);select.after(group);
     const help={defaultPortfolioSelect:'Uygulama açıldığında seçili gelecek portföy.',defaultBenchmarkSelect:'Karşılaştırma grafiğinde başlangıçta kullanılacak ürün.',baseCurrencySelect:'Yerel: ürünün kendi para birimi. Karma toplamlar USD bazındadır.',priceDecimalsSelect:'Yalnız gösterim hassasiyetini değiştirir; hesaplamalar aynı kalır.',percentDecimalsSelect:'Yüzde değişiminde virgülden sonra gösterilen basamak sayısı.',refreshIntervalSelect:'Açık sayfanın verilerini kontrol eder; kaynak gecikmesini değiştirmez.',defaultRangeSelect:'Grafik açıldığında seçili gelen zaman aralığı.',alarmCheckIntervalSelect:'Uygulama açıkken fiyatların kontrol sıklığıdır; geri sayım değildir.',backupReminderSelect:'Yedek almayı hatırlatır; otomatik yedek oluşturmaz.',restoreMode:'Birleştir mevcut portföyleri korur; eşleşen kayıtları yedekten günceller. Değiştir mevcut verinin yerine yedeği koyar.'};
     Object.entries(help).forEach(([id,text])=>{const input=document.getElementById(id),note=document.createElement('small');note.className='native-help';note.id=id+'Help';note.textContent=text;input.closest('label').append(note);input.setAttribute('aria-describedby',note.id);});
     const paths=['M3 11 12 3l9 8M5 10v11h5v-6h4v6h5V10','M3 3v18h18M6 15l5-6 4 3 5-7','M4 7h16v13H4zM7 4h10','M5 12h.01M12 12h.01M19 12h.01'];

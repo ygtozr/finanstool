@@ -771,10 +771,10 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.10">
+  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.11">
   <link rel="stylesheet" href="assets/design-tokens.css?v=8.0">
-  <link rel="stylesheet" href="assets/ios-parity.css?v=8.1-preview.10">
-  <link rel="stylesheet" href="assets/component-system.css?v=8.1-preview.10">
+  <link rel="stylesheet" href="assets/ios-parity.css?v=8.1-preview.11">
+  <link rel="stylesheet" href="assets/component-system.css?v=8.1-preview.11">
   <link rel="stylesheet" href="assets/ios-screen-alignment.css?v=8.0">
 </head>
 <body class="auth-locked">
@@ -803,7 +803,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small id="desktopVersion">v8.1.0-preview.10</small>
+      <small id="desktopVersion">v8.1.0-preview.11</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
@@ -1022,7 +1022,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
   </dialog>
   <script src="assets/storage-events.js?v=8.0"></script>
   <script src="assets/appearance.js?v=8.0"></script>
-  <script src="assets/ios-parity.js?v=8.0"></script>
+  <script src="assets/ios-parity.js?v=8.1-preview.11"></script>
   <script src="assets/chart-theme.js?v=8.0"></script>
   <script>
     let chart;
@@ -5167,7 +5167,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         const hidden=[...decorations,...controls].map(node=>[node,node.hidden]);
         hidden.forEach(([node])=>{node.hidden=true});nodes.forEach(node=>content.append(node));
         const version=kind==='other'?view.querySelector('.settings-version strong'):null,oldVersion=version?.textContent;
-        if(version)version.textContent='v'+(document.documentElement.dataset.appVersion||'8.1.0-preview.10');
+        if(version)version.textContent='v'+(document.documentElement.dataset.appVersion||'8.1.0-preview.11');
         view.dataset.reactPage='ready';
         return ()=>{moved.reverse().forEach(([node,parent,next])=>parent.insertBefore(node,next?.parentNode===parent?next:null));hidden.forEach(([node,value])=>{node.hidden=value});if(version)version.textContent=oldVersion;delete view.dataset.reactPage};
       },
@@ -5261,6 +5261,6 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     })();
   </script>
   <script src="assets/auth-account.js?v=8.0.0"></script>
-  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.10"></script>
+  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.11"></script>
 </body>
 </html>

@@ -1,5 +1,11 @@
 # Özer Finans v8.0
 
+## v8.1.0-preview.11 — Kompakt ayar seçimleri
+
+Görünüm ve para birimi seçimleri aynı kompakt segmented tasarımını kullanır. Görünen track 32 px, düğmenin dokunma alanı 44 px; genişlik en çok 300 px. Seçili gösterge 220 ms cubic-bezier geçişle kayar, metin rengi kısa geçişle değişir. Framework7 React Segmented strong göstergesi tema seçiminde, aynı çizim native para birimi grubunda kullanılır. prefers-reduced-motion durumunda mevcut ortak kurallar hareketi kapatır. Kullanıcının tema, renk, yüzey ve veri tercihleri değiştirilmez. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek şemaları korunur; yeni dependency yok.
+
+Build, hedefli dört genişlik/iki tema kontrolü ve genel regresyon geçti. Tema/para birimi ölçü eşlemesi, 44 px hedef, kayan göstergenin seçili konumu ve azaltılmış hareket davranışı kontrol edilir. Yalnız migration ön izlemesi; production/main v8.0 korunur. Gerçek iPhone ve canlı servis doğrulaması ayrıca gerekir.
+
 ## v8.1.0-preview.10 — Kullanılmayan kod ve kontrol tasarımı
 
 Aktif girişler ve çağrı bağlantıları incelenerek çağrılmayan fetchFavoriteQuote, addPortfolioStat, destroyPortfolioDistributionCharts ve solidLegendLabels yardımcıları; kullanılmayan LoadingState bileşeni; eski detail-toggle/portfolio-detail-controls/show-chart-detail ve portfolio-stat/stats stilleri kaldırıldı. Artık çağrılmayan işlevlerin kaynakta varlığını arayan iki eski test temizlendi; kullanılan toplu fiyat akışı tarayıcı testinde korunuyor. React/native köprü handler’ları ve fallback renderer’ları hâlâ kullanıldığından korundu.
