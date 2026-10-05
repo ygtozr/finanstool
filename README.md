@@ -1,4 +1,24 @@
-# Özer Finans v9.0.0
+# Özer Finans v9.0.1
+
+## v9.0.1 — Onaylı kalıcı sürüm
+
+Kullanıcı v9.0.1-preview.2 için kalıcı yayın onayı verdi. Mobil alt menü içeriklerin üstünde fixed kalır; Framework7 View kabuklarının gereksiz yüksek katmanı kaldırılır. Giriş ekranı açıkken alt menü render edilmez. Popup/sheet/native dialog önceliği, safe-area, eski ayar kartları, tam genişlik ve vurgu renkli seçimler korunur. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok.
+
+Güncel kaynak main ve v9.0.1 etiketi; kalıcı adres https://finanstool.vercel.app. Önceki v9.0.0, etiketi ve archive/v9.0.0 dalıyla korunur. Yayın iş akışı GitHub Release kaydını RELEASE_NOTES_v9.0.1.md ile oluşturur. Aşağıdaki preview ve eski kalıcı sürüm notları tarihsel kayıttır.
+
+Build, genel regresyon ve pilot tarayıcı akışı; sabit/dokunulabilir alt menü, kısa ekran, dört genişlik/iki tema/sekiz materyal katman denetimi. Sentetik testler gerçek hesap/sağlayıcı ve fiziksel iPhone kabul kontrolü değildir.
+
+## v9.0.1-preview.2 — Katman denetimi ve giriş ekranı
+
+Katman denetimi arama/görünüm menülerini dört genişlik, iki tema ve sekiz yüzey stilinde gerçek elementFromPoint kontrolüyle kapsar; popup, native dialog, geri al bildirimi ve giriş ekranında tıklanabilirlik kontrol edilir. Menüdeki Framework7 hidden özelliği toolbar-hidden dönüşümüyle gizleme yapıyordu; sabit menünün transform:none kuralı bunu iptal ettiğinden giriş ekranında menü görünmeye devam edebiliyordu. MobileTabBar, authGate açıkken render edilmez; hesap işlemleri ve auth protokolü değişmez. Önceki fixed/z-index düzeltmesi korunur.
+
+Yeni dependency yok; finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları korunur. Yalnız fix/v9.0.1-mobile-navigation ön izlemesi; main/production v9.0.0 değişmez. Test verileri sentetiktir; fiziksel iPhone ve canlı sağlayıcı testi değildir.
+
+## v9.0.1-preview.1 — Sabit mobil alt menü
+
+Framework7 View katmanı z-index:5000 iken alt menü 44 seviyesinde kaldığından sayfa içeriği menünün önüne geçebiliyordu. Belge kaydırması kullanan entegre View kabuklarının katmanı auto olur; alt menü açıkça fixed ve z-index:1000 kullanır. Sheet/popup/native dialog kendi üst katmanlarını korur. Menü geometrisi, safe-area ve masaüstü sidebar davranışı korunur. Finans/API/cache/batch/auth/kullanıcı/yedek yapıları değişmez; yeni dependency yok.
+
+Hedefli tarayıcı testi dört sayfada üst/orta/alt kaydırma konumlarında menü düğmelerinin gerçek elementFromPoint ile dokunulabilirliğini, 375/390/430 px ve 844/500 px yüksekliklerde açık/koyu görünümü, açık renk menüsü katmanını, sheet önceliği/kapanışını ve 1024 px masaüstünü kontrol eder. Yalnız fix/v9.0.1-mobile-navigation ön izlemesi; main/production v9.0.0 korunur.
 
 ## v9.0.0 — Onaylı kalıcı sürüm
 

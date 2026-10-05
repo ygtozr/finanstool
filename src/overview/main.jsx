@@ -58,7 +58,8 @@ export function FavoriteRow({ item, openActions, order, actionsOpen }) {
 }
 const tabs = [['main', 'Özet', 'M3 11 12 3l9 8M5 10v11h5v-6h4v6h5V10'], ['chart', 'Grafik', 'M3 3v18h18M6 15l5-6 4 3 5-7'], ['portfolio', 'Portföy', 'M4 7h16v13H4zM7 4h10'], ['other', 'Diğer', 'M5 12h.01M12 12h.01M19 12h.01']];
 export function MobileTabBar({ view, authenticated }) {
-  return createPortal(<Toolbar bottom className="mobile-bottom-nav pilot-tabbar" hidden={!authenticated} aria-label="Mobil gezinme">
+  if (!authenticated) return null;
+  return createPortal(<Toolbar bottom className="mobile-bottom-nav pilot-tabbar" aria-label="Mobil gezinme">
     {tabs.map(([id, label, icon]) => <button type="button" key={id} className={id === view ? 'is-active' : ''}
       aria-current={id === view ? 'page' : undefined} aria-label={label}
       onClick={() => overview.navigate(id)}>
@@ -109,7 +110,7 @@ function AppShell() {
   return <App theme="ios" name="Özer Finans" className={`pilot-app ${state.theme === 'dark' ? 'dark' : ''}`}
     touch={{ fastClicks: false }} clicks={{ externalLinks: '.external, a[download], #inviteLink' }} view={{ router: false }}>
     <View main router={false}><Page name="overview" className="pilot-page">
-      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.0</span></h1>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.1</span></h1>
       {refreshError ? <ErrorState message={refreshError} retry={refresh} /> : null}
       <div className="app-layout"><section className="chart-panel">
       <Section className="market-summary" title="Piyasa Özeti" note={state.marketUpdated} actions={<div className="market-actions"><button type="button" id="pilotMarketRefresh" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile">{state.busy ? 'Yenileniyor…' : 'Yenile'}</button><button type="button" id="pilotMarketSettings" onClick={() => setSettingsOpen(true)} aria-label="Piyasa özetini düzenle">⚙</button></div>}>

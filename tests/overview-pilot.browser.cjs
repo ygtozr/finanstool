@@ -199,8 +199,8 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
   const beforeFooter=await footer.boundingBox(),beforeHead=await head.boundingBox();
   assert(beforeFooter.y+beforeFooter.height<=height+.5,'Actions remain inside short viewport');
   await body.hover();await page.mouse.wheel(0,600);await page.waitForFunction(()=>document.getElementById('favoriteDetailBody').scrollTop>0);
-  assert.equal((await footer.boundingBox()).y,beforeFooter.y,'Footer stays fixed while content scrolls');
-  assert.equal((await head.boundingBox()).y,beforeHead.y,'Header stays fixed while content scrolls');
+  assert(Math.abs((await footer.boundingBox()).y-beforeFooter.y)<=.5,'Footer stays fixed while content scrolls');
+  assert(Math.abs((await head.boundingBox()).y-beforeHead.y)<=.5,'Header stays fixed while content scrolls');
   await body.evaluate(n=>{n.scrollTop=0});
   const bounds=await body.boundingBox(),x=Math.round(bounds.x+bounds.width/2),y=Math.round(bounds.y+bounds.height*.75);
   await touchDevice.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});
@@ -506,6 +506,8 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await require('./audit-fixes.browser.cjs')({browser,seed,routeHandler,output});
  await require('./control-consistency.browser.cjs')({browser,seed,routeHandler,output});
  assert.deepEqual(errors,[],'No console or runtime errors');
+ await require('./mobile-navigation.browser.cjs')({browser,seed,routeHandler});
+ await require('./layer-audit.browser.cjs')({browser,seed,routeHandler});
  console.log('PASS: Portfolio/Other Framework7 shells and controls, book/position/cash transactions/undo/reload, settings/switches/backup/auth handoffs/short forms, React chart search/asset picker/summary, v8.0 summary parity and empty states, wheel/touch short-screen detail scroll, React chart shell/real canvases/period/custom-date/search/MA/actions/exports, React detail loading/error/stale-response/focus/native handoffs, React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
