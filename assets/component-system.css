@@ -1,4 +1,27 @@
 /* Components and responsive layouts share the tokens while preserving app behavior. */
+/* Same operation, same control geometry across native and Framework7 pages. */
+html[data-theme][data-palette] body :is(.toolbar:not(.pilot-tabbar):not(.mobile-bottom-nav) button,.settings-inline-actions button,.dialog-actions button,.data-actions button,.favorite-detail-actions button,.pilot-sheet-content .button,#backupDownload,#restoreBackup,#diagnosticsRefresh,#benchmarkApply,#cashAddButton,#accountAction,#accountSignOut,#createInvite,#copyInvite,#pilotChartSubmit) {
+  min-height:44px; padding:10px 14px; border:1px solid var(--line); border-radius:var(--radius-control);
+  font-size:var(--font-control); font-weight:700; line-height:1.25; letter-spacing:normal; text-transform:none;
+  color:var(--text); background:var(--surface-control); box-shadow:none;
+}
+html[data-theme][data-palette] body :is(.dialog-actions button[type="submit"],#restoreBackup,#pilotChartSubmit) {
+  color:var(--on-accent); background:var(--accent); border-color:var(--accent);
+}
+html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.native-segments button,.chart-asset-switcher-buttons button,.theme-choice:not([data-appearance-color]):not([data-appearance-look])) {
+  min-height:44px; padding:8px 12px; border:1px solid var(--line); border-radius:var(--radius-pill);
+  font-size:var(--font-control); font-weight:700; line-height:1.25; letter-spacing:normal; text-transform:none;
+  color:var(--text); background:var(--surface-control); box-shadow:none;
+}
+html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.native-segments button,.chart-asset-switcher-buttons button,.theme-choice:not([data-appearance-color]):not([data-appearance-look])):is(.active,.is-active,[aria-pressed="true"],[aria-expanded="true"]) {
+  color:var(--on-accent); background:var(--accent); border-color:var(--accent);
+}
+html[data-theme][data-palette] body :is(#resetAppDataButton,.danger-button,.pilot-sheet-content .negative) {
+  color:var(--danger); background:color-mix(in srgb,var(--danger) 12%,var(--surface-control)); border-color:color-mix(in srgb,var(--danger) 35%,var(--line));
+}
+html[data-theme][data-palette] body :is(.toolbar:not(.pilot-tabbar):not(.mobile-bottom-nav) button,.settings-inline-actions button,.dialog-actions button,.data-actions button,.favorite-detail-actions button,.pilot-sheet-content .button,.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.native-segments button,.chart-asset-switcher-buttons button,.theme-choice):focus-visible {
+  outline:2px solid var(--accent); outline-offset:2px;
+}
 html[data-theme][data-palette] body { font-family:var(--font-system);font-size:var(--font-body);color:var(--color-primary);background:var(--color-page); }
 html[data-theme][data-palette] body main { background:var(--color-section);border-color:var(--color-border);box-shadow:none; }
 /* One card paint path: material changes never alter card geometry or density. */
@@ -46,9 +69,6 @@ html[data-theme][data-palette] body .native-positions-card .portfolio-search { m
 html[data-theme][data-palette] body :is(.portfolio-row,.portfolio-cash-item,.dividend-row,.market-settings-row) { border:var(--stroke-card);border-radius:var(--radius-row);background:var(--color-card);box-shadow:none; }
 html[data-theme][data-palette] body :is(button,input,select) { font-family:var(--font-system); }
 html[data-theme][data-palette] body button { border-radius:var(--radius-control); }
-html[data-theme][data-palette] body :is(.toolbar button,.settings-inline-actions button,.dialog-actions button,.data-actions button,.market-summary-head button,.favorites-panel-head button) { min-height:var(--control-height);font-size:var(--font-control);font-weight:700; }
-html[data-theme][data-palette] body :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab) { min-height:var(--pill-height);border-radius:var(--radius-pill);font-size:var(--font-control);font-weight:700; }
-html[data-theme][data-palette] body :is(.periods button.active,.benchmark-ranges button.active,.benchmark-presets button.active,.portfolio-book-tab[aria-pressed="true"]) { color:var(--on-accent);background:var(--color-action);border-color:var(--color-action); }
 html[data-theme][data-palette] body :is(.periods,.benchmark-ranges) { gap:7px; }
 html[data-theme][data-palette] body :is(.native-plot-card,.benchmark-chart-wrap) canvas { max-width:100%; }
 html[data-theme][data-palette] body .period-summary-list { grid-template-columns:repeat(2,minmax(0,1fr)); }

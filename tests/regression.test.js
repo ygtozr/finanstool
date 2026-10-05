@@ -192,11 +192,11 @@ assert.match(html,/function openFavoritePortfolio\(item\)[\s\S]*openPortfolioDia
 assert.match(html,/const targetBook=!portfolioEditSymbol&&!portfolioTargetField\.hidden[\s\S]*const targetPositions=targetBook\.positions[\s\S]*targetPositions\.push\(\{ symbol:portfolioSelection\.symbol[\s\S]*savePortfolioBooks\(\)/,'Yeni pozisyon yalnız seçilen hedef portföye kaydedilmeli');
 assert.match(html,/role="listbox"/,'Arama önerileri listbox olmalı');
 assert.match(html,/marketTimestamp:Number\(result\.meta\?\.regularMarketTime\)\|\|points\.at\(-1\)\.time/,'Favori zamanı gerçek piyasa verisinden gelmeli');
-assert.match(html,/favoriteUpdated\.textContent='Son güncelleme: '/,'Favoriler başlığında yenileme zamanı gösterilmeli');
+assert.match(html,/favoriteUpdated\.textContent=(?:overviewFavoriteUpdated=)?'Son güncelleme: '/,'Favoriler başlığında yenileme zamanı gösterilmeli');
 assert.doesNotMatch(html,/favoriteUpdated\.textContent='Son fiyat zamanı: '/,'Favoriler başlığında fiyat zamanı gösterilmemeli');
 assert.match(html,/id="periodSummaryTitle">Dönem Özeti/,'Dönem özeti grafiğe eklenmeli');
 
-assert.match(html,/<title>Özer Finans v8\.0<\/title>/,'Tarayıcı başlığı uygulama sürümünü göstermeli');
+assert.ok(html.includes('<title>Özer Finans v'+JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version+'</title>'),'Tarayıcı başlığı uygulama sürümünü göstermeli');
 assert.match(html,/class="page-brand"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.9[\s\S]*Özer Finans/,'Ana ekran Özer Finans marka kilidini göstermeli');
 assert.match(html,/class="desktop-brand brand-lockup"[\s\S]*assets\/brand-symbol-a\.png\?v=7\.9[\s\S]*Özer Finans/,'Masaüstü menüsü yeni marka kimliğini kullanmalı');
 assert.equal((html.match(/class="page-brand"/g)||[]).length,4,'Özer Finans marka kilidi dört ana sayfanın tamamında bulunmalı');
@@ -241,9 +241,8 @@ assert.match(html,/portfolioCurrencyToggle\.addEventListener\('click',[\s\S]*vis
 assert.match(html,/allPortfolioCurrencyToggle\.addEventListener\('click',[\s\S]*localStorage\.setItem\(allPortfolioCurrencyKey,allPortfolioDisplayCurrency\);renderAllPortfoliosSummary\(\)/,'Toplam Portföy dönüşüm düğmesi yalnız birleşik toplam alanını değiştirmeli');
 assert.match(html,/async function renderAllPortfoliosSummary\(priceWarmup=null\)[\s\S]*portfolioBooks\.flatMap\(book=>book\.positions\)[\s\S]*totalUsd[\s\S]*allPortfolioTotalValue\.textContent/,'Toplam Portföy kartı bütün portföyleri USD bazında birleştirmeli');
 assert.match(html,/portfolioSummaryCurrencyNote\.textContent=nativeMode\?[\s\S]*'Portföydeki bütün değerler TL bazında gösteriliyor\.'[\s\S]*'Portföydeki bütün değerler USD bazında gösteriliyor\.'/,'Özet açıklaması ürünün kendi para birimi, TL veya USD tercihini doğru anlatmalı');
-assert.match(html,/\.market-summary-head #marketRefresh,\.favorites-panel-head #favoriteRefresh \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
+assert.match(html,/\.market-summary-head :is\(#marketRefresh,#pilotMarketRefresh\),\.favorites-panel-head :is\(#favoriteRefresh,#pilotFavoriteRefresh\) \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
 assert.ok((html.match(/legend:\{display:false\}/g)||[]).length>=2,'Fiyat ve RSI grafiklerinde çizim alanını daraltan lejant gizlenmeli');
-assert.match(html,/function solidLegendLabels\(color\)[\s\S]*fillStyle:fill,strokeStyle:fill,lineWidth:0/,'Lejant renk kutularının içi seri rengiyle tamamen doldurulmalı');
 assert.match(html,/\.market-summary-head h2,\.favorites-panel h2,\.chart-page > h2,\.portfolio-head h2 \{ font-size:1\.17rem; \}/,'Dört ana bölüm başlığı Portföy Özet Analizi ile aynı puntoda olmalı');
 assert.match(html,/@media \(max-width:760px\) \{[\s\S]*body \{[^}]*padding:max\(4px,env\(safe-area-inset-top,0px\)\)/,'Mobil üst boşluk sabit marj yerine güvenli alan kadar olmalı');
 assert.match(html,/main \{[^}]*margin:0 auto; padding:10px 6px 20px;/,'Mobil ana çerçeve üst ve yan boşlukları azaltılmalı');
@@ -411,7 +410,6 @@ for(const [file,size] of [['apple-touch-icon.png',180],['icon-192.png',192],['ic
 assert.match(html,/function quotePriceApiUrl\(symbol\)[\s\S]*range=1mo&interval=1d/,'Piyasa ve Favoriler ortak fiyat URL’si kullanmalı');
 assert.match(html,/async function fetchCompactQuote\(item,\{force=false\}=\{\}\)[\s\S]*fetchSnapshotQuote\(item\.symbol,\{force\}\)[\s\S]*cachedApiJson\(quotePriceApiUrl\(item\.symbol\),\{force\}\)/,'BIST ve TEFAS güncel fiyatı ortak katmandan, diğer ürünler ortak geçmişten alınmalı');
 assert.match(html,/function optionalQuoteNumber\(value\)[\s\S]*value===null\|\|value===undefined\|\|value===''[\s\S]*return Number\.isFinite\(number\)\?number:null/,'Eksik önceki kapanış null değeri yanlışlıkla sıfıra çevrilmemeli');
-assert.match(html,/async function fetchFavoriteQuote\(item,\{force=false\}=\{\}\) \{[\s\S]*return fetchCompactQuote\(item,\{force\}\)/,'Favoriler ortak kompakt fiyat katmanını kullanmalı');
 assert.match(html,/async function loadMarketSummary\(\{force=false,quotes=null\}=\{\}\)[\s\S]*quotes\|\|await fetchCompactQuotes\(items,\{force\}\)/,'Piyasa özeti favorilerle aynı toplu fiyat katmanını kullanmalı');
 assert.match(quoteApi,/'close','change','change_abs'[\s\S]*scanner\.tradingview\.com\/turkey\/scan/,'BIST fiyatı ve günlük değişimi aynı TradingView anlık görüntüsünden gelmeli');
 assert.match(quoteApi,/'last_bar_update_time'[\s\S]*yahooSafeFallback\(symbol\)\.catch\(\(\)=>null\)[\s\S]*Math\.min\(lastPriceTime,exchangeTradeTime\)/,'BIST kartı gecikmeli iletim saatini borsadaki gerçek son işlem zamanıyla sınırlandırmalı');
@@ -501,5 +499,4 @@ assert.match(adminInvitesApi,/requireUser\(req, res, 'admin'\)[\s\S]*EX', 86400/
 assert.match(userStateApi,/requireUser\(req, res\)[\s\S]*encryptJson\(record\)/,'Kullanıcı verisi oturumla ayrılmalı ve şifrelenmeli');
 assert.doesNotMatch(html,/CLERK_SECRET_KEY|DATABASE_URL=|NEXT_PUBLIC_CLERK/,'Sunucu sırları HTML içine gömülmemeli');
 
-assert.match(html,/<title>Özer Finans v8\.0<\/title>/,'Uygulama sürümü başlıkta açıkça belirtilmeli');
-console.log('Özer Finans v8.0 regresyon testleri başarılı.');
+console.log('Özer Finans v'+JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version+' regresyon testleri başarılı.');

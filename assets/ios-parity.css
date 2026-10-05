@@ -6,7 +6,7 @@ html[data-font-size="standard"] { font-size:17px; }
 html[data-font-size="large"] { font-size:19px; }
 html body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
 html[data-palette] body main { box-shadow:none; }
-html[data-look][data-palette] body :is(.portfolio-stat,.period-summary-item,.benchmark-stat) { background:transparent; box-shadow:none; border:0; }
+html[data-look][data-palette] body :is(.period-summary-item,.benchmark-stat) { background:transparent; box-shadow:none; border:0; }
 html[data-look][data-palette] body :is(.periods button,.theme-choice,.portfolio-currency-toggle,.market-summary-head button) { background-image:none; box-shadow:none; }
 html body button { border-radius:9px; font-weight:700; transition:opacity .12s ease,background-color .18s ease,border-color .18s ease; }
 html body button:active:not(:disabled) { opacity:.75; }

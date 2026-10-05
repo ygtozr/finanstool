@@ -1,6 +1,103 @@
 # Özer Finans — Yeni sohbet devir notları
 
+## v9.0.0 — Onaylı kalıcı sürüm
+
+Kullanıcı v9.0.0 adıyla kalıcı yayını açıkça onayladı. Ayarlar preview.11 sürümündeki ayrı kart düzenine geri döner; preview.12'nin beş birleşik grubu ve grup stilleri kaldırılır. Tam genişlikte üçlü seçimler, mevcut vurgu renkli kayan gösterge, kısa açıklamalar ve eş genişlikli finans rakamları korunur. React + Framework7 kabukları ve önceki denetim düzeltmeleri kalıcı sürüme dahildir. Yeni dependency yok; finans/API/cache/batch/auth/Upstash ve kullanıcı/portföy/yedek formatları değişmez.
+
+Sürüm başlığı, tüm sayfa rozetleri, footer ve ayarlar 9.0.0 gösterir. Kalıcı adres https://finanstool.vercel.app; güncel kaynak main ve v9.0.0 etiketi. Önceki v8.0 etiketi korunur; yayın iş akışı archive/v8.0 dalını ve GitHub Release kaydını oluşturur. Sürüm notları RELEASE_NOTES_v9.0.0.md içindedir. Aşağıdaki preview notları tarihsel kayıttır; production için eski v8.0 ifadeleri bu sürümle geçersiz olur.
+
+Doğrulama: build, genel regresyon ve dört genişlik/iki tema tarayıcı akışı. Çevrimdışı sentetik test, gerçek hesap/veri sağlayıcısı veya fiziksel iPhone doğrulaması değildir.
+
+## v8.1.0-preview.12 — Tam genişlik ve vurgu rengi
+
+Görünüm ve para birimi üçlü seçimleri satırın tamamını doldurur. Kayan gösterge mevcut vurgu rengini, seçili metin ona uygun kontrast rengini kullanır; 32 px görünür track, 44 px dokunma alanı ve azaltılmış hareket desteği korunur. Ayarlar beş ortak yüzeyde gruplanır: Tercihler, Veri ve alarmlar, Yedek ve depolama, Hesap, Destek. İç bölümler ince ayraçlarla ayrılır; başlık ve açıklamalar sadeleşir. Finans rakamları tabular-nums kullanır. Kullanıcının tema/renk/stil tercihi değiştirilmez; finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları korunur. Yeni dependency yok.
+
+Build, genel regresyon, tam pilot tarayıcı akışı ve hedefli 375/390/430/1024 px açık/koyu kontrol testi geçti. Tam genişlik, vurgu rengi, gruplama, finans rakamları, dokunma alanı ve taşma doğrulandı. Tarayıcı testleri sentetik veriler kullanır; fiziksel iPhone ve canlı servis doğrulaması değildir. Yalnız migration ön izlemesi; production/main v8.0 korunur.
+
+## v8.1.0-preview.11 — Kompakt ayar seçimleri
+
+Görünüm ve para birimi seçimleri aynı kompakt segmented tasarımını kullanır. Görünen track 32 px, düğmenin dokunma alanı 44 px; genişlik en çok 300 px. Seçili gösterge 220 ms cubic-bezier geçişle kayar, metin rengi kısa geçişle değişir. Framework7 React Segmented strong göstergesi tema seçiminde, aynı çizim native para birimi grubunda kullanılır. prefers-reduced-motion durumunda mevcut ortak kurallar hareketi kapatır. Kullanıcının tema, renk, yüzey ve veri tercihleri değiştirilmez. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek şemaları korunur; yeni dependency yok.
+
+Build, hedefli dört genişlik/iki tema kontrolü ve genel regresyon geçti. Tema/para birimi ölçü eşlemesi, 44 px hedef, kayan göstergenin seçili konumu ve azaltılmış hareket davranışı kontrol edilir. Yalnız migration ön izlemesi; production/main v8.0 korunur. Gerçek iPhone ve canlı servis doğrulaması ayrıca gerekir.
+
+## v8.1.0-preview.10 — Kullanılmayan kod ve kontrol tasarımı
+
+Aktif girişler ve çağrı bağlantıları incelenerek çağrılmayan fetchFavoriteQuote, addPortfolioStat, destroyPortfolioDistributionCharts ve solidLegendLabels yardımcıları; kullanılmayan LoadingState bileşeni; eski detail-toggle/portfolio-detail-controls/show-chart-detail ve portfolio-stat/stats stilleri kaldırıldı. Artık çağrılmayan işlevlerin kaynakta varlığını arayan iki eski test temizlendi; kullanılan toplu fiyat akışı tarayıcı testinde korunuyor. React/native köprü handler’ları ve fallback renderer’ları hâlâ kullanıldığından korundu.
+
+assets/component-system.css dönem/kıyas/tema/para birimi/portföy seçimlerini ortak 44 px geometri, tipografi, pill ve seçili durum kurallarına; eylem/onay/iptal/silme düğmelerini ortak kontrol biçimine bağlar. Mobil tab bar ve renk/yüzey ön izleme seçenekleri kendi amaçlarına uygun stillerini korur. Silme işlemleri kırmızı vurgulanır. Yeni dependency yok; finans/veri/API/cache/batch/auth/Upstash ve kullanıcı/yedek şemaları değişmez.
+
+Build, genel regresyon, mevcut tarayıcı akışı ve tests/control-consistency.browser.cjs geçti. Kontrol tutarlılığı dört genişlik/iki temada gerçek computed style, dokunma yüksekliği, renk, taşma ve ekran görüntüleriyle doğrulandı. Sentetik veri kullanılır; gerçek iPhone/hesap/sağlayıcı doğrulaması değildir. Yalnız migration ön izlemesi; production/main v8.0 korunur.
+
+## v8.1.0-preview.9 — Denetimde bulunan hataların giderilmesi
+
+Alım tarihi ve portföy adındaki özel doğrulama hataları kullanıcı girdiyi düzelttiğinde temizlenir; DRIP kapatıldığında tarih hatası kaydı engellemez. Başarısız manuel grafik sorgusu eski fiyat/RSI grafiklerini ve görüntü verilerini kaldırır; CSV/PNG hem React hem native işlemde kilitlenir. Başarılı sorgu grafik ve dışa aktarımı geri açar. Başarısız arama ile boş sonuç ayrılır; gelişmiş aramada servis hatası tekrar deneme düğmesi sunar. Masaüstü ve ayarlar sürüm bilgisi package.json sürümünü kullanır. 320 px piyasa kartlarında fiyat ve değişim ayrı satırlara alınarak yüksek hassasiyet korunur.
+
+Yeni dependency yok. Finans hesaplama algoritmaları, API/cache/batch, hesap/Upstash ve kullanıcı/portföy/yedek formatları korunur. loadPrice değişikliği kullanıcı sorgusunun hata durumu ve dışa aktarım geçerliliğiyle sınırlıdır; sağlayıcı kontratları değişmez. tests/audit-fixes.browser.cjs tarih/DRIP ve ad düzeltme, grafik hata/başarılı tekrar/dışa aktarım, arama hata/tekrar/boş sonuç, sürüm eşleşmesi ve dar ekran hassasiyetini izole sentetik verilerle doğrular. Build, hedefli test, genel regresyon ve 375/390/430/1024 px açık/koyu tarayıcı akışı geçti. Gerçek sağlayıcı/hesap ve fiziksel iPhone/Safari/PWA doğrulaması yapılmadı.
+
+Yalnız migration/v8.1-framework7-overview ön izlemesi; main/production v8.0 korunur. Kalıcı yayın ayrıca kullanıcı onayı gerektirir.
+
+## v8.1.0-preview.8 — Portföy ve Diğer ekranlarının kontrollü geçişi
+
+`RemainingPages.jsx` kalan iki ekranı React + Framework7 Page kabuğuna alır. Portföy Bugün/Toplam ve rakam gizleme ile Diğer tema/bildirim kontrolleri React/Framework7 üzerinden mevcut işlemleri çağırır. Bildirim anahtarları mevcut tercihlerle eşleşir, klavye odağı ve erişilebilir adları vardır. Framework7 Toggle’ın React 19 kontrollü checkbox olay sırası çakışması, native olay sahibini koruyup dış tercihleri layout effect ile yansıtarak giderilir. Yeni dependency yok; mevcut Framework7 Toggle modülü kullanılır.
+
+Hesap, yedek, portföy formları, varlık/nakit listeleri, portföy sıralama, dağılım/benchmark canvas’ları ve dinleyicileri aynı DOM düğümleriyle korunur. Finans/veri widget’larının JSX içinde yeniden yazılması bu kontrollü geçişin hedefi değildir. `renderPortfolio`, toplam/benchmark/temettü/fiyat hesaplama işlevleri, `createBackup`, `normalizeBackup`, `applyBackup`, portföy kayıt/geçiş işlevleri önceki kaynakla birebir aynıdır. API/cache/batch/auth/Upstash ve kullanıcı/portföy/yedek formatları değişmez. Mobil temel kontroller 44 px dokunma alanı alır; Varlıklar ikonu v8.0 ölçüsündedir. Uzun native formlar kısa iPhone ekranında ve safe-area içinde kaydırılır. Diğer’de sürüm bilgisi gerçek ön izleme sürümünü gösterir.
+
+Hedefli doğrulama ayrı sentetik storage bağlamında: dört genişlik/iki tema, v8.0 finans çıktısı, portföy oluştur/adlandır/sırala/sil/geri al, hisse ekle/düzenle/sil/geri al, nakit, boş ekran, tercih/klavye anahtarları, kısa form/safe-area, yedek indir/geri yükle ve yerel hesap ekranı geçişi. Build, pilot tarayıcı akışı ve genel regresyon geçti; konsol/runtime hatası yok. Fiziksel iPhone kurulumu/klavye/standalone ve gerçek hesap senkronizasyonu ayrıca cihaz/hesap gerektirir; emülasyon bunları doğrulamaz.
+
+Yalnız `migration/v8.1-framework7-overview` ön izlemesi; production/main v8.0 kalır. Kalan iki sayfanın planlanan kabuk geçişi tamamlanır; sonraki adım ön izlemenin gerçek iPhone ve hesapla kabul kontrolüdür. Kullanıcı kalıcı yayın için ayrıca onay vermeden production’a geçilmez.
+
+## v8.1.0-preview.7 — Grafik araması, kayıtlı varlıklar ve Dönem Özeti
+
+Grafik araması ve favori düğmesi ortak `AssetSearch.jsx` ile React’e taşındı. Mevcut arama/çözümleme servisleri ve gecikme kullanılır; kayıtlı varlık veya başka ekrandan seçim, yeni arama sorgusu başlatmadan girişe yansır. `ChartAssets.jsx` Favoriler/Portföy seçicisini Framework7 Segmented/Button ile çizer; seçim paneli kapatıp mevcut `loadPrice` akışına gider. `ChartSummary.jsx` hizmet katmanının biçimlenmiş görüntü modelini gösterir; JSX finans hesabı yapmaz. Gizli eski varlık listeleri boş kalır. Fiyat/RSI canvas’ları, MA, tarih girişi ve dinleyicileri korunur.
+
+`loadPrice`, `fetchFavoriteDetail` ve `calculatePeriodSummary` önceki ön izleme ile birebir aynı. API/cache/batch/auth/Upstash ve kullanıcı/portföy/yedek formatları değişmez. Yeni dependency yok. Hedefli grafik testi ve v8.0 Dönem Özeti yazı/renk/boşluk eşlemesi geçti. Build, genel regresyon ve 375/390/430/1024 px açık/koyu tarayıcı akışı geçti; konsol/runtime hatası yok. Testler sentetik sağlayıcı verisi kullanır.
+
+Yalnız `migration/v8.1-framework7-overview` ön izlemesi; main/production v8.0 korunur. Sonraki öneri Portföy mobil kabuğunu mevcut hesap/veri işlemleriyle taşımaktır; bu sürümde yapılmaz. Diğer ekranı, fiziksel iPhone/Safari/PWA ve canlı hesap/sağlayıcı doğrulaması kalan işlerdir.
+
+## v8.1.0-preview.6 — Ayrıntı kaydırması ve Grafik kabuğu
+
+Hisse ayrıntısında ortak stil gövdenin yükseklik sınırını kaldırıyor, dış dialog `overflow:hidden` ile uzun içeriği kesiyordu. Dialog flex sütun, gövde `min-height:0` ve ayrı scroll alanı oldu; başlık/alt düğmeler yerinde kalır. Mobil alt düğmeler safe-area boşluğu alır; yeni ayrıntı üstten açılır. 375/390/430/1024 px’de 640/500 px yüksekliklerde gerçek wheel/touch olaylarıyla kontrol edilir.
+
+`ChartShell.jsx` Grafik sayfası, araç çubuğu ve dönem/özel tarih düğmelerini React + Framework7 Page/Segmented/Button ile çizer. Mevcut arama formu, fiyat/RSI canvas’ları, MA toggle, dönem özeti ve kayıtlı varlık seçici aynı DOM düğümleri/dinleyicileriyle korunur. Dönem ve araç işlemleri mevcut handler’lara yönlenir. Mobil düğmeler en az 44 px; Framework7 toolbar yüksekliği/katmanları sıfırlanarak grafikle çakışma önlenir. `loadPrice` ve `fetchFavoriteDetail` API/cache/hesaplama işlevleri birebir korunur. Yeni dependency veya veri alanı yok.
+
+Framework7’nin indirme linklerini router olarak yakalaması engellenir (`a[download]` ve mevcut davet bağlantısı tarayıcıya bırakılır); CSV/PNG üretim mantığı değişmez; React PNG düğmesi mevcut hazırlama/kilit durumunu yansıtır. Sheet/popup açıkken eski aşağı çekerek yenileme başlayamaz. Hedefli kapsam: dört genişlik/iki tema, bağımsız ayrıntı kaydırma/odak, gerçek Chart.js/RSI, tek dönem sorgusu, özel tarih, öneri seçimi, favori/MA, mevcut arama/alarm pencereleri, gerçek CSV/PNG indirme ve masaüstü PNG save-picker yazma yolu, popup hareketi, PWA/safe-area, veri/yedek uyumluluğu ve genel regresyon geçti; konsol/runtime hatası yok. Fiziksel iPhone/Safari ve canlı sağlayıcı kontrolü yapılmaz.
+
+Yalnız `migration/v8.1-framework7-overview` ön izlemesi; main/production v8.0 değişmez. Kalan migration işleri: Grafik arama/kayıtlı varlık/özet kontrolleri hâlâ eski DOM ile çalışır; Portföy ve Diğer taşınmadı. Sonraki öneri Grafik araması ve kayıtlı varlık seçimini mevcut servislerle React’e almaktır; bu sürümde uygulanmaz. Fiziksel iPhone kurulum/klavye/standalone ve canlı sağlayıcı uçtan uca kontrolü ayrıca gerekir.
+
+## v8.1.0-preview.5 — React Favori Ayrıntısı
+
+`src/overview/FavoriteDetail.jsx`, mevcut native `favoriteDetailDialog` içeriğini React ile çizer. Dialogun top-layer/arka plan, Escape, odak geri dönüşü ve ortak kaydırma kilidi korunur; Tab/Shift+Tab odağı içeride tutulur. Grafik/Alarm/Portföy düğmeleri adaptör üzerinden mevcut işlemlere gider. Mevcut `fetchFavoriteDetail` sorgu/cache/hesaplama işlevi birebir korunur. Biçimlenmiş görüntü modeli hizmet sınırında hazırlanır; JSX finans hesabı veya yeni fetch/timer içermez. Eski renderer pilot yüklenmezse kullanılabilir. Yeni dependency veya kullanıcı/depolama/yedek alanı yok.
+
+375/390/430/1024 px açık/koyu v8.0 ayrıntı eşlemesi; yükleme/hata, kapatılan sorgunun yeni sembolü ezmemesi, odak/kaydırma kilidi ve üç mevcut ekrana geçiş; temel veri sayı/destek/kaynak/applicability durumları, logo yedek kaynağı ve PWA safe-area emülasyonu hedefli kontrolleri, build ve aşama sonu regresyon geçti. Konsol/runtime hatası yok. Fiziksel iPhone/Safari ve canlı sağlayıcı kontrolü yapılmaz. Yalnız `migration/v8.1-framework7-overview` ön izlemesi; main/production v8.0 değişmez. Sonraki öneri mevcut Chart.js/veri akışını koruyarak mobil Grafik ekranının kabuğunu taşımaktır; bu sürümde uygulanmaz.
+
+## v8.1.0-preview.4 — React arama/piyasa ayarları ve hisse kartı eşlemesi
+
+Favori ve piyasa araması `AssetSearch.jsx`, piyasa düzenleme popup’ı `MarketSettings.jsx` üzerinden React tarafından yönetilir. Mevcut birleşik arama, 400 ms gecikme, veri kaynakları ve kayıt işlemleri adaptör üzerinden kullanılır; geç gelen eski sorgular yeni sonuçları değiştirmez. Popup odak tuzağı, arka plan inert/kaydırma kilidi ve klavye ile sıralama sonrası odak korunur. Finans/API/cache/batch/auth/Upstash, kullanıcı/portföy/yedek formatları ve Portföy/Grafik/Diğer korunur. Yeni dependency yok.
+
+Favori hisse satırları ve mevcut hisse ayrıntı kartı v8.0 ile aynı ölçü/yazı/renk/boşluk değerlerine eşlendi. Framework7’nin genel button genişliğinin eski düğmeleri tam satıra yayması giderildi; ayrıntı alt düğmeleri eski yerleşimini kullanır. Eski ayrıntı veri/hesaplama akışı yeniden yazılmaz.
+
+Build, hedefli tarayıcı testi ve aşama sonu regresyon geçti. 375/390/430/1024 px açık/koyu karşılaştırma, manuel/otomatik yenileme, favori işlemleri, piyasa ekle/çıkar/sırala/boş liste, arama hata/gecikmiş yanıt, klavye odağı, PWA/safe-area emülasyonu ve veri formatı kontrolleri geçti. Fiziksel iPhone/Safari ve canlı sağlayıcı kontrolü yapılmadı. Yalnız `migration/v8.1-framework7-overview` ön izlemesi; main/production v8.0 değişmez. Sonraki öneri mevcut veri akışını koruyarak Favori Ayrıntısı görünümünü React’e taşımaktır; bu sürümde uygulanmaz.
+
+## v8.1.0-preview.3 — DOM’dan bağımsız Özet ve sheet erişilebilirliği
+
+Özet fiyat/favori görüntü modeli doğrudan mevcut quote/veri durumundan ve aynı formatlama/logo işlevlerinden üretilir. React devraldıktan sonra eski piyasa/favori listeleri boş tutulur; yalnız auth, gezinme, tema ve yenileme düğmesi gibi kabuk durumları dar DOM gözlemcisiyle izlenir. Arama formu mevcut dinleyicileriyle kalır. API/cache/batch/zamanlayıcı/finans hesapları, kullanıcı/yedek/portföy şemaları korunur.
+
+Favori logoları mevcut kaynak sırasıyla yedek sağlayıcıya geçer. Framework7 işlem sheet’i dialog olarak etiketlenir; klavye odağı içeride kalır, Escape kapanışı odağı açan düğmeye döndürür. Arka plan inert yapılır ve mevcut modal kaydırma kilidi paylaşılır; eski dialoglara geçişte odak ve kilit çakışmaz. Boş piyasa listesinde ekleme yönlendirmesi, piyasa kartlarında erişilebilir fiyat etiketi vardır. v8.0 görsel eşlemesi korunur.
+
+Hedefli test: DOM boşken fiyat/yenileme/favori işlemleri, logo yedek kaynağı, sheet odağı/arka plan kilidi, eksik önceki kapanış ve resmî fiyat zamanı, 375/390/430/1024px açık/koyu görsel eşleşme ve PWA safe-area emülasyonu. Genel regresyon aşama sonunda çalıştırılır. Canlı sağlayıcı ve fiziksel iPhone kontrolü kapsam dışıdır. Çalışma yalnız migration ön izlemesidir; main/production v8.0 değişmez. Yeni dependency yok. Sonraki aşama için arama ve piyasa ayarları bağımsız React bileşenlerine taşınabilir; Portföy/Grafik/Diğer bu sürümde yeniden yazılmaz.
+
+## v8.1.0-preview.2 — Özet görünüm eşlemesi
+
+React + Framework7 pilotu korunarak Özet ve mobil alt menü v8.0 ortak bileşen stillerine eşlendi. Ek Özet/tema satırı kaldırıldı; marka başlığı, kompakt piyasa kartları, Favoriler satırı, yıldız düğmesi, arama ve masaüstü yerleşimi eski ölçülerdedir. Finans/veri katmanları ve kullanıcı şemaları değişmez. Yalnız migration dalında ön izleme; production v8.0 kalır.
+
+375/390/430/1024 px açık/koyu modda v8.0 etiketi ayrı tarayıcı bağlamında aynı sentetik verilerle karşılaştırılır: ekran görüntüleri ve bileşen ölçüleri/yazı/renk/yüzey/boşluk değerleri, mobil menü sabitliği, favori ve yenileme işlemleri, standalone safe-area ve regresyon kontrolleri. Canlı API ve fiziksel iPhone doğrulaması bu çevrimdışı kontrole dahil değildir.
+
+
 Güncelleme: 30 Eylül 2026. Bu dosya kaynak kodun yerine geçmez; yeni oturum için başlangıç rehberidir.
+
+## v8.1 pilot çalışması
+
+`migration/v8.1-framework7-overview` yalnız ön izleme dalıdır; kalıcı sürüm v8.0. Kaynaklar `src/overview/{main.jsx,legacy-adapter.js,pilot.css}`; build `scripts/build-overview.mjs`. Dört ana sayfa React + Framework7 kabuğundadır; Özet/Grafik kontrolleri React tarafından çizilir, Portföy/Diğer temel kontrolleri mevcut hizmete yönlenir. Finans, auth ve yedek widget’ları mevcut DOM/dinleyicileri korur. Girişteki dar `OzerOverviewLegacy` sınırı finans, API, batch/cache/timer, auth, Upstash ve yedek şemalarını korur; fiyat görüntü modeli doğrudan hizmet durumundan üretilir; gizli eski fiyat listeleri boştur. JSX içine finans mantığı taşınmaz. `assets/overview-pilot/` üretildiği için Git’e alınmaz; Vercel build aynı çıktıyı oluşturur.
 
 ## v8.0 onaylı yayın
 
@@ -36,14 +133,14 @@ Aktif görünüm dosyaları assets/appearance.js, assets/design-tokens.css, asse
 - onizleme/ ve tasarim-onerileri/: tarihsel tasarım örnekleri; gerçek uygulama olarak yayınlamayın.
 - archive/: önceki sürüm kaynakları; .vercelignore bunları dağıtımdan dışlar.
 
-Uygulama React/Next.js değildir: statik arayüz + Vercel API işlevleri. Kurulumda mevcut package.json ve pnpm-lock.yaml esas alınır. Finans hesaplama/yenileme altyapısını sırf tasarım için yeniden yazmayın.
+Uygulama React + Framework7 arayüz kabukları ve korunmuş finans/veri katmanı + Vercel API işlevlerinden oluşur. Next.js kullanılmaz. Kurulumda mevcut package.json ve pnpm-lock.yaml esas alınır. Finans hesaplama/yenileme altyapısını sırf tasarım için yeniden yazmayın.
 
 ## 4. Ürün ve çalışma kuralları
 
 - Dört ana görünüm: Özet (piyasa ve favoriler), Grafik, Portföy, Diğer. Açılış Özet.
 - Birden çok portföy, nakit, para birimi tercihleri, temettü yeniden yatırımı, TEFAS ve altın ürünleri vardır. Ayrıntılar teknik belgede.
 - Türkçe, mobil öncelikli; kullanıcı çoğunlukla telefondan kontrol eder. Önizleme linki telefonda erişilebilir olmalı; korumalı Vercel linki oturum isteyebilir.
-- Yeni tasarım/işlev önce önizleme ve kullanıcı onayı; kalıcı yayın daha sonra. Son sürüm v8.0 olduğundan sonraki sürüm adayı normalde v8.1 olur; kalıcılaştırmayı kendiliğinden yapmayın.
+- Yeni tasarım/işlev önce önizleme ve kullanıcı onayı; kalıcı yayın daha sonra. Son onaylı sürüm v9.0.0 olduğundan sonraki sürüm adayı normalde v9.1 olur; kalıcılaştırmayı kendiliğinden yapmayın.
 - Her onaylı sürümü GitHub'da koruyun, önceki sürümü arşivleyin, kapsamlı teknik belgeyi güncelleyin. Sabit üretim URL'sini değiştirmeyin.
 - Periyodik yenilemeyi adaptif aralığa dönüştürme önerisi kullanıcı tarafından dışlanmıştır. Mevcut bölüm/görünürlük kontrollerini, batch ve önbelleği koruyun.
 - Alarm uygulama kapalıyken çalışmaz; bağımsız push/e-posta servisi için yeni onay gerekir.

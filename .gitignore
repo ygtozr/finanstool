@@ -2,3 +2,6 @@
 .env*
 !.env.example
 node_modules/
+
+# Rebuilt for each preview deployment
+assets/overview-pilot/

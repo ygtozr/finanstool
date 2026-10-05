@@ -1,0 +1,140 @@
+@import 'framework7/css' layer(framework7);
+@import 'framework7/components/sheet/css' layer(framework7);
+@import 'framework7/components/popup/css' layer(framework7);
+@import 'framework7/components/toggle/css' layer(framework7);
+/* Shared v8.0 classes own the visual design; Framework7 owns the shell and sheet. */
+html, body { height:auto; overflow:visible; }
+/* Framework7's generic button width must not change legacy card/dialog controls. */
+:where(button:not(.button)) { width:auto; appearance:auto; }
+html[data-overview-pilot] #mainView > .app-layout,
+html[data-overview-pilot] #mainView > .page-brand,
+html[data-overview-pilot] body > .mobile-bottom-nav { display:none !important; }
+#overview-react { min-width:0; }
+#overview-react .pilot-app, #overview-react .view, #overview-react .page,
+#overview-react .page-content { position:relative; height:auto; min-height:0; width:100%; overflow:visible; transform:none; background:transparent; }
+#overview-react .page-content { padding:0; }
+.pilot-app, #pilot-navigation {
+  --f7-theme-color:var(--accent); --f7-text-color:var(--text);
+  --f7-safe-area-bottom:env(safe-area-inset-bottom,0px);
+  font-family:var(--font-system); color:var(--text);
+}
+#pilot-navigation .pilot-tabbar { top:auto; margin:0; height:auto; transform:none; grid-template-columns:repeat(4,minmax(0,1fr)); }
+#pilot-navigation .toolbar-inner { display:contents; }
+#pilot-navigation .pilot-tabbar::before, #pilot-navigation .pilot-tabbar::after { display:none; }
+.pilot-error { font-size:12px; color:var(--muted); }
+.pilot-error { color:var(--negative); }
+html body #chartView.chart-no-data :is(.chart-wrap,#maToggle,#rsiWrap,[data-chart-slot="rsi"],.period-summary) { display:none; }
+/* Preserve full configured prices on compact phones. */
+@media(max-width:360px) {
+  html[data-overview-pilot] .pilot-market-card .market-card-value,
+  html[data-overview-pilot] .pilot-market-card .market-card-change { grid-column:1/-1; }
+  html[data-overview-pilot] .pilot-market-card .market-card-change { justify-self:start; }
+}
+.pilot-action-sheet .button { display:inline-flex; align-items:center; justify-content:center; height:auto; min-height:38px; padding:7px 12px; border:1px solid var(--line); border-radius:10px; color:var(--accent-ink); background:var(--surface-control); font-size:var(--font-control); font-weight:600; line-height:1.25; text-transform:none; letter-spacing:0; box-shadow:none; }
+.pilot-action-sheet { height:auto; max-height:85dvh; z-index:15000; color:var(--text); background:var(--surface-section);
+  border-radius:22px 22px 0 0; backdrop-filter:none !important; box-shadow:none !important; }
+.pilot-action-sheet::after { display:none; }
+.pilot-sheet-content { padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px)); }
+.pilot-sheet-content > header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px; }
+.pilot-sheet-content h2 { margin:0; font-size:18px; }
+.pilot-sheet-content > .button { display:flex; width:100%; min-height:48px; margin-top:8px; justify-content:flex-start; background:var(--surface-card); color:var(--text); }
+.pilot-sheet-content > .negative { color:var(--negative); }
+@media(max-width:600px) {
+  /* The original main padding reserves the top safe area once. */
+  html[data-overview-pilot] #overview-react .pilot-brand { top:env(safe-area-inset-top,0px); }
+}
+@media(prefers-reduced-motion:reduce) {
+  #overview-react *, #pilot-navigation * { transition:none !important; animation:none !important; }
+}
+/* Toolbar also carries legacy chart toolbar rules; restore the shared mobile tab paint. */
+@media(max-width:600px) {
+  #pilot-navigation .pilot-tabbar button { font-size:.6875rem; font-weight:600; background:transparent; border:0; color:var(--muted); }
+  #pilot-navigation .pilot-tabbar button.is-active { background:var(--surface-control); color:var(--text); border-color:var(--line); }
+}
+
+/* Framework popup owns presentation; its inner card uses the v8.0 dialog skin. */
+.pilot-market-popup { left:0; top:0; width:100%; height:100dvh; margin:0; background:transparent; }
+.pilot-market-popup.modal-in, .pilot-market-popup.modal-out { display:flex; align-items:center; justify-content:center; }
+.pilot-market-popup > .portfolio-dialog { margin:0; max-height:90dvh; overflow:auto; }
+.pilot-market-popup .market-settings-list { overscroll-behavior:contain; }
+.search-suggestions .suggestion[aria-selected="true"] { background:var(--surface-control); }
+@media(max-width:600px) { .pilot-market-popup.modal-in, .pilot-market-popup.modal-out { align-items:flex-end; } }
+
+/* Keep the native sheet chrome fixed while long detail content can scroll. */
+#favoriteDetailDialog[open] { display:flex; flex-direction:column; max-height:calc(100dvh - env(safe-area-inset-top,0px) - 48px); }
+#favoriteDetailDialog > .favorite-detail-head,
+#favoriteDetailDialog > .favorite-detail-actions { flex-shrink:0; }
+#favoriteDetailDialog > .favorite-detail-body { flex:1 1 auto; min-height:0; align-content:start; overflow-y:auto; overscroll-behavior-y:contain; touch-action:pan-y; -webkit-overflow-scrolling:touch; }
+@media(max-width:760px) { #favoriteDetailDialog > .favorite-detail-actions { padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); } }
+
+#chart-react { min-width:0; }
+#chart-react .page, #chart-react .page-content { position:relative; height:auto; min-height:0; width:100%; overflow:visible; transform:none; background:transparent; }
+#chart-react .page-content { padding:0; }
+.pilot-chart-slot { display:contents; }
+#pilotChartTitle { font-size:1.1875rem; font-weight:700; }
+#chart-react .pilot-chart-toolbar .button { display:block; height:auto; line-height:1.5; text-transform:none; letter-spacing:normal; }
+#chart-react .pilot-chart-periods { box-shadow:none; }
+#chart-react .pilot-chart-periods .button { height:auto; line-height:1.5; text-transform:none; letter-spacing:normal; }
+#chart-react #pilotCustomPeriod { grid-column:1 / -1; }
+@media(max-width:760px) {
+  #chart-react .pilot-brand { top:env(safe-area-inset-top,0px); }
+  #chart-react .pilot-chart-toolbar .button, #chart-react .pilot-chart-periods .button { min-height:44px; }
+}
+@media(prefers-reduced-motion:reduce) { #chart-react * { transition:none !important; animation:none !important; } }
+/* Neutralize Framework7's fixed toolbar sizing and overlays for chart action grids. */
+#chart-react .pilot-chart-toolbar { position:relative; top:auto; bottom:auto; height:auto; transform:none; z-index:auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:0 0 12px; padding:0; border:0; background:transparent; box-shadow:none; }
+#chart-react .pilot-chart-toolbar::before, #chart-react .pilot-chart-toolbar::after { display:none; }
+
+#chart-react #pilotChartSearchForm { display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:12px; }
+#chart-react #pilotChartSubmit { min-height:44px; padding:8px; font-size:.8125rem; }
+#chart-react #pilotChartFavorite { color:var(--accent-ink); background:color-mix(in srgb,var(--accent) 13%,transparent); border:1px solid var(--line); }
+#chart-react .chart-asset-switcher-buttons { box-shadow:none; }
+#chart-react .chart-asset-switcher-buttons .button { height:auto; line-height:1.5; text-transform:none; letter-spacing:normal; }
+@media(max-width:760px) { #chart-react .chart-asset-switcher-buttons .button, #chart-react .chart-asset-item { min-height:44px; } }
+
+.pilot-preserved-page { min-width:0; }
+.pilot-preserved-page .page, .pilot-preserved-page .page-content { position:relative; height:auto; min-height:0; width:100%; overflow:visible; transform:none; background:transparent; }
+.pilot-preserved-page .page-content { padding:0; }
+.pilot-preserved-content, .pilot-theme-controls { display:contents; }
+/* Compact iOS segmented paint; the full 44px target remains tappable. */
+html[data-theme][data-palette] body #appMain #otherView .theme-choices[aria-label="Tema seçimi"] { padding:0; background:transparent; display:block; }
+html[data-theme][data-palette] body #appMain #otherView .settings-segments {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); position:relative;
+  width:100%; height:44px; padding:0; gap:0; background:transparent; border:0; box-shadow:none;
+}
+html[data-theme][data-palette] body #appMain #otherView .settings-segments::before {
+  content:""; position:absolute; inset:6px 0; border-radius:8px; background:var(--surface-control); pointer-events:none;
+}
+html[data-theme][data-palette] body #appMain #otherView .settings-segments .segmented-highlight {
+  position:absolute; left:2px; top:8px; bottom:8px; height:auto; width:calc((100% - 4px)/3); margin:0;
+  border-radius:6px; background:var(--accent); border:1px solid var(--accent); box-shadow:none;
+  transform:translateX(calc(var(--selected-segment,0)*100%)); pointer-events:none;
+  transition:transform 220ms cubic-bezier(.2,.8,.2,1),background-color 180ms ease;
+}
+html[data-theme][data-palette] body #appMain #otherView .settings-segments button {
+  z-index:1; position:relative; min-height:44px; height:44px; padding:6px 8px; border:0; border-radius:8px;
+  font-size:calc(var(--font-control) - 1px); line-height:1.25; color:var(--muted); background:transparent;
+  transition:color 160ms ease; box-shadow:none;
+}
+html[data-theme][data-palette] body #appMain #otherView .settings-segments button:is(.active,[aria-pressed="true"]) { background:transparent; color:var(--on-accent); }
+.pilot-page-title { margin-top:0; font-size:var(--font-heading); }
+html[data-theme][data-palette] body :is(.market-card-value,.market-card-change,.favorite-card-price,.favorite-change,.favorite-market-time,.portfolio-head-value,.portfolio-daily-change,.portfolio-current-value,.portfolio-compact-profit,.portfolio-compact-detail,.portfolio-cash-value,.analysis-table td,.distribution-summary-value,.benchmark-stat strong,.period-summary-item dd,.period-summary-item strong,.favorite-detail-metric strong,.dividend-row strong) { font-variant-numeric:tabular-nums; }
+.pilot-portfolio-modes { box-shadow:none; }
+.pilot-preserved-page .button { height:auto; line-height:1.5; text-transform:none; letter-spacing:normal; }
+.pilot-preserved-page .pilot-privacy { display:flex; align-items:center; justify-content:center; padding:0; }
+.pilot-notification .toggle { flex:0 0 auto; height:44px; --f7-theme-color:var(--accent); --f7-toggle-active-bg-color:var(--accent); --f7-toggle-active-border-color:var(--accent); --f7-toggle-inactive-bg-color:var(--surface-control); --f7-toggle-inactive-border-color:var(--surface-control); }
+.pilot-notification .toggle::before { inset:8px 0; }
+.pilot-notification .toggle::after { top:8px; }
+.pilot-notification .toggle-icon { top:10px; }
+html[data-overview-pilot] .pilot-notification .toggle input { display:block; position:absolute; inset:0; z-index:2; opacity:0; appearance:none; width:100%; height:100%; margin:0; background:none; }
+.pilot-notification .toggle:focus-within { outline:2px solid var(--accent); outline-offset:3px; border-radius:99px; }
+/* Native forms keep their validation and top layer; long iPhone forms can scroll. */
+html[data-overview-pilot] dialog.portfolio-dialog:not(.favorite-detail-dialog) { max-height:calc(100dvh - env(safe-area-inset-top,0px) - 24px); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+@media(max-width:760px) {
+  :is(#portfolio-react,#other-react) .pilot-brand { top:env(safe-area-inset-top,0px); }
+  :is(#portfolio-react,#other-react) :is(.theme-choice,.portfolio-metric-mode .button,.pilot-privacy,.portfolio-switcher-actions button,.portfolio-book-tab,.portfolio-currency-toggle,.settings-inline-actions button,.settings-card-controls > button,.data-actions button,.dialog-cancel,.native-font-control button) { min-height:44px; }
+  #portfolio-react .pilot-privacy { min-width:44px; }
+  .pilot-notification { min-height:44px; }
+  html[data-overview-pilot] dialog.portfolio-dialog:not(.favorite-detail-dialog) { padding-bottom:calc(20px + env(safe-area-inset-bottom,0px)); }
+}
+@media(prefers-reduced-motion:reduce) { .pilot-preserved-page * { transition:none !important; animation:none !important; } }

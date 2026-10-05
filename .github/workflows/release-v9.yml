@@ -1,0 +1,26 @@
+name: Publish approved v9.0.0 release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archive v8.0 and publish v9.0.0
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          test "$(node -p 'require("./package.json").version')" = "9.0.0" || exit 0
+          gh api "repos/$GH_REPO/git/ref/heads/archive/v8.0" >/dev/null 2>&1 || gh api --method POST "repos/$GH_REPO/git/refs" -f ref=refs/heads/archive/v8.0 -f sha=a80b5c386523ef6cc0669f17d2484bd0f6caa305
+          if gh release view v9.0.0 >/dev/null 2>&1; then
+            echo "v9.0.0 already exists; keep its original tag."
+          else
+            gh release create v9.0.0 --target "$GITHUB_SHA" --title "Özer Finans v9.0.0" --notes-file RELEASE_NOTES_v9.0.0.md --latest
+          fi
