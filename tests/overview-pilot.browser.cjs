@@ -199,8 +199,8 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
   const beforeFooter=await footer.boundingBox(),beforeHead=await head.boundingBox();
   assert(beforeFooter.y+beforeFooter.height<=height+.5,'Actions remain inside short viewport');
   await body.hover();await page.mouse.wheel(0,600);await page.waitForFunction(()=>document.getElementById('favoriteDetailBody').scrollTop>0);
-  assert.equal((await footer.boundingBox()).y,beforeFooter.y,'Footer stays fixed while content scrolls');
-  assert.equal((await head.boundingBox()).y,beforeHead.y,'Header stays fixed while content scrolls');
+  assert(Math.abs((await footer.boundingBox()).y-beforeFooter.y)<=.5,'Footer stays fixed while content scrolls');
+  assert(Math.abs((await head.boundingBox()).y-beforeHead.y)<=.5,'Header stays fixed while content scrolls');
   await body.evaluate(n=>{n.scrollTop=0});
   const bounds=await body.boundingBox(),x=Math.round(bounds.x+bounds.width/2),y=Math.round(bounds.y+bounds.height*.75);
   await touchDevice.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});

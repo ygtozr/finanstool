@@ -1,5 +1,13 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
+## v9.0.1 — Onaylı kalıcı sürüm
+
+Kullanıcı v9.0.1-preview.2 için kalıcı yayın onayı verdi. Mobil alt menü içeriklerin üstünde fixed kalır; Framework7 View kabuklarının gereksiz yüksek katmanı kaldırılır. Giriş ekranı açıkken alt menü render edilmez. Popup/sheet/native dialog önceliği, safe-area, eski ayar kartları, tam genişlik ve vurgu renkli seçimler korunur. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok.
+
+Güncel kaynak main ve v9.0.1 etiketi; kalıcı adres https://finanstool.vercel.app. Önceki v9.0.0, etiketi ve archive/v9.0.0 dalıyla korunur. Yayın iş akışı GitHub Release kaydını RELEASE_NOTES_v9.0.1.md ile oluşturur. Aşağıdaki preview ve eski kalıcı sürüm notları tarihsel kayıttır.
+
+Build, genel regresyon ve pilot tarayıcı akışı; sabit/dokunulabilir alt menü, kısa ekran, dört genişlik/iki tema/sekiz materyal katman denetimi. Sentetik testler gerçek hesap/sağlayıcı ve fiziksel iPhone kabul kontrolü değildir.
+
 ## v9.0.1-preview.2 — Katman denetimi ve giriş ekranı
 
 Katman denetimi arama/görünüm menülerini dört genişlik, iki tema ve sekiz yüzey stilinde gerçek elementFromPoint kontrolüyle kapsar; popup, native dialog, geri al bildirimi ve giriş ekranında tıklanabilirlik kontrol edilir. Menüdeki Framework7 hidden özelliği toolbar-hidden dönüşümüyle gizleme yapıyordu; sabit menünün transform:none kuralı bunu iptal ettiğinden giriş ekranında menü görünmeye devam edebiliyordu. MobileTabBar, authGate açıkken render edilmez; hesap işlemleri ve auth protokolü değişmez. Önceki fixed/z-index düzeltmesi korunur.

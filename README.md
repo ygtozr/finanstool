@@ -1,4 +1,12 @@
-# Özer Finans v9.0.0
+# Özer Finans v9.0.1
+
+## v9.0.1 — Onaylı kalıcı sürüm
+
+Kullanıcı v9.0.1-preview.2 için kalıcı yayın onayı verdi. Mobil alt menü içeriklerin üstünde fixed kalır; Framework7 View kabuklarının gereksiz yüksek katmanı kaldırılır. Giriş ekranı açıkken alt menü render edilmez. Popup/sheet/native dialog önceliği, safe-area, eski ayar kartları, tam genişlik ve vurgu renkli seçimler korunur. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok.
+
+Güncel kaynak main ve v9.0.1 etiketi; kalıcı adres https://finanstool.vercel.app. Önceki v9.0.0, etiketi ve archive/v9.0.0 dalıyla korunur. Yayın iş akışı GitHub Release kaydını RELEASE_NOTES_v9.0.1.md ile oluşturur. Aşağıdaki preview ve eski kalıcı sürüm notları tarihsel kayıttır.
+
+Build, genel regresyon ve pilot tarayıcı akışı; sabit/dokunulabilir alt menü, kısa ekran, dört genişlik/iki tema/sekiz materyal katman denetimi. Sentetik testler gerçek hesap/sağlayıcı ve fiziksel iPhone kabul kontrolü değildir.
 
 ## v9.0.1-preview.2 — Katman denetimi ve giriş ekranı
 
