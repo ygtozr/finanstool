@@ -1,5 +1,11 @@
 # Özer Finans — Yeni sohbet devir notları
 
+## v9.0.1-preview.1 — Sabit mobil alt menü
+
+Framework7 View katmanı z-index:5000 iken alt menü 44 seviyesinde kaldığından sayfa içeriği menünün önüne geçebiliyordu. Belge kaydırması kullanan entegre View kabuklarının katmanı auto olur; alt menü açıkça fixed ve z-index:1000 kullanır. Sheet/popup/native dialog kendi üst katmanlarını korur. Menü geometrisi, safe-area ve masaüstü sidebar davranışı korunur. Finans/API/cache/batch/auth/kullanıcı/yedek yapıları değişmez; yeni dependency yok.
+
+Hedefli tarayıcı testi dört sayfada üst/orta/alt kaydırma konumlarında menü düğmelerinin gerçek elementFromPoint ile dokunulabilirliğini, 375/390/430 px ve 844/500 px yüksekliklerde açık/koyu görünümü, açık renk menüsü katmanını, sheet önceliği/kapanışını ve 1024 px masaüstünü kontrol eder. Yalnız fix/v9.0.1-mobile-navigation ön izlemesi; main/production v9.0.0 korunur.
+
 ## v9.0.0 — Onaylı kalıcı sürüm
 
 Kullanıcı v9.0.0 adıyla kalıcı yayını açıkça onayladı. Ayarlar preview.11 sürümündeki ayrı kart düzenine geri döner; preview.12'nin beş birleşik grubu ve grup stilleri kaldırılır. Tam genişlikte üçlü seçimler, mevcut vurgu renkli kayan gösterge, kısa açıklamalar ve eş genişlikli finans rakamları korunur. React + Framework7 kabukları ve önceki denetim düzeltmeleri kalıcı sürüme dahildir. Yeni dependency yok; finans/API/cache/batch/auth/Upstash ve kullanıcı/portföy/yedek formatları değişmez.
