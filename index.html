@@ -771,10 +771,10 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.11">
+  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=8.1-preview.12">
   <link rel="stylesheet" href="assets/design-tokens.css?v=8.0">
-  <link rel="stylesheet" href="assets/ios-parity.css?v=8.1-preview.11">
-  <link rel="stylesheet" href="assets/component-system.css?v=8.1-preview.11">
+  <link rel="stylesheet" href="assets/ios-parity.css?v=8.1-preview.12">
+  <link rel="stylesheet" href="assets/component-system.css?v=8.1-preview.12">
   <link rel="stylesheet" href="assets/ios-screen-alignment.css?v=8.0">
 </head>
 <body class="auth-locked">
@@ -803,7 +803,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small id="desktopVersion">v8.1.0-preview.11</small>
+      <small id="desktopVersion">v8.1.0-preview.12</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
@@ -884,7 +884,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         <section id="adminUsersCard" class="settings-card settings-horizontal" aria-labelledby="adminUsersTitle" hidden><div class="settings-card-copy"><h3 id="adminUsersTitle">Kullanıcı Yönetimi</h3><p>Yeni kullanıcı için 24 saat geçerli, tek kullanımlık davet bağlantısı oluşturun.</p><div id="adminUsersList" class="user-admin-list"></div></div><div class="settings-card-controls"><label>Davet Edilecek E-posta<input id="inviteEmail" type="email" autocomplete="off" placeholder="kullanici@ornek.com"></label><button id="createInvite" type="button">Davet Oluştur</button><div id="inviteResult" class="invite-result" hidden><a id="inviteLink" href="#"></a><button id="copyInvite" class="account-secondary" type="button">Bağlantıyı Kopyala</button></div></div></section>
         <section class="settings-card settings-horizontal" aria-labelledby="alarmShortcutTitle"><div class="settings-card-copy"><h3 id="alarmShortcutTitle">Fiyat Alarmları</h3><p>Kaydettiğiniz fiyat hedeflerini görüntüleyin veya yeni alarm kurun.</p></div><button id="otherAlarmShortcut" class="alarm-shortcut settings-card-controls" type="button"><strong>Alarmları Aç</strong><span id="otherAlarmCount">0 aktif alarm</span></button></section>
         <section class="settings-card settings-horizontal" aria-labelledby="appearanceTitle">
-          <div class="settings-card-copy"><h3 id="appearanceTitle">Görünüm</h3><p>Uygulamanın görünümünü seçin veya cihazınızın temasını otomatik takip edin.</p></div>
+          <div class="settings-card-copy"><h3 id="appearanceTitle">Görünüm</h3><p>Temayı, rengi ve yüzey stilini seçin.</p></div>
           <div class="settings-options settings-card-controls">
             <div class="theme-choices" role="group" aria-label="Tema seçimi">
               <button class="theme-choice" type="button" data-theme-choice="system" aria-pressed="false">Sistem</button>
@@ -896,7 +896,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
           </div>
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="portfolioDefaultsTitle">
-          <div class="settings-card-copy"><h3 id="portfolioDefaultsTitle">Portföy Ve Gösterim</h3><p>Açılışta seçilecek portföyü, aktif portföyün tercih edilen para birimini ve varsayılan performans ölçütünü belirleyin.</p></div>
+          <div class="settings-card-copy"><h3 id="portfolioDefaultsTitle">Portföy ve gösterim</h3><p>Başlangıç portföyünü, para birimini ve kıyas ölçütünü seçin.</p></div>
           <div class="settings-options settings-card-controls"><label>Varsayılan portföy<select id="defaultPortfolioSelect"></select></label><div class="settings-options two-column"><label>Tercih edilen para birimi<select id="baseCurrencySelect"><option value="NATIVE">Ürünün kendi para birimi</option><option value="TRY">Türk lirası</option><option value="USD">ABD doları</option></select></label><label>Varsayılan kıyas<select id="defaultBenchmarkSelect"><option value="^GSPC">S&amp;P 500</option><option value="^IXIC">Nasdaq</option><option value="XU100.IS">BIST 100</option><option value="GLD">Altın</option></select></label></div></div>
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="numberFormatTitle">
@@ -904,19 +904,19 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
           <div class="settings-options two-column settings-card-controls"><label>Fiyat hassasiyeti<select id="priceDecimalsSelect"><option value="auto">Otomatik</option><option value="2">2 basamak</option><option value="4">4 basamak</option><option value="6">6 basamak</option></select></label><label>Yüzde hassasiyeti<select id="percentDecimalsSelect"><option value="1">1 basamak</option><option value="2">2 basamak</option><option value="3">3 basamak</option></select></label></div>
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="dataPreferencesTitle">
-          <div class="settings-card-copy"><h3 id="dataPreferencesTitle">Yenileme Ve Veri Tercihleri</h3><p>Otomatik veri yenileme sıklığını ve grafiklerin başlangıç dönemini belirleyin.</p></div>
+          <div class="settings-card-copy"><h3 id="dataPreferencesTitle">Veri tercihleri</h3><p>Fiyat hassasiyetini, yenilemeyi ve grafik dönemini ayarlayın.</p></div>
           <div class="settings-options settings-card-controls">
             <label>Otomatik yenileme<select id="refreshIntervalSelect"><option value="5000">5 saniye</option><option value="15000">15 saniye</option><option value="30000">30 saniye</option><option value="60000">1 dakika</option><option value="0">Kapalı</option></select></label>
             <label>Varsayılan grafik dönemi<select id="defaultRangeSelect"><option value="5d">1 hafta</option><option value="1mo">1 ay</option><option value="3mo">3 ay</option><option value="6mo">6 ay</option><option value="1y">1 yıl</option><option value="5y">5 yıl</option></select></label>
           </div>
         </section>
         <section class="settings-card settings-horizontal" aria-labelledby="notificationsTitle">
-          <div class="settings-card-copy"><h3 id="notificationsTitle">Bildirimler</h3><p>Uygulama açıkken fiyat alarmlarının nasıl denetleneceğini ve haber verileceğini yönetin.</p></div>
+          <div class="settings-card-copy"><h3 id="notificationsTitle">Bildirimler</h3><p>Alarm denetimini ve bildirimleri ayarlayın.</p></div>
           <div class="settings-options settings-card-controls"><div class="settings-switches"><label class="setting-switch"><span><strong>Denetim</strong><small id="alarmPreferenceStatus">Alarmlar düzenli olarak kontrol edilir.</small></span><input id="alarmNotificationsToggle" type="checkbox" role="switch"></label><label class="setting-switch"><span><strong>Ses</strong><small>Alarm tetiklenince kısa bir ses çal.</small></span><input id="alarmSoundToggle" type="checkbox" role="switch"></label><label class="setting-switch"><span><strong>Titreşim</strong><small>Desteklenen cihazlarda titreşim kullan.</small></span><input id="alarmVibrationToggle" type="checkbox" role="switch"></label><label class="setting-switch"><span><strong>Otomatik Kapat</strong><small>Aynı alarmın art arda bildirim vermesini önler.</small></span><input id="alarmAutoDisableToggle" type="checkbox" role="switch"></label></div><label>Alarm kontrol sıklığı<select id="alarmCheckIntervalSelect"><option value="15000">15 saniye</option><option value="30000">30 saniye</option><option value="60000">1 dakika</option><option value="300000">5 dakika</option></select></label></div>
         </section>
         <section class="settings-card settings-wide other-backup" aria-labelledby="backupTitle">
           <h3 id="backupTitle">Veri Yedekleme</h3>
-          <p>Favoriler, bütün bağımsız portföyler, hisse ve nakit bakiyeleri, temettü ayarları, fiyat alarmları, piyasa özeti ve tercihlerinizi tek bir JSON dosyasında saklayın.</p>
+          <p>Portföyler, favoriler, alarmlar ve tercihler tek JSON dosyasında saklanır.</p>
           <div class="data-actions"><button id="backupDownload" type="button">Yedek Dosyasını İndir</button></div><label class="restore-mode">Yedek hatırlatıcısı<select id="backupReminderSelect"><option value="0">Kapalı</option><option value="7">Her 7 günde</option><option value="14">Her 14 günde</option><option value="30">Her 30 günde</option></select></label><p id="backupReminderStatus" class="settings-status"></p>
           <div class="backup-file-label"><span>Geri yüklenecek JSON dosyası</span><label class="dialog-cancel" for="backupFile">Yedek Dosyası Seç</label><input id="backupFile" class="sr-only" type="file" accept=".json,application/json"><small id="backupFileName">Henüz dosya seçilmedi.</small></div>
           <label class="restore-mode">Geri yükleme yöntemi<select id="restoreMode"><option value="merge">Mevcut verilerle birleştir (önerilen)</option><option value="replace">Mevcut verilerin yerine koy</option></select></label>
@@ -924,10 +924,10 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
           <p id="backupError" class="backup-error" role="alert"></p>
           <div class="data-actions"><button id="restoreBackup" type="button" disabled>Geri Yükle</button></div>
         </section>
-        <section class="settings-card settings-horizontal" aria-labelledby="storageTitle"><div class="settings-card-copy"><h3 id="storageTitle">Veri Ve Depolama</h3><p>Geçici fiyat önbelleğini temizleyin veya bu cihazdaki tüm uygulama verilerini sıfırlayın.</p></div><div class="settings-card-controls"><div class="settings-inline-actions"><button id="clearCacheButton" type="button">Önbelleği Temizle</button><button id="resetAppDataButton" class="danger-button" type="button">Tüm Verileri Sıfırla</button></div><p id="storageStatus" class="settings-status" aria-live="polite"></p></div></section>
-        <section class="settings-card settings-horizontal" aria-labelledby="diagnosticsTitle"><div class="settings-card-copy"><h3 id="diagnosticsTitle">Bağlantı Tanılama</h3><p>Veri bağlantısının ve uygulama önbelleğinin son durumunu görüntüleyin.</p></div><div class="settings-card-controls"><dl id="diagnosticsList" class="diagnostics-list"></dl><div class="settings-inline-actions"><button id="diagnosticsRefresh" type="button">Durumu Yenile</button></div></div></section>
+        <section class="settings-card settings-horizontal" aria-labelledby="storageTitle"><div class="settings-card-copy"><h3 id="storageTitle">Depolama</h3><p>Önbelleği temizleyin veya cihazdaki tüm verileri sıfırlayın.</p></div><div class="settings-card-controls"><div class="settings-inline-actions"><button id="clearCacheButton" type="button">Önbelleği Temizle</button><button id="resetAppDataButton" class="danger-button" type="button">Tüm Verileri Sıfırla</button></div><p id="storageStatus" class="settings-status" aria-live="polite"></p></div></section>
+        <section class="settings-card settings-horizontal" aria-labelledby="diagnosticsTitle"><div class="settings-card-copy"><h3 id="diagnosticsTitle">Bağlantı durumu</h3><p>Veri bağlantısını ve önbelleği kontrol edin.</p></div><div class="settings-card-controls"><dl id="diagnosticsList" class="diagnostics-list"></dl><div class="settings-inline-actions"><button id="diagnosticsRefresh" type="button">Durumu Yenile</button></div></div></section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
-          <div class="settings-card-copy"><h3 id="helpTitle">Yardım Ve Uygulama Bilgileri</h3><p>Finans kodları ve uygulamanın çalışma biçimi için kısa bilgiler.</p></div>
+          <div class="settings-card-copy"><h3 id="helpTitle">Yardım</h3><p>Arama ve uygulama hakkında kısa bilgiler.</p></div>
           <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Yerel modda veriler yalnız cihazda; giriş yapıldığında kullanıcıya bağlı ve şifreli Upstash kaydında saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v8.0</strong></div></div>
         </section>
       </div>
@@ -1022,7 +1022,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
   </dialog>
   <script src="assets/storage-events.js?v=8.0"></script>
   <script src="assets/appearance.js?v=8.0"></script>
-  <script src="assets/ios-parity.js?v=8.1-preview.11"></script>
+  <script src="assets/ios-parity.js?v=8.1-preview.12"></script>
   <script src="assets/chart-theme.js?v=8.0"></script>
   <script>
     let chart;
@@ -5167,7 +5167,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         const hidden=[...decorations,...controls].map(node=>[node,node.hidden]);
         hidden.forEach(([node])=>{node.hidden=true});nodes.forEach(node=>content.append(node));
         const version=kind==='other'?view.querySelector('.settings-version strong'):null,oldVersion=version?.textContent;
-        if(version)version.textContent='v'+(document.documentElement.dataset.appVersion||'8.1.0-preview.11');
+        if(version)version.textContent='v'+(document.documentElement.dataset.appVersion||'8.1.0-preview.12');
         view.dataset.reactPage='ready';
         return ()=>{moved.reverse().forEach(([node,parent,next])=>parent.insertBefore(node,next?.parentNode===parent?next:null));hidden.forEach(([node,value])=>{node.hidden=value});if(version)version.textContent=oldVersion;delete view.dataset.reactPage};
       },
@@ -5261,6 +5261,6 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     })();
   </script>
   <script src="assets/auth-account.js?v=8.0.0"></script>
-  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.11"></script>
+  <script type="module" src="assets/overview-pilot/app.js?v=8.1-preview.12"></script>
 </body>
 </html>

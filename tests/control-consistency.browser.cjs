@@ -27,7 +27,12 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
    for(const group of ['.pilot-theme-controls','.native-segments.settings-segments']){
     assert((await page.locator(group+' button').first().boundingBox()).height>=44,'Compact paint retains a 44px touch target');
     assert.equal(await page.locator(group).evaluate(n=>getComputedStyle(n,'::before').top),'6px','Visible track is inset');
+    assert(await page.locator(group).evaluate(n=>Math.abs(n.getBoundingClientRect().width-n.parentElement.clientWidth)<=1),'Three choices fill their row');
+    assert.equal(await page.locator(group+' .segmented-highlight').evaluate(n=>getComputedStyle(n).backgroundColor),await page.evaluate(()=>{const n=document.createElement('span');n.style.background='var(--accent)';document.body.append(n);const c=getComputedStyle(n).backgroundColor;n.remove();return c}),'Selection uses the current accent');
    }
+   assert.equal(await page.locator('#otherView .settings-grid > .settings-group').count(),5,'Settings are grouped into five surfaces');
+   assert.equal(await page.locator('#otherView .settings-grid > .settings-card').count(),0,'No isolated old setting cards remain');
+   assert.equal(await page.locator('.market-card-value').first().evaluate(n=>getComputedStyle(n).fontVariantNumeric),'tabular-nums','Financial values use equal-width digits');
    for(const selector of ['#clearCacheButton','#backupDownload','#diagnosticsRefresh'])assert.deepEqual(await style(selector),action,`${selector} uses the shared action design`);
    assert.equal(await page.locator('#resetAppDataButton').evaluate(n=>getComputedStyle(n).color),await page.locator('body').evaluate(()=>{const n=document.createElement('span');n.style.color='var(--danger)';document.body.append(n);const color=getComputedStyle(n).color;n.remove();return color}),'Delete action retains danger color');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),'No horizontal overflow');

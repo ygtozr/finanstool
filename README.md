@@ -1,5 +1,11 @@
 # Özer Finans v8.0
 
+## v8.1.0-preview.12 — Tam genişlik ve vurgu rengi
+
+Görünüm ve para birimi üçlü seçimleri satırın tamamını doldurur. Kayan gösterge mevcut vurgu rengini, seçili metin ona uygun kontrast rengini kullanır; 32 px görünür track, 44 px dokunma alanı ve azaltılmış hareket desteği korunur. Ayarlar beş ortak yüzeyde gruplanır: Tercihler, Veri ve alarmlar, Yedek ve depolama, Hesap, Destek. İç bölümler ince ayraçlarla ayrılır; başlık ve açıklamalar sadeleşir. Finans rakamları tabular-nums kullanır. Kullanıcının tema/renk/stil tercihi değiştirilmez; finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları korunur. Yeni dependency yok.
+
+Build, genel regresyon, tam pilot tarayıcı akışı ve hedefli 375/390/430/1024 px açık/koyu kontrol testi geçti. Tam genişlik, vurgu rengi, gruplama, finans rakamları, dokunma alanı ve taşma doğrulandı. Tarayıcı testleri sentetik veriler kullanır; fiziksel iPhone ve canlı servis doğrulaması değildir. Yalnız migration ön izlemesi; production/main v8.0 korunur.
+
 ## v8.1.0-preview.11 — Kompakt ayar seçimleri
 
 Görünüm ve para birimi seçimleri aynı kompakt segmented tasarımını kullanır. Görünen track 32 px, düğmenin dokunma alanı 44 px; genişlik en çok 300 px. Seçili gösterge 220 ms cubic-bezier geçişle kayar, metin rengi kısa geçişle değişir. Framework7 React Segmented strong göstergesi tema seçiminde, aynı çizim native para birimi grubunda kullanılır. prefers-reduced-motion durumunda mevcut ortak kurallar hareketi kapatır. Kullanıcının tema, renk, yüzey ve veri tercihleri değiştirilmez. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek şemaları korunur; yeni dependency yok.
