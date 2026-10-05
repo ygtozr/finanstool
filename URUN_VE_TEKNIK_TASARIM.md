@@ -1,5 +1,11 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
+## v9.0.1-preview.2 — Katman denetimi ve giriş ekranı
+
+Katman denetimi arama/görünüm menülerini dört genişlik, iki tema ve sekiz yüzey stilinde gerçek elementFromPoint kontrolüyle kapsar; popup, native dialog, geri al bildirimi ve giriş ekranında tıklanabilirlik kontrol edilir. Menüdeki Framework7 hidden özelliği toolbar-hidden dönüşümüyle gizleme yapıyordu; sabit menünün transform:none kuralı bunu iptal ettiğinden giriş ekranında menü görünmeye devam edebiliyordu. MobileTabBar, authGate açıkken render edilmez; hesap işlemleri ve auth protokolü değişmez. Önceki fixed/z-index düzeltmesi korunur.
+
+Yeni dependency yok; finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları korunur. Yalnız fix/v9.0.1-mobile-navigation ön izlemesi; main/production v9.0.0 değişmez. Test verileri sentetiktir; fiziksel iPhone ve canlı sağlayıcı testi değildir.
+
 ## v9.0.1-preview.1 — Sabit mobil alt menü
 
 Framework7 View katmanı z-index:5000 iken alt menü 44 seviyesinde kaldığından sayfa içeriği menünün önüne geçebiliyordu. Belge kaydırması kullanan entegre View kabuklarının katmanı auto olur; alt menü açıkça fixed ve z-index:1000 kullanır. Sheet/popup/native dialog kendi üst katmanlarını korur. Menü geometrisi, safe-area ve masaüstü sidebar davranışı korunur. Finans/API/cache/batch/auth/kullanıcı/yedek yapıları değişmez; yeni dependency yok.
