@@ -243,7 +243,6 @@ assert.match(html,/async function renderAllPortfoliosSummary\(priceWarmup=null\)
 assert.match(html,/portfolioSummaryCurrencyNote\.textContent=nativeMode\?[\s\S]*'Portföydeki bütün değerler TL bazında gösteriliyor\.'[\s\S]*'Portföydeki bütün değerler USD bazında gösteriliyor\.'/,'Özet açıklaması ürünün kendi para birimi, TL veya USD tercihini doğru anlatmalı');
 assert.match(html,/\.market-summary-head :is\(#marketRefresh,#pilotMarketRefresh\),\.favorites-panel-head :is\(#favoriteRefresh,#pilotFavoriteRefresh\) \{ min-height:38px; padding:6px 10px; font-size:\.75rem; \}/,'Özet sayfasındaki yenile düğmeleri kompakt olmalı');
 assert.ok((html.match(/legend:\{display:false\}/g)||[]).length>=2,'Fiyat ve RSI grafiklerinde çizim alanını daraltan lejant gizlenmeli');
-assert.match(html,/function solidLegendLabels\(color\)[\s\S]*fillStyle:fill,strokeStyle:fill,lineWidth:0/,'Lejant renk kutularının içi seri rengiyle tamamen doldurulmalı');
 assert.match(html,/\.market-summary-head h2,\.favorites-panel h2,\.chart-page > h2,\.portfolio-head h2 \{ font-size:1\.17rem; \}/,'Dört ana bölüm başlığı Portföy Özet Analizi ile aynı puntoda olmalı');
 assert.match(html,/@media \(max-width:760px\) \{[\s\S]*body \{[^}]*padding:max\(4px,env\(safe-area-inset-top,0px\)\)/,'Mobil üst boşluk sabit marj yerine güvenli alan kadar olmalı');
 assert.match(html,/main \{[^}]*margin:0 auto; padding:10px 6px 20px;/,'Mobil ana çerçeve üst ve yan boşlukları azaltılmalı');
@@ -411,7 +410,6 @@ for(const [file,size] of [['apple-touch-icon.png',180],['icon-192.png',192],['ic
 assert.match(html,/function quotePriceApiUrl\(symbol\)[\s\S]*range=1mo&interval=1d/,'Piyasa ve Favoriler ortak fiyat URL’si kullanmalı');
 assert.match(html,/async function fetchCompactQuote\(item,\{force=false\}=\{\}\)[\s\S]*fetchSnapshotQuote\(item\.symbol,\{force\}\)[\s\S]*cachedApiJson\(quotePriceApiUrl\(item\.symbol\),\{force\}\)/,'BIST ve TEFAS güncel fiyatı ortak katmandan, diğer ürünler ortak geçmişten alınmalı');
 assert.match(html,/function optionalQuoteNumber\(value\)[\s\S]*value===null\|\|value===undefined\|\|value===''[\s\S]*return Number\.isFinite\(number\)\?number:null/,'Eksik önceki kapanış null değeri yanlışlıkla sıfıra çevrilmemeli');
-assert.match(html,/async function fetchFavoriteQuote\(item,\{force=false\}=\{\}\) \{[\s\S]*return fetchCompactQuote\(item,\{force\}\)/,'Favoriler ortak kompakt fiyat katmanını kullanmalı');
 assert.match(html,/async function loadMarketSummary\(\{force=false,quotes=null\}=\{\}\)[\s\S]*quotes\|\|await fetchCompactQuotes\(items,\{force\}\)/,'Piyasa özeti favorilerle aynı toplu fiyat katmanını kullanmalı');
 assert.match(quoteApi,/'close','change','change_abs'[\s\S]*scanner\.tradingview\.com\/turkey\/scan/,'BIST fiyatı ve günlük değişimi aynı TradingView anlık görüntüsünden gelmeli');
 assert.match(quoteApi,/'last_bar_update_time'[\s\S]*yahooSafeFallback\(symbol\)\.catch\(\(\)=>null\)[\s\S]*Math\.min\(lastPriceTime,exchangeTradeTime\)/,'BIST kartı gecikmeli iletim saatini borsadaki gerçek son işlem zamanıyla sınırlandırmalı');

@@ -1,5 +1,13 @@
 # Özer Finans v8.0
 
+## v8.1.0-preview.10 — Kullanılmayan kod ve kontrol tasarımı
+
+Aktif girişler ve çağrı bağlantıları incelenerek çağrılmayan fetchFavoriteQuote, addPortfolioStat, destroyPortfolioDistributionCharts ve solidLegendLabels yardımcıları; kullanılmayan LoadingState bileşeni; eski detail-toggle/portfolio-detail-controls/show-chart-detail ve portfolio-stat/stats stilleri kaldırıldı. Artık çağrılmayan işlevlerin kaynakta varlığını arayan iki eski test temizlendi; kullanılan toplu fiyat akışı tarayıcı testinde korunuyor. React/native köprü handler’ları ve fallback renderer’ları hâlâ kullanıldığından korundu.
+
+assets/component-system.css dönem/kıyas/tema/para birimi/portföy seçimlerini ortak 44 px geometri, tipografi, pill ve seçili durum kurallarına; eylem/onay/iptal/silme düğmelerini ortak kontrol biçimine bağlar. Mobil tab bar ve renk/yüzey ön izleme seçenekleri kendi amaçlarına uygun stillerini korur. Silme işlemleri kırmızı vurgulanır. Yeni dependency yok; finans/veri/API/cache/batch/auth/Upstash ve kullanıcı/yedek şemaları değişmez.
+
+Build, genel regresyon, mevcut tarayıcı akışı ve tests/control-consistency.browser.cjs geçti. Kontrol tutarlılığı dört genişlik/iki temada gerçek computed style, dokunma yüksekliği, renk, taşma ve ekran görüntüleriyle doğrulandı. Sentetik veri kullanılır; gerçek iPhone/hesap/sağlayıcı doğrulaması değildir. Yalnız migration ön izlemesi; production/main v8.0 korunur.
+
 ## v8.1.0-preview.9 — Denetimde bulunan hataların giderilmesi
 
 Alım tarihi ve portföy adındaki özel doğrulama hataları kullanıcı girdiyi düzelttiğinde temizlenir; DRIP kapatıldığında tarih hatası kaydı engellemez. Başarısız manuel grafik sorgusu eski fiyat/RSI grafiklerini ve görüntü verilerini kaldırır; CSV/PNG hem React hem native işlemde kilitlenir. Başarılı sorgu grafik ve dışa aktarımı geri açar. Başarısız arama ile boş sonuç ayrılır; gelişmiş aramada servis hatası tekrar deneme düğmesi sunar. Masaüstü ve ayarlar sürüm bilgisi package.json sürümünü kullanır. 320 px piyasa kartlarında fiyat ve değişim ayrı satırlara alınarak yüksek hassasiyet korunur.

@@ -18,7 +18,6 @@ Framework7.use([Framework7React, SheetModule, PopupModule, ToggleModule]);
 document.documentElement.dataset.appVersion = appPackage.version;
 document.getElementById('desktopVersion').textContent = `v${appPackage.version}`;
 
-export function LoadingState() { return <span className="pilot-loading" role="status">Yükleniyor…</span>; }
 export function ErrorState({ message = 'Veri alınamadı', retry }) {
   return <span className="pilot-error" role="status">{message}{retry ? <button type="button" onClick={retry}>Tekrar dene</button> : null}</span>;
 }

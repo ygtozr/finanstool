@@ -18,11 +18,10 @@ html[data-overview-pilot] body > .mobile-bottom-nav { display:none !important; }
   --f7-safe-area-bottom:env(safe-area-inset-bottom,0px);
   font-family:var(--font-system); color:var(--text);
 }
-.pilot-search-slot { display:contents; }
 #pilot-navigation .pilot-tabbar { top:auto; margin:0; height:auto; transform:none; grid-template-columns:repeat(4,minmax(0,1fr)); }
 #pilot-navigation .toolbar-inner { display:contents; }
 #pilot-navigation .pilot-tabbar::before, #pilot-navigation .pilot-tabbar::after { display:none; }
-.pilot-loading, .pilot-error { font-size:12px; color:var(--muted); }
+.pilot-error { font-size:12px; color:var(--muted); }
 .pilot-error { color:var(--negative); }
 html body #chartView.chart-no-data :is(.chart-wrap,#maToggle,#rsiWrap,[data-chart-slot="rsi"],.period-summary) { display:none; }
 /* Preserve full configured prices on compact phones. */
