@@ -26,18 +26,25 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
    assert.equal(await page.locator('#pilot-portfolioTodayMode').evaluate(n=>getComputedStyle(n).backgroundColor),'rgba(0, 0, 0, 0)','Paint only the inset compact surface');
    for(const size of ['small','standard','large']){
     await page.evaluate(size=>document.documentElement.dataset.fontSize=size,size);
+    const sizes=await page.locator('.portfolio-book-tab:visible').evaluateAll(nodes=>nodes.map(n=>({width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height})));
+    assert(sizes.every(n=>n.height===44),'All book controls have fixed height');
+    assert(sizes.every(n=>Math.abs(n.width-sizes[0].width)<1),'Book controls have equal widths');
     for(const selector of ['.portfolio-book-tab','.portfolio-metric-mode button','.benchmark-presets button','.benchmark-ranges button']){
-     assert(await page.locator(selector).evaluateAll(nodes=>nodes.every(n=>n.scrollWidth<=n.clientWidth+1&&n.scrollHeight<=n.clientHeight+1)),selector+' labels fit at '+width+'/'+theme+'/'+size);
-     for(const button of await page.locator(selector+':visible').all())assert((await button.boundingBox()).height>=44,'Compact choices retain touch targets');
+     assert(await page.locator(selector).evaluateAll(nodes=>nodes.every(n=>n.classList.contains('portfolio-book-tab')||n.scrollWidth<=n.clientWidth+1&&n.scrollHeight<=n.clientHeight+1)),selector+' labels fit at '+width+'/'+theme+'/'+size);
+     for(const button of await page.locator(selector+':visible').all())assert.equal((await button.boundingBox()).height,44,'Choice height stays fixed at every text size');
     }
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Large text has no horizontal overflow');
    }
    await page.evaluate(()=>document.documentElement.dataset.fontSize='standard');
-   assert.equal(await page.locator('.portfolio-book-tab').first().evaluate(n=>getComputedStyle(n).textOverflow),'clip','Full book name wraps instead of ellipsis');
+   assert.match(await page.locator('.portfolio-book-tab').first().getAttribute('title'),/Amerika Uzun Vadeli Birikim Portföyü/,'Full name remains in tooltip');
+   assert.equal(await page.locator('.portfolio-book-tab').first().evaluate(n=>getComputedStyle(n).textOverflow),'ellipsis','Long book name stays within the fixed-height control');
+   assert.equal(await page.locator('.portfolio-book-tab').first().evaluate(n=>getComputedStyle(n).whiteSpace),'nowrap');
+   assert.equal(await page.locator('.portfolio-book-tab').first().evaluate(n=>getComputedStyle(n).overflow),'hidden');
    assert.equal(await page.locator('#pilot-portfolioTodayMode').evaluate(n=>getComputedStyle(n,'::before').top),'5px','Compact paint is inset inside touch target');
-   for(const id of ['#pilot-portfolioPrivacyToggle','#pilot-activePortfolioPrivacyToggle']){
+   for(const id of ['#pilot-portfolioPrivacyToggle','#pilot-activePortfolioPrivacyToggle','#portfolioBookAdd','#portfolioBookRename','#portfolioBookDelete']){
     const box=await page.locator(id).boundingBox();assert.equal(box.width,44);assert.equal(box.height,44);
-    assert.equal(await page.locator(id).evaluate(n=>getComputedStyle(n,'::before').left),'6px','Privacy paints a 32px circle inside a 44px target');
+    assert.equal(await page.locator(id).evaluate(n=>getComputedStyle(n,'::before').left),'6px','Icon paints a 32px rounded square inside a 44px target');
+    assert.equal(await page.locator(id).evaluate(n=>getComputedStyle(n,'::before').borderRadius),'9px');
    }
    await page.locator('#pilot-activePortfolioPrivacyToggle').click();
    await page.waitForFunction(()=>document.getElementById('pilot-portfolioPrivacyToggle').getAttribute('aria-pressed')==='true');
@@ -55,8 +62,16 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
    assert.equal(await page.locator('#otherView .settings-grid > .settings-group').count(),0,'Merged groups are removed');
    assert.equal(await page.locator('#otherView .settings-grid > .settings-card').count(),10,'Original setting cards are restored');
    assert.equal(await page.locator('.market-card-value').first().evaluate(n=>getComputedStyle(n).fontVariantNumeric),'tabular-nums','Financial values use equal-width digits');
-   for(const selector of ['#clearCacheButton','#backupDownload','#diagnosticsRefresh','#pilot-theme-light'])assert.equal(await page.locator(selector).evaluate(n=>getComputedStyle(n).borderRadius),'999px','Settings controls use round corners');
-   assert.equal(await page.locator('.pilot-theme-controls .segmented-highlight').evaluate(n=>getComputedStyle(n).borderRadius),'999px','Segmented highlight is round');
+   for(const selector of ['#clearCacheButton','#backupDownload','#diagnosticsRefresh','#pilot-theme-light'])assert.equal(await page.locator(selector).evaluate(n=>getComputedStyle(n).borderRadius),'9px','Settings controls use round corners');
+   assert.equal(await page.locator('.pilot-theme-controls .segmented-highlight').evaluate(n=>getComputedStyle(n).borderRadius),'9px','Segmented highlight is round');
+   for(const size of ['small','standard','large']){
+    await page.evaluate(size=>document.documentElement.dataset.fontSize=size,size);
+    for(const selector of ['#clearCacheButton','#resetAppDataButton','#backupDownload','#diagnosticsRefresh','#pilot-theme-light']){
+     assert.equal((await page.locator(selector).boundingBox()).height,44,'Settings height stays fixed at '+size);
+     assert(await page.locator(selector).evaluate(n=>n.scrollHeight<=n.clientHeight+1),'Settings label fits at '+size);
+    }
+   }
+   await page.evaluate(()=>document.documentElement.dataset.fontSize='standard');
    for(const selector of ['#clearCacheButton','#backupDownload','#diagnosticsRefresh'])assert.deepEqual(await style(selector),action,`${selector} uses the shared action design`);
    assert.equal(await page.locator('#resetAppDataButton').evaluate(n=>getComputedStyle(n).color),await page.locator('body').evaluate(()=>{const n=document.createElement('span');n.style.color='var(--danger)';document.body.append(n);const color=getComputedStyle(n).color;n.remove();return color}),'Delete action retains danger color');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),'No horizontal overflow');
@@ -71,6 +86,13 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
   }
   await page.locator('#favoriteDetailDialog .favorite-detail-close').click();
   await page.evaluate(()=>{OzerAppearance.restore({color:'turkuaz',look:'seramik'},false);OzerOverviewLegacy.theme('dark')});
+  await page.getByRole('button',{name:'AAPL işlemleri',exact:true}).click();
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('.pilot-action-sheet')).transform==='matrix(1, 0, 0, 1, 0, 0)');
+  assert.equal(await page.locator('.pilot-action-sheet').evaluate(n=>getComputedStyle(n).position),'fixed','Action sheet stays in the viewport');
+  for(const button of await page.locator('.pilot-action-sheet .button').all()){
+   const box=await button.boundingBox();assert.equal(box.height,44);assert(box.x>=0&&box.x+box.width<=page.viewportSize().width+1&&box.y>=0&&box.y+box.height<=page.viewportSize().height+1,'Sheet buttons fit viewport');
+  }
+  await page.getByRole('button',{name:'İşlemleri kapat',exact:true}).click();await page.locator('.pilot-action-sheet.modal-in').waitFor({state:'hidden'});
   await nav('Portföy');await page.locator('#portfolioBookRename').click();
   assert.deepEqual(await style('#portfolioBookSave'),await style('#portfolioBookCancel'),'Confirm and cancel share action geometry');
   await page.locator('#portfolioBookCancel').click();

@@ -1,5 +1,11 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
+## v9.0.2-preview.3 — Sabit ölçüler ve yumuşak kare kontroller
+
+Kontroller ortak 9 px köşe kullanır; eylem ve seçim yüksekliği 44 px ile sabitlenir. Portföy seçimleri her genişlikte eş sütunlara yerleşir; uzun ad ellipsis kullanır, tam ad seçim alanında ve mevcut araç ipucu/erişilebilir ad içinde korunur. Aktif Portföy yanındaki oluştur/adlandır/sil/gizle tuşları ve Toplam yanındaki göz 44 px hedef içinde eş 32 px yumuşak kare yüzey kullanır. Silme rengi, tema vurgu renkleri ve mevcut gizlilik tercihi korunur.
+
+Hedefli kontrol dört genişlik, iki tema ve üç yazı boyutunda sabit/eş ölçüleri, taşmayı ve gizlilik eşleşmesini kapsar. Yeni dependency yok; finans/API/veri formatları değişmez. Yalnız fix/v9.0.2-compact-controls ön izlemesi; main/production v9.0.1 korunur. Sentetik Chromium kontrolü canlı sağlayıcı/fiziksel iPhone doğrulaması değildir.
+
 ## v9.0.2-preview.2 — Yuvarlak düğmeler ve eş gizlilik kontrolleri
 
 Ayarlar ve diğer eylem/seçim düğmeleri ortak yuvarlak köşe kullanır; kart ve liste satırlarının geometrisi korunur. Toplam yanındaki göz tuşu 44 px dokunma alanı içinde 32 px dairesel yüzey kullanır. Aktif Portföy başlığına aynı tuş eklenir; ikisi mevcut gizlilik tercihini birlikte değiştirir. Hisse ayrıntısındaki alt eylemler ve normal sheet eylemleri seçili vurgu rengine uyar; silme rengi korunur.
