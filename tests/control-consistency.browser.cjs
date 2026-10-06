@@ -8,7 +8,7 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
   const page=await context.newPage();await page.goto('https://parity.test');await page.locator('#authLocalContinue').click();
   await page.waitForSelector('#otherView[data-react-page="ready"]',{state:'attached'});
   const nav=async label=>page.viewportSize().width>=1024
-   ?page.locator({Grafik:'#desktopChartNav',Portföy:'#desktopPortfolioNav',Diğer:'#desktopMoreNav'}[label]).click()
+   ?page.locator({Özet:'#desktopOverviewNav',Grafik:'#desktopChartNav',Portföy:'#desktopPortfolioNav',Diğer:'#desktopMoreNav'}[label]).click()
    :page.locator('.pilot-tabbar').getByRole('button',{name:label,exact:true}).click();
   const style=selector=>page.locator(selector).first().evaluate(n=>{
    const c=getComputedStyle(n);return Object.fromEntries(['borderRadius','borderWidth','borderStyle','paddingTop','paddingRight','paddingBottom','paddingLeft','fontSize','fontWeight','lineHeight','letterSpacing','textTransform'].map(k=>[k,c[k]]));
@@ -35,6 +35,14 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
    await page.evaluate(()=>document.documentElement.dataset.fontSize='standard');
    assert.equal(await page.locator('.portfolio-book-tab').first().evaluate(n=>getComputedStyle(n).textOverflow),'clip','Full book name wraps instead of ellipsis');
    assert.equal(await page.locator('#pilot-portfolioTodayMode').evaluate(n=>getComputedStyle(n,'::before').top),'5px','Compact paint is inset inside touch target');
+   for(const id of ['#pilot-portfolioPrivacyToggle','#pilot-activePortfolioPrivacyToggle']){
+    const box=await page.locator(id).boundingBox();assert.equal(box.width,44);assert.equal(box.height,44);
+    assert.equal(await page.locator(id).evaluate(n=>getComputedStyle(n,'::before').left),'6px','Privacy paints a 32px circle inside a 44px target');
+   }
+   await page.locator('#pilot-activePortfolioPrivacyToggle').click();
+   await page.waitForFunction(()=>document.getElementById('pilot-portfolioPrivacyToggle').getAttribute('aria-pressed')==='true');
+   assert(await page.locator('#portfolioView').evaluate(n=>n.classList.contains('is-private')),'Active privacy uses existing masking');
+   await page.locator('#pilot-portfolioPrivacyToggle').click();await page.waitForFunction(()=>document.getElementById('pilot-activePortfolioPrivacyToggle').getAttribute('aria-pressed')==='false');
    await page.screenshot({path:path.join(output,`${width}-${theme}-consistent-portfolio.png`)});
    await nav('Diğer');
    assert.deepEqual(await style('#pilot-theme-light'),await style('[data-native-select="baseCurrencySelect"][data-value="USD"]'),'Compact settings choices share geometry');
@@ -47,11 +55,22 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
    assert.equal(await page.locator('#otherView .settings-grid > .settings-group').count(),0,'Merged groups are removed');
    assert.equal(await page.locator('#otherView .settings-grid > .settings-card').count(),10,'Original setting cards are restored');
    assert.equal(await page.locator('.market-card-value').first().evaluate(n=>getComputedStyle(n).fontVariantNumeric),'tabular-nums','Financial values use equal-width digits');
+   for(const selector of ['#clearCacheButton','#backupDownload','#diagnosticsRefresh','#pilot-theme-light'])assert.equal(await page.locator(selector).evaluate(n=>getComputedStyle(n).borderRadius),'999px','Settings controls use round corners');
+   assert.equal(await page.locator('.pilot-theme-controls .segmented-highlight').evaluate(n=>getComputedStyle(n).borderRadius),'999px','Segmented highlight is round');
    for(const selector of ['#clearCacheButton','#backupDownload','#diagnosticsRefresh'])assert.deepEqual(await style(selector),action,`${selector} uses the shared action design`);
    assert.equal(await page.locator('#resetAppDataButton').evaluate(n=>getComputedStyle(n).color),await page.locator('body').evaluate(()=>{const n=document.createElement('span');n.style.color='var(--danger)';document.body.append(n);const color=getComputedStyle(n).color;n.remove();return color}),'Delete action retains danger color');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),'No horizontal overflow');
    await page.screenshot({path:path.join(output,`${width}-${theme}-consistent-settings.png`)});
   }
+  await nav('Özet');await page.locator('.pilot-favorite-main').first().click();await page.locator('#favoriteDetailChart').waitFor();
+  for(const color of ['klasik','turkuaz','safir','lavanta','sampanya']){
+   await page.evaluate(color=>{OzerAppearance.restore({color,look:'seramik'},false);OzerOverviewLegacy.theme('dark');},color);
+   const accent=await page.evaluate(()=>{const n=document.createElement('span');n.style.background='var(--accent)';document.body.append(n);const value=getComputedStyle(n).backgroundColor;n.remove();return value});
+   await page.waitForFunction(accent=>[...document.querySelectorAll('.favorite-detail-actions button')].every(n=>getComputedStyle(n).backgroundColor===accent),accent);
+   for(const button of await page.locator('.favorite-detail-actions button').all())assert.equal(await button.evaluate(n=>getComputedStyle(n).backgroundColor),accent,'Stock detail actions follow '+color);
+  }
+  await page.locator('#favoriteDetailDialog .favorite-detail-close').click();
+  await page.evaluate(()=>{OzerAppearance.restore({color:'turkuaz',look:'seramik'},false);OzerOverviewLegacy.theme('dark')});
   await nav('Portföy');await page.locator('#portfolioBookRename').click();
   assert.deepEqual(await style('#portfolioBookSave'),await style('#portfolioBookCancel'),'Confirm and cancel share action geometry');
   await page.locator('#portfolioBookCancel').click();

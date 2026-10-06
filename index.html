@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=8.0">
   <link rel="manifest" href="manifest.webmanifest?v=8.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://financialmodelingprep.com https://eodhd.com; connect-src 'self'; font-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
-  <title>Özer Finans v9.0.2-preview.1</title>
+  <title>Özer Finans v9.0.2-preview.2</title>
   <style>
     :root { color-scheme:dark; --surface-page:#101827; --surface-main:#192337; --surface-section:#111a2b; --surface-card:#0d1523; --surface-soft:#182235; --surface-control:#26344d; --line:#2b3a55; --border-strong:#40516e; --text:#eef3fb; --muted:#aebbd0; --accent:#52d5b1; --on-accent:#062019; --positive:#34d399; --negative:#ff8f9c; --warning:#ffd66b; --info:#60a5fa; --focus-ring:#7dd3fc; --chart-fill:rgba(82,213,177,.14); --chart-fill-soft:rgba(82,213,177,.08); --bg:var(--surface-page); --panel:var(--surface-main); --danger:var(--negative); }
     * { box-sizing:border-box; }
@@ -771,10 +771,10 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
 @media(prefers-reduced-motion:reduce) { html[data-theme] body :is(.toolbar button,.periods button,.theme-choice,.portfolio-book-tab,.portfolio-currency-toggle,.favorite-menu-trigger,.market-summary-head button,.favorites-panel-head button,.portfolio-display-controls button) { transition:none; } }
 
 </style>
-  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=9.0.2-preview.1">
+  <link rel="stylesheet" href="assets/overview-pilot/app.css?v=9.0.2-preview.2">
   <link rel="stylesheet" href="assets/design-tokens.css?v=8.0">
-  <link rel="stylesheet" href="assets/ios-parity.css?v=9.0.2-preview.1">
-  <link rel="stylesheet" href="assets/component-system.css?v=9.0.2-preview.1">
+  <link rel="stylesheet" href="assets/ios-parity.css?v=9.0.2-preview.2">
+  <link rel="stylesheet" href="assets/component-system.css?v=9.0.2-preview.2">
   <link rel="stylesheet" href="assets/ios-screen-alignment.css?v=8.0">
 </head>
 <body class="auth-locked">
@@ -803,11 +803,11 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       <button id="desktopAlarmNav" type="button">♢ <span>Alarmlar</span></button>
       <div class="desktop-sidebar-spacer"></div>
       <button id="desktopMoreNav" type="button">••• <span>Diğer</span></button>
-      <small id="desktopVersion">v9.0.2-preview.1</small>
+      <small id="desktopVersion">v9.0.2-preview.2</small>
     </aside>
     <nav class="app-tabs" aria-label="Uygulama bölümleri" role="tablist"><button id="mainTab" class="active" type="button" role="tab" aria-controls="mainView" aria-selected="true">Özet</button><button id="chartTab" type="button" role="tab" aria-controls="chartView" aria-selected="false">Grafik Ve Analiz</button><button id="portfolioTab" type="button" role="tab" aria-controls="portfolioView" aria-selected="false">Portföy</button><button id="otherTab" type="button" role="tab" aria-controls="otherView" aria-selected="false">Diğer</button></nav>
     <section id="mainView" class="app-view active overview-page" role="tabpanel" aria-labelledby="mainTab">
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v9.0.2-preview.1</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v9.0.2-preview.2</span></h1>
       <div class="app-layout"><section class="chart-panel">
     <section class="market-summary" aria-labelledby="marketSummaryTitle">
       <div class="market-summary-head"><div><h2 id="marketSummaryTitle">Piyasa Özeti</h2><p id="marketUpdated" class="favorites-note" aria-live="polite">Veriler yükleniyor…</p></div><div class="market-actions"><button id="marketRefresh" type="button">Yenile</button><button id="marketSettingsButton" type="button" aria-label="Piyasa özetini düzenle" title="Piyasa özetini düzenle">⚙</button></div></div>
@@ -817,7 +817,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       </section></div>
     </section>
     <section id="chartView" class="app-view chart-page" role="tabpanel" aria-labelledby="chartTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v9.0.2-preview.1</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v9.0.2-preview.2</span></h1>
       <h2>Grafik Ve Teknik Analiz</h2>
     <form id="symbolForm" role="search">
       <label class="sr-only" for="symbol">Hisse ara</label>
@@ -847,7 +847,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     <section class="chart-asset-switcher" aria-label="Grafikte gösterilecek kayıtlı hisseler"><div class="chart-asset-switcher-buttons"><button id="chartFavoritesToggle" type="button" aria-expanded="false" aria-controls="chartFavoritesPanel">Favoriler</button><button id="chartPortfolioToggle" type="button" aria-expanded="false" aria-controls="chartPortfolioPanel">Portföy</button></div><div id="chartFavoritesPanel" class="chart-asset-panel" hidden><ul id="chartFavoritesList" class="chart-asset-list"></ul></div><div id="chartPortfolioPanel" class="chart-asset-panel" hidden><ul id="chartPortfolioList" class="chart-asset-list"></ul></div></section>
     </section>
     <section id="portfolioView" class="app-view portfolio-page" role="tabpanel" aria-labelledby="portfolioTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v9.0.2-preview.1</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v9.0.2-preview.2</span></h1>
       <div id="allPortfolioHead" class="portfolio-head portfolio-overall-head"><div class="portfolio-overall-heading"><h2>Toplam Portföy</h2><div class="portfolio-view-toolbar"><div class="portfolio-metric-mode" role="group" aria-label="Portföy kâr zarar dönemi"><button id="portfolioTodayMode" class="is-active" type="button" aria-pressed="true">Bugün</button><button id="portfolioTotalMode" type="button" aria-pressed="false">Toplam</button></div><button id="portfolioPrivacyToggle" class="portfolio-privacy-toggle" type="button" aria-label="Portföy rakamlarını gizle" aria-pressed="false" title="Portföy rakamlarını gizle"><svg class="privacy-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></svg><svg class="privacy-off" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.3 3M6.4 6.5C3.9 8.2 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6M9.8 9.8a3 3 0 0 0 4.4 4.4"/></svg></button></div></div><div class="portfolio-overall-body"><div class="portfolio-head-metrics"><strong id="allPortfolioTotalValue" class="portfolio-head-value">—</strong><p id="allPortfolioDailyChange" class="portfolio-daily-change">Bugün —</p></div><button id="allPortfolioCurrencyToggle" class="portfolio-currency-toggle" type="button" aria-label="Toplam portföyü TL olarak göster" aria-pressed="false" title="TL görünümüne geç">⇄</button></div></div>
       <div class="portfolio-switcher"><label class="portfolio-switcher-field" for="portfolioBookSelect">Aktif Portföy<select id="portfolioBookSelect" aria-label="Aktif portföyü seç"></select></label><div class="portfolio-switcher-actions"><button id="portfolioBookAdd" type="button" aria-label="Yeni portföy oluştur" title="Yeni portföy">+</button><button id="portfolioBookRename" type="button" aria-label="Aktif portföyün adını değiştir" title="Adını değiştir">✎</button><button id="portfolioBookDelete" type="button" aria-label="Aktif portföyü sil" title="Portföyü sil">×</button></div></div>
       <div id="portfolioBookTabs" class="portfolio-book-tabs" role="group" aria-label="Portföy kısayolları"></div>
@@ -877,7 +877,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       <section id="portfolioDividendSection" class="dividend-section"><h3>Temettü Takvimi</h3><p class="dividend-note">Portföy hisseleri için açıklanmış en yakın 5 hak kullanım veya ödeme tarihi.</p><ul id="dividendList" class="dividend-list"></ul></section>
     </section>
     <section id="otherView" class="app-view other-page" role="tabpanel" aria-labelledby="otherTab" hidden>
-      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v9.0.2-preview.1</span></h1>
+      <h1 class="page-brand"><img class="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt=""><span class="brand-lockup-name">Özer Finans</span><span class="version-badge">v9.0.2-preview.2</span></h1>
       <h2>Diğer</h2>
       <div class="settings-grid">
         <section class="settings-card settings-horizontal" aria-labelledby="accountTitle"><div class="settings-card-copy"><h3 id="accountTitle">Hesap</h3><p id="accountDescription">Oturum durumu hazırlanıyor…</p><p id="cloudSyncStatus" class="settings-status cloud-sync-status" aria-live="polite"></p></div><div class="settings-card-controls account-controls"><button id="accountAction" type="button">Giriş Yap</button><button id="accountSignOut" class="account-secondary" type="button" hidden>Çıkış Yap</button></div></section>
@@ -928,7 +928,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         <section class="settings-card settings-horizontal" aria-labelledby="diagnosticsTitle"><div class="settings-card-copy"><h3 id="diagnosticsTitle">Bağlantı durumu</h3><p>Veri bağlantısını ve önbelleği kontrol edin.</p></div><div class="settings-card-controls"><dl id="diagnosticsList" class="diagnostics-list"></dl><div class="settings-inline-actions"><button id="diagnosticsRefresh" type="button">Durumu Yenile</button></div></div></section>
         <section class="settings-card settings-horizontal" aria-labelledby="helpTitle">
           <div class="settings-card-copy"><h3 id="helpTitle">Yardım</h3><p>Arama ve uygulama hakkında kısa bilgiler.</p></div>
-          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Yerel modda veriler yalnız cihazda; giriş yapıldığında kullanıcıya bağlı ve şifreli Upstash kaydında saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v9.0.2-preview.1</strong></div></div>
+          <div class="settings-card-controls"><ul class="settings-help"><li>ABD hisseleri için <code>AAPL</code>, <code>NVDA</code> gibi kodları kullanın.</li><li>BIST hisselerinde yalnız kodu yazmanız yeterlidir; örneğin <code>THYAO</code>. Gerekli <code>.IS</code> eki otomatik eklenir.</li><li>Portföy aramasında TEFAS fon kodunu veya uzun adını yazabilirsiniz.</li><li>Gram, çeyrek, yarım ve diğer altın ürünlerini adlarıyla arayın.</li><li>Yerel modda veriler yalnız cihazda; giriş yapıldığında kullanıcıya bağlı ve şifreli Upstash kaydında saklanır.</li></ul><div class="settings-version"><span>Özer Finans</span><strong>v9.0.2-preview.2</strong></div></div>
         </section>
       </div>
     </section>
@@ -1022,7 +1022,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
   </dialog>
   <script src="assets/storage-events.js?v=8.0"></script>
   <script src="assets/appearance.js?v=8.0"></script>
-  <script src="assets/ios-parity.js?v=9.0.2-preview.1"></script>
+  <script src="assets/ios-parity.js?v=9.0.2-preview.2"></script>
   <script src="assets/chart-theme.js?v=8.0"></script>
   <script>
     let chart;
@@ -2732,7 +2732,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
       activeBook.cashBalances=cashBalances;
       return {
         schemaVersion:3,
-        appVersion:'9.0.2-preview.1',
+        appVersion:'9.0.2-preview.2',
         exportedAt:new Date().toISOString(),
         data:{
           favorites:favorites.map(({symbol,name})=>({symbol,name})),
@@ -5167,7 +5167,7 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
         const hidden=[...decorations,...controls].map(node=>[node,node.hidden]);
         hidden.forEach(([node])=>{node.hidden=true});nodes.forEach(node=>content.append(node));
         const version=kind==='other'?view.querySelector('.settings-version strong'):null,oldVersion=version?.textContent;
-        if(version)version.textContent='v'+(document.documentElement.dataset.appVersion||'9.0.2-preview.1');
+        if(version)version.textContent='v'+(document.documentElement.dataset.appVersion||'9.0.2-preview.2');
         view.dataset.reactPage='ready';
         return ()=>{moved.reverse().forEach(([node,parent,next])=>parent.insertBefore(node,next?.parentNode===parent?next:null));hidden.forEach(([node,value])=>{node.hidden=value});if(version)version.textContent=oldVersion;delete view.dataset.reactPage};
       },
@@ -5261,6 +5261,6 @@ html[data-theme] body .favorite-quick-menu button:is(:hover,:focus-visible) { ba
     })();
   </script>
   <script src="assets/auth-account.js?v=8.0.0"></script>
-  <script type="module" src="assets/overview-pilot/app.js?v=9.0.2-preview.1"></script>
+  <script type="module" src="assets/overview-pilot/app.js?v=9.0.2-preview.2"></script>
 </body>
 </html>

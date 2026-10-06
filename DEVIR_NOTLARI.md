@@ -1,5 +1,11 @@
 # Özer Finans — Yeni sohbet devir notları
 
+## v9.0.2-preview.2 — Yuvarlak düğmeler ve eş gizlilik kontrolleri
+
+Ayarlar ve diğer eylem/seçim düğmeleri ortak yuvarlak köşe kullanır; kart ve liste satırlarının geometrisi korunur. Toplam yanındaki göz tuşu 44 px dokunma alanı içinde 32 px dairesel yüzey kullanır. Aktif Portföy başlığına aynı tuş eklenir; ikisi mevcut gizlilik tercihini birlikte değiştirir. Hisse ayrıntısındaki alt eylemler ve normal sheet eylemleri seçili vurgu rengine uyar; silme rengi korunur.
+
+Hedefli tarayıcı kontrolü 375/390/430/1024 px açık/koyu görünüm, iki gizlilik tuşunun eşleşmesi, yuvarlak ayar seçimleri ve beş vurgu rengini kapsar. Finans, veri ve kullanıcı formatları değişmez; yeni dependency yok. Yalnız fix/v9.0.2-compact-controls ön izlemesi; main/production v9.0.1 korunur. Sentetik testler canlı sağlayıcı ve fiziksel iPhone doğrulaması değildir.
+
 ## v9.0.2-preview.1 — Kompakt kontrol yüzeyleri ve tam metin
 
 Bugün/Toplam, portföy kısayolları, dönem/kıyas ve varlık seçicileri 44 px dokunma alanı içinde yaklaşık 32 px kompakt yüzey kullanır. Uzun ad gerektiğinde kontrolü büyütür; portföy adları ellipsis yerine satıra bölünür. Kontrol yazısı kullanıcının boyut tercihine bağlı olarak bir piksel küçülür; padding ve yazı ağırlığı sadeleşir. Eylem düğmelerinde uzun metin satıra sığar. Renkler, seçili vurgu ve klavye odağı korunur. Ayarlardaki kompakt segmented seçimler ve alt navigasyon kendi yüzeylerini korur.

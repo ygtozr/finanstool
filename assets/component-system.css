@@ -22,7 +22,7 @@ html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-rang
   --choice-fill:var(--surface-control); --choice-line:var(--line);
 }
 html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.chart-asset-switcher-buttons button):not([data-appearance-color]):not([data-appearance-look])::before {
-  content:""; position:absolute; inset:5px 0; z-index:-1; pointer-events:none; border:1px solid var(--choice-line); border-radius:10px; background:var(--choice-fill);
+  content:""; position:absolute; inset:5px 0; z-index:-1; pointer-events:none; border:1px solid var(--choice-line); border-radius:var(--radius-pill); background:var(--choice-fill);
 }
 html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.chart-asset-switcher-buttons button):not([data-appearance-color]):not([data-appearance-look]):is(.active,.is-active,[aria-pressed="true"],[aria-expanded="true"]) {
   background:transparent; border-color:transparent; --choice-fill:var(--accent); --choice-line:var(--accent);
@@ -126,3 +126,16 @@ html[data-theme][data-palette] body :is(.negative,.favorite-change.negative,.por
   html[data-theme][data-palette] body .rsi-wrap { height:180px; }
 }
 @media(prefers-reduced-motion:reduce) { html[data-theme][data-palette] body *,html[data-theme][data-palette] body *::before,html[data-theme][data-palette] body *::after { animation:none !important;transition:none !important; } }
+
+/* Control corners stay consistent across legacy, Framework7 and account screens. */
+html[data-theme][data-palette] body :is(button,.button):not(.favorite-card):not(.chart-asset-item):not(.suggestion) { border-radius:var(--radius-pill) !important; }
+html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle) {
+  position:relative; isolation:isolate; flex:0 0 44px; width:44px; height:44px; min-height:44px; padding:0; border:0; background:transparent; color:var(--text);
+}
+html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle)::before {
+  content:""; position:absolute; inset:6px; z-index:-1; border-radius:var(--radius-pill); background:var(--surface-control); pointer-events:none;
+}
+html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle)[aria-pressed="true"] { color:var(--on-accent); }
+html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle)[aria-pressed="true"]::before { background:var(--accent); }
+html[data-theme][data-palette] body #favoriteDetailDialog .favorite-detail-actions button,
+html[data-theme][data-palette] body .pilot-sheet-content .button:not(.negative) { color:var(--on-accent); background:var(--accent); border-color:var(--accent); }

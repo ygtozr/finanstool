@@ -110,7 +110,7 @@ function AppShell() {
   return <App theme="ios" name="Özer Finans" className={`pilot-app ${state.theme === 'dark' ? 'dark' : ''}`}
     touch={{ fastClicks: false }} clicks={{ externalLinks: '.external, a[download], #inviteLink' }} view={{ router: false }}>
     <View main router={false}><Page name="overview" className="pilot-page">
-      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.2-preview.1</span></h1>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.2-preview.2</span></h1>
       {refreshError ? <ErrorState message={refreshError} retry={refresh} /> : null}
       <div className="app-layout"><section className="chart-panel">
       <Section className="market-summary" title="Piyasa Özeti" note={state.marketUpdated} actions={<div className="market-actions"><button type="button" id="pilotMarketRefresh" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile">{state.busy ? 'Yenileniyor…' : 'Yenile'}</button><button type="button" id="pilotMarketSettings" onClick={() => setSettingsOpen(true)} aria-label="Piyasa özetini düzenle">⚙</button></div>}>
