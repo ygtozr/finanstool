@@ -131,17 +131,23 @@ html[data-theme][data-palette] body :is(.negative,.favorite-change.negative,.por
 
 /* Fixed control geometry across legacy, Framework7 and account screens. */
 html[data-theme][data-palette] body :is(button,.button):not(.favorite-card):not(.chart-asset-item):not(.suggestion) { border-radius:var(--radius-control) !important; }
-html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle,.native-selector-card .portfolio-switcher-actions button) {
+html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle,.native-selector-card .portfolio-switcher-actions button,.portfolio-currency-toggle) {
   position:relative; isolation:isolate; flex:0 0 44px; width:44px; height:44px; min-height:44px; padding:0; border:0; background:transparent; color:var(--text);
 }
-html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle,.native-selector-card .portfolio-switcher-actions button)::before {
+html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle,.native-selector-card .portfolio-switcher-actions button,.portfolio-currency-toggle)::before {
   content:""; position:absolute; inset:6px; z-index:-1; border-radius:var(--radius-control); background:var(--surface-control); pointer-events:none;
 }
-html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle,.native-selector-card .portfolio-switcher-actions button)[aria-pressed="true"] { color:var(--on-accent); }
-html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle,.native-selector-card .portfolio-switcher-actions button)[aria-pressed="true"]::before { background:var(--accent); }
+html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle,.native-selector-card .portfolio-switcher-actions button,.portfolio-currency-toggle)[aria-pressed="true"] { color:var(--on-accent); }
+html[data-theme][data-palette] body #appMain :is(#pilot-portfolioPrivacyToggle,#pilot-activePortfolioPrivacyToggle,.native-selector-card .portfolio-switcher-actions button,.portfolio-currency-toggle)[aria-pressed="true"]::before { background:var(--accent); }
 html[data-theme][data-palette] body #favoriteDetailDialog .favorite-detail-actions button,
 html[data-theme][data-palette] body .pilot-sheet-content .button:not(.negative) { color:var(--on-accent); background:var(--accent); border-color:var(--accent); }
 
 html[data-theme][data-palette] body #appMain .native-selector-card #portfolioBookDelete { color:var(--danger); }
 html[data-theme][data-palette] body :is(.settings-inline-actions,.dialog-actions) > button { flex:1 1 0; min-width:0; }
 html[data-theme][data-palette] body :is(.native-font-control button,.portfolio-currency-toggle,.market-summary-head button,.favorites-panel-head button,.favorite-menu-trigger) { height:44px; min-height:44px; max-height:44px; }
+
+/* Adjacent icon touch targets meet; their inset surfaces remain visibly separate. */
+html[data-theme][data-palette] body #appMain .native-selector-card .portfolio-switcher-actions { gap:0; }
+html[data-theme][data-palette] body #appMain .portfolio-currency-toggle { font-size:18px; line-height:1; }
+html[data-theme][data-palette] body #favoriteDetailDialog .favorite-detail-actions button { position:relative; isolation:isolate; background:transparent; border-color:transparent; }
+html[data-theme][data-palette] body #favoriteDetailDialog .favorite-detail-actions button::before { content:""; position:absolute; inset:2px 0; z-index:-1; pointer-events:none; border-radius:var(--radius-control); background:var(--accent); }

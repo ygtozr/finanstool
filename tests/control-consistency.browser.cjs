@@ -41,11 +41,12 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
    assert.equal(await page.locator('.portfolio-book-tab').first().evaluate(n=>getComputedStyle(n).whiteSpace),'nowrap');
    assert.equal(await page.locator('.portfolio-book-tab').first().evaluate(n=>getComputedStyle(n).overflow),'hidden');
    assert.equal(await page.locator('#pilot-portfolioTodayMode').evaluate(n=>getComputedStyle(n,'::before').top),'5px','Compact paint is inset inside touch target');
-   for(const id of ['#pilot-portfolioPrivacyToggle','#pilot-activePortfolioPrivacyToggle','#portfolioBookAdd','#portfolioBookRename','#portfolioBookDelete']){
+   for(const id of ['#pilot-portfolioPrivacyToggle','#pilot-activePortfolioPrivacyToggle','#portfolioBookAdd','#portfolioBookRename','#portfolioBookDelete','#allPortfolioCurrencyToggle','#portfolioCurrencyToggle']){
     const box=await page.locator(id).boundingBox();assert.equal(box.width,44);assert.equal(box.height,44);
     assert.equal(await page.locator(id).evaluate(n=>getComputedStyle(n,'::before').left),'6px','Icon paints a 32px rounded square inside a 44px target');
     assert.equal(await page.locator(id).evaluate(n=>getComputedStyle(n,'::before').borderRadius),'9px');
    }
+   assert.equal(await page.locator('.native-selector-card .portfolio-switcher-actions').evaluate(n=>getComputedStyle(n).gap),'0px');
    await page.locator('#pilot-activePortfolioPrivacyToggle').click();
    await page.waitForFunction(()=>document.getElementById('pilot-portfolioPrivacyToggle').getAttribute('aria-pressed')==='true');
    assert(await page.locator('#portfolioView').evaluate(n=>n.classList.contains('is-private')),'Active privacy uses existing masking');
@@ -81,9 +82,14 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
   for(const color of ['klasik','turkuaz','safir','lavanta','sampanya']){
    await page.evaluate(color=>{OzerAppearance.restore({color,look:'seramik'},false);OzerOverviewLegacy.theme('dark');},color);
    const accent=await page.evaluate(()=>{const n=document.createElement('span');n.style.background='var(--accent)';document.body.append(n);const value=getComputedStyle(n).backgroundColor;n.remove();return value});
-   await page.waitForFunction(accent=>[...document.querySelectorAll('.favorite-detail-actions button')].every(n=>getComputedStyle(n).backgroundColor===accent),accent);
-   for(const button of await page.locator('.favorite-detail-actions button').all())assert.equal(await button.evaluate(n=>getComputedStyle(n).backgroundColor),accent,'Stock detail actions follow '+color);
+   await page.waitForFunction(accent=>[...document.querySelectorAll('.favorite-detail-actions button')].every(n=>getComputedStyle(n,'::before').backgroundColor===accent),accent);
+   for(const button of await page.locator('.favorite-detail-actions button').all())assert.equal(await button.evaluate(n=>getComputedStyle(n,'::before').backgroundColor),accent,'Stock detail actions follow '+color);
   }
+  for(const button of await page.locator('.favorite-detail-actions button').all()){
+   assert.equal((await button.boundingBox()).height,44,'Detail actions retain full touch targets');
+   assert.equal(await button.evaluate(n=>getComputedStyle(n,'::before').height),'38px','Detail action surface is slightly shorter');
+  }
+  await page.screenshot({path:path.join(output,'compact-detail-actions.png')});
   await page.locator('#favoriteDetailDialog .favorite-detail-close').click();
   await page.evaluate(()=>{OzerAppearance.restore({color:'turkuaz',look:'seramik'},false);OzerOverviewLegacy.theme('dark')});
   await page.getByRole('button',{name:'AAPL işlemleri',exact:true}).click();

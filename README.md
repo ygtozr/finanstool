@@ -1,5 +1,11 @@
 # Özer Finans v9.0.1
 
+## v9.0.2-preview.4 — Yakın ikonlar ve kompakt eylem yüzeyleri
+
+Aktif Portföy başlığındaki ikon hedefleri arasındaki ek boşluk kaldırılır; eş 32 px yüzeyler 44 px dokunma alanı içinde kalır. Toplam ve seçili portföy para birimi tuşları da aynı 32 px yumuşak kare yüzeye ve 18 px simgeye geçer; mevcut para birimi davranışı korunur. Hisse ayrıntısındaki üç eylemin görünen yüksekliği 44 yerine 38 px olur; 44 px hedef ve tema vurgu rengi korunur.
+
+Hedefli kontrol dört genişlik/iki tema, ikon ölçüleri ve aralığı, para birimi tuşları, 38 px eylem yüzeyi ve beş vurgu rengini kapsar. Yeni dependency yok; finans/API/veri formatları değişmez. Yalnız fix/v9.0.2-compact-controls ön izlemesi; main/production v9.0.1 korunur. Sentetik Chromium kontrolü canlı sağlayıcı/fiziksel iPhone doğrulaması değildir.
+
 ## v9.0.2-preview.3 — Sabit ölçüler ve yumuşak kare kontroller
 
 Kontroller ortak 9 px köşe kullanır; eylem ve seçim yüksekliği 44 px ile sabitlenir. Portföy seçimleri her genişlikte eş sütunlara yerleşir; uzun ad ellipsis kullanır, tam ad seçim alanında ve mevcut araç ipucu/erişilebilir ad içinde korunur. Aktif Portföy yanındaki oluştur/adlandır/sil/gizle tuşları ve Toplam yanındaki göz 44 px hedef içinde eş 32 px yumuşak kare yüzey kullanır. Silme rengi, tema vurgu renkleri ve mevcut gizlilik tercihi korunur.
