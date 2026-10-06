@@ -1,4 +1,4 @@
-name: Publish approved v9.0.1 release
+name: Publish approved v9.0.2 release
 
 on:
   push:
@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Publish v9.0.1
+      - name: Publish v9.0.2
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          test "$(node -p 'require("./package.json").version')" = "9.0.1" || exit 0
-          if gh release view v9.0.1 >/dev/null 2>&1; then
-            echo "v9.0.1 already exists; keep its original tag."
+          test "$(node -p 'require("./package.json").version')" = "9.0.2" || exit 0
+          if gh release view v9.0.2 >/dev/null 2>&1; then
+            echo "v9.0.2 already exists; keep its original tag."
           else
-            gh release create v9.0.1 --target "$GITHUB_SHA" --title "Özer Finans v9.0.1" --notes-file RELEASE_NOTES_v9.0.1.md --latest
+            gh release create v9.0.2 --target "$GITHUB_SHA" --title "Özer Finans v9.0.2" --notes-file RELEASE_NOTES_v9.0.2.md --latest
           fi

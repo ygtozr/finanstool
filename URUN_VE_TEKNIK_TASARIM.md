@@ -1,5 +1,13 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
+## v9.0.2 — Onaylı kalıcı sürüm
+
+Kullanıcı v9.0.2-preview.5 görünümünü kalıcı yayın için onayladı. Kontroller 9 px köşe ve sabit yükseklik kullanır; Aktif Portföy ikonları 40×44 px hedef içinde eş 32 px yüzey ve 8 px aralık kullanır. Para birimi tuşları kompaktlaşır, iki gizlilik tuşu eşleşir, hisse ayrıntısı eylemleri 38 px görünen yüzey ve tema vurgu rengi kullanır. Uzun portföy adları sabit kutuda kısalır; tam ad seçim alanı/araç ipucu/erişilebilir adda korunur. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok.
+
+Güncel kaynak main ve v9.0.2 etiketi; kalıcı adres https://finanstool.vercel.app. Önceki v9.0.1, özgün etiketi ve archive/v9.0.1 dalında korunur. Kullanılmayan 37 tarihsel ön izleme/tasarım dosyası, boş requirements.txt ve kullanılmayan assets/gold-icon-options.png güncel daldan kaldırılır; Git geçmişi ve önceki sürüm arşivi korunur. Yaklaşık 7,2 MB kaynak kalıntısı temizlenir. Yayın iş akışı RELEASE_NOTES_v9.0.2.md ile GitHub Release kaydı oluşturur. Aşağıdaki preview ve eski sürüm notları tarihsel kayıttır.
+
+Build, genel regresyon ve tam pilot tarayıcı akışı yayın öncesinde kontrol edilir; dört genişlik, iki tema, üç yazı boyutu, yakın ikon tıklanabilirliği, para birimi/gizlilik, hisse eylemleri, navigasyon/katmanlar ve PWA safe-area kapsanır. Sentetik test fiziksel iPhone/canlı sağlayıcı kabulü değildir.
+
 ## v9.0.2-preview.5 — Daha yakın Aktif Portföy ikonları
 
 Yalnız Aktif Portföy başlığındaki dört ikonun yatay hedefi 40 px olur; yükseklik 44 px ve görünen yüzey 32 px kalır. Yüzey aralığı 12 yerine 8 px olur, hedefler çakışmaz. Hedefli Chromium kontrolü dört genişlik/iki temada ölçü ve gerçek elementFromPoint tıklanabilirliğini doğrular. Finans/veri sistemi değişmez; yeni dependency yok. Yalnız preview; main/production v9.0.1 korunur.
