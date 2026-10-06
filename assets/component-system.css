@@ -1,21 +1,35 @@
 /* Components and responsive layouts share the tokens while preserving app behavior. */
 /* Same operation, same control geometry across native and Framework7 pages. */
 html[data-theme][data-palette] body :is(.toolbar:not(.pilot-tabbar):not(.mobile-bottom-nav) button,.settings-inline-actions button,.dialog-actions button,.data-actions button,.favorite-detail-actions button,.pilot-sheet-content .button,#backupDownload,#restoreBackup,#diagnosticsRefresh,#benchmarkApply,#cashAddButton,#accountAction,#accountSignOut,#createInvite,#copyInvite,#pilotChartSubmit) {
-  min-height:44px; padding:10px 14px; border:1px solid var(--line); border-radius:var(--radius-control);
-  font-size:var(--font-control); font-weight:700; line-height:1.25; letter-spacing:normal; text-transform:none;
+  min-height:44px; min-width:0; padding:7px 10px; border:1px solid var(--line); border-radius:var(--radius-control);
+  font-size:calc(var(--font-control) - 1px); font-weight:650; line-height:1.25; letter-spacing:normal; text-transform:none; white-space:normal; overflow-wrap:anywhere; height:auto;
   color:var(--text); background:var(--surface-control); box-shadow:none;
 }
 html[data-theme][data-palette] body :is(.dialog-actions button[type="submit"],#restoreBackup,#pilotChartSubmit) {
   color:var(--on-accent); background:var(--accent); border-color:var(--accent);
 }
 html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.native-segments button,.chart-asset-switcher-buttons button,.theme-choice:not([data-appearance-color]):not([data-appearance-look])) {
-  min-height:44px; padding:8px 12px; border:1px solid var(--line); border-radius:var(--radius-pill);
-  font-size:var(--font-control); font-weight:700; line-height:1.25; letter-spacing:normal; text-transform:none;
+  min-height:44px; min-width:0; padding:6px 7px; border:1px solid var(--line); border-radius:var(--radius-pill);
+  font-size:calc(var(--font-control) - 1px); font-weight:650; line-height:1.25; letter-spacing:normal; text-transform:none; white-space:normal; overflow-wrap:anywhere; height:auto;
   color:var(--text); background:var(--surface-control); box-shadow:none;
 }
 html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.native-segments button,.chart-asset-switcher-buttons button,.theme-choice:not([data-appearance-color]):not([data-appearance-look])):is(.active,.is-active,[aria-pressed="true"],[aria-expanded="true"]) {
   color:var(--on-accent); background:var(--accent); border-color:var(--accent);
 }
+/* Compact paint inside a full touch target. Labels stay above their own surface. */
+html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.chart-asset-switcher-buttons button):not([data-appearance-color]):not([data-appearance-look]) {
+  position:relative; isolation:isolate; background:transparent; border-color:transparent; overflow:visible;
+  --choice-fill:var(--surface-control); --choice-line:var(--line);
+}
+html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.chart-asset-switcher-buttons button):not([data-appearance-color]):not([data-appearance-look])::before {
+  content:""; position:absolute; inset:5px 0; z-index:-1; pointer-events:none; border:1px solid var(--choice-line); border-radius:10px; background:var(--choice-fill);
+}
+html[data-theme][data-palette] body #appMain :is(.periods button,.benchmark-ranges button,.benchmark-presets button,.portfolio-book-tab,.portfolio-metric-mode button,.chart-asset-switcher-buttons button):not([data-appearance-color]):not([data-appearance-look]):is(.active,.is-active,[aria-pressed="true"],[aria-expanded="true"]) {
+  background:transparent; border-color:transparent; --choice-fill:var(--accent); --choice-line:var(--accent);
+}
+html[data-theme][data-palette] body #appMain .portfolio-book-tab { max-width:none; white-space:normal; text-overflow:clip; overflow-wrap:anywhere; }
+html[data-theme][data-palette] body #appMain .portfolio-metric-mode { padding:0; gap:3px; background:transparent; border:0; box-shadow:none; }
+html[data-theme][data-palette] body #appMain .portfolio-metric-mode button { width:auto; min-width:62px; white-space:nowrap; }
 html[data-theme][data-palette] body :is(#resetAppDataButton,.danger-button,.pilot-sheet-content .negative) {
   color:var(--danger); background:color-mix(in srgb,var(--danger) 12%,var(--surface-control)); border-color:color-mix(in srgb,var(--danger) 35%,var(--line));
 }

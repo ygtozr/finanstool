@@ -1,5 +1,11 @@
 # Özer Finans v9.0.1
 
+## v9.0.2-preview.1 — Kompakt kontrol yüzeyleri ve tam metin
+
+Bugün/Toplam, portföy kısayolları, dönem/kıyas ve varlık seçicileri 44 px dokunma alanı içinde yaklaşık 32 px kompakt yüzey kullanır. Uzun ad gerektiğinde kontrolü büyütür; portföy adları ellipsis yerine satıra bölünür. Kontrol yazısı kullanıcının boyut tercihine bağlı olarak bir piksel küçülür; padding ve yazı ağırlığı sadeleşir. Eylem düğmelerinde uzun metin satıra sığar. Renkler, seçili vurgu ve klavye odağı korunur. Ayarlardaki kompakt segmented seçimler ve alt navigasyon kendi yüzeylerini korur.
+
+Hedefli kontrol testi gerçek portföy adlandırmasıyla uzun ad, üç yazı boyutu, 375/390/430/1024 px açık/koyu görünüm, metin taşması ve 44 px dokunma alanını doğrular. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok. Yalnız fix/v9.0.2-compact-controls ön izlemesi; main/production v9.0.1 korunur. Sentetik tarayıcı testi fiziksel iPhone/canlı servis kabulü değildir.
+
 ## v9.0.1 — Onaylı kalıcı sürüm
 
 Kullanıcı v9.0.1-preview.2 için kalıcı yayın onayı verdi. Mobil alt menü içeriklerin üstünde fixed kalır; Framework7 View kabuklarının gereksiz yüksek katmanı kaldırılır. Giriş ekranı açıkken alt menü render edilmez. Popup/sheet/native dialog önceliği, safe-area, eski ayar kartları, tam genişlik ve vurgu renkli seçimler korunur. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok.

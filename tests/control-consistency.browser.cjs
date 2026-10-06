@@ -13,6 +13,7 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
   const style=selector=>page.locator(selector).first().evaluate(n=>{
    const c=getComputedStyle(n);return Object.fromEntries(['borderRadius','borderWidth','borderStyle','paddingTop','paddingRight','paddingBottom','paddingLeft','fontSize','fontWeight','lineHeight','letterSpacing','textTransform'].map(k=>[k,c[k]]));
   });
+  await nav('Portföy');await page.locator('#portfolioBookRename').click();await page.locator('#portfolioBookName').fill('Amerika Uzun Vadeli Birikim Portföyü');await page.locator('#portfolioBookSave').click();
   for(const width of [375,390,430,1024])for(const theme of ['light','dark']){
    await page.setViewportSize({width,height:844});await page.evaluate(theme=>OzerOverviewLegacy.theme(theme),theme);
    await nav('Grafik');const choice=await style('#chart-react [data-range="5d"]'),action=await style('#pilot-advancedSearchButton');
@@ -21,6 +22,19 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
    await page.screenshot({path:path.join(output,`${width}-${theme}-consistent-chart.png`)});
    await nav('Portföy');await page.evaluate(()=>renderPortfolio());
    for(const selector of ['#pilot-portfolioTotalMode','[data-benchmark-range="5d"]','[data-benchmark-symbol="^GSPC"]','.portfolio-book-tab'])assert.deepEqual(await style(selector),choice,`${selector} uses the shared choice design`);
+   assert.match(await page.locator('.portfolio-book-tab').first().textContent(),/Amerika Uzun Vadeli Birikim Portföyü/);
+   assert.equal(await page.locator('#pilot-portfolioTodayMode').evaluate(n=>getComputedStyle(n).backgroundColor),'rgba(0, 0, 0, 0)','Paint only the inset compact surface');
+   for(const size of ['small','standard','large']){
+    await page.evaluate(size=>document.documentElement.dataset.fontSize=size,size);
+    for(const selector of ['.portfolio-book-tab','.portfolio-metric-mode button','.benchmark-presets button','.benchmark-ranges button']){
+     assert(await page.locator(selector).evaluateAll(nodes=>nodes.every(n=>n.scrollWidth<=n.clientWidth+1&&n.scrollHeight<=n.clientHeight+1)),selector+' labels fit at '+width+'/'+theme+'/'+size);
+     for(const button of await page.locator(selector+':visible').all())assert((await button.boundingBox()).height>=44,'Compact choices retain touch targets');
+    }
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Large text has no horizontal overflow');
+   }
+   await page.evaluate(()=>document.documentElement.dataset.fontSize='standard');
+   assert.equal(await page.locator('.portfolio-book-tab').first().evaluate(n=>getComputedStyle(n).textOverflow),'clip','Full book name wraps instead of ellipsis');
+   assert.equal(await page.locator('#pilot-portfolioTodayMode').evaluate(n=>getComputedStyle(n,'::before').top),'5px','Compact paint is inset inside touch target');
    await page.screenshot({path:path.join(output,`${width}-${theme}-consistent-portfolio.png`)});
    await nav('Diğer');
    assert.deepEqual(await style('#pilot-theme-light'),await style('[data-native-select="baseCurrencySelect"][data-value="USD"]'),'Compact settings choices share geometry');
