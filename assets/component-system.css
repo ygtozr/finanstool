@@ -148,6 +148,9 @@ html[data-theme][data-palette] body :is(.native-font-control button,.portfolio-c
 
 /* Adjacent icon touch targets meet; their inset surfaces remain visibly separate. */
 html[data-theme][data-palette] body #appMain .native-selector-card .portfolio-switcher-actions { gap:0; }
+html[data-theme][data-palette] body #appMain .native-selector-card .portfolio-switcher-actions :is(#portfolioBookAdd,#portfolioBookRename,#portfolioBookDelete,#pilot-activePortfolioPrivacyToggle) { width:40px; min-width:40px; max-width:40px; flex-basis:40px; }
+html[data-theme][data-palette] body #appMain .native-selector-card .portfolio-switcher-actions :is(#portfolioBookAdd,#portfolioBookRename,#portfolioBookDelete,#pilot-activePortfolioPrivacyToggle)::before { inset:6px 4px; }
+
 html[data-theme][data-palette] body #appMain .portfolio-currency-toggle { font-size:18px; line-height:1; }
 html[data-theme][data-palette] body #favoriteDetailDialog .favorite-detail-actions button { position:relative; isolation:isolate; background:transparent; border-color:transparent; }
 html[data-theme][data-palette] body #favoriteDetailDialog .favorite-detail-actions button::before { content:""; position:absolute; inset:2px 0; z-index:-1; pointer-events:none; border-radius:var(--radius-control); background:var(--accent); }

@@ -42,11 +42,15 @@ module.exports=async function verifyControlConsistency({browser,seed,routeHandle
    assert.equal(await page.locator('.portfolio-book-tab').first().evaluate(n=>getComputedStyle(n).overflow),'hidden');
    assert.equal(await page.locator('#pilot-portfolioTodayMode').evaluate(n=>getComputedStyle(n,'::before').top),'5px','Compact paint is inset inside touch target');
    for(const id of ['#pilot-portfolioPrivacyToggle','#pilot-activePortfolioPrivacyToggle','#portfolioBookAdd','#portfolioBookRename','#portfolioBookDelete','#allPortfolioCurrencyToggle','#portfolioCurrencyToggle']){
-    const box=await page.locator(id).boundingBox();assert.equal(box.width,44);assert.equal(box.height,44);
-    assert.equal(await page.locator(id).evaluate(n=>getComputedStyle(n,'::before').left),'6px','Icon paints a 32px rounded square inside a 44px target');
+    const compact=await page.locator(id).evaluate(n=>Boolean(n.closest('.portfolio-switcher-actions')));
+    const box=await page.locator(id).boundingBox();assert.equal(box.width,compact?40:44);assert.equal(box.height,44);
+    assert.equal(await page.locator(id).evaluate(n=>getComputedStyle(n,'::before').left),compact?'4px':'6px','Icon keeps its 32px rounded square surface');
     assert.equal(await page.locator(id).evaluate(n=>getComputedStyle(n,'::before').borderRadius),'9px');
    }
    assert.equal(await page.locator('.native-selector-card .portfolio-switcher-actions').evaluate(n=>getComputedStyle(n).gap),'0px');
+   const iconGeometry=await page.locator('.native-selector-card .portfolio-switcher-actions button').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {x:r.x,width:r.width,hit:document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===n}}));
+   assert(iconGeometry.every(n=>n.hit),'Each close icon remains individually clickable');
+   for(let i=1;i<iconGeometry.length;i++)assert(Math.abs(iconGeometry[i].x-iconGeometry[i-1].x-40)<1,'Close icons have 8px between their 32px surfaces');
    await page.locator('#pilot-activePortfolioPrivacyToggle').click();
    await page.waitForFunction(()=>document.getElementById('pilot-portfolioPrivacyToggle').getAttribute('aria-pressed')==='true');
    assert(await page.locator('#portfolioView').evaluate(n=>n.classList.contains('is-private')),'Active privacy uses existing masking');

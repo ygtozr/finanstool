@@ -1,5 +1,9 @@
 # Özer Finans v9.0.1
 
+## v9.0.2-preview.5 — Daha yakın Aktif Portföy ikonları
+
+Yalnız Aktif Portföy başlığındaki dört ikonun yatay hedefi 40 px olur; yükseklik 44 px ve görünen yüzey 32 px kalır. Yüzey aralığı 12 yerine 8 px olur, hedefler çakışmaz. Hedefli Chromium kontrolü dört genişlik/iki temada ölçü ve gerçek elementFromPoint tıklanabilirliğini doğrular. Finans/veri sistemi değişmez; yeni dependency yok. Yalnız preview; main/production v9.0.1 korunur.
+
 ## v9.0.2-preview.4 — Yakın ikonlar ve kompakt eylem yüzeyleri
 
 Aktif Portföy başlığındaki ikon hedefleri arasındaki ek boşluk kaldırılır; eş 32 px yüzeyler 44 px dokunma alanı içinde kalır. Toplam ve seçili portföy para birimi tuşları da aynı 32 px yumuşak kare yüzeye ve 18 px simgeye geçer; mevcut para birimi davranışı korunur. Hisse ayrıntısındaki üç eylemin görünen yüksekliği 44 yerine 38 px olur; 44 px hedef ve tema vurgu rengi korunur.
