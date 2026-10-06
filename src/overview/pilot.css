@@ -33,11 +33,13 @@ html body #chartView.chart-no-data :is(.chart-wrap,#maToggle,#rsiWrap,[data-char
   html[data-overview-pilot] .pilot-market-card .market-card-change { justify-self:start; }
 }
 .pilot-action-sheet .button { display:inline-flex; align-items:center; justify-content:center; height:auto; min-height:38px; padding:7px 12px; border:1px solid var(--line); border-radius:10px; color:var(--accent-ink); background:var(--surface-control); font-size:var(--font-control); font-weight:600; line-height:1.25; text-transform:none; letter-spacing:0; box-shadow:none; }
-.pilot-action-sheet { height:auto; max-height:85dvh; z-index:15000; color:var(--text); background:var(--surface-section);
+.pilot-action-sheet { position:fixed; height:auto; max-height:85dvh; z-index:15000; color:var(--text); background:var(--surface-section);
   border-radius:22px 22px 0 0; backdrop-filter:none !important; box-shadow:none !important; }
 .pilot-action-sheet::after { display:none; }
+.pilot-action-sheet .sheet-modal-inner { max-height:85dvh; overflow-y:auto; overscroll-behavior:contain; }
 .pilot-sheet-content { padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px)); }
 .pilot-sheet-content > header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px; }
+.pilot-sheet-content > header .button { width:auto; flex:0 0 auto; }
 .pilot-sheet-content h2 { margin:0; font-size:18px; }
 .pilot-sheet-content > .button { display:flex; width:100%; min-height:48px; margin-top:8px; justify-content:flex-start; background:var(--surface-card); color:var(--text); }
 .pilot-sheet-content > .negative { color:var(--negative); }
@@ -105,11 +107,11 @@ html[data-theme][data-palette] body #appMain #otherView .settings-segments {
   width:100%; height:44px; padding:0; gap:0; background:transparent; border:0; box-shadow:none;
 }
 html[data-theme][data-palette] body #appMain #otherView .settings-segments::before {
-  content:""; position:absolute; inset:6px 0; border-radius:8px; background:var(--surface-control); pointer-events:none;
+  content:""; position:absolute; inset:6px 0; border-radius:var(--radius-control); background:var(--surface-control); pointer-events:none;
 }
 html[data-theme][data-palette] body #appMain #otherView .settings-segments .segmented-highlight {
   position:absolute; left:2px; top:8px; bottom:8px; height:auto; width:calc((100% - 4px)/3); margin:0;
-  border-radius:6px; background:var(--accent); border:1px solid var(--accent); box-shadow:none;
+  border-radius:var(--radius-control); background:var(--accent); border:1px solid var(--accent); box-shadow:none;
   transform:translateX(calc(var(--selected-segment,0)*100%)); pointer-events:none;
   transition:transform 220ms cubic-bezier(.2,.8,.2,1),background-color 180ms ease;
 }

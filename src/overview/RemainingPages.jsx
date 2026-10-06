@@ -15,7 +15,7 @@ function PreservedPage({ view, title }) {
   }, [view]);
   return createPortal(<div id={`${view}-react`} className="pilot-preserved-page">
     <Page name={view}>
-      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.1</span></h1>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.2</span></h1>
       {title ? <h2 className="pilot-page-title">{title}</h2> : null}
       <div ref={content} className="pilot-preserved-content" />
     </Page>
@@ -24,16 +24,18 @@ function PreservedPage({ view, title }) {
 
 export function PortfolioShell({ state }) {
   const label = state.private ? 'Portföy rakamlarını göster' : 'Portföy rakamlarını gizle';
+  const privacyButton = (id, active = false) => <Button id={id} type="button" className="portfolio-privacy-toggle pilot-privacy" aria-label={active ? `Aktif ${label.toLocaleLowerCase('tr-TR')}` : label} title={active ? `Aktif ${label.toLocaleLowerCase('tr-TR')}` : label} aria-pressed={state.private} onClick={() => overview.portfolioAction('portfolioPrivacyToggle')}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c2.5-4 5.8-6 10-6s7.5 2 10 6c-2.5 4-5.8 6-10 6S4.5 16 2 12Z" /><circle cx="12" cy="12" r="2.6" />{state.private ? <path d="m3 3 18 18" /> : null}</svg>
+  </Button>;
   return <>
     <PreservedPage view="portfolio" />
     {createPortal(<>
       <Segmented className="portfolio-metric-mode pilot-portfolio-modes" role="group" aria-label="Portföy kâr zarar dönemi">
         {[['today', 'Bugün', 'portfolioTodayMode'], ['total', 'Toplam', 'portfolioTotalMode']].map(([mode, text, id]) => <Button type="button" key={mode} id={`pilot-${id}`} className={state.mode === mode ? 'is-active' : ''} aria-pressed={state.mode === mode} onClick={() => overview.portfolioAction(id)}>{text}</Button>)}
       </Segmented>
-      <Button id="pilot-portfolioPrivacyToggle" type="button" className="portfolio-privacy-toggle pilot-privacy" aria-label={label} title={label} aria-pressed={state.private} onClick={() => overview.portfolioAction('portfolioPrivacyToggle')}>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c2.5-4 5.8-6 10-6s7.5 2 10 6c-2.5 4-5.8 6-10 6S4.5 16 2 12Z" /><circle cx="12" cy="12" r="2.6" />{state.private ? <path d="m3 3 18 18" /> : null}</svg>
-      </Button>
+      {privacyButton('pilot-portfolioPrivacyToggle')}
     </>, document.querySelector('#allPortfolioHead .portfolio-view-toolbar'))}
+    {createPortal(privacyButton('pilot-activePortfolioPrivacyToggle', true), document.querySelector('.native-selector-card .portfolio-switcher-actions'))}
   </>;
 }
 

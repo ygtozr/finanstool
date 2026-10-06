@@ -22,7 +22,7 @@ export function ChartShell({ chart }) {
   }, []);
   return createPortal(<div id="chart-react" ref={host}>
     <Page name="chart" className="pilot-chart-page">
-      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.1</span></h1>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.2</span></h1>
       <h2 id="pilotChartTitle">Grafik Ve Teknik Analiz</h2>
       <AssetSearch kind="chart" onAdd={overview.chartSelect} chartState={chart} />
       <div className="toolbar pilot-chart-toolbar" role="group" aria-label="Grafik işlemleri">

@@ -1,4 +1,40 @@
-# Özer Finans v9.0.1
+# Özer Finans v9.0.2
+
+## v9.0.2 — Onaylı kalıcı sürüm
+
+Kullanıcı v9.0.2-preview.5 görünümünü kalıcı yayın için onayladı. Kontroller 9 px köşe ve sabit yükseklik kullanır; Aktif Portföy ikonları 40×44 px hedef içinde eş 32 px yüzey ve 8 px aralık kullanır. Para birimi tuşları kompaktlaşır, iki gizlilik tuşu eşleşir, hisse ayrıntısı eylemleri 38 px görünen yüzey ve tema vurgu rengi kullanır. Uzun portföy adları sabit kutuda kısalır; tam ad seçim alanı/araç ipucu/erişilebilir adda korunur. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok.
+
+Güncel kaynak main ve v9.0.2 etiketi; kalıcı adres https://finanstool.vercel.app. Önceki v9.0.1, özgün etiketi ve archive/v9.0.1 dalında korunur. Kullanılmayan 37 tarihsel ön izleme/tasarım dosyası, boş requirements.txt ve kullanılmayan assets/gold-icon-options.png güncel daldan kaldırılır; Git geçmişi ve önceki sürüm arşivi korunur. Yaklaşık 7,2 MB kaynak kalıntısı temizlenir. Yayın iş akışı RELEASE_NOTES_v9.0.2.md ile GitHub Release kaydı oluşturur. Aşağıdaki preview ve eski sürüm notları tarihsel kayıttır.
+
+Build, genel regresyon ve tam pilot tarayıcı akışı yayın öncesinde kontrol edilir; dört genişlik, iki tema, üç yazı boyutu, yakın ikon tıklanabilirliği, para birimi/gizlilik, hisse eylemleri, navigasyon/katmanlar ve PWA safe-area kapsanır. Sentetik test fiziksel iPhone/canlı sağlayıcı kabulü değildir.
+
+## v9.0.2-preview.5 — Daha yakın Aktif Portföy ikonları
+
+Yalnız Aktif Portföy başlığındaki dört ikonun yatay hedefi 40 px olur; yükseklik 44 px ve görünen yüzey 32 px kalır. Yüzey aralığı 12 yerine 8 px olur, hedefler çakışmaz. Hedefli Chromium kontrolü dört genişlik/iki temada ölçü ve gerçek elementFromPoint tıklanabilirliğini doğrular. Finans/veri sistemi değişmez; yeni dependency yok. Yalnız preview; main/production v9.0.1 korunur.
+
+## v9.0.2-preview.4 — Yakın ikonlar ve kompakt eylem yüzeyleri
+
+Aktif Portföy başlığındaki ikon hedefleri arasındaki ek boşluk kaldırılır; eş 32 px yüzeyler 44 px dokunma alanı içinde kalır. Toplam ve seçili portföy para birimi tuşları da aynı 32 px yumuşak kare yüzeye ve 18 px simgeye geçer; mevcut para birimi davranışı korunur. Hisse ayrıntısındaki üç eylemin görünen yüksekliği 44 yerine 38 px olur; 44 px hedef ve tema vurgu rengi korunur.
+
+Hedefli kontrol dört genişlik/iki tema, ikon ölçüleri ve aralığı, para birimi tuşları, 38 px eylem yüzeyi ve beş vurgu rengini kapsar. Yeni dependency yok; finans/API/veri formatları değişmez. Yalnız fix/v9.0.2-compact-controls ön izlemesi; main/production v9.0.1 korunur. Sentetik Chromium kontrolü canlı sağlayıcı/fiziksel iPhone doğrulaması değildir.
+
+## v9.0.2-preview.3 — Sabit ölçüler ve yumuşak kare kontroller
+
+Kontroller ortak 9 px köşe kullanır; eylem ve seçim yüksekliği 44 px ile sabitlenir. Portföy seçimleri her genişlikte eş sütunlara yerleşir; uzun ad ellipsis kullanır, tam ad seçim alanında ve mevcut araç ipucu/erişilebilir ad içinde korunur. Aktif Portföy yanındaki oluştur/adlandır/sil/gizle tuşları ve Toplam yanındaki göz 44 px hedef içinde eş 32 px yumuşak kare yüzey kullanır. Silme rengi, tema vurgu renkleri ve mevcut gizlilik tercihi korunur.
+
+Hedefli kontrol dört genişlik, iki tema ve üç yazı boyutunda sabit/eş ölçüleri, taşmayı ve gizlilik eşleşmesini kapsar. Yeni dependency yok; finans/API/veri formatları değişmez. Yalnız fix/v9.0.2-compact-controls ön izlemesi; main/production v9.0.1 korunur. Sentetik Chromium kontrolü canlı sağlayıcı/fiziksel iPhone doğrulaması değildir.
+
+## v9.0.2-preview.2 — Yuvarlak düğmeler ve eş gizlilik kontrolleri
+
+Ayarlar ve diğer eylem/seçim düğmeleri ortak yuvarlak köşe kullanır; kart ve liste satırlarının geometrisi korunur. Toplam yanındaki göz tuşu 44 px dokunma alanı içinde 32 px dairesel yüzey kullanır. Aktif Portföy başlığına aynı tuş eklenir; ikisi mevcut gizlilik tercihini birlikte değiştirir. Hisse ayrıntısındaki alt eylemler ve normal sheet eylemleri seçili vurgu rengine uyar; silme rengi korunur.
+
+Hedefli tarayıcı kontrolü 375/390/430/1024 px açık/koyu görünüm, iki gizlilik tuşunun eşleşmesi, yuvarlak ayar seçimleri ve beş vurgu rengini kapsar. Finans, veri ve kullanıcı formatları değişmez; yeni dependency yok. Yalnız fix/v9.0.2-compact-controls ön izlemesi; main/production v9.0.1 korunur. Sentetik testler canlı sağlayıcı ve fiziksel iPhone doğrulaması değildir.
+
+## v9.0.2-preview.1 — Kompakt kontrol yüzeyleri ve tam metin
+
+Bugün/Toplam, portföy kısayolları, dönem/kıyas ve varlık seçicileri 44 px dokunma alanı içinde yaklaşık 32 px kompakt yüzey kullanır. Uzun ad gerektiğinde kontrolü büyütür; portföy adları ellipsis yerine satıra bölünür. Kontrol yazısı kullanıcının boyut tercihine bağlı olarak bir piksel küçülür; padding ve yazı ağırlığı sadeleşir. Eylem düğmelerinde uzun metin satıra sığar. Renkler, seçili vurgu ve klavye odağı korunur. Ayarlardaki kompakt segmented seçimler ve alt navigasyon kendi yüzeylerini korur.
+
+Hedefli kontrol testi gerçek portföy adlandırmasıyla uzun ad, üç yazı boyutu, 375/390/430/1024 px açık/koyu görünüm, metin taşması ve 44 px dokunma alanını doğrular. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok. Yalnız fix/v9.0.2-compact-controls ön izlemesi; main/production v9.0.1 korunur. Sentetik tarayıcı testi fiziksel iPhone/canlı servis kabulü değildir.
 
 ## v9.0.1 — Onaylı kalıcı sürüm
 
