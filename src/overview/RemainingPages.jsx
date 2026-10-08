@@ -15,7 +15,7 @@ function PreservedPage({ view, title }) {
   }, [view]);
   return createPortal(<div id={`${view}-react`} className="pilot-preserved-page">
     <Page name={view}>
-      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.2</span></h1>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.1.0-preview.1</span></h1>
       {title ? <h2 className="pilot-page-title">{title}</h2> : null}
       <div ref={content} className="pilot-preserved-content" />
     </Page>

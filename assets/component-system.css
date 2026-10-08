@@ -154,3 +154,29 @@ html[data-theme][data-palette] body #appMain .native-selector-card .portfolio-sw
 html[data-theme][data-palette] body #appMain .portfolio-currency-toggle { font-size:18px; line-height:1; }
 html[data-theme][data-palette] body #favoriteDetailDialog .favorite-detail-actions button { position:relative; isolation:isolate; background:transparent; border-color:transparent; }
 html[data-theme][data-palette] body #favoriteDetailDialog .favorite-detail-actions button::before { content:""; position:absolute; inset:2px 0; z-index:-1; pointer-events:none; border-radius:var(--radius-control); background:var(--accent); }
+
+/* Opt-in iOS surface: existing material and colour choices remain available. */
+html[data-look="ios"] { --radius-card:14px; --radius-row:12px; --shadow-menu:0 6px 20px #00000018; }
+html[data-theme][data-palette][data-look="ios"] body :is(.portfolio-row,.settings-card,.native-surface,.favorite-card,.portfolio-summary-card,.portfolio-overall-head) { background:var(--surface-card); border-color:color-mix(in srgb,var(--line) 65%,transparent); box-shadow:none; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-overall-heading h2 { max-width:none; font-size:17px; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-head-value { font-size:clamp(25px,6vw,32px); letter-spacing:-.5px; line-height:1.2; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-daily-change { font-weight:600; }
+html[data-theme][data-palette][data-look="ios"] body .native-positions-card { padding:0; border:0; background:transparent; }
+html[data-theme][data-palette][data-look="ios"] body .native-positions-card .portfolio-positions-title { margin:4px 2px 12px; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-row { padding:12px; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-row-head { align-items:center; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-row-logo { border-radius:10px; }
+html[data-theme][data-palette][data-look="ios"] body :is(.portfolio-row-title small,.portfolio-compact-detail) { color:var(--muted); }
+.portfolio-ios-actions { display:none; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-ios-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:6px; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-ios-actions button { position:relative; isolation:isolate; height:44px; padding:3px 6px; min-width:0; border:0; background:transparent; color:var(--accent-ink); font-size:calc(var(--font-control) - 1px); font-weight:600; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-ios-actions button::before { content:""; position:absolute; inset:4px 0; z-index:-1; border-radius:var(--radius-control); background:color-mix(in srgb,var(--accent) 9%,var(--surface-card)); border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line)); pointer-events:none; }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-ios-actions button:first-child { color:var(--on-accent); }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-ios-actions button:first-child::before { background:var(--accent); border-color:var(--accent); }
+html[data-theme][data-palette][data-look="ios"] body .portfolio-ios-actions button:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+html[data-theme][data-palette][data-look="ios"] body #favoriteDetailDialog .favorite-detail-actions button:not(:first-child) { color:var(--accent-ink); }
+html[data-theme][data-palette][data-look="ios"] body #favoriteDetailDialog .favorite-detail-actions button:not(:first-child)::before { background:color-mix(in srgb,var(--accent) 9%,var(--surface-card)); border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line)); }
+html[data-theme][data-palette][data-look="ios"] body :is(.desktop-sidebar,.appearance-menu,.search-suggestions,.favorite-quick-menu) { background:var(--surface-card); }
+html[data-theme][data-palette][data-look="ios"] body :is(.desktop-nav-link.active,.app-tabs button.active) { color:var(--accent-ink); background:color-mix(in srgb,var(--accent) 12%,var(--surface-card)); }
+
+html[data-theme][data-palette][data-look="ios"] body #appMain .native-selector-card .portfolio-switcher select { background:var(--surface-control); }

@@ -1,5 +1,13 @@
 # Özer Finans v9.0.2
 
+## v9.1.0-preview.1 — Safir ve iOS Sade tasarımı
+
+Kullanıcının seçtiği görsel konsept uygulanır: açık gri/beyaz ve koyu lacivert yüzeyler, 14 px kart köşesi, ince sınırlar, kısa düğmeler ve vurgu renkli sabit alt menü. Safir açık temada #245FD1, koyuda #82ACFF kullanır. Yeni iOS Sade seçeneği eski materyallerin yanında bulunur; yeni kurulum varsayılanı Safir/iOS Sade olur. Kayıtlı tercihler değiştirilmez. ?appearancePreview=ios-safir bağlantısı kayıtlı görünümü yazmadan tasarımı gösterir; ayarlardan yapılan açık seçim normal şekilde kaydedilir.
+
+Portföy kartlarına Grafik/Alarm/Ekle kısayolları eklenir; mevcut işlevlere yönlenir, finans hesaplama ve veri akışı yeniden yazılmaz. Kayıttan ve canlı veriden oluşturulan kartlar aynı tekil UI yardımcısını kullanır. API/cache/batch/auth/Upstash, kullanıcı ve yedek formatları korunur; yeni dependency yok. CSS/JS cache sürümleri güncellenir.
+
+Yalnız design/v9.1.0-ios-sapphire dalı ve ön izleme; main/production v9.0.2 korunur. Hedefli test dört genişlik/iki tema, renk ve geometri, gerçek tıklanabilirlik, kayıtlı tercihin korunması ve üç işlem devrini kapsar. Aşama sonunda mevcut tam tarayıcı regresyonu çalıştırılır. Sentetik testler canlı sağlayıcı/fiziksel iPhone kabulü değildir.
+
 ## v9.0.2 — Onaylı kalıcı sürüm
 
 Kullanıcı v9.0.2-preview.5 görünümünü kalıcı yayın için onayladı. Kontroller 9 px köşe ve sabit yükseklik kullanır; Aktif Portföy ikonları 40×44 px hedef içinde eş 32 px yüzey ve 8 px aralık kullanır. Para birimi tuşları kompaktlaşır, iki gizlilik tuşu eşleşir, hisse ayrıntısı eylemleri 38 px görünen yüzey ve tema vurgu rengi kullanır. Uzun portföy adları sabit kutuda kısalır; tam ad seçim alanı/araç ipucu/erişilebilir adda korunur. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok.
