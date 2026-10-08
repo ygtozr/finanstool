@@ -142,3 +142,9 @@ html[data-overview-pilot] dialog.portfolio-dialog:not(.favorite-detail-dialog) {
   html[data-overview-pilot] dialog.portfolio-dialog:not(.favorite-detail-dialog) { padding-bottom:calc(20px + env(safe-area-inset-bottom,0px)); }
 }
 @media(prefers-reduced-motion:reduce) { .pilot-preserved-page * { transition:none !important; animation:none !important; } }
+
+html[data-look="ios"] #pilot-navigation .pilot-tabbar { background:var(--surface-card); border-top:1px solid var(--line); box-shadow:none; }
+html[data-look="ios"] #pilot-navigation .pilot-tabbar button { color:var(--muted); background:transparent; font-weight:500; }
+html[data-look="ios"] #pilot-navigation .pilot-tabbar button.is-active { color:var(--accent-ink); background:color-mix(in srgb,var(--accent) 12%,var(--surface-card)); }
+html[data-look="ios"] #pilot-navigation .pilot-tabbar button svg { width:22px; height:22px; stroke-width:1.6; }
+html[data-look="ios"] :is(.pilot-action-sheet,.pilot-market-popup,.pilot-search-popup,.portfolio-dialog) { background:var(--surface-card); }
