@@ -1,5 +1,11 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
+## v9.0.3-preview.1 — Siyah Beyaz renk ön izlemesi
+
+Canlı v9.0.2 temelinden ayrı design/v9.0.3-monochrome dalı. Reddedilen Safir/iOS Sade tasarımı dahil edilmez. Görünüm > Vurgu rengi altında Siyah Beyaz eklenir; açık temada koyu, koyu temada beyaz vurgu ve nötr gri yüzeyler kullanılır. Pozitif/negatif ve uyarı renkleri anlamlarını korur. Düzen, düğme boyutları, mevcut yüzey stilleri ve eski varsayılan değişmez.
+
+?appearancePreview=monochrome kayıtlı tercihi değiştirmeden yeni paleti açar; açık seçim normal şekilde kaydedilir. Kullanıcı/portföy/yedek, finans, API/cache/batch/auth/Upstash korunur; yeni dependency yok. Yalnız preview, production değişmez. Hedefli dört genişlik/iki tema kontrolü ve regresyon; sentetik test canlı sağlayıcı veya fiziksel iPhone doğrulaması değildir.
+
 ## v9.0.2 — Onaylı kalıcı sürüm
 
 Kullanıcı v9.0.2-preview.5 görünümünü kalıcı yayın için onayladı. Kontroller 9 px köşe ve sabit yükseklik kullanır; Aktif Portföy ikonları 40×44 px hedef içinde eş 32 px yüzey ve 8 px aralık kullanır. Para birimi tuşları kompaktlaşır, iki gizlilik tuşu eşleşir, hisse ayrıntısı eylemleri 38 px görünen yüzey ve tema vurgu rengi kullanır. Uzun portföy adları sabit kutuda kısalır; tam ad seçim alanı/araç ipucu/erişilebilir adda korunur. Finans/API/cache/batch/auth/Upstash ve kullanıcı/yedek formatları değişmez; yeni dependency yok.
