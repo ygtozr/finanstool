@@ -1,5 +1,13 @@
 # Özer Finans — Yeni sohbet devir notları
 
+## v9.0.3 — Onaylı kalıcı sürüm
+
+Kullanıcı Siyah Beyaz renk seçeneğinin kalıcı yayınını onayladı. v9.0.2 görünümü ve varsayılan tercihleri korunur; Görünüm > Vurgu rengi menüsüne Siyah Beyaz eklenir. Açık temada siyah, koyu temada beyaz vurgu ve nötr gri yüzeyler; finansal pozitif/negatif/uyarı renkleri anlamlarını korur. Reddedilen Safir/iOS Sade tasarımı bu sürümde yoktur. Yeni dependency veya finans/API/cache/batch/auth/Upstash/kullanıcı/yedek kontratı değişikliği yoktur.
+
+Güncel kaynak main ve v9.0.3 etiketi; kalıcı adres https://finanstool.vercel.app. Önceki sürüm özgün v9.0.2 etiketi ve archive/v9.0.2 dalında korunur. Yayın iş akışı RELEASE_NOTES_v9.0.3.md ile GitHub Release oluşturur. Aşağıdaki preview notları tarihsel kayıttır.
+
+Onaylanan preview üzerinde build, finans regresyonu ve tam tarayıcı regresyonu geçti: 375/390/430/1024, açık/koyu, kontrast, Özet/Portföy/Ayarlar, tercihler/veri koruma, gezinme/katmanlar ve PWA safe-area. Kalıcı sürümde yalnız sürüm/cache numaraları, yayın notları ve release iş akışı güncellenir; build/finans regresyonu ve hedefli renk testi yeniden doğrulanır. Sentetik test canlı sağlayıcı veya fiziksel iPhone kabulü değildir.
+
 ## v9.0.3-preview.1 — Siyah Beyaz renk ön izlemesi
 
 Canlı v9.0.2 temelinden ayrı design/v9.0.3-monochrome dalı. Reddedilen Safir/iOS Sade tasarımı dahil edilmez. Görünüm > Vurgu rengi altında Siyah Beyaz eklenir; açık temada koyu, koyu temada beyaz vurgu ve nötr gri yüzeyler kullanılır. Pozitif/negatif ve uyarı renkleri anlamlarını korur. Düzen, düğme boyutları, mevcut yüzey stilleri ve eski varsayılan değişmez.
