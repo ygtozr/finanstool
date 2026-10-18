@@ -1,5 +1,13 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
+## v9.0.4-preview.1 — Kazanç dağılımı
+
+Canlı v9.0.3 temelinden ayrı feature/v9.0.4-gain-breakdown dalı. Aktif portföy özetinin altına açılır Kazanç dağılımı eklenir. Bugün/Toplam seçimi ve özetin para birimi kullanılır; varlıklar mutlak katkı tutarına göre sıralanır, pozitif/negatif çubuklar ortak sıfır çizgisi etrafında gösterilir. İlk beş satırdan sonrası Tümünü göster ile açılır. Günlük nakit kur etkisi dahildir; toplam görünümü mevcut açık pozisyonların maliyete göre kâr/zararını gösterir, kapatılan işlemler için gerçekleşmiş getiri iddiası yoktur.
+
+Mevcut renderPortfolio sonuçlarından salt okunur UI izdüşümü alınır. Ek fiyat/kur isteği, dependency, kalıcı kullanıcı alanı, snapshot/yedek formatı veya finans/API/cache/batch/auth/Upstash değişikliği yoktur. Gizlilik tutarları/çubukları erişilebilir DOM'dan kaldırır. Yükleme, boş portföy, eksik veri ve portföy değişiminde eski sıralama temizlenir; eksik fiyat sıfır kazanç gibi gösterilmez. assets/gain-breakdown.js yalnız sunumu yönetir.
+
+Yalnız ön izleme; main ve production v9.0.3 korunur. Hedefli test: günlük/toplam katkıların mevcut özetle yuvarlama sınırında eşleşmesi, karma para birimi ve nakit, gizlilik, boş/hata/toparlanma, portföy değişimi, genişletme, 375/390/430/1024 açık/koyu. Aşama sonunda build, finans regresyonu ve tam tarayıcı regresyonu çalıştırılır; sentetik test canlı sağlayıcı veya fiziksel iPhone kabulü değildir.
+
 ## v9.0.3 — Onaylı kalıcı sürüm
 
 Kullanıcı Siyah Beyaz renk seçeneğinin kalıcı yayınını onayladı. v9.0.2 görünümü ve varsayılan tercihleri korunur; Görünüm > Vurgu rengi menüsüne Siyah Beyaz eklenir. Açık temada siyah, koyu temada beyaz vurgu ve nötr gri yüzeyler; finansal pozitif/negatif/uyarı renkleri anlamlarını korur. Reddedilen Safir/iOS Sade tasarımı bu sürümde yoktur. Yeni dependency veya finans/API/cache/batch/auth/Upstash/kullanıcı/yedek kontratı değişikliği yoktur.

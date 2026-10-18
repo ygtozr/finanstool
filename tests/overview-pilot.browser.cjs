@@ -506,6 +506,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await require('./audit-fixes.browser.cjs')({browser,seed,routeHandler,output});
  await require('./control-consistency.browser.cjs')({browser,seed,routeHandler,output});
  await require('./monochrome.browser.cjs')({browser,seed,routeHandler,output});
+ await require('./gain-breakdown.browser.cjs')({browser,seed,routeHandler,output});
  assert.deepEqual(errors,[],'No console or runtime errors');
  await require('./mobile-navigation.browser.cjs')({browser,seed,routeHandler});
  await require('./layer-audit.browser.cjs')({browser,seed,routeHandler});
