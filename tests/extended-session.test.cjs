@@ -1,0 +1,41 @@
+const assert=require('node:assert/strict');
+const {activeSession,freshSession,fromChart,fetchExtended}=require('../lib/extended-session');
+const day=Date.UTC(2026,9,21)/1000,now=day+21*3600;
+const periods={pre:{start:day+8*3600,end:day+13.5*3600},regular:{start:day+13.5*3600,end:day+20*3600},post:{start:day+20*3600,end:day+24*3600}};
+const meta={exchangeName:'NMS',instrumentType:'EQUITY',currency:'USD',currentTradingPeriod:periods};
+const payload={chart:{result:[{meta,timestamp:[now-300,now-60,now+300],indicators:{quote:[{close:[147,147.1,999]}]}}]}};
+const regular={price:145.3,asOf:periods.regular.end-60,stale:false};
+(async()=>{
+ const post=fromChart(payload,regular,now);assert.equal(post.state,'post');assert.equal(post.price,147.1);assert.equal(post.regularPrice,145.3);assert.equal(post.delayed,true);
+ assert.equal(fromChart(payload,regular,now+1300),null,'Old bars do not masquerade as fresh prices');
+ assert.equal(freshSession(post,periods.post.end),null,'Closed session expires');
+ assert.equal(activeSession(meta,day+15*3600),null,'Regular trading does not fetch extended data');
+ assert.equal(activeSession({...meta,exchangeName:'IST'},now),null,'BIST is not a US extended session');
+ assert.equal(activeSession({...meta,instrumentType:'CRYPTOCURRENCY'},now),null);
+ assert.equal(fromChart(payload,{...regular,price:0},now),null);assert.equal(fromChart(payload,{...regular,stale:true},now),null);
+ assert.equal(fromChart(payload,{...regular,asOf:day-86400},now),null,'Yesterday’s regular price cannot anchor today’s post-market');
+ const preNow=day+10*3600,prePayload=structuredClone(payload);prePayload.chart.result[0].timestamp=[preNow-60];prePayload.chart.result[0].indicators.quote[0].close=[144];
+ const pre=fromChart(prePayload,{price:145.3,asOf:day-4*3600-60},preNow);assert.equal(pre.state,'pre');assert.equal(pre.price,144);
+ let calls=0;const fetcher=async()=>{calls++;return{ok:true,json:async()=>payload}};
+ assert.equal((await fetchExtended('NVDA',meta,regular,{fetcher,now})).price,147.1);assert.equal(calls,1);
+ assert.equal(await fetchExtended('NVDA',meta,regular,{fetcher,now:day+15*3600}),null);assert.equal(calls,1,'No additional request during regular hours');
+ assert.equal(await fetchExtended('NVDA',meta,regular,{fetcher:async()=>{throw Error('offline')},now}),null,'Optional provider failure does not break normal quote');
+ assert.equal(await fetchExtended('NVDA',meta,regular,{fetcher:async()=>({ok:false}),now}),null);
+ // Exercise the actual compact endpoint path with isolated providers/cache.
+ const liveNow=Math.floor(Date.now()/1000),apiMeta={...meta,regularMarketTime:liveNow-3600,currentTradingPeriod:{pre:{start:liveNow-30000,end:liveNow-24000},regular:{start:liveNow-24000,end:liveNow-3500},post:{start:liveNow-3500,end:liveNow+3600}}};
+ const normalPayload={chart:{result:[{meta:apiMeta,timestamp:[liveNow-86400,liveNow-3600],indicators:{quote:[{close:[144.1,145.3]}]}}]}};
+ const extendedPayload={chart:{result:[{meta:apiMeta,timestamp:[liveNow-60],indicators:{quote:[{close:[147.1]}]}}]}};
+ let offline=false;
+ const handler=(req,res)=>res.status(200).json(normalPayload);
+ const sandbox={module:{exports:{}},console,Date,Map,Set,Promise,URLSearchParams,AbortSignal,setTimeout,clearTimeout,require:name=>{
+  if(name==='@vercel/functions')return{getCache:()=>({get:async()=>null,set:async()=>{}})};
+  if(name==='../lib/extended-session')return{freshSession,fetchExtended:(s,m,r)=>fetchExtended(s,m,r,{fetcher:async()=>{if(offline)throw Error('offline');return{ok:true,json:async()=>extendedPayload}}})};
+  return handler;
+ }};
+ require('node:vm').runInNewContext(require('node:fs').readFileSync(require('node:path').join(__dirname,'../api/prices.js'),'utf8'),sandbox);
+ const batch=sandbox.module.exports._test.resolveCompactBatch;
+ const first=(await batch(['NVDA'],{headers:{}},{force:true})).get('NVDA');
+ assert.equal(first.price,145.3);assert(Math.abs(first.delta-1.2)<1e-8);assert.equal(first.extendedSession.price,147.1,'Compact API carries a separate optional extended quote');
+ offline=true;const second=(await batch(['NVDA'],{headers:{}},{force:true})).get('NVDA');assert.equal(second.price,145.3);assert.equal(second.extendedSession,null,'Extended-provider outage preserves the normal quote');
+ console.log('PASS: extended-session provider selection, pre/post boundaries, regular-price anchor, future/stale guards and graceful failure');
+})().catch(error=>{console.error(error);process.exitCode=1});

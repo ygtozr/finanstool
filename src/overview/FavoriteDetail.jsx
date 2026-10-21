@@ -1,3 +1,4 @@
+import { SessionQuote } from './SessionQuote';
 import React, { useEffect, useLayoutEffect, useState, useSyncExternalStore } from 'react';
 import { overview } from './legacy-adapter';
 
@@ -31,6 +32,7 @@ export function FavoriteDetail() {
           <div className="favorite-detail-price"><strong>{detail.price}</strong><span className={`favorite-detail-change ${detail.tone}`}>{detail.change}</span></div>
           <small className="favorite-detail-time">{detail.time}</small>
           <small className="favorite-detail-time">{detail.priceSource}</small>
+          <SessionQuote session={detail.extendedSession} />
         </section>
         <section className="favorite-detail-metrics-card"><h3>Temel Bilgiler</h3>
           <dl className="favorite-detail-metrics">{detail.metrics.map(([label, value]) => <div className="favorite-detail-metric" key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>

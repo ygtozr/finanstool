@@ -1,4 +1,5 @@
 const priceHandler=require('./price');
+const {fetchExtended,freshSession}=require('../lib/extended-session');
 const quoteHandler=require('./quote');
 const goldHandler=require('./gold');
 const tefasHandler=require('./tefas');
@@ -58,7 +59,7 @@ async function resolveSymbol(symbol,query,req){
 function number(value){const parsed=Number(value);return Number.isFinite(parsed)?parsed:null}
 function normalizeCompactData(data){
   const timestamp=number(data?.marketTimestamp??data?.asOf),marketTimestamp=Number.isFinite(timestamp)&&timestamp>0?timestamp:null;
-  return{...data,asOf:marketTimestamp,marketTimestamp};
+  return{...data,asOf:marketTimestamp,marketTimestamp,extendedSession:data?.stale?null:freshSession(data?.extendedSession)};
 }
 function forexPair(symbol){
   const aliases={'TRY=X':'USDTRY','EURTRY=X':'EURTRY','GBPTRY=X':'GBPTRY','EURUSD=X':'EURUSD','TRYUSD=X':'TRYUSD'};
@@ -90,7 +91,8 @@ async function resolveCompact(symbol,req){
   const chart=result.data?.chart?.result?.[0],closes=chart?.indicators?.quote?.[0]?.close||[],points=(chart?.timestamp||[]).map((time,index)=>({time:Number(time),price:number(closes[index])})).filter(item=>Number.isFinite(item.time)&&Number.isFinite(item.price)&&item.price>0);
   if(!points.length)throw new Error('Fiyat bulunamadı.');
   const last=points.at(-1),previous=points.at(-2)||last,meta=chart.meta||{};
-  return{symbol,name:meta.longName||meta.shortName||symbol,currency:String(meta.currency||'USD').toUpperCase(),price:last.price,previousClose:previous.price,delta:last.price-previous.price,change:previous.price?(last.price/previous.price-1)*100:null,asOf:number(meta.regularMarketTime)||last.time,provider:meta.dataProvider||result.data?._finansTool?.provider||'',priceType:'compact_chart',delayed:false,stale:Boolean(result.data?._finansTool?.stale)};
+  const extendedSession=await fetchExtended(symbol,meta,{price:last.price,asOf:number(meta.regularMarketTime)||last.time,stale:Boolean(result.data?._finansTool?.stale)});
+  return{extendedSession,symbol,name:meta.longName||meta.shortName||symbol,currency:String(meta.currency||'USD').toUpperCase(),price:last.price,previousClose:previous.price,delta:last.price-previous.price,change:previous.price?(last.price/previous.price-1)*100:null,asOf:number(meta.regularMarketTime)||last.time,provider:meta.dataProvider||result.data?._finansTool?.provider||'',priceType:'compact_chart',delayed:false,stale:Boolean(result.data?._finansTool?.stale)};
 }
 
 function compactTtlSeconds(symbol){
@@ -121,7 +123,7 @@ async function storeCompact(symbol,data){
 
 async function staleCompact(symbol){
   const saved=compactLastGood.get(symbol)||await safeRuntimeGet(compactCacheKey('quote',symbol));
-  return saved?.data?{...normalizeCompactData(saved.data),stale:true,cacheStatus:'stale'}:null;
+  return saved?.data?{...normalizeCompactData(saved.data),stale:true,extendedSession:null,cacheStatus:'stale'}:null;
 }
 
 function compactRequest(symbol,resolver){

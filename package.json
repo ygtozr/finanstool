@@ -1,9 +1,9 @@
 {
   "name": "ozer-finans",
   "private": true,
-  "version": "9.0.4-preview.1",
+  "version": "9.0.4",
   "scripts": {
-    "test": "node tests/regression.test.js",
+    "test": "node tests/regression.test.js && node tests/extended-session.test.cjs",
     "build": "node scripts/build-overview.mjs",
     "test:overview": "node tests/overview-pilot.browser.cjs"
   },

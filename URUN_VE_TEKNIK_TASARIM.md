@@ -1,5 +1,15 @@
 # Özer Finans — Ürün ve Teknik Tasarım Belgesi
 
+## v9.0.4 — Onaylı kazanç dağılımı ve seans dışı fiyat satırı
+
+Kullanıcı kazanç dağılımı ile mevcut favori kartı tasarımını koruyan seans öncesi/sonrası satırının uygulanmasını ve kalıcı yayınını açıkça onayladı. Aşağıdaki bekletme notu tarihsel kayıttır. Aktif portföyde Kazanç dağılımı, Bugün/Toplam, ortak para birimi, gizlilik ve eksik veri korumasıyla yayınlanır.
+
+Desteklenen ABD hisse/ETF için aktif pre/post döneminde Yahoo 5 dk bar verisi ayrı extendedSession alanıyla compact yanıta eklenir. Normal fiyat, değişim, portföy ve alarm girdileri değiştirilmez. Normal seans sırasında veya desteklenmeyen borsada ek istek yoktur; aktif seans başına sembol başına bir isteğin 2,5 sn zaman sınırı vardır. Mevcut TTL/batch/cache namespace, auth/Upstash ve kullanıcı/yedek şemaları korunur. Sağlayıcı hatasında alan boş kalır. Yeni dependency yoktur.
+
+Geçerli dönem, normal kapanış referansı, pozitif fiyat, zaman ve 15 dk tazelik doğrulanır; gelecek, eski, önceki günün yanlış referansı ve stale veri elenir. Kart ve ayrıntıda küçük ek satır, Türkçe yüzde ve ET saati gösterilir; istemci zamanlayıcısı seans bitince/veri eskidiğinde satırı kaldırır. Favori kartının mevcut ilk satırı ve iki eylemi korunur. 5 dk bar gerçek zaman garantisi değildir. Çalışma ortamından gerçek Yahoo/Vercel API yanıtına erişim doğrulanamadı; sentetik sağlayıcı ve tarayıcı testleri bu sınırı kaldırmaz.
+
+Önceki v9.0.3 özgün etiketi ve archive/v9.0.3 dalıyla korunur; güncel sürüm main/v9.0.4 ve https://finanstool.vercel.app. RELEASE_NOTES_v9.0.4.md yayın iş akışıyla GitHub Release oluşturur. Build, finans/sağlayıcı birim testleri ve tam tarayıcı regresyonu; dört genişlik/iki tema, seans öncesi/sonrası/eskime ve eski normal fiyat, kazanç dağılımı, veri koruma, navigasyon/katmanlar ve PWA safe-area kontrol edilir. Fiziksel iPhone ve canlı sağlayıcı kabulü değildir.
+
 ## v9.0.4-preview.1 — Kazanç dağılımı
 
 Canlı v9.0.3 temelinden ayrı feature/v9.0.4-gain-breakdown dalı. Aktif portföy özetinin altına açılır Kazanç dağılımı eklenir. Bugün/Toplam seçimi ve özetin para birimi kullanılır; varlıklar mutlak katkı tutarına göre sıralanır, pozitif/negatif çubuklar ortak sıfır çizgisi etrafında gösterilir. İlk beş satırdan sonrası Tümünü göster ile açılır. Günlük nakit kur etkisi dahildir; toplam görünümü mevcut açık pozisyonların maliyete göre kâr/zararını gösterir, kapatılan işlemler için gerçekleşmiş getiri iddiası yoktur.
