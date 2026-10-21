@@ -1,3 +1,4 @@
+import { SessionQuote } from './SessionQuote';
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createPortal } from 'react-dom';
@@ -52,6 +53,7 @@ export function FavoriteRow({ item, openActions, order, actionsOpen }) {
       <span className="favorite-card-badge"><span>{item.badge}</span>{item.logoSources[logoSource] ? <img className={item.logoClass} src={item.logoSources[logoSource]} alt="" referrerPolicy="no-referrer" decoding="async" onError={() => setLogoSource(index => index + 1)} /> : null}</span>
       <span className="favorite-card-head"><strong className="favorite-card-symbol">{item.displaySymbol}</strong><small className="favorite-card-name">{item.name}</small></span>
       <span className="favorite-card-quote pilot-quote"><strong className="favorite-card-price">{item.price}</strong><span className={`favorite-change ${item.tone}`}>{item.change}</span><small className="favorite-market-time">{item.time}</small></span>
+      <SessionQuote session={item.extendedSession} />
     </button>
     <div className="favorite-actions"><button type="button" className="favorite-menu-trigger" aria-label={`${item.displaySymbol} işlemleri`} aria-haspopup="dialog" aria-expanded={actionsOpen} onClick={() => openActions(item)}>⋯</button><button type="button" className="favorite-remove" aria-label={`${item.displaySymbol} favorilerden çıkar`} onClick={() => overview.favorite(item.symbol, 'remove')}>★</button></div>
   </li>;
@@ -110,7 +112,7 @@ function AppShell() {
   return <App theme="ios" name="Özer Finans" className={`pilot-app ${state.theme === 'dark' ? 'dark' : ''}`}
     touch={{ fastClicks: false }} clicks={{ externalLinks: '.external, a[download], #inviteLink' }} view={{ router: false }}>
     <View main router={false}><Page name="overview" className="pilot-page">
-      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.3</span></h1>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.4</span></h1>
       {refreshError ? <ErrorState message={refreshError} retry={refresh} /> : null}
       <div className="app-layout"><section className="chart-panel">
       <Section className="market-summary" title="Piyasa Özeti" note={state.marketUpdated} actions={<div className="market-actions"><button type="button" id="pilotMarketRefresh" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile">{state.busy ? 'Yenileniyor…' : 'Yenile'}</button><button type="button" id="pilotMarketSettings" onClick={() => setSettingsOpen(true)} aria-label="Piyasa özetini düzenle">⚙</button></div>}>
