@@ -1,5 +1,9 @@
 # Özer Finans v9.0.4
 
+## v9.0.5-preview.1 — Tek satırlı seans bilgisi
+
+Kullanıcının istediği görsel düzen: seans etiketi ve ET saati solda, fiyat ve yüzde sağda tek yatay satırda. Mevcut favori kartı ilk satırı ve iki tuşu korunur; ortak bileşen ayrıntıda da tek satırdır. 5 dk bar/gecikme açıklaması araç ipucunda korunur. Veri, hesaplama, API, cache, tazelik ve seans sonu zamanlayıcısı değişmez; yeni dependency yoktur. Yalnız fix/v9.0.5-single-line-session ön izlemesi; main ve canlı v9.0.4 değişmez. Dört genişlik ve açık/koyu, satır geometrisi ve mevcut seans testleri ile aşama sonunda regresyon kontrol edilir.
+
 ## v9.0.4 — Onaylı kazanç dağılımı ve seans dışı fiyat satırı
 
 Kullanıcı kazanç dağılımı ile mevcut favori kartı tasarımını koruyan seans öncesi/sonrası satırının uygulanmasını ve kalıcı yayınını açıkça onayladı. Aşağıdaki bekletme notu tarihsel kayıttır. Aktif portföyde Kazanç dağılımı, Bugün/Toplam, ortak para birimi, gizlilik ve eksik veri korumasıyla yayınlanır.

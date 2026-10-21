@@ -23,6 +23,12 @@ module.exports=async({browser,seed,routeHandler,output})=>{
   for(const width of [375,390,430,1024])for(const theme of ['light','dark']){
    await page.setViewportSize({width,height:844});await page.evaluate(theme=>{OzerAppearance.restore({color:'monokrom',look:'cizgi'},false);OzerOverviewLegacy.theme(theme)},theme);
    await card.scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'No horizontal overflow');
+   const geometry=await card.locator('.favorite-session').evaluate(n=>{
+    const label=n.querySelector('.favorite-session-label'),price=n.querySelector('strong'),change=n.querySelector('.favorite-session-value small');
+    return{height:n.getBoundingClientRect().height,centers:[label,price,change].map(el=>{const r=el.getBoundingClientRect();return r.y+r.height/2})};
+   });
+   assert(geometry.height<24,'Session information occupies one compact line');
+   assert(Math.max(...geometry.centers)-Math.min(...geometry.centers)<5,'Label/time, price and percentage share the same line');
    assert.equal(await card.locator('.favorite-menu-trigger').count(),1);assert.equal(await card.locator('.favorite-remove').count(),1,'Existing two actions retained');
    await page.screenshot({path:path.join(output,`${width}-${theme}-session-card.png`)});
   }

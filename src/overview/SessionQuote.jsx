@@ -9,8 +9,8 @@ export function SessionQuote({ session }) {
     return ()=>clearTimeout(timer);
   },[session?.expiresAt]);
   if(!session||session.expiresAt<=now)return null;
-  return <span className="favorite-session" title="Normal seans kapanışına göre · 5 dk bar verisi; gecikmeli olabilir">
-    <span className="favorite-session-label">{session.label}<small>{session.time} · 5 dk bar</small></span>
+  return <span className="favorite-session" title={`${session.label} · ${session.time} · Normal seans kapanışına göre · 5 dk bar verisi; gecikmeli olabilir`}>
+    <span className="favorite-session-label">{session.label}<small> · {session.time}</small></span>
     <span className="favorite-session-value"><strong>{session.price}</strong><small className={session.tone}>{session.change}</small></span>
   </span>;
 }
