@@ -1,5 +1,13 @@
 # Özer Finans v9.0.4
 
+## v9.0.4 — Tek satır güncellemesi, aynı sürüm üzerine onaylı yayın
+
+Kullanıcı v9.0.5-preview.1 tek satırlı seans düzenini kalıcı yayına onayladı ve sürüm numarasının artırılmadan v9.0.4 üzerine yazılmasını istedi. Görünen sürüm ve package sürümü 9.0.4 kalır; statik giriş sorguları 9.0.4-single-line.1 ile tazelenir. Favori/ayrıntı seans etiketi ve ET saati solda, fiyat ve yüzde sağda tek satırdır. Veri/finans/API/cache TTL/tazelik/gizlilik ve kullanıcı/yedek formatları değişmez.
+
+Önceki v9.0.4 (a85344d2b8e60e28f34b37e97e3435869f789a36) archive/v9.0.4-before-single-line dalında korunur. Kullanıcının aynı sürüm üzerine yazma talebiyle mevcut v9.0.4 Git etiketi ve GitHub Release aynı kayıt üzerinde güncellenir; yeni sürüm kaydı açılmaz. İş akışı arşivi ve beklenen eski etiketi doğrular, etiket taşımasını force-with-lease ile yapar. Fotoğraf oluşturulmaz; ileride ayrıca istenmedikçe her değişiklikte görsel üretmeyin.
+
+Build, finans/sağlayıcı birim regresyonu ve hedefli seans kartı/ayrıntı testi: 375/390/430/1024 açık/koyu, tek satır geometrisi, normal fiyat/tuşlar, pre/post, eskime ve zamanlayıcı kontrol edildi. Bu testler sentetiktir; fiziksel iPhone/canlı sağlayıcı kabulü değildir. Aşağıdaki ön izleme notları tarihsel kayıttır.
+
 ## v9.0.5-preview.1 — Tek satırlı seans bilgisi
 
 Kullanıcının istediği görsel düzen: seans etiketi ve ET saati solda, fiyat ve yüzde sağda tek yatay satırda. Mevcut favori kartı ilk satırı ve iki tuşu korunur; ortak bileşen ayrıntıda da tek satırdır. 5 dk bar/gecikme açıklaması araç ipucunda korunur. Veri, hesaplama, API, cache, tazelik ve seans sonu zamanlayıcısı değişmez; yeni dependency yoktur. Yalnız fix/v9.0.5-single-line-session ön izlemesi; main ve canlı v9.0.4 değişmez. Dört genişlik ve açık/koyu, satır geometrisi ve mevcut seans testleri ile aşama sonunda regresyon kontrol edilir.
