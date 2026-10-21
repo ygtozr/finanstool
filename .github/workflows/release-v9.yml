@@ -19,7 +19,18 @@ jobs:
         run: |
           test "$(node -p 'require("./package.json").version')" = "9.0.4" || exit 0
           if gh release view v9.0.4 >/dev/null 2>&1; then
-            echo "v9.0.4 already exists; keep its original tag."
+            previous_tag=a85344d2b8e60e28f34b37e97e3435869f789a36
+            archive_sha=$(gh api "repos/$GH_REPO/git/ref/heads/archive/v9.0.4-before-single-line" --jq '.object.sha')
+            test "$archive_sha" = "$previous_tag"
+            current_tag=$(gh api "repos/$GH_REPO/git/ref/tags/v9.0.4" --jq '.object.sha')
+            if test "$current_tag" != "$GITHUB_SHA"; then
+              test "$current_tag" = "$previous_tag"
+              git tag -f v9.0.4 "$GITHUB_SHA"
+              git push origin refs/tags/v9.0.4 --force-with-lease="refs/tags/v9.0.4:$previous_tag"
+            fi
+            gh release edit v9.0.4 --title "Özer Finans v9.0.4" --notes-file RELEASE_NOTES_v9.0.4.md --latest
+            release_id=$(gh api "repos/$GH_REPO/releases/tags/v9.0.4" --jq '.id')
+            gh api --method PATCH "repos/$GH_REPO/releases/$release_id" -f target_commitish="$GITHUB_SHA" >/dev/null
           else
             gh release create v9.0.4 --target "$GITHUB_SHA" --title "Özer Finans v9.0.4" --notes-file RELEASE_NOTES_v9.0.4.md --latest
           fi

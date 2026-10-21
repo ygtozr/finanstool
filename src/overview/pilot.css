@@ -144,10 +144,10 @@ html[data-overview-pilot] dialog.portfolio-dialog:not(.favorite-detail-dialog) {
 @media(prefers-reduced-motion:reduce) { .pilot-preserved-page * { transition:none !important; animation:none !important; } }
 
 /* Keep the favorite card's original first row and action controls. */
-.favorite-session { grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; min-width:0; padding-top:4px; text-align:left; font-size:.75rem; font-weight:400; }
-.favorite-session-label { color:var(--muted); min-width:0; }
-.favorite-session small { display:block; font-size:.6875rem; line-height:1.4; }
-.favorite-session-value { flex-shrink:0; text-align:right; font-variant-numeric:tabular-nums; }
+.favorite-session { grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; min-width:0; padding-top:4px; text-align:left; font-size:.6875rem; font-weight:400; }
+.favorite-session-label { color:var(--muted); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.favorite-session small { display:inline; font-size:.6875rem; line-height:1.4; }
+.favorite-session-value { display:inline-flex; flex-shrink:0; align-items:baseline; gap:5px; white-space:nowrap; text-align:right; font-variant-numeric:tabular-nums; }
 .favorite-session-value strong { font-size:.8125rem; color:var(--text); }
 .favorite-session-value small { font-weight:600; }
 .favorite-detail-hero .favorite-session { padding-top:10px; }
