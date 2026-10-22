@@ -59,7 +59,7 @@ async function resolveSymbol(symbol,query,req){
 function number(value){const parsed=Number(value);return Number.isFinite(parsed)?parsed:null}
 function normalizeCompactData(data){
   const timestamp=number(data?.marketTimestamp??data?.asOf),marketTimestamp=Number.isFinite(timestamp)&&timestamp>0?timestamp:null;
-  return{...data,asOf:marketTimestamp,marketTimestamp,extendedSession:data?.stale?null:freshSession(data?.extendedSession)};
+  return{...data,asOf:marketTimestamp,marketTimestamp,extendedSession:freshSession(data?.extendedSession)};
 }
 function forexPair(symbol){
   const aliases={'TRY=X':'USDTRY','EURTRY=X':'EURTRY','GBPTRY=X':'GBPTRY','EURUSD=X':'EURUSD','TRYUSD=X':'TRYUSD'};
@@ -115,6 +115,11 @@ async function readCompactCache(symbol,force=false){
 }
 
 async function storeCompact(symbol,data){
+  if(!data.extendedSession&&data.currency==='USD'&&!symbol.startsWith('ALTIN-')&&/^[A-Z][A-Z0-9.-]{0,14}$/.test(symbol)){
+    const saved=compactLastGood.get(symbol)||await safeRuntimeGet(compactCacheKey('quote',symbol));
+    const previous=freshSession(saved?.data?.extendedSession);
+    if(previous&&data.asOf<previous.validUntil)data={...data,extendedSession:{...previous,lastKnown:true}};
+  }
   const normalized=normalizeCompactData(data),entry={cachedAt:Date.now(),data:{...normalized,cacheStatus:undefined}};
   compactMemoryCache.set(symbol,entry);compactLastGood.set(symbol,entry);
   await safeRuntimeSet(compactCacheKey('quote',symbol),entry,{ttl:86400,tags:['compact-quotes','compact:'+symbol],name:'compact '+symbol});
@@ -123,7 +128,7 @@ async function storeCompact(symbol,data){
 
 async function staleCompact(symbol){
   const saved=compactLastGood.get(symbol)||await safeRuntimeGet(compactCacheKey('quote',symbol));
-  return saved?.data?{...normalizeCompactData(saved.data),stale:true,extendedSession:null,cacheStatus:'stale'}:null;
+  return saved?.data?{...normalizeCompactData(saved.data),stale:true,cacheStatus:'stale'}:null;
 }
 
 function compactRequest(symbol,resolver){

@@ -1,5 +1,15 @@
 # Özer Finans — Yeni sohbet devir notları
 
+## v9.0.4 — Son seans fiyatını koruma düzeltmesi
+
+Kullanıcı seans satırının kaybolmasını düzeltip yayınlamayı onayladı. Son seans öncesi/sonrası fiyatı seans bitince silinmez; tarih/saat ve Son seans etiketiyle, tek satırda korunur. Yeni geçerli seans fiyatıyla yenilenir; normal seans açılışında önceki kayıt temizlenir. 15 dk eşiği artık silme yerine son fiyat etiketine geçiştir. İstemci zamanlayıcısı etiketi ve tarihi günceller; normal fiyat, alarm ve portföy hesaplarına dokunulmaz.
+
+Servis kapalı saatte de desteklenen ABD varlıkları için 5 günlük 5 dk barlardan son seans fiyatını geri alır. currentTradingPeriod/tradingPeriods varsa kullanılır; tarih değişmişse New York tarih ve standart pre/post saatleriyle geçmiş barlar ayrıştırılır. Son fiyat yalnız eşleşen normal kapanışa referanslanır. Sağlayıcının gelecek normal seans başlangıcı varsa esas alınır; aksi halde New York hafta sonu/DST hesabı kullanılır, en fazla 7 gün saklanır. Eski quote şeması kabul edilir. Mevcut sembol runtime kaydı son fiyatı sağlayıcı hatasında da korur; yeni KV alanı/namespace/TTL veya kullanıcı/yedek formatı yoktur. İlk açılış ve gece yarısı sonrası geri alma desteklenir. Gerçek sağlayıcı erişimi bu ortamdan doğrulanmış sayılmaz; eksik veri üretilmez.
+
+Kullanıcının mevcut sürümü koruma tercihi sürdürülür: v9.0.4, statik sorgu eki 9.0.4-session-retention.1. Önceki tek satırlı v9.0.4 (967ddb3f7cd0ab6e90d61314023d04fac6b32a35), archive/v9.0.4-before-session-retention dalında korunur. Mevcut GitHub Release/etiket beklenen eski SHA ve arşiv kontrolü/force-with-lease ile güncellenir. Yeni fotoğraf üretilmez/paylaşılmaz.
+
+Build, finans/sağlayıcı birim testleri, gece/hafta sonu/DST, normal açılışta sona erme, cold-load/sağlayıcı hatasında saklama; dört genişlik/iki tema tek satır, tarih, normal fiyat/tuşlar ve istemci etiket geçişi kontrol edilir. Aşama sonunda tam tarayıcı regresyonu çalıştırılır. Testler sentetik; fiziksel iPhone veya canlı sağlayıcı kabulü değildir.
+
 ## v9.0.4 — Tek satır güncellemesi, aynı sürüm üzerine onaylı yayın
 
 Kullanıcı v9.0.5-preview.1 tek satırlı seans düzenini kalıcı yayına onayladı ve sürüm numarasının artırılmadan v9.0.4 üzerine yazılmasını istedi. Görünen sürüm ve package sürümü 9.0.4 kalır; statik giriş sorguları 9.0.4-single-line.1 ile tazelenir. Favori/ayrıntı seans etiketi ve ET saati solda, fiyat ve yüzde sağda tek satırdır. Veri/finans/API/cache TTL/tazelik/gizlilik ve kullanıcı/yedek formatları değişmez.
