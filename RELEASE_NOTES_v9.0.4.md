@@ -1,5 +1,7 @@
 # Özer Finans v9.0.4
 
+Saat düzeltmesi: Favori kartı ve ayrıntıdaki seans saati/tarihi cihazın yerel saatine çevrildi; ET eki kaldırıldı. Türkiye’de Türkiye saati görünür. Borsa seans hesapları korunur. İstanbul/Los Angeles, gece yarısı tarih geçişi ve dört genişlik/iki tema hedefli testleri eklendi. Önceki hali archive/v9.0.4-before-local-time dalındadır; aynı v9.0.4 güncellenir.
+
 Düzeltme: Son seans öncesi/sonrası fiyatı kapandıktan sonra kaybolmaz; Son seans etiketi ve tarih/saatle, yeni seans verisi veya normal açılışa kadar korunur. Gece yeniden açılışta geçmiş barlardan geri alınır. Veri eskidiğinde canlı gibi gösterilmez. Mevcut v9.0.4 üzerine yayınlanır; önceki hali archive/v9.0.4-before-session-retention dalındadır. Gece/hafta sonu/DST, sağlayıcı hatası, yeniden açılış ve tarihli tek satır kontrolleri eklendi.
 
 Güncelleme: Kullanıcı onayıyla sürüm numarası korunarak seans etiketi/saat/fiyat/yüzde tek satıra alındı. Önceki v9.0.4, archive/v9.0.4-before-single-line dalında korunur. Mevcut sürüm kaydı ve etiketi güncellenmiştir. 5 dk bar/gecikme açıklaması araç ipucundadır. Build, finans/sağlayıcı regresyonu ve dört genişlik/iki tema seans geometri testi geçti.

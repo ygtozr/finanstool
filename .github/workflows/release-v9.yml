@@ -19,8 +19,8 @@ jobs:
         run: |
           test "$(node -p 'require("./package.json").version')" = "9.0.4" || exit 0
           if gh release view v9.0.4 >/dev/null 2>&1; then
-            previous_tag=967ddb3f7cd0ab6e90d61314023d04fac6b32a35
-            archive_sha=$(gh api "repos/$GH_REPO/git/ref/heads/archive/v9.0.4-before-session-retention" --jq '.object.sha')
+            previous_tag=11659deae9c167920eab6072c413ca5fa8b3f53d
+            archive_sha=$(gh api "repos/$GH_REPO/git/ref/heads/archive/v9.0.4-before-local-time" --jq '.object.sha')
             test "$archive_sha" = "$previous_tag"
             current_tag=$(gh api "repos/$GH_REPO/git/ref/tags/v9.0.4" --jq '.object.sha')
             if test "$current_tag" != "$GITHUB_SHA"; then

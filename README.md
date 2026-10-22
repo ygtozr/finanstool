@@ -1,5 +1,11 @@
 # Özer Finans v9.0.4
 
+## v9.0.4 — Cihazın yerel saatinde seans bilgisi
+
+Seans öncesi/sonrası saat ve son seans tarihi favori kartı ile ayrıntıda cihazın yerel saat diliminde gösterilir; ET eki kaldırılır. Türkiye’de Türkiye saati kullanılır. Gece yarısında tarih de yerel takvime göre değişir. Borsa seanslarını hesaplayan New York saat dilimi ve veri/finans katmanları korunur. Yeni dependency yoktur.
+
+Aynı v9.0.4 üzerinde düzeltme; statik sorgu eki 9.0.4-local-time.1. Önceki main 11659deae9c167920eab6072c413ca5fa8b3f53d, archive/v9.0.4-before-local-time dalında korunur. Mevcut yayın onayı ve aynı sürüm tercihi sürdürülür. Build, birim regresyonu ve İstanbul/Los Angeles saat dilimlerinde kart/ayrıntı, tarih geçişi, zamanlayıcı, dört genişlik/iki tema hedefli tarayıcı testi uygulanır. Sentetik testtir; fiziksel iPhone/canlı sağlayıcı doğrulaması değildir. Fotoğraf oluşturulmaz.
+
 ## v9.0.4 — Son seans fiyatını koruma düzeltmesi
 
 Kullanıcı seans satırının kaybolmasını düzeltip yayınlamayı onayladı. Son seans öncesi/sonrası fiyatı seans bitince silinmez; tarih/saat ve Son seans etiketiyle, tek satırda korunur. Yeni geçerli seans fiyatıyla yenilenir; normal seans açılışında önceki kayıt temizlenir. 15 dk eşiği artık silme yerine son fiyat etiketine geçiştir. İstemci zamanlayıcısı etiketi ve tarihi günceller; normal fiyat, alarm ve portföy hesaplarına dokunulmaz.
