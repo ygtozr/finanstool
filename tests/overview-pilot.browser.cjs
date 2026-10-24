@@ -11,7 +11,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
  let unavailable=false,detailMode='',fundamentalFixture=null;const heldSearch=[],heldDetails=[];
  // Normalize only the release badge; the reference layout and finance remain v8.0.
- const referenceHtml=require('node:child_process').execFileSync('git',['show','v8.0:index.html'],{cwd:root}).toString().replaceAll('version-badge">v8.0','version-badge">v'+require('../package.json').version);
+ const referenceHtml=require('node:child_process').execFileSync('git',['show','v8.0:index.html'],{cwd:root}).toString().replace('</head>','<script src="assets/ui-icons.js"></script><style>.ui-icon{width:20px;height:20px;pointer-events:none}</style></head>').replaceAll('version-badge">v8.0','version-badge">v'+require('../package.json').version);
  const referenceContext=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
  const reference=await referenceContext.newPage();
  const page=await context.newPage(),errors=[],requests=[];page.on('pageerror',e=>{errors.push(e.message);console.error('PAGE ERROR',e.message)});page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('net::')){errors.push(m.text());console.error('CONSOLE',m.text())}});
@@ -77,23 +77,15 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
    await page.waitForTimeout(350);
    await reference.evaluate(()=>scrollTo(0,0));
    await page.evaluate(()=>scrollTo(0,0));
-   const measure=scope=>{
-    const selectors=['.page-brand','.brand-lockup-mark','.brand-lockup-name','.market-summary','.market-summary-head','.market-cards','.market-card','.market-card-label','.market-card-value','.market-card-change','.favorites-panel','.favorites-panel-head','.favorites-list','.favorite-row','.favorite-card','.favorite-card-badge','.favorite-card-head','.favorite-card-quote','.favorite-menu-trigger','.favorite-remove','.favorite-add-search'];
-    return selectors.map(selector=>{
-     const node=document.querySelector(scope+' '+selector),r=node.getBoundingClientRect(),c=getComputedStyle(node);
-     return [selector,...['x','y','width','height'].map(k=>Math.round(r[k]*100)/100),...['fontSize','fontWeight','lineHeight','color','backgroundColor','backgroundImage','borderRadius','padding','gap'].map(k=>c[k])];
-    });
-   };
-   assert.deepEqual(await page.evaluate(measure,'#overview-react'),await reference.evaluate(measure,'#mainView'),'v8.0 geometry and styling at '+width+'/'+mode);
-   const cardsMeasure=scope=>[...document.querySelectorAll(scope+' .favorite-card, '+scope+' .favorite-card *')].map(n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n);return [n.tagName,n.textContent.trim(),...['x','y','width','height'].map(k=>Math.round(r[k]*100)/100),...['fontSize','fontWeight','lineHeight','color','backgroundColor','backgroundImage','borderRadius','padding','gap'].map(k=>c[k])];});
-   assert.deepEqual(await page.evaluate(cardsMeasure,'#overview-react'),await reference.evaluate(cardsMeasure,'#mainView'),'All stock-card contents match v8.0 at '+width+'/'+mode);
+   const financialCards=scope=>[...document.querySelectorAll(scope+' .favorite-card')].map(n=>['.favorite-card-symbol','.favorite-card-price','.favorite-change'].map(selector=>n.querySelector(selector).textContent.trim()));
+   assert.deepEqual(await page.evaluate(financialCards,'#overview-react'),await reference.evaluate(financialCards,'#mainView'),'Favorite financial values remain equal to v8.0 at '+width+'/'+mode);
    await page.locator('.pilot-favorite-main').first().click();
    await reference.locator('#favoritesList .favorite-card').first().click();
    await page.locator('#favoriteDetailDialog .favorite-detail-hero').waitFor();
    await reference.locator('#favoriteDetailDialog .favorite-detail-hero').waitFor();
    await page.waitForTimeout(350);
-   const detailMeasure=()=>[...document.querySelectorAll('#favoriteDetailDialog, #favoriteDetailDialog .favorite-detail-hero, #favoriteDetailDialog .favorite-detail-identity, #favoriteDetailDialog .favorite-detail-price, #favoriteDetailDialog .favorite-detail-metric')].map(n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n);return [n.className,n.textContent.replace(/\s/g,''),...['x','y','width','height'].map(k=>Math.round(r[k]*100)/100),...['fontSize','lineHeight','color','backgroundColor','borderRadius','padding','gap'].map(k=>c[k])];});
-   assert.deepEqual(await page.evaluate(detailMeasure),await reference.evaluate(detailMeasure),'Stock detail card matches v8.0 at '+width+'/'+mode);
+   const detailMeasure=()=>[...document.querySelectorAll('#favoriteDetailDialog .favorite-detail-price, #favoriteDetailDialog .favorite-detail-metric')].map(n=>n.textContent.replace(/\s/g,''));
+   assert.deepEqual(await page.evaluate(detailMeasure),await reference.evaluate(detailMeasure),'Stock detail financial values match v8.0 at '+width+'/'+mode);
    await page.screenshot({path:path.join(output,`${width}-${mode}-stock-detail.png`)});
    await reference.screenshot({path:path.join(output,`${width}-${mode}-stock-detail-v8.0.png`)});
    await page.locator('.favorite-detail-close').click();
@@ -101,8 +93,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
    await page.waitForFunction(()=>!document.body.classList.contains('modal-open'));
    await reference.waitForFunction(()=>!document.body.classList.contains('modal-open'));
    if(width<601){
-    const navMeasure=()=>{const n=document.querySelector('.pilot-tabbar')||document.querySelector('.mobile-bottom-nav'),r=n.getBoundingClientRect(),c=getComputedStyle(n);return [r.x,r.y,r.width,r.height,c.backgroundColor,c.borderRadius,c.padding,...[...n.querySelectorAll('button')].map(b=>{const r=b.getBoundingClientRect();return [r.x,r.y,r.width,r.height,...['fontSize','backgroundColor','border','color','padding','gap'].map(k=>getComputedStyle(b)[k])];})];};
-    assert.deepEqual(await page.evaluate(navMeasure),await reference.evaluate(navMeasure),'v8.0 mobile navigation at '+width+'/'+mode);
+    assert.deepEqual(await page.locator('.pilot-tabbar button').allTextContents(),['Özet','Grafik','Portföy','Diğer'],'iOS navigation retains the original four destinations');
    }
    await reference.screenshot({path:path.join(output,`${width}-${mode}-v8.0.png`),fullPage:true});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'No overflow at '+width);
@@ -238,9 +229,9 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await reference.waitForFunction(()=>!document.getElementById('submitButton').disabled&&document.getElementById('periodLast').textContent!=='—');
  const summaryMeasure=selector=>{
   const root=document.querySelector(selector);
-  return [...root.querySelectorAll('h3,dt,dd,small,.period-summary-range-fill,.period-summary-range-labels')].map(n=>{const c=getComputedStyle(n);return [n.tagName,n.className,n.textContent.replace(/\s/g,''),c.fontSize,c.fontWeight,c.color,c.backgroundColor,c.borderRadius,c.padding,c.gap,n.classList.contains('period-summary-range-fill')?n.style.width:''];});
+  return [...root.querySelectorAll('h3,dt,dd,small,.period-summary-range-fill,.period-summary-range-labels')].map(n=>[n.tagName,n.className,n.textContent.replace(/\s/g,''),n.classList.contains('period-summary-range-fill')?n.style.width:'']);
  };
- assert.deepEqual(await page.evaluate(summaryMeasure,'#pilotPeriodSummary'),await reference.evaluate(summaryMeasure,'.period-summary'),'Service-owned React summary matches v8.0');
+ assert.deepEqual(await page.evaluate(summaryMeasure,'#pilotPeriodSummary'),await reference.evaluate(summaryMeasure,'.period-summary'),'Service-owned React summary financial values match v8.0');
  const initialChartSymbol=await page.locator('#pilotChartSearch').inputValue(),startCalls=priceCalls(initialChartSymbol,'1mo');
  await page.locator('#chart-react [data-range="1mo"]').click();
  await page.waitForFunction(()=>!document.getElementById('submitButton').disabled&&selectedRange==='1mo');
@@ -505,12 +496,13 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await require('./remaining-pages.browser.cjs')({browser,seed,routeHandler,reference,output});
  await require('./audit-fixes.browser.cjs')({browser,seed,routeHandler,output});
  await require('./control-consistency.browser.cjs')({browser,seed,routeHandler,output});
+ await require('./ios-language.browser.cjs')({browser,seed,routeHandler,output});
  await require('./monochrome.browser.cjs')({browser,seed,routeHandler,output});
  await require('./gain-breakdown.browser.cjs')({browser,seed,routeHandler,output});
  await require('./session-quote.browser.cjs')({browser,seed,routeHandler,output});
  assert.deepEqual(errors,[],'No console or runtime errors');
  await require('./mobile-navigation.browser.cjs')({browser,seed,routeHandler});
  await require('./layer-audit.browser.cjs')({browser,seed,routeHandler});
- console.log('PASS: Portfolio/Other Framework7 shells and controls, book/position/cash transactions/undo/reload, settings/switches/backup/auth handoffs/short forms, React chart search/asset picker/summary, v8.0 summary parity and empty states, wheel/touch short-screen detail scroll, React chart shell/real canvases/period/custom-date/search/MA/actions/exports, React detail loading/error/stale-response/focus/native handoffs, React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 visual geometry/style and mobile navigation parity, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
+ console.log('PASS: Portfolio/Other Framework7 shells and controls, book/position/cash transactions/undo/reload, settings/switches/backup/auth handoffs/short forms, React chart search/asset picker/summary, v8.0 summary parity and empty states, wheel/touch short-screen detail scroll, React chart shell/real canvases/period/custom-date/search/MA/actions/exports, React detail loading/error/stale-response/focus/native handoffs, React search/market popup add/remove/reorder/empty-list, all stock cards/detail parity, keyboard focus, DOM-independent quote projection, empty legacy lists, logo fallback, accessible sheet/focus, v8.0 financial values with iOS visuals and preserved navigation, Overview 375/390/430/1024, batch/manual refresh, favorites add/remove/detail/reorder/reload, themes, legacy navigation, standalone/actual safe-area insets, automatic batch/error recovery, unchanged portfolio/backup, no console errors. '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

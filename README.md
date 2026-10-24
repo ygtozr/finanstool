@@ -1,4 +1,12 @@
-# Özer Finans v9.0.4
+# Özer Finans v9.0.5-preview.3
+
+## v9.0.5-preview.3 — iOS görsel dili
+
+Kullanıcı tema kısayolu istemiyor; preview.2 reddedildi. Bu çalışma güncel main v9.0.4 üzerinden açılır; hazır tema menüsü içermez. Figma kullanılmaz. Yeni özgün SVG ikon seti: alt menü ve masaüstü gezinme, yenileme/ayar, favori/yıldız, arama ekleme, portföy ekle/adlandır/sil ve gizlilik. SVG’ler SF Symbols yaklaşımını referans alır; resmî Apple sembol dosyaları değildir, yeni dependency/font indirmesi yoktur. Aktif alt sekmede dolu ikon ve tema vurgusu, tutarlı 20/22 px ikonlar. Ekran okuyucu etiketleri korunur.
+
+Sistem font yığını iPhone’da San Francisco’yu kullanmaya devam eder; font ailesi zaten sistemdi. Bu değişiklikte gövde/başlık/piyasa/favori fiyatı ağırlık-boyut hiyerarşisi, kompakt yumuşak kare kontroller, 38 px şirket rozeti, 34 px marka simgesi, 9/12 px köşeler ve sade yüzeyler uygulanır. Kullanıcı renk/materyal/yazı boyutu tercihleri, sabit alt menü/safe-area, hesaplar/API/cache/auth/Upstash ve kullanıcı/yedek şemaları korunur. Görsel v8 birebir eşitliği artık hedef değildir; finans çıktısı eşitliği ile yeni iOS görsel ölçüleri ayrı kontrol edilir.
+
+Yalnız feat/v9.0.5-preview.3-ios-visual önizlemesi; main/canlıya onaysız yayın yoktur. Test kapsamı: build/birimler; 375/390/430/1024 açık-koyu, ikon tutarlılığı, tipografi, taşma, gizlilik/favori ve gezinme eylemleri, büyük yazı/azaltılmış hareket, ardından tam tarayıcı regresyonu. Sentetik test fiziksel iPhone veya gerçek sağlayıcı doğrulaması değildir.
 
 ## v9.0.4 — Cihazın yerel saatinde seans bilgisi
 

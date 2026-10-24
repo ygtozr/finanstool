@@ -1,3 +1,4 @@
+import { Icon } from './Icon';
 import React, { useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Button, Page, Segmented, Toggle } from 'framework7-react';
@@ -15,7 +16,7 @@ function PreservedPage({ view, title }) {
   }, [view]);
   return createPortal(<div id={`${view}-react`} className="pilot-preserved-page">
     <Page name={view}>
-      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.4</span></h1>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.5-preview.3</span></h1>
       {title ? <h2 className="pilot-page-title">{title}</h2> : null}
       <div ref={content} className="pilot-preserved-content" />
     </Page>
@@ -25,7 +26,7 @@ function PreservedPage({ view, title }) {
 export function PortfolioShell({ state }) {
   const label = state.private ? 'Portföy rakamlarını göster' : 'Portföy rakamlarını gizle';
   const privacyButton = (id, active = false) => <Button id={id} type="button" className="portfolio-privacy-toggle pilot-privacy" aria-label={active ? `Aktif ${label.toLocaleLowerCase('tr-TR')}` : label} title={active ? `Aktif ${label.toLocaleLowerCase('tr-TR')}` : label} aria-pressed={state.private} onClick={() => overview.portfolioAction('portfolioPrivacyToggle')}>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c2.5-4 5.8-6 10-6s7.5 2 10 6c-2.5 4-5.8 6-10 6S4.5 16 2 12Z" /><circle cx="12" cy="12" r="2.6" />{state.private ? <path d="m3 3 18 18" /> : null}</svg>
+    <Icon name={state.private ? 'eyeSlash' : 'eye'} />
   </Button>;
   return <>
     <PreservedPage view="portfolio" />

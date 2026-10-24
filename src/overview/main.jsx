@@ -1,3 +1,4 @@
+import { Icon } from './Icon';
 import { SessionQuote } from './SessionQuote';
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -55,17 +56,17 @@ export function FavoriteRow({ item, openActions, order, actionsOpen }) {
       <span className="favorite-card-quote pilot-quote"><strong className="favorite-card-price">{item.price}</strong><span className={`favorite-change ${item.tone}`}>{item.change}</span><small className="favorite-market-time">{item.time}</small></span>
       <SessionQuote session={item.extendedSession} />
     </button>
-    <div className="favorite-actions"><button type="button" className="favorite-menu-trigger" aria-label={`${item.displaySymbol} işlemleri`} aria-haspopup="dialog" aria-expanded={actionsOpen} onClick={() => openActions(item)}>⋯</button><button type="button" className="favorite-remove" aria-label={`${item.displaySymbol} favorilerden çıkar`} onClick={() => overview.favorite(item.symbol, 'remove')}>★</button></div>
+    <div className="favorite-actions"><button type="button" className="favorite-menu-trigger" aria-label={`${item.displaySymbol} işlemleri`} aria-haspopup="dialog" aria-expanded={actionsOpen} onClick={() => openActions(item)}><Icon name="ellipsis" /></button><button type="button" className="favorite-remove" aria-label={`${item.displaySymbol} favorilerden çıkar`} onClick={() => overview.favorite(item.symbol, 'remove')}><Icon name="starFilled" /></button></div>
   </li>;
 }
-const tabs = [['main', 'Özet', 'M3 11 12 3l9 8M5 10v11h5v-6h4v6h5V10'], ['chart', 'Grafik', 'M3 3v18h18M6 15l5-6 4 3 5-7'], ['portfolio', 'Portföy', 'M4 7h16v13H4zM7 4h10'], ['other', 'Diğer', 'M5 12h.01M12 12h.01M19 12h.01']];
+const tabs = [['main','Özet','home'],['chart','Grafik','chart'],['portfolio','Portföy','briefcase'],['other','Diğer','more']];
 export function MobileTabBar({ view, authenticated }) {
   if (!authenticated) return null;
   return createPortal(<Toolbar bottom className="mobile-bottom-nav pilot-tabbar" aria-label="Mobil gezinme">
     {tabs.map(([id, label, icon]) => <button type="button" key={id} className={id === view ? 'is-active' : ''}
       aria-current={id === view ? 'page' : undefined} aria-label={label}
       onClick={() => overview.navigate(id)}>
-      <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d={icon} /></svg></span>{label}
+      <span><Icon name={id === view ? icon+'Filled' : icon} /></span>{label}
     </button>)}
   </Toolbar>, document.getElementById('pilot-navigation'));
 }
@@ -112,13 +113,13 @@ function AppShell() {
   return <App theme="ios" name="Özer Finans" className={`pilot-app ${state.theme === 'dark' ? 'dark' : ''}`}
     touch={{ fastClicks: false }} clicks={{ externalLinks: '.external, a[download], #inviteLink' }} view={{ router: false }}>
     <View main router={false}><Page name="overview" className="pilot-page">
-      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.4</span></h1>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.5-preview.3</span></h1>
       {refreshError ? <ErrorState message={refreshError} retry={refresh} /> : null}
       <div className="app-layout"><section className="chart-panel">
-      <Section className="market-summary" title="Piyasa Özeti" note={state.marketUpdated} actions={<div className="market-actions"><button type="button" id="pilotMarketRefresh" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile">{state.busy ? 'Yenileniyor…' : 'Yenile'}</button><button type="button" id="pilotMarketSettings" onClick={() => setSettingsOpen(true)} aria-label="Piyasa özetini düzenle">⚙</button></div>}>
+      <Section className="market-summary" title="Piyasa Özeti" note={state.marketUpdated} actions={<div className="market-actions"><button type="button" id="pilotMarketRefresh" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile"><Icon name="refresh" />{state.busy ? 'Yenileniyor…' : 'Yenile'}</button><button type="button" id="pilotMarketSettings" onClick={() => setSettingsOpen(true)} aria-label="Piyasa özetini düzenle"><Icon name="sliders" /></button></div>}>
         <div className="market-cards" aria-busy={state.busy}>{state.markets.map(item => <MarketCard key={item.symbol} item={item} />)}{!state.markets.length ? <p className="market-settings-empty">Dişli düğmesinden piyasa verisi ekleyin.</p> : null}</div>
       </Section>
-      <Section className="favorites-panel" title="Favoriler" note={state.favoriteUpdated} actions={<button type="button" id="pilotFavoriteRefresh" disabled={state.busy} onClick={refresh} aria-label="Favorileri yenile">Yenile</button>}>
+      <Section className="favorites-panel" title="Favoriler" note={state.favoriteUpdated} actions={<button type="button" id="pilotFavoriteRefresh" disabled={state.busy} onClick={refresh} aria-label="Favorileri yenile"><Icon name="refresh" />Yenile</button>}>
         {!state.favorites.length ? <p className="favorites-note">Henüz favori hisse yok.</p> : null}
         <ul className="favorites-list pilot-favorites">{state.favorites.map(item => <FavoriteRow key={`${item.symbol}:${order}`} order={order} item={item} openActions={openActions} actionsOpen={actions?.symbol === item.symbol} />)}</ul>
         <AssetSearch onAdd={overview.addFavorite} />
