@@ -1,4 +1,10 @@
-# Özer Finans v9.0.4
+# Özer Finans v9.0.5-preview.2
+
+## v9.0.5-preview.2 — Diğer menüsünde hazır temalar
+
+Görsel seçenekler üç hazır tema olarak Görünüm bölümüne eklenir: Açık ve Sade (açık/siyah-beyaz/mat), Kompakt Monokrom (koyu/siyah-beyaz/ince çizgi), Safir (koyu/safir/ince çizgi). Renk ve yüzey menüleri ile Sistem/Koyu/Açık seçimi korunur. Hazır tema seçimi yazı boyutunu değiştirmez; mevcut kompakt kart/tuş ölçülerini kullanır. Seçim mevcut theme ve appearance tercihlerine yazılır; yeni kalıcı alan, yedek şeması, API veya dependency yoktur. Elle özelleştirme ve yedekten geri yükleme desteklenir.
+
+Kullanıcı Figma planını iptal etti; Figma kullanılmaz. Görseller tasarım referansıdır, birebir ekran görüntüsü değildir. feat/v9.0.5-preview.2-theme-presets dalında yalnız önizleme; kalıcı yayın için kullanıcı onayı beklenir. Main/canlı v9.0.4 korunur. Doğrulama: build, birim regresyonu, üç tema/dört genişlik, gezinme, kalıcılık, büyük yazı, özel görünüm, sistem modu, yedek uyumluluğu ve son aşamada tam tarayıcı regresyonu. Yeni fotoğraf üretilmez.
 
 ## v9.0.4 — Cihazın yerel saatinde seans bilgisi
 

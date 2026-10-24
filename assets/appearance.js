@@ -2,6 +2,12 @@
 window.OzerAppearance = (() => {
   const colors={klasik:['Klasik','#52D5B1'],turkuaz:['Turkuaz','#00D5D8'],safir:['Safir','#246BFF'],lavanta:['Lavanta','#A78BFA'],sampanya:['Şampanya','#D6A34B'],monokrom:['Siyah Beyaz','#171717']};
   const looks={mat:'Mat',cam:'Hafif Cam',cizgi:'İnce Çizgi',seramik:'Seramik',cerceve:'Çift Çerçeve',isik:'Köşe Işığı',katman:'Ton Katmanı',doku:'Mikro Doku'};
+  // Presets reuse existing preferences; no extra stored theme ID or backup field.
+  const presets={
+    'acik-sade':{label:'Açık ve Sade',mode:'light',color:'monokrom',look:'mat',swatch:['#F4F4F4','#FFFFFF','#171717']},
+    'kompakt-monokrom':{label:'Kompakt Monokrom',mode:'dark',color:'monokrom',look:'cizgi',swatch:['#111111','#303030','#F5F5F5']},
+    'safir':{label:'Safir',mode:'dark',color:'safir',look:'cizgi',swatch:['#101827','#26344d','#246BFF']},
+  };
   const key='finans-grafigi-appearance';
   const normalize=value=>({color:Object.hasOwn(colors,value?.color)?value.color:'klasik',look:Object.hasOwn(looks,value?.look)?value.look:'cizgi'});
   let initial;try{initial=JSON.parse(localStorage.getItem(key)||'null')}catch{}
@@ -35,7 +41,7 @@ window.OzerAppearance = (() => {
     }
     return {theme,color:normalized.color,look:normalized.look,density:['small','large'].includes(density)?density:'standard',accent,material};
   }
-  function apply(mode){
+  function apply(mode,preference=mode){
     const root=document.documentElement,resolved=resolve({mode,color:state.color,look:state.look,density:root.dataset.fontSize,systemLight:matchMedia('(prefers-color-scheme: light)').matches});
     const light=resolved.theme==='light',accent=resolved.accent;
     root.dataset.theme=resolved.theme;root.dataset.palette=resolved.color;root.dataset.look=resolved.look;
@@ -51,11 +57,29 @@ window.OzerAppearance = (() => {
       const active=b.dataset.appearanceColor?b.dataset.appearanceColor===state.color:b.dataset.appearanceLook===state.look;
       b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));
     });
+    const selected=Object.entries(presets).find(([,p])=>p.mode===preference&&p.color===state.color&&p.look===state.look);
+    document.querySelectorAll('[data-appearance-preset]').forEach(button=>{
+      const active=button.dataset.appearancePreset===selected?.[0];
+      button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
+    });
+    const status=document.getElementById('appearancePresetStatus');
+    const message=selected?'Geçerli tema: '+selected[1].label:'Özel görünüm · Aşağıdaki ayarlarla özelleştirebilirsiniz.';
+    if(status&&status.textContent!==message)status.textContent=message;
     window.OzerNativeUI?.sync();
   }
   function restore(value,persist=true){state=normalize(value);if(persist)localStorage.setItem(key,JSON.stringify(state));}
   function mount(refresh){
     const host=document.getElementById('appearanceChoices');
+    const title=document.createElement('p');title.className='appearance-presets-title';title.id='appearancePresetsTitle';title.textContent='Hazır temalar';host.append(title);
+    const group=document.createElement('div');group.className='appearance-presets';group.setAttribute('role','group');group.setAttribute('aria-labelledby',title.id);
+    Object.entries(presets).forEach(([id,preset])=>{
+      const button=document.createElement('button');button.type='button';button.className='appearance-preset';button.dataset.appearancePreset=id;button.setAttribute('aria-pressed','false');
+      const swatch=document.createElement('span');swatch.className='appearance-preset-swatch';swatch.setAttribute('aria-hidden','true');
+      preset.swatch.forEach(color=>{const chip=document.createElement('i');chip.style.backgroundColor=color;swatch.append(chip)});
+      const label=document.createElement('span');label.className='appearance-preset-label';label.textContent=preset.label;button.append(swatch,label);
+      button.addEventListener('click',()=>{restore(preset);refresh(preset.mode)});group.append(button);
+    });host.append(group);
+    const status=document.createElement('p');status.id='appearancePresetStatus';status.className='settings-status appearance-preset-status';status.setAttribute('role','status');host.append(status);
     for(const [field,items] of [['color',colors],['look',looks]]){
       const menu=document.createElement('details');menu.className='appearance-menu';
       const heading=document.createElement('summary');heading.textContent=field==='color'?'Vurgu rengi':'Yüzey stili';menu.append(heading);host.append(menu);

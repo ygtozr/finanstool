@@ -505,6 +505,7 @@ const history=symbol=>({chart:{result:[{meta:{symbol,currency:'USD',longName:sym
  await require('./remaining-pages.browser.cjs')({browser,seed,routeHandler,reference,output});
  await require('./audit-fixes.browser.cjs')({browser,seed,routeHandler,output});
  await require('./control-consistency.browser.cjs')({browser,seed,routeHandler,output});
+ await require('./theme-presets.browser.cjs')({browser,seed,routeHandler});
  await require('./monochrome.browser.cjs')({browser,seed,routeHandler,output});
  await require('./gain-breakdown.browser.cjs')({browser,seed,routeHandler,output});
  await require('./session-quote.browser.cjs')({browser,seed,routeHandler,output});

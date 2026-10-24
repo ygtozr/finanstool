@@ -178,3 +178,16 @@ html[data-theme][data-palette] body .portfolio-gains { margin:0 0 12px; padding:
 .gain-up { left:50%; background:var(--positive); }
 .gain-down { right:50%; background:var(--negative); }
 html[data-theme][data-palette] body .gain-expand { display:block; width:100%; height:44px; margin-top:4px; color:var(--accent-ink); background:var(--surface-control); border:1px solid var(--line); border-radius:var(--radius-control); font-size:.8125rem; }
+
+/* Ready-made themes share the existing preference model and compact controls. */
+#appearanceChoices .appearance-presets-title { margin:8px 0; color:var(--text); font-size:var(--font-control); font-weight:650; }
+#appearanceChoices .appearance-presets { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+html[data-theme][data-palette] body #appearanceChoices .appearance-preset { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; width:100%; min-width:0; height:76px; min-height:76px; max-height:76px; padding:7px 4px; border:1px solid var(--line); border-radius:var(--radius-control); background:var(--surface-soft); color:var(--text); box-shadow:none; cursor:pointer; transition:background-color .16s ease,border-color .16s ease,transform .12s ease; }
+html[data-theme][data-palette] body #appearanceChoices .appearance-preset[aria-pressed="true"] { background:color-mix(in srgb,var(--accent) 12%,var(--surface-card)); border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
+#appearanceChoices .appearance-preset-label { display:flex; align-items:center; justify-content:center; height:30px; font-size:12px; font-weight:650; line-height:1.2; text-align:center; overflow-wrap:normal; }
+#appearanceChoices .appearance-preset-swatch { display:flex; gap:3px; pointer-events:none; }
+#appearanceChoices .appearance-preset-swatch i { display:block; width:16px; height:16px; border:1px solid #8888; border-radius:4px; }
+#appearanceChoices .appearance-preset-status { margin:8px 0 4px; min-height:2.4em; font-size:12px; }
+#appearanceChoices .appearance-preset:focus-visible { outline:2px solid var(--focus-ring); outline-offset:3px; }
+#appearanceChoices .appearance-preset:active { transform:scale(.98); }
+@media(prefers-reduced-motion:reduce) { #appearanceChoices .appearance-preset { transition:none!important; transform:none!important; } }
