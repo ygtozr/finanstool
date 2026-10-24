@@ -1,3 +1,4 @@
+import { Icon } from './Icon';
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Popup } from 'framework7-react';
@@ -15,7 +16,7 @@ function MarketSettingRow({ item, order }) {
   }, [order]);
   return <div ref={row} className="market-settings-row" data-symbol={item.symbol}>
     <span ref={handle} onKeyDownCapture={event => { keyboard.current = event.altKey && event.key.startsWith("Arrow"); }} onPointerDownCapture={() => { keyboard.current = false; }} tabIndex={0} role="button" aria-label={`${item.label} sırasını değiştir`}>{item.label} <small>· {overview.displaySymbol(item.symbol)}</small></span>
-    <button type="button" className="market-settings-remove" aria-label={`${item.label} verisini kaldır`} onClick={() => overview.removeMarket(item.symbol)}>×</button>
+    <button type="button" className="market-settings-remove" aria-label={`${item.label} verisini kaldır`} onClick={() => overview.removeMarket(item.symbol)}><Icon name="close" /></button>
   </div>;
 }
 export function MarketSettings({ opened, onClose, items }) {

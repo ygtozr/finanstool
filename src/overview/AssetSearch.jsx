@@ -1,3 +1,4 @@
+import { Icon } from './Icon';
 import React, { useEffect, useRef, useState } from 'react';
 import { overview } from './legacy-adapter';
 
@@ -59,8 +60,8 @@ export function AssetSearch({ kind = 'favorite', onAdd, chartState }) {
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
     <label className="sr-only" htmlFor={id}>{chart ? 'Hisse ara' : market ? 'Piyasa verisi ara' : 'Favorilere eklenecek hisseyi ara'}</label>
     {chart ? <>
-      <div className="search-field">{field}<button id="pilotChartFavorite" className={`favorite-toggle ${chartState.isFavorite ? 'is-favorite' : ''}`} type="button" aria-label={chartState.isFavorite ? 'Hisseyi favorilerden çıkar' : 'Hisseyi favorilere ekle'} aria-pressed={chartState.isFavorite} title={chartState.isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle'} onClick={overview.chartFavorite}>{chartState.isFavorite ? '★' : '☆'}</button>{options}</div>
+      <div className="search-field">{field}<button id="pilotChartFavorite" className={`favorite-toggle ${chartState.isFavorite ? 'is-favorite' : ''}`} type="button" aria-label={chartState.isFavorite ? 'Hisseyi favorilerden çıkar' : 'Hisseyi favorilere ekle'} aria-pressed={chartState.isFavorite} title={chartState.isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle'} onClick={overview.chartFavorite}><Icon name={chartState.isFavorite ? 'starFilled' : 'star'} /></button>{options}</div>
       <button id="pilotChartSubmit" type="submit" disabled={busy || chartState.busy}>{busy ? 'Yükleniyor…' : chartState.buttonLabel}</button>
-    </> : <>{field}<button type="submit" disabled={busy} aria-label={market ? 'Piyasa verisi ekle' : 'Hisseyi favorilere ekle'}>+</button>{options}</>}
+    </> : <>{field}<button type="submit" disabled={busy} aria-label={market ? 'Piyasa verisi ekle' : 'Hisseyi favorilere ekle'}><Icon name="plus" /></button>{options}</>}
   </form>;
 }

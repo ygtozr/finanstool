@@ -1,0 +1,47 @@
+/* iOS visual refinement: system type, original SVG icons, stable touch geometry.
+   Existing palettes/materials, layout ownership and financial values are retained. */
+html {
+ --font-body:17px; --font-heading:20px; --font-brand:22px;
+ --font-market-label:12px; --font-market-price:17px; --font-market-change:11px;
+ --font-system:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+html[data-font-size="small"] { --font-body:16px; --font-heading:19px; --font-market-label:11px; --font-market-price:16px; --font-market-change:10px; }
+html[data-font-size="large"] { --font-body:19px; --font-heading:22px; --font-market-label:13px; --font-market-price:18px; --font-market-change:12px; }
+html[data-theme] body { font-family:var(--font-system); font-size:var(--font-body); line-height:1.45; -webkit-text-size-adjust:100%; }
+html[data-theme] body :is(button,input,select,textarea) { font-family:var(--font-system); }
+html[data-theme][data-palette] body .ui-icon { display:inline-block; width:20px; height:20px; min-width:20px; flex-shrink:0; vertical-align:middle; overflow:visible; fill:none; stroke:none; pointer-events:none; }
+html[data-theme][data-palette] body .ui-icon path { stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+html[data-theme][data-palette] body .ui-icon:not([data-ui-icon$="Filled"]) path { fill:none; stroke:currentColor; }
+html[data-theme][data-palette] body .ui-icon[data-ui-icon$="Filled"] path { fill:currentColor; stroke:none; }
+html[data-theme][data-palette] body .page-brand { min-height:52px; padding:7px 0; }
+html[data-theme][data-palette] body .page-brand .brand-lockup-mark { width:34px; height:34px; flex-basis:34px; border-radius:8px; }
+html[data-theme][data-palette] body .brand-lockup-name { font-size:var(--font-brand); font-weight:600; letter-spacing:-.45px; }
+html[data-theme][data-palette] body :is(.market-summary-head h2,.favorites-panel h2,.pilot-page-title,.settings-card h3,.portfolio-head h2) { font-size:var(--font-heading); font-weight:600; letter-spacing:-.35px; line-height:1.25; }
+html[data-theme][data-palette] body :is(.favorites-note,.native-help,.settings-card p) { line-height:1.4; }
+html[data-theme][data-palette] body .market-card { min-height:54px; padding:5px 9px; border-radius:10px; }
+html[data-theme][data-palette] body .market-card::before { display:none; }
+html[data-theme][data-palette] body .market-card-label { font-size:var(--font-market-label); font-weight:500; letter-spacing:0; }
+html[data-theme][data-palette] body .market-card-value { font-size:var(--font-market-price); font-weight:600; letter-spacing:-.2px; }
+html[data-theme][data-palette] body .market-card-change { font-size:var(--font-market-change); font-weight:500; }
+html[data-theme][data-palette] body .favorite-card { border-radius:12px; padding:8px; gap:8px; grid-template-columns:38px minmax(0,1fr) auto; }
+html[data-theme][data-palette] body .favorite-card-badge { width:38px; height:38px; border-radius:10px; }
+html[data-theme][data-palette] body .favorite-card-symbol { font-size:.9375rem; font-weight:600; letter-spacing:-.2px; }
+html[data-theme][data-palette] body .favorite-card-price { font-size:1rem; font-weight:600; letter-spacing:-.2px; }
+html[data-theme][data-palette] body :is(.favorite-card-name,.favorite-change) { font-size:.75rem; font-weight:400; }
+html[data-theme][data-palette] body .favorite-market-time { font-size:.625rem; }
+html[data-theme][data-palette] body .favorite-actions :is(.favorite-menu-trigger,.favorite-remove) { display:grid; place-items:center; color:var(--accent-ink); background:var(--surface-control); border-radius:9px; }
+html[data-theme][data-palette] body :is(.market-actions button,#pilotFavoriteRefresh) { display:inline-flex; align-items:center; justify-content:center; gap:5px; font-size:calc(var(--font-control) - 2px); font-weight:600; }
+html[data-theme][data-palette] body #pilotMarketSettings { width:44px; min-width:44px; padding:0; }
+html[data-theme][data-palette] body :is(.favorite-add-search button,.market-settings-search button,.native-position-add) { display:grid; place-items:center; }
+html[data-theme][data-palette] body .desktop-sidebar button .ui-icon { margin-right:6px; }
+html[data-theme][data-palette] body :is(.settings-card label,.settings-card select,.settings-card input) { font-size:var(--font-control); line-height:1.35; }
+html[data-theme][data-palette] body :is(.settings-card,.native-surface,.favorite-detail-metrics-card) { border-radius:12px; }
+html[data-theme][data-palette] body .favorite-detail-price > strong { font-size:2rem; font-weight:600; letter-spacing:-.6px; }
+/* 44 px targets keep their existing 9 px soft-square paint; no capsule controls. */
+html[data-theme][data-palette] body :is(.toolbar button,.periods button,.settings-inline-actions button,.favorite-detail-actions button,.dialog-actions button) { font-weight:600; }
+html[data-theme][data-palette] body :is(button,a,input,select):focus-visible { outline:2px solid var(--focus-ring); outline-offset:2px; }
+#pilot-navigation .pilot-tabbar button .ui-icon { width:22px; height:22px; min-width:22px; }
+#pilot-navigation .pilot-tabbar button { font-size:11px; font-weight:500; letter-spacing:0; gap:3px; border-radius:9px; }
+#pilot-navigation .pilot-tabbar button.is-active { background:transparent; color:var(--accent-ink); border-color:transparent; font-weight:600; }
+@media(prefers-reduced-motion:no-preference) { #pilot-navigation .pilot-tabbar button { transition:color .15s ease,opacity .12s ease; } }
+@media(prefers-reduced-motion:reduce) { html[data-theme] body :is(button,.ui-icon) { transition:none!important; animation:none!important; } }

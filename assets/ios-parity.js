@@ -131,7 +131,7 @@ window.OzerNativeUI = (() => {
     const positionTitle=document.querySelector('.portfolio-positions-title'),positionsCard=document.createElement('section');positionsCard.className='native-positions-card native-surface';
     positionTitle.before(positionsCard);positionsCard.append(positionTitle,document.getElementById('portfolioList'),document.querySelector('.portfolio-search'));
     positionTitle.firstChild.textContent='Varlıklar';
-    const positionAdd=document.createElement('button');positionAdd.type='button';positionAdd.className='native-position-add';positionAdd.textContent='⊕';positionAdd.setAttribute('aria-label','Varlık eklemek için aramaya git');
+    const positionAdd=document.createElement('button');positionAdd.type='button';positionAdd.className='native-position-add';positionAdd.innerHTML=OzerIcons.markup('plus');positionAdd.setAttribute('aria-label','Varlık eklemek için aramaya git');
     positionAdd.addEventListener('click',()=>{const search=document.getElementById('portfolioSymbol');search.scrollIntoView({behavior:'smooth',block:'center'});search.focus()});positionTitle.append(positionAdd);
     const themeGroup=document.querySelector('[aria-label="Tema seçimi"]');
     ['system','dark','light'].forEach(mode=>{const b=themeGroup.querySelector('[data-theme-choice="'+mode+'"]');b.textContent=({system:'Sistem',dark:'Koyu',light:'Açık'})[mode];themeGroup.append(b);});
@@ -157,8 +157,12 @@ window.OzerNativeUI = (() => {
     });const highlight=document.createElement('span');highlight.className='segmented-highlight';highlight.setAttribute('aria-hidden','true');group.append(highlight);select.after(group);
     const help={defaultPortfolioSelect:'Uygulama açıldığında seçili gelecek portföy.',defaultBenchmarkSelect:'Karşılaştırma grafiğinde başlangıçta kullanılacak ürün.',baseCurrencySelect:'Yerel: ürünün kendi para birimi. Karma toplamlar USD bazındadır.',priceDecimalsSelect:'Yalnız gösterim hassasiyetini değiştirir; hesaplamalar aynı kalır.',percentDecimalsSelect:'Yüzde değişiminde virgülden sonra gösterilen basamak sayısı.',refreshIntervalSelect:'Açık sayfanın verilerini kontrol eder; kaynak gecikmesini değiştirmez.',defaultRangeSelect:'Grafik açıldığında seçili gelen zaman aralığı.',alarmCheckIntervalSelect:'Uygulama açıkken fiyatların kontrol sıklığıdır; geri sayım değildir.',backupReminderSelect:'Yedek almayı hatırlatır; otomatik yedek oluşturmaz.',restoreMode:'Birleştir mevcut portföyleri korur; eşleşen kayıtları yedekten günceller. Değiştir mevcut verinin yerine yedeği koyar.'};
     Object.entries(help).forEach(([id,text])=>{const input=document.getElementById(id),note=document.createElement('small');note.className='native-help';note.id=id+'Help';note.textContent=text;input.closest('label').append(note);input.setAttribute('aria-describedby',note.id);});
-    const paths=['M3 11 12 3l9 8M5 10v11h5v-6h4v6h5V10','M3 3v18h18M6 15l5-6 4 3 5-7','M4 7h16v13H4zM7 4h10','M5 12h.01M12 12h.01M19 12h.01'];
-    document.querySelectorAll('.mobile-bottom-nav button span').forEach((span,i)=>{span.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+paths[i]+'"/></svg>';});
+    const navIcons=['home','chart','briefcase','more'];
+    document.querySelectorAll('.mobile-bottom-nav button span').forEach((span,i)=>{span.innerHTML=OzerIcons.markup(navIcons[i]);});
+    [['desktopOverviewNav','home'],['desktopChartNav','chart'],['desktopPortfolioNav','briefcase'],['desktopAlarmNav','bell'],['desktopMoreNav','more']].forEach(([id,icon])=>{
+      const button=document.getElementById(id);button.firstChild.remove();button.insertAdjacentHTML('afterbegin',OzerIcons.markup(icon));
+    });
+    [['portfolioBookAdd','plus'],['portfolioBookRename','pencil'],['portfolioBookDelete','trash'],['marketSettingsButton','sliders'],['allPortfolioCurrencyToggle','exchange'],['portfolioCurrencyToggle','exchange']].forEach(([id,icon])=>{document.getElementById(id).innerHTML=OzerIcons.markup(icon)});
     const marketForm=document.getElementById('marketSettingsForm');document.getElementById('marketSettingsList').before(marketForm);
     document.querySelector('#marketSettingsDialog .portfolio-dialog-symbol').textContent='Arayarak ekleyin; sıralamak için basılı tutup sürükleyin. Çarpıyla kaldırın.';
     document.addEventListener('change',sync);sync();
