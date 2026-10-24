@@ -24,7 +24,7 @@ jobs:
           test "$archive_sha" = "$previous_tag"
           old_tag_sha=$(gh api "repos/$GH_REPO/git/ref/tags/v9.0.4" --jq '.object.sha')
           test "$old_tag_sha" = "$previous_tag"
-          tag_sha=$(gh api "repos/$GH_REPO/git/ref/tags/v9.0.5" --jq '.object.sha' 2>/dev/null || true)
+          tag_sha=$(gh api "repos/$GH_REPO/git/ref/tags/v9.0.5" --jq '.object.sha' 2>/dev/null) || tag_sha=''
           if test -n "$tag_sha"; then
             test "$tag_sha" = "$GITHUB_SHA"
           fi
