@@ -106,14 +106,14 @@ function AppShell() {
   useEffect(() => {
     const release = overview.claimView();
     const oldTitle = document.title;
-    document.title = `Özer Finans v${appPackage.version} — Ön izleme`;
+    document.title = `Özer Finans v${appPackage.version}${appPackage.version.includes('-preview') ? ' — Ön izleme' : ''}`;
     document.documentElement.dataset.overviewPilot = 'ready';
     return () => { unlockSheet(); release(); document.title = oldTitle; delete document.documentElement.dataset.overviewPilot; };
   }, []);
   return <App theme="ios" name="Özer Finans" className={`pilot-app ${state.theme === 'dark' ? 'dark' : ''}`}
     touch={{ fastClicks: false }} clicks={{ externalLinks: '.external, a[download], #inviteLink' }} view={{ router: false }}>
     <View main router={false}><Page name="overview" className="pilot-page">
-      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.5-preview.3</span></h1>
+      <h1 className="page-brand pilot-brand"><img className="brand-lockup-mark" src="assets/brand-symbol-a.png?v=7.9" alt="" /><span className="brand-lockup-name">Özer Finans</span><span className="version-badge">v9.0.5</span></h1>
       {refreshError ? <ErrorState message={refreshError} retry={refresh} /> : null}
       <div className="app-layout"><section className="chart-panel">
       <Section className="market-summary" title="Piyasa Özeti" note={state.marketUpdated} actions={<div className="market-actions"><button type="button" id="pilotMarketRefresh" disabled={state.busy} onClick={refresh} aria-label="Piyasa verilerini yenile"><Icon name="refresh" />{state.busy ? 'Yenileniyor…' : 'Yenile'}</button><button type="button" id="pilotMarketSettings" onClick={() => setSettingsOpen(true)} aria-label="Piyasa özetini düzenle"><Icon name="sliders" /></button></div>}>

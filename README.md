@@ -1,4 +1,10 @@
-# Özer Finans v9.0.5-preview.3
+# Özer Finans v9.0.5
+
+## v9.0.5 — Onaylı kalıcı iOS görsel sürümü
+
+Kullanıcı v9.0.5-preview.3 iOS görsel düzenlemesini kalıcı yayına onayladı. Aynı ikon/ölçü/tipografi değişiklikleri v9.0.5 olarak yayınlanır; hazır tema kısayolları içermez. Resmî Apple font/ikon dosyaları eklenmez; iPhone sistem fontu ve özgün SVG çizimleri kullanılır. Yeni dependency yoktur. Finans/API/cache/auth/Upstash, kullanıcı/yedek şemaları ve mevcut renk/materyal/yazı boyutu tercihleri korunur.
+
+Önceki canlı v9.0.4 (5078dbe0dc78cf2ef363c9e9dc70e7d736a96e5c) archive/v9.0.4-before-ios-v9.0.5 dalında ve mevcut v9.0.4 etiketi/Release kaydında korunur. Kalıcı adres https://finanstool.vercel.app; yeni GitHub Release v9.0.5. İş akışı arşiv ve önceki etiket SHA’sını doğrular; v9.0.4 etiketi taşınmaz. Önizlemenin build/birim ve tam tarayıcı regresyonu geçti; sürüm hazırlığında build/birim ve hedefli dört genişlik/açık-koyu iOS testi tekrar çalıştırılır. Testler sentetiktir, fiziksel iPhone veya canlı sağlayıcı doğrulaması değildir. Aşağıdaki preview notları tarihsel kayıttır.
 
 ## v9.0.5-preview.3 — iOS görsel dili
 
